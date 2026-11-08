@@ -24,6 +24,7 @@
     "test:workbench": "node scripts/check-workbench.mjs",
     "test:sharing": "node scripts/check-sharing.mjs",
     "test:mobile": "node scripts/check-mobile.mjs",
+    "test:video": "node scripts/check-video.mjs",
     "test:surveillance": "node scripts/check-surveillance.mjs",
     "test:gpu": "node scripts/check-gpu-v4.mjs",
     "test:hires": "node scripts/check-hires-interaction.mjs",

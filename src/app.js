@@ -6,7 +6,7 @@
   let cellColors;try{cellColors=CellLabDisplay.normalizeColors(JSON.parse(localStorage.getItem('cell-arena-colors-v1')));}catch{cellColors=CellLabDisplay.normalizeColors();}
   const signalLayers=new Set(),displayCache=new CellLabDisplay.Cache();
   const opacity={adversity:.35,oxygen:.35,glucose:.35,acid:.35,density:.35,cohesion:.45,danger:.45,trail:.45};
-  let hover=null,probeDirty=false,panGesture=null;
+  let hover=null,probeDirty=false,panGesture=null,recordingScale=0;
   const viewport=canvas.parentElement,view={x:0,y:0};
   // The probe must remain in the fullscreen element's subtree as well.
   canvas.parentElement.append($('field-probe'));
@@ -214,7 +214,9 @@
   function resizeDisplay(){
     fitCanvas();
     const cssWidth=Math.max(1,canvas.getBoundingClientRect().width),choice=$('render-resolution').value;
-    const width=choice==='auto'?Math.min(3840,Math.ceil(Math.max(960,snapshot.width,cssWidth*(devicePixelRatio||1))/4)*4):Number(choice),height=Math.round(width*snapshot.height/snapshot.width);
+    let width=choice==='auto'?Math.min(3840,Math.ceil(Math.max(960,snapshot.width,cssWidth*(devicePixelRatio||1))/4)*4):Number(choice);
+    if(recordingScale>0)width=Math.min(Math.floor(Math.min(8192,8192*snapshot.width/snapshot.height)/4)*4,Math.max(width,Math.ceil(cssWidth*recordingScale/4)*4));
+    const height=Math.round(width*snapshot.height/snapshot.width);
     if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}
     $('render-info').textContent=`当前显示／PNG：${width} × ${height} 像素；物理格点 ${snapshot.width} × ${snapshot.height}`;
     return width/cssWidth;
@@ -351,7 +353,7 @@
   canvas.addEventListener('pointermove',e=>{if(panGesture){view.x=panGesture.viewX+e.clientX-panGesture.x;view.y=panGesture.viewY+e.clientY-panGesture.y;fitCanvas();hover=null;probeDirty=true;dirty=true;return;}if(e.pointerType!=='touch'){hover={clientX:e.clientX,clientY:e.clientY};probeDirty=true;}if(!stroke||stroke.ending||!snapshot||tool==='inspect'||tool==='seed')return;queuedPoint=point(e);if(!flushTimer)flushTimer=setTimeout(flush,25);});
   canvas.addEventListener('pointerleave',()=>{hover=null;probeDirty=true;});
   window.addEventListener('blur',()=>{panGesture=null;hover=null;probeDirty=true;void endStroke();});document.addEventListener('scroll',()=>probeDirty=true,true);window.addEventListener('resize',()=>{hover=null;probeDirty=true;dirty=true;});
-  const layoutObserver=new ResizeObserver(()=>dirty=true);layoutObserver.observe(viewport);layoutObserver.observe($('history'));document.addEventListener('fullscreenchange',()=>dirty=true);
+  const layoutObserver=new ResizeObserver(()=>{dirty=true;refreshRecordingOptions();});layoutObserver.observe(viewport);layoutObserver.observe($('history'));document.addEventListener('fullscreenchange',()=>dirty=true);
   viewport.addEventListener('wheel',e=>e.preventDefault(),{passive:false});
   async function endStroke(){if(!stroke||stroke.ending)return;const current=stroke;current.ending=true;await flush();if(current.drag)await rpc('endDrag',{token:current.token}).catch(fail);if(current.removed)toast(`已手动擦除 ${current.removed} 颗细胞`);if(stroke===current)stroke=null;canvas.style.cursor=['move','pan'].includes(tool)?'grab':tool==='inspect'?'pointer':'crosshair';}
   for(const event of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(event,()=>{panGesture=null;canvas.style.cursor=['move','pan'].includes(tool)?'grab':tool==='inspect'?'pointer':'crosshair';void endStroke();});
@@ -406,13 +408,23 @@
   const modes={wander:{alignment:0,cohesion:0,repulsion:1.2,noise:1.2,normalMotility:.9},cluster:{alignment:.4,cohesion:2.6,repulsion:.3,noise:.4,normalMotility:.45},flock:{alignment:2.7,cohesion:1.1,repulsion:.5,noise:.25,normalMotility:1}};
   document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',async()=>{for(const [name,value] of Object.entries(modes[b.dataset.mode]))await rpc('set',{name,value});toast('局部规则已更新；变化会逐步形成');}));
   function download(url,name){const a=document.createElement('a');a.href=url;a.download=name;a.click();}
+  let recordUnavailable=false;
+  function refreshRecordingOptions(){
+    const format=$('record-format').value,quality=$('record-quality').value,label=format==='mp4'?'MP4':'WebM',state=video.status,busy=state.active||state.stopping,q=busy?state:CellLabVideo.plan(viewport.getBoundingClientRect(),quality);
+    $('record-options-summary').textContent=label+' · '+({standard:'1080p',high:'1440p',ultra:'4K'}[quality]);
+    const supported=CellLabVideo.ArenaRecorder.supported(format);
+    $('record-options-info').textContent=supported?`${q.width} × ${q.height} · 30 FPS`:(format==='mp4'?'当前浏览器不支持 MP4，请使用新版 Chrome、Edge 或 Safari，或手动选择 WebM':'当前浏览器不支持所选视频格式');
+    $('record-format').disabled=busy;$('record-quality').disabled=busy;
+    if(!busy){$('record-video').textContent='● 录制 '+label;$('record-video').disabled=!supported;if(!supported)$('record-status').textContent=$('record-options-info').textContent;else if(recordUnavailable)$('record-status').textContent='';recordUnavailable=!supported;}
+  }
   const video=new CellLabVideo.ArenaRecorder(canvas,viewport,{
-    onChange:state=>{const time=Math.floor(state.elapsed||0),stamp=String(Math.floor(time/60)).padStart(2,'0')+':'+String(time%60).padStart(2,'0');$('record-video').textContent=state.active?'■ 停止并下载':'● 录制视频';$('record-video').disabled=!!state.stopping;$('record-indicator').hidden=!state.active;$('record-indicator').textContent='■ '+stamp;$('record-indicator').disabled=!!state.stopping;if(state.active)$('record-status').textContent=`录制中 ${stamp} · ${state.width} × ${state.height} · 30 FPS`;},
-    onReady:(blob,state)=>{const url=URL.createObjectURL(blob),extension=blob.type.includes('mp4')?'mp4':'webm';download(url,`cell-arena-${snapshot.scene}-${Date.now()}.${extension}`);setTimeout(()=>URL.revokeObjectURL(url),60000);$('record-status').textContent=`视频已导出 · ${Math.round(state.elapsed)} 秒 · ${(blob.size/1024/1024).toFixed(1)} MB`;},
-    onError:error=>{$('record-status').textContent=String(error.message||error);}
+    onChange:state=>{const time=Math.floor(state.elapsed||0),stamp=String(Math.floor(time/60)).padStart(2,'0')+':'+String(time%60).padStart(2,'0');$('record-video').textContent=state.stopping?'正在生成视频…':state.active?'■ 停止并下载':'● 录制 '+($('record-format').value==='mp4'?'MP4':'WebM');$('record-video').disabled=!!state.stopping;$('record-indicator').hidden=!state.active;$('record-indicator').textContent='■ '+stamp;$('record-indicator').disabled=!!state.stopping;if(state.active)$('record-status').textContent=`录制中 ${stamp} · ${state.format==='mp4'?'MP4':'WebM'} · ${state.width} × ${state.height} · ${state.fps} FPS`;refreshRecordingOptions();},
+    onReady:(blob,state)=>{const url=URL.createObjectURL(blob),extension=blob.type.includes('mp4')?'mp4':'webm';download(url,`cell-arena-${snapshot.scene}-${state.width}x${state.height}-${Date.now()}.${extension}`);setTimeout(()=>URL.revokeObjectURL(url),60000);$('record-status').textContent=`视频已导出 · ${extension==='mp4'?'MP4':'WebM'} · ${state.width} × ${state.height} · ${Math.round(state.elapsed)} 秒 · ${(blob.size/1024/1024).toFixed(1)} MB`;},
+    onError:error=>{$('record-status').textContent=String(error.message||error);},
+    onResolution:scale=>{if(Math.abs(recordingScale-scale)>.001){recordingScale=scale;if(scale>0)render();else dirty=true;}}
   });
-  $('record-video').addEventListener('click',()=>{try{if(video.status.active)void video.stop();else{render();video.start();}}catch(error){$('record-status').textContent=String(error.message||error);}});$('record-indicator').addEventListener('click',()=>void video.stop());
-  if(!CellLabVideo.ArenaRecorder.supported()){$('record-video').disabled=true;$('record-status').textContent='浏览器不支持视频录制，请使用新版 Chrome、Edge 或 Safari';}
+  $('record-video').addEventListener('click',()=>{try{if(video.status.active)void video.stop();else{render();video.start({quality:$('record-quality').value,format:$('record-format').value});}}catch(error){$('record-status').textContent=String(error.message||error);}});$('record-indicator').addEventListener('click',()=>void video.stop());
+  for(const id of ['record-format','record-quality'])$(id).addEventListener('change',refreshRecordingOptions);refreshRecordingOptions();
   $('snapshot').addEventListener('click',()=>{render();download(canvas.toDataURL('image/png'),`cell-arena-${snapshot.scene}-${snapshot.time}.png`);});
   function displaySettings(){return {cellColors:CellLabDisplay.normalizeColors(cellColors),fieldView:$('field-view').value,signalLayers:[...signalLayers],opacity:{...opacity},flags:Object.fromEntries(CellLabExperiment.flags.map(id=>[id,$(id).checked])),zoom:$('zoom').value,fit:$('view-fit').value,renderResolution:$('render-resolution').value};}
   async function exportData(){return {...await rpc('export'),display:displaySettings()};}

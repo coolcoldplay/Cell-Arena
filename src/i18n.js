@@ -226,6 +226,22 @@ POPULATION HISTORY|POPULATION HISTORY
 导入实验参数 ↑|Import parameters ↑
 导入实验参数|Import parameters
 ● 录制视频|● Record video
+● 录制 MP4|● Record MP4
+● 录制 WebM|● Record WebM
+正在生成视频…|Finalizing video…
+录像设置|Video settings
+视频格式|Video format
+录像画质|Video quality
+MP4 · 推荐|MP4 · Recommended
+WebM · 兼容|WebM · Compatibility
+1080p · 标准|1080p · Standard
+1440p · 高清|1440p · High quality
+4K · 超清|4K · Ultra quality
+保留画布比例，高清录制时提升绘制精度；4K 文件较大。|Preserves arena proportions and renders more detail during capture; 4K files are larger.
+当前浏览器不支持 MP4，请使用新版 Chrome、Edge 或 Safari，或手动选择 WebM|MP4 recording is unavailable in this browser. Use an up-to-date Chrome, Edge or Safari, or select WebM manually.
+当前浏览器不支持所选视频格式|This browser cannot record the selected video format.
+无法创建视频编码器，请降低画质或更换浏览器|Could not create the video encoder. Try a lower quality or a different browser.
+视频编码失败，请降低画质或更换浏览器|Video encoding failed. Try a lower quality or a different browser.
 ■ 停止并下载|■ Stop & download
 停止录制并下载|Stop recording and download
 取消|Cancel
@@ -538,6 +554,7 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
     [/^加入了 (\d+) \/ (\d+) 颗细胞$/,(_,n,k)=>`Added ${n} / ${k} cells`],
     [/^当前稳定接触 ([\d.]+) 对；各细胞保持独立胞体。$/,(_,n)=>`${n} stable contacts; cell bodies remain separate.`],
     [/^视频已导出 · (\d+) 秒 · ([\d.]+) MB$/,(_,s,mb)=>`Video saved · ${s} s · ${mb} MB`],
+    [/^视频已导出 · (MP4|WebM) · (\d+) × (\d+) · (\d+) 秒 · ([\d.]+) MB$/,(_,format,w,h,s,mb)=>`Video saved · ${format} · ${w} × ${h} · ${s} s · ${mb} MB`],
     [/^正常、异常、肿瘤和免疫细胞数量：从 0 到 (\d+) MCS 的完整过程$/,(_,t)=>`Normal, abnormal, tumor and immune populations from 0 to ${t} MCS`]
   ];
   let terms;

@@ -68,7 +68,8 @@
   </section>
 </details></details>
       <details id="mobile-tools" class="panel-details mobile-only"><summary>画布工具</summary><div id="mobile-tools-host"></div></details><details id="mobile-session" class="panel-details mobile-only"><summary>场景与开局</summary><div id="mobile-scenes-host"></div><div id="mobile-session-actions"></div></details>
-      <div class="exports"><button id="snapshot">保存画面 ↓</button><button id="export-data">导出实验数据 ↓</button><button id="import-data">导入实验参数 ↑</button><button id="record-video">● 录制视频</button></div>
+      <details id="record-options" class="subsection"><summary>录像设置 <span id="record-options-summary">MP4 · 1440p</span></summary><label class="select-row">视频格式<select id="record-format"><option value="mp4" selected>MP4 · 推荐</option><option value="webm">WebM · 兼容</option></select></label><label class="select-row">录像画质<select id="record-quality"><option value="standard">1080p · 标准</option><option value="high" selected>1440p · 高清</option><option value="ultra">4K · 超清</option></select></label><p id="record-options-info" class="hint"></p><p class="hint">保留画布比例，高清录制时提升绘制精度；4K 文件较大。</p></details>
+      <div class="exports"><button id="snapshot">保存画面 ↓</button><button id="export-data">导出实验数据 ↓</button><button id="import-data">导入实验参数 ↑</button><button id="record-video">● 录制 MP4</button></div>
       <input id="import-file" type="file" accept=".json,application/json" hidden><p id="record-status" class="hint" role="status"></p><footer><a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/THIRD_PARTY_NOTICES.md" target="_blank" rel="noreferrer">Artistoo · 来源与许可</a><span>二维模型 · MCS 非真实时间</span></footer>
     </div>
   </aside>

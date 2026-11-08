@@ -57,7 +57,7 @@ try{
  const beforeFiles=new Set(await readdir(downloads));await click('#record-video');check('recording started',await b.evaluate('artistooLab.recording.active'));
  await b.evaluate('artistooLab.rpc("playing",{value:true})');await delay(2300);await set('zoom','100');await delay(1000);await click('#record-indicator');await waitFor('!artistooLab.recording.active');await b.evaluate('artistooLab.rpc("playing",{value:false})');
  let video;for(let i=0;i<100;i++){video=(await readdir(downloads)).find(f=>!beforeFiles.has(f)&&/\.(webm|mp4)$/.test(f));if(video)break;await delay(100);}
- check('a real video file was downloaded',!!video);const videoPath=path.join(downloads,video),bytes=(await readFile(videoPath)).length;check('video contains encoded frames',bytes>5000);
+ check('a real MP4 file was downloaded',!!video&&video.endsWith('.mp4'));const videoPath=path.join(downloads,video),bytes=(await readFile(videoPath)).length;check('video contains encoded frames',bytes>5000);
  await writeFile(path.join(output,'video-path.txt'),videoPath);
  await b.evaluate('artistooLab.rpc("advance",{steps:500})');await delay(150);
  missing=await b.evaluate(untranslated);await writeFile(path.join(output,'untranslated-events.json'),JSON.stringify(missing,null,2));console.log('Untranslated event history:',JSON.stringify(missing));

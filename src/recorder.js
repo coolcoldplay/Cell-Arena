@@ -28,29 +28,75 @@
       return new Blob([prefix,duration,blob.slice(info.end)],{type:blob.type});
     }catch{return blob;}
   }
+  const QUALITIES=Object.freeze({
+    standard:{short:1080,long:1920,bitrate:12000000},
+    high:{short:1440,long:2560,bitrate:24000000},
+    ultra:{short:2160,long:3840,bitrate:48000000}
+  });
+  const FORMATS=Object.freeze({
+    mp4:['video/mp4;codecs=avc1.640033','video/mp4;codecs=avc1'],
+    webm:['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm']
+  });
+  function plan(rect,quality='high'){
+    const q=QUALITIES[quality];if(!q||![rect.width,rect.height].every(v=>Number.isFinite(v)&&v>0))throw Error('Invalid recording dimensions or quality');
+    const landscape=rect.width>=rect.height,scale=Math.min((landscape?q.long:q.short)/rect.width,(landscape?q.short:q.long)/rect.height);
+    // Even dimensions satisfy H.264; sizing is independent of CSS pixels/DPR.
+    return {width:Math.max(2,Math.floor(rect.width*scale/2)*2),height:Math.max(2,Math.floor(rect.height*scale/2)*2),fps:30,bitrate:q.bitrate,quality};
+  }
+  function candidates(format='mp4',supports=type=>typeof MediaRecorder!=='undefined'&&MediaRecorder.isTypeSupported(type)){
+    return (FORMATS[format]||[]).filter(supports);
+  }
   class ArenaRecorder {
-    constructor(canvas,viewport,{onChange=()=>{},onReady=()=>{},onError=()=>{}}={}){this.canvas=canvas;this.viewport=viewport;this.onChange=onChange;this.onReady=onReady;this.onError=onError;this.session=null;this.last={active:false,elapsed:0,bytes:0};}
-    static supported(){return typeof MediaRecorder!=='undefined'&&typeof HTMLCanvasElement!=='undefined'&&typeof HTMLCanvasElement.prototype.captureStream==='function';}
-    get status(){const s=this.session;return s?{active:s.recorder.state!=='inactive',stopping:s.stopping,elapsed:(performance.now()-s.started)/1000,bytes:s.bytes,width:s.output.width,height:s.output.height,mimeType:s.recorder.mimeType}:this.last;}
-    start(){
+    constructor(canvas,viewport,{onChange=()=>{},onReady=()=>{},onError=()=>{},onResolution=()=>{}}={}){
+      Object.assign(this,{canvas,viewport,onChange,onReady,onError,onResolution});this.session=null;this.last={active:false,stopping:false,elapsed:0,bytes:0};
+    }
+    static supported(format){return typeof MediaRecorder!=='undefined'&&typeof HTMLCanvasElement!=='undefined'&&typeof HTMLCanvasElement.prototype.captureStream==='function'&&(!format||candidates(format).length>0);}
+    get status(){
+      const s=this.session;return s?{...s.config,active:s.recorder.state!=='inactive',stopping:s.stopping,elapsed:((s.stoppedAt||performance.now())-s.started)/1000,bytes:s.bytes,frames:s.frames,mimeType:s.recorder.mimeType||s.mime}:this.last;
+    }
+    start({quality='high',format='mp4'}={}){
       if(this.session)return;if(!ArenaRecorder.supported())throw Error('浏览器不支持视频录制，请使用新版 Chrome、Edge 或 Safari');
-      const rect=this.viewport.getBoundingClientRect(),scale=Math.min(1,1920/rect.width,1080/rect.height),output=document.createElement('canvas');output.width=Math.max(2,Math.round(rect.width*scale/2)*2);output.height=Math.max(2,Math.round(rect.height*scale/2)*2);
-      const stream=output.captureStream(30),mime=['video/webm;codecs=vp8','video/webm;codecs=vp9','video/mp4'].find(type=>MediaRecorder.isTypeSupported(type));let recorder;
-      try{recorder=new MediaRecorder(stream,{...(mime?{mimeType:mime}:{}),videoBitsPerSecond:6000000});}catch(error){stream.getTracks().forEach(t=>t.stop());throw error;}
-      const session={output,ctx:output.getContext('2d',{alpha:false}),stream,recorder,chunks:[],bytes:0,started:performance.now(),lastFrame:-Infinity,lastNotice:0,raf:0,stopping:false,error:null};this.session=session;
-      session.done=new Promise(resolve=>session.resolve=resolve);
-      recorder.ondataavailable=event=>{if(event.data.size){session.chunks.push(event.data);session.bytes+=event.data.size;}};
-      recorder.onerror=event=>{session.error=event.error||Error('视频录制失败');this.stop();};
+      const types=candidates(format);if(!types.length)throw Error(format==='mp4'?'当前浏览器不支持 MP4，请使用新版 Chrome、Edge 或 Safari，或手动选择 WebM':'当前浏览器不支持所选视频格式');
+      const config={...plan(this.viewport.getBoundingClientRect(),quality),format},output=document.createElement('canvas');output.width=config.width;output.height=config.height;
+      const ctx=output.getContext('2d',{alpha:false});ctx.fillStyle='#eee4d2';ctx.fillRect(0,0,output.width,output.height);
+      const stream=output.captureStream(config.fps),track=stream.getVideoTracks()[0];if('contentHint' in track)track.contentHint='detail';
+      let recorder,mime;
+      for(const type of types){try{recorder=new MediaRecorder(stream,{mimeType:type,videoBitsPerSecond:config.bitrate});mime=type;break;}catch{/* Try another codec in the same container, never silently change format. */}}
+      if(!recorder){stream.getTracks().forEach(t=>t.stop());throw Error('无法创建视频编码器，请降低画质或更换浏览器');}
+      const s={output,ctx,stream,track,recorder,mime,config,chunks:[],bytes:0,frames:0,started:performance.now(),nextFrame:0,lastNotice:0,raf:0,stopping:false,error:null};this.session=s;
+      s.done=new Promise(resolve=>s.resolve=resolve);
+      recorder.ondataavailable=event=>{if(event.data.size){s.chunks.push(event.data);s.bytes+=event.data.size;}};
+      recorder.onerror=()=>{s.error=Error('视频编码失败，请降低画质或更换浏览器');void this.stop();};
       recorder.onstop=async()=>{
-        cancelAnimationFrame(session.raf);stream.getTracks().forEach(t=>t.stop());const elapsed=((session.stoppedAt||performance.now())-session.started)/1000;let blob=new Blob(session.chunks,{type:recorder.mimeType||mime||'video/webm'});session.chunks=[];
-        try{blob=await finalizeWebM(blob,elapsed);}catch{/* Keep a playable original if metadata finalization fails. */}
-        this.last={active:false,elapsed,bytes:blob.size,width:output.width,height:output.height,mimeType:blob.type};if(this.session===session)this.session=null;this.onChange(this.last);
-        if(session.error)this.onError(session.error);if(blob.size)this.onReady(blob,this.last);else if(!session.error)this.onError(Error('录制没有生成视频，请重试'));session.resolve(blob);
+        cancelAnimationFrame(s.raf);stream.getTracks().forEach(t=>t.stop());const elapsed=((s.stoppedAt||performance.now())-s.started)/1000;
+        let blob=new Blob(s.chunks,{type:recorder.mimeType||mime});s.chunks=[];
+        try{if(s.error)throw s.error;if(!blob.size)throw Error('录制没有生成视频，请重试');blob=await finalizeWebM(blob,elapsed);}
+        catch(error){s.error=error;}
+        this.last={...config,active:false,stopping:false,elapsed,bytes:s.error?0:blob.size,frames:s.frames,mimeType:blob.type};
+        if(this.session===s)this.session=null;this.onResolution(0);this.onChange(this.last);
+        try{if(s.error)this.onError(s.error);else this.onReady(blob,this.last);}finally{s.resolve(s.error?null:blob);}
       };
-      const draw=now=>{if(this.session!==session||session.stopping)return;if(now-session.lastFrame>=1000/30){const r=framing(this.canvas.getBoundingClientRect(),this.viewport.getBoundingClientRect(),output.width,output.height,this.canvas);session.ctx.fillStyle='#eee4d2';session.ctx.fillRect(0,0,output.width,output.height);session.ctx.imageSmoothingEnabled=false;if(r)session.ctx.drawImage(this.canvas,r.sx,r.sy,r.sw,r.sh,r.dx,r.dy,r.dw,r.dh);session.lastFrame=now;}if(now-session.lastNotice>250){session.lastNotice=now;this.onChange(this.status);}session.raf=requestAnimationFrame(draw);};
-      try{draw(performance.now());recorder.start(1000);this.onChange(this.status);}catch(error){cancelAnimationFrame(session.raf);stream.getTracks().forEach(t=>t.stop());this.session=null;throw error;}
+      const draw=now=>{
+        if(this.session!==s||s.stopping)return;
+        try{
+          if(now>=s.nextFrame){
+            const view=this.viewport.getBoundingClientRect(),scale=Math.min(output.width/view.width,output.height/view.height);
+            this.onResolution(scale);
+            const r=framing(this.canvas.getBoundingClientRect(),view,output.width,output.height,this.canvas);
+            ctx.fillStyle='#eee4d2';ctx.fillRect(0,0,output.width,output.height);ctx.imageSmoothingEnabled=false;
+            if(r)ctx.drawImage(this.canvas,r.sx,r.sy,r.sw,r.sh,r.dx,r.dy,r.dw,r.dh);
+            track.requestFrame?.();s.frames++;
+            // Carry fractional frame time forward; resetting to 'now' drops to
+            // ~20 FPS when 60 Hz animation-frame timestamps fluctuate slightly.
+            const interval=1000/config.fps;s.nextFrame+=interval;if(s.nextFrame<now-interval)s.nextFrame=now+interval;
+          }
+          if(now-s.lastNotice>250){s.lastNotice=now;this.onChange(this.status);}s.raf=requestAnimationFrame(draw);
+        }catch(error){s.error=error;void this.stop();}
+      };
+      try{s.nextFrame=performance.now();recorder.start(1000);draw(s.nextFrame);this.onChange(this.status);}
+      catch(error){cancelAnimationFrame(s.raf);recorder.onstop=null;stream.getTracks().forEach(t=>t.stop());if(recorder.state!=='inactive')recorder.stop();this.session=null;this.onResolution(0);s.resolve(null);throw error;}
     }
     stop(){const s=this.session;if(!s)return Promise.resolve(null);if(!s.stopping){s.stopping=true;s.stoppedAt=performance.now();cancelAnimationFrame(s.raf);if(s.recorder.state!=='inactive')s.recorder.stop();this.onChange(this.status);}return s.done;}
   }
-  globalThis.CellLabVideo={ArenaRecorder,framing,finalizeWebM};
+  globalThis.CellLabVideo={ArenaRecorder,framing,finalizeWebM,plan,candidates,QUALITIES};
 })();

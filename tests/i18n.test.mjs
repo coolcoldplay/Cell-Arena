@@ -5,6 +5,7 @@ test('translation preserves numerical measurements and supports dynamic status t
  assert.equal(t('正常细胞','en'),'Normal cells');assert.equal(t('正常细胞','zh'),'正常细胞');
  assert.equal(t('第 3 代 · 剩余分裂 2 次'),'Generation 3 · 2 divisions left');
  assert.equal(t('视频已导出 · 12 秒 · 1.7 MB'),'Video saved · 12 s · 1.7 MB');
+ assert.equal(t('视频已导出 · MP4 · 1580 × 1440 · 12 秒 · 1.7 MB'),'Video saved · MP4 · 1580 × 1440 · 12 s · 1.7 MB');
  assert.equal(t('氧 0.93 / 糖 0.90 / 酸 0.05'),'Oxygen 0.93 / Glucose 0.90 / Acid 0.05');
  assert.equal(t('  暂无新翻译  '),'  暂无新翻译  ');assert.ok(CellLabI18n.missing.has('  暂无新翻译  '));
 });

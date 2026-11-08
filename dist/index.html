@@ -163,7 +163,8 @@ dialog{max-width:700px;width:calc(100% - 32px);max-height:86dvh;overflow:auto;ov
   </section>
 </details></details>
       <details id="mobile-tools" class="panel-details mobile-only"><summary>画布工具</summary><div id="mobile-tools-host"></div></details><details id="mobile-session" class="panel-details mobile-only"><summary>场景与开局</summary><div id="mobile-scenes-host"></div><div id="mobile-session-actions"></div></details>
-      <div class="exports"><button id="snapshot">保存画面 ↓</button><button id="export-data">导出实验数据 ↓</button><button id="import-data">导入实验参数 ↑</button><button id="record-video">● 录制视频</button></div>
+      <details id="record-options" class="subsection"><summary>录像设置 <span id="record-options-summary">MP4 · 1440p</span></summary><label class="select-row">视频格式<select id="record-format"><option value="mp4" selected>MP4 · 推荐</option><option value="webm">WebM · 兼容</option></select></label><label class="select-row">录像画质<select id="record-quality"><option value="standard">1080p · 标准</option><option value="high" selected>1440p · 高清</option><option value="ultra">4K · 超清</option></select></label><p id="record-options-info" class="hint"></p><p class="hint">保留画布比例，高清录制时提升绘制精度；4K 文件较大。</p></details>
+      <div class="exports"><button id="snapshot">保存画面 ↓</button><button id="export-data">导出实验数据 ↓</button><button id="import-data">导入实验参数 ↑</button><button id="record-video">● 录制 MP4</button></div>
       <input id="import-file" type="file" accept=".json,application/json" hidden><p id="record-status" class="hint" role="status"></p><footer><a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/THIRD_PARTY_NOTICES.md" target="_blank" rel="noreferrer">Artistoo · 来源与许可</a><span>二维模型 · MCS 非真实时间</span></footer>
     </div>
   </aside>
@@ -13084,6 +13085,22 @@ POPULATION HISTORY|POPULATION HISTORY
 导入实验参数 ↑|Import parameters ↑
 导入实验参数|Import parameters
 ● 录制视频|● Record video
+● 录制 MP4|● Record MP4
+● 录制 WebM|● Record WebM
+正在生成视频…|Finalizing video…
+录像设置|Video settings
+视频格式|Video format
+录像画质|Video quality
+MP4 · 推荐|MP4 · Recommended
+WebM · 兼容|WebM · Compatibility
+1080p · 标准|1080p · Standard
+1440p · 高清|1440p · High quality
+4K · 超清|4K · Ultra quality
+保留画布比例，高清录制时提升绘制精度；4K 文件较大。|Preserves arena proportions and renders more detail during capture; 4K files are larger.
+当前浏览器不支持 MP4，请使用新版 Chrome、Edge 或 Safari，或手动选择 WebM|MP4 recording is unavailable in this browser. Use an up-to-date Chrome, Edge or Safari, or select WebM manually.
+当前浏览器不支持所选视频格式|This browser cannot record the selected video format.
+无法创建视频编码器，请降低画质或更换浏览器|Could not create the video encoder. Try a lower quality or a different browser.
+视频编码失败，请降低画质或更换浏览器|Video encoding failed. Try a lower quality or a different browser.
 ■ 停止并下载|■ Stop & download
 停止录制并下载|Stop recording and download
 取消|Cancel
@@ -13396,6 +13413,7 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
     [/^加入了 (\d+) \/ (\d+) 颗细胞$/,(_,n,k)=>`Added ${n} / ${k} cells`],
     [/^当前稳定接触 ([\d.]+) 对；各细胞保持独立胞体。$/,(_,n)=>`${n} stable contacts; cell bodies remain separate.`],
     [/^视频已导出 · (\d+) 秒 · ([\d.]+) MB$/,(_,s,mb)=>`Video saved · ${s} s · ${mb} MB`],
+    [/^视频已导出 · (MP4|WebM) · (\d+) × (\d+) · (\d+) 秒 · ([\d.]+) MB$/,(_,format,w,h,s,mb)=>`Video saved · ${format} · ${w} × ${h} · ${s} s · ${mb} MB`],
     [/^正常、异常、肿瘤和免疫细胞数量：从 0 到 (\d+) MCS 的完整过程$/,(_,t)=>`Normal, abnormal, tumor and immune populations from 0 to ${t} MCS`]
   ];
   let terms;
@@ -13664,31 +13682,77 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
       return new Blob([prefix,duration,blob.slice(info.end)],{type:blob.type});
     }catch{return blob;}
   }
+  const QUALITIES=Object.freeze({
+    standard:{short:1080,long:1920,bitrate:12000000},
+    high:{short:1440,long:2560,bitrate:24000000},
+    ultra:{short:2160,long:3840,bitrate:48000000}
+  });
+  const FORMATS=Object.freeze({
+    mp4:['video/mp4;codecs=avc1.640033','video/mp4;codecs=avc1'],
+    webm:['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm']
+  });
+  function plan(rect,quality='high'){
+    const q=QUALITIES[quality];if(!q||![rect.width,rect.height].every(v=>Number.isFinite(v)&&v>0))throw Error('Invalid recording dimensions or quality');
+    const landscape=rect.width>=rect.height,scale=Math.min((landscape?q.long:q.short)/rect.width,(landscape?q.short:q.long)/rect.height);
+    // Even dimensions satisfy H.264; sizing is independent of CSS pixels/DPR.
+    return {width:Math.max(2,Math.floor(rect.width*scale/2)*2),height:Math.max(2,Math.floor(rect.height*scale/2)*2),fps:30,bitrate:q.bitrate,quality};
+  }
+  function candidates(format='mp4',supports=type=>typeof MediaRecorder!=='undefined'&&MediaRecorder.isTypeSupported(type)){
+    return (FORMATS[format]||[]).filter(supports);
+  }
   class ArenaRecorder {
-    constructor(canvas,viewport,{onChange=()=>{},onReady=()=>{},onError=()=>{}}={}){this.canvas=canvas;this.viewport=viewport;this.onChange=onChange;this.onReady=onReady;this.onError=onError;this.session=null;this.last={active:false,elapsed:0,bytes:0};}
-    static supported(){return typeof MediaRecorder!=='undefined'&&typeof HTMLCanvasElement!=='undefined'&&typeof HTMLCanvasElement.prototype.captureStream==='function';}
-    get status(){const s=this.session;return s?{active:s.recorder.state!=='inactive',stopping:s.stopping,elapsed:(performance.now()-s.started)/1000,bytes:s.bytes,width:s.output.width,height:s.output.height,mimeType:s.recorder.mimeType}:this.last;}
-    start(){
+    constructor(canvas,viewport,{onChange=()=>{},onReady=()=>{},onError=()=>{},onResolution=()=>{}}={}){
+      Object.assign(this,{canvas,viewport,onChange,onReady,onError,onResolution});this.session=null;this.last={active:false,stopping:false,elapsed:0,bytes:0};
+    }
+    static supported(format){return typeof MediaRecorder!=='undefined'&&typeof HTMLCanvasElement!=='undefined'&&typeof HTMLCanvasElement.prototype.captureStream==='function'&&(!format||candidates(format).length>0);}
+    get status(){
+      const s=this.session;return s?{...s.config,active:s.recorder.state!=='inactive',stopping:s.stopping,elapsed:((s.stoppedAt||performance.now())-s.started)/1000,bytes:s.bytes,frames:s.frames,mimeType:s.recorder.mimeType||s.mime}:this.last;
+    }
+    start({quality='high',format='mp4'}={}){
       if(this.session)return;if(!ArenaRecorder.supported())throw Error('浏览器不支持视频录制，请使用新版 Chrome、Edge 或 Safari');
-      const rect=this.viewport.getBoundingClientRect(),scale=Math.min(1,1920/rect.width,1080/rect.height),output=document.createElement('canvas');output.width=Math.max(2,Math.round(rect.width*scale/2)*2);output.height=Math.max(2,Math.round(rect.height*scale/2)*2);
-      const stream=output.captureStream(30),mime=['video/webm;codecs=vp8','video/webm;codecs=vp9','video/mp4'].find(type=>MediaRecorder.isTypeSupported(type));let recorder;
-      try{recorder=new MediaRecorder(stream,{...(mime?{mimeType:mime}:{}),videoBitsPerSecond:6000000});}catch(error){stream.getTracks().forEach(t=>t.stop());throw error;}
-      const session={output,ctx:output.getContext('2d',{alpha:false}),stream,recorder,chunks:[],bytes:0,started:performance.now(),lastFrame:-Infinity,lastNotice:0,raf:0,stopping:false,error:null};this.session=session;
-      session.done=new Promise(resolve=>session.resolve=resolve);
-      recorder.ondataavailable=event=>{if(event.data.size){session.chunks.push(event.data);session.bytes+=event.data.size;}};
-      recorder.onerror=event=>{session.error=event.error||Error('视频录制失败');this.stop();};
+      const types=candidates(format);if(!types.length)throw Error(format==='mp4'?'当前浏览器不支持 MP4，请使用新版 Chrome、Edge 或 Safari，或手动选择 WebM':'当前浏览器不支持所选视频格式');
+      const config={...plan(this.viewport.getBoundingClientRect(),quality),format},output=document.createElement('canvas');output.width=config.width;output.height=config.height;
+      const ctx=output.getContext('2d',{alpha:false});ctx.fillStyle='#eee4d2';ctx.fillRect(0,0,output.width,output.height);
+      const stream=output.captureStream(config.fps),track=stream.getVideoTracks()[0];if('contentHint' in track)track.contentHint='detail';
+      let recorder,mime;
+      for(const type of types){try{recorder=new MediaRecorder(stream,{mimeType:type,videoBitsPerSecond:config.bitrate});mime=type;break;}catch{/* Try another codec in the same container, never silently change format. */}}
+      if(!recorder){stream.getTracks().forEach(t=>t.stop());throw Error('无法创建视频编码器，请降低画质或更换浏览器');}
+      const s={output,ctx,stream,track,recorder,mime,config,chunks:[],bytes:0,frames:0,started:performance.now(),nextFrame:0,lastNotice:0,raf:0,stopping:false,error:null};this.session=s;
+      s.done=new Promise(resolve=>s.resolve=resolve);
+      recorder.ondataavailable=event=>{if(event.data.size){s.chunks.push(event.data);s.bytes+=event.data.size;}};
+      recorder.onerror=()=>{s.error=Error('视频编码失败，请降低画质或更换浏览器');void this.stop();};
       recorder.onstop=async()=>{
-        cancelAnimationFrame(session.raf);stream.getTracks().forEach(t=>t.stop());const elapsed=((session.stoppedAt||performance.now())-session.started)/1000;let blob=new Blob(session.chunks,{type:recorder.mimeType||mime||'video/webm'});session.chunks=[];
-        try{blob=await finalizeWebM(blob,elapsed);}catch{/* Keep a playable original if metadata finalization fails. */}
-        this.last={active:false,elapsed,bytes:blob.size,width:output.width,height:output.height,mimeType:blob.type};if(this.session===session)this.session=null;this.onChange(this.last);
-        if(session.error)this.onError(session.error);if(blob.size)this.onReady(blob,this.last);else if(!session.error)this.onError(Error('录制没有生成视频，请重试'));session.resolve(blob);
+        cancelAnimationFrame(s.raf);stream.getTracks().forEach(t=>t.stop());const elapsed=((s.stoppedAt||performance.now())-s.started)/1000;
+        let blob=new Blob(s.chunks,{type:recorder.mimeType||mime});s.chunks=[];
+        try{if(s.error)throw s.error;if(!blob.size)throw Error('录制没有生成视频，请重试');blob=await finalizeWebM(blob,elapsed);}
+        catch(error){s.error=error;}
+        this.last={...config,active:false,stopping:false,elapsed,bytes:s.error?0:blob.size,frames:s.frames,mimeType:blob.type};
+        if(this.session===s)this.session=null;this.onResolution(0);this.onChange(this.last);
+        try{if(s.error)this.onError(s.error);else this.onReady(blob,this.last);}finally{s.resolve(s.error?null:blob);}
       };
-      const draw=now=>{if(this.session!==session||session.stopping)return;if(now-session.lastFrame>=1000/30){const r=framing(this.canvas.getBoundingClientRect(),this.viewport.getBoundingClientRect(),output.width,output.height,this.canvas);session.ctx.fillStyle='#eee4d2';session.ctx.fillRect(0,0,output.width,output.height);session.ctx.imageSmoothingEnabled=false;if(r)session.ctx.drawImage(this.canvas,r.sx,r.sy,r.sw,r.sh,r.dx,r.dy,r.dw,r.dh);session.lastFrame=now;}if(now-session.lastNotice>250){session.lastNotice=now;this.onChange(this.status);}session.raf=requestAnimationFrame(draw);};
-      try{draw(performance.now());recorder.start(1000);this.onChange(this.status);}catch(error){cancelAnimationFrame(session.raf);stream.getTracks().forEach(t=>t.stop());this.session=null;throw error;}
+      const draw=now=>{
+        if(this.session!==s||s.stopping)return;
+        try{
+          if(now>=s.nextFrame){
+            const view=this.viewport.getBoundingClientRect(),scale=Math.min(output.width/view.width,output.height/view.height);
+            this.onResolution(scale);
+            const r=framing(this.canvas.getBoundingClientRect(),view,output.width,output.height,this.canvas);
+            ctx.fillStyle='#eee4d2';ctx.fillRect(0,0,output.width,output.height);ctx.imageSmoothingEnabled=false;
+            if(r)ctx.drawImage(this.canvas,r.sx,r.sy,r.sw,r.sh,r.dx,r.dy,r.dw,r.dh);
+            track.requestFrame?.();s.frames++;
+            // Carry fractional frame time forward; resetting to 'now' drops to
+            // ~20 FPS when 60 Hz animation-frame timestamps fluctuate slightly.
+            const interval=1000/config.fps;s.nextFrame+=interval;if(s.nextFrame<now-interval)s.nextFrame=now+interval;
+          }
+          if(now-s.lastNotice>250){s.lastNotice=now;this.onChange(this.status);}s.raf=requestAnimationFrame(draw);
+        }catch(error){s.error=error;void this.stop();}
+      };
+      try{s.nextFrame=performance.now();recorder.start(1000);draw(s.nextFrame);this.onChange(this.status);}
+      catch(error){cancelAnimationFrame(s.raf);recorder.onstop=null;stream.getTracks().forEach(t=>t.stop());if(recorder.state!=='inactive')recorder.stop();this.session=null;this.onResolution(0);s.resolve(null);throw error;}
     }
     stop(){const s=this.session;if(!s)return Promise.resolve(null);if(!s.stopping){s.stopping=true;s.stoppedAt=performance.now();cancelAnimationFrame(s.raf);if(s.recorder.state!=='inactive')s.recorder.stop();this.onChange(this.status);}return s.done;}
   }
-  globalThis.CellLabVideo={ArenaRecorder,framing,finalizeWebM};
+  globalThis.CellLabVideo={ArenaRecorder,framing,finalizeWebM,plan,candidates,QUALITIES};
 })();
 
 /* Responsive controls only. Moving existing DOM nodes preserves input state,
@@ -13780,7 +13844,7 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
   let cellColors;try{cellColors=CellLabDisplay.normalizeColors(JSON.parse(localStorage.getItem('cell-arena-colors-v1')));}catch{cellColors=CellLabDisplay.normalizeColors();}
   const signalLayers=new Set(),displayCache=new CellLabDisplay.Cache();
   const opacity={adversity:.35,oxygen:.35,glucose:.35,acid:.35,density:.35,cohesion:.45,danger:.45,trail:.45};
-  let hover=null,probeDirty=false,panGesture=null;
+  let hover=null,probeDirty=false,panGesture=null,recordingScale=0;
   const viewport=canvas.parentElement,view={x:0,y:0};
   // The probe must remain in the fullscreen element's subtree as well.
   canvas.parentElement.append($('field-probe'));
@@ -13988,7 +14052,9 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
   function resizeDisplay(){
     fitCanvas();
     const cssWidth=Math.max(1,canvas.getBoundingClientRect().width),choice=$('render-resolution').value;
-    const width=choice==='auto'?Math.min(3840,Math.ceil(Math.max(960,snapshot.width,cssWidth*(devicePixelRatio||1))/4)*4):Number(choice),height=Math.round(width*snapshot.height/snapshot.width);
+    let width=choice==='auto'?Math.min(3840,Math.ceil(Math.max(960,snapshot.width,cssWidth*(devicePixelRatio||1))/4)*4):Number(choice);
+    if(recordingScale>0)width=Math.min(Math.floor(Math.min(8192,8192*snapshot.width/snapshot.height)/4)*4,Math.max(width,Math.ceil(cssWidth*recordingScale/4)*4));
+    const height=Math.round(width*snapshot.height/snapshot.width);
     if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}
     $('render-info').textContent=`当前显示／PNG：${width} × ${height} 像素；物理格点 ${snapshot.width} × ${snapshot.height}`;
     return width/cssWidth;
@@ -14125,7 +14191,7 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
   canvas.addEventListener('pointermove',e=>{if(panGesture){view.x=panGesture.viewX+e.clientX-panGesture.x;view.y=panGesture.viewY+e.clientY-panGesture.y;fitCanvas();hover=null;probeDirty=true;dirty=true;return;}if(e.pointerType!=='touch'){hover={clientX:e.clientX,clientY:e.clientY};probeDirty=true;}if(!stroke||stroke.ending||!snapshot||tool==='inspect'||tool==='seed')return;queuedPoint=point(e);if(!flushTimer)flushTimer=setTimeout(flush,25);});
   canvas.addEventListener('pointerleave',()=>{hover=null;probeDirty=true;});
   window.addEventListener('blur',()=>{panGesture=null;hover=null;probeDirty=true;void endStroke();});document.addEventListener('scroll',()=>probeDirty=true,true);window.addEventListener('resize',()=>{hover=null;probeDirty=true;dirty=true;});
-  const layoutObserver=new ResizeObserver(()=>dirty=true);layoutObserver.observe(viewport);layoutObserver.observe($('history'));document.addEventListener('fullscreenchange',()=>dirty=true);
+  const layoutObserver=new ResizeObserver(()=>{dirty=true;refreshRecordingOptions();});layoutObserver.observe(viewport);layoutObserver.observe($('history'));document.addEventListener('fullscreenchange',()=>dirty=true);
   viewport.addEventListener('wheel',e=>e.preventDefault(),{passive:false});
   async function endStroke(){if(!stroke||stroke.ending)return;const current=stroke;current.ending=true;await flush();if(current.drag)await rpc('endDrag',{token:current.token}).catch(fail);if(current.removed)toast(`已手动擦除 ${current.removed} 颗细胞`);if(stroke===current)stroke=null;canvas.style.cursor=['move','pan'].includes(tool)?'grab':tool==='inspect'?'pointer':'crosshair';}
   for(const event of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(event,()=>{panGesture=null;canvas.style.cursor=['move','pan'].includes(tool)?'grab':tool==='inspect'?'pointer':'crosshair';void endStroke();});
@@ -14180,13 +14246,23 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
   const modes={wander:{alignment:0,cohesion:0,repulsion:1.2,noise:1.2,normalMotility:.9},cluster:{alignment:.4,cohesion:2.6,repulsion:.3,noise:.4,normalMotility:.45},flock:{alignment:2.7,cohesion:1.1,repulsion:.5,noise:.25,normalMotility:1}};
   document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',async()=>{for(const [name,value] of Object.entries(modes[b.dataset.mode]))await rpc('set',{name,value});toast('局部规则已更新；变化会逐步形成');}));
   function download(url,name){const a=document.createElement('a');a.href=url;a.download=name;a.click();}
+  let recordUnavailable=false;
+  function refreshRecordingOptions(){
+    const format=$('record-format').value,quality=$('record-quality').value,label=format==='mp4'?'MP4':'WebM',state=video.status,busy=state.active||state.stopping,q=busy?state:CellLabVideo.plan(viewport.getBoundingClientRect(),quality);
+    $('record-options-summary').textContent=label+' · '+({standard:'1080p',high:'1440p',ultra:'4K'}[quality]);
+    const supported=CellLabVideo.ArenaRecorder.supported(format);
+    $('record-options-info').textContent=supported?`${q.width} × ${q.height} · 30 FPS`:(format==='mp4'?'当前浏览器不支持 MP4，请使用新版 Chrome、Edge 或 Safari，或手动选择 WebM':'当前浏览器不支持所选视频格式');
+    $('record-format').disabled=busy;$('record-quality').disabled=busy;
+    if(!busy){$('record-video').textContent='● 录制 '+label;$('record-video').disabled=!supported;if(!supported)$('record-status').textContent=$('record-options-info').textContent;else if(recordUnavailable)$('record-status').textContent='';recordUnavailable=!supported;}
+  }
   const video=new CellLabVideo.ArenaRecorder(canvas,viewport,{
-    onChange:state=>{const time=Math.floor(state.elapsed||0),stamp=String(Math.floor(time/60)).padStart(2,'0')+':'+String(time%60).padStart(2,'0');$('record-video').textContent=state.active?'■ 停止并下载':'● 录制视频';$('record-video').disabled=!!state.stopping;$('record-indicator').hidden=!state.active;$('record-indicator').textContent='■ '+stamp;$('record-indicator').disabled=!!state.stopping;if(state.active)$('record-status').textContent=`录制中 ${stamp} · ${state.width} × ${state.height} · 30 FPS`;},
-    onReady:(blob,state)=>{const url=URL.createObjectURL(blob),extension=blob.type.includes('mp4')?'mp4':'webm';download(url,`cell-arena-${snapshot.scene}-${Date.now()}.${extension}`);setTimeout(()=>URL.revokeObjectURL(url),60000);$('record-status').textContent=`视频已导出 · ${Math.round(state.elapsed)} 秒 · ${(blob.size/1024/1024).toFixed(1)} MB`;},
-    onError:error=>{$('record-status').textContent=String(error.message||error);}
+    onChange:state=>{const time=Math.floor(state.elapsed||0),stamp=String(Math.floor(time/60)).padStart(2,'0')+':'+String(time%60).padStart(2,'0');$('record-video').textContent=state.stopping?'正在生成视频…':state.active?'■ 停止并下载':'● 录制 '+($('record-format').value==='mp4'?'MP4':'WebM');$('record-video').disabled=!!state.stopping;$('record-indicator').hidden=!state.active;$('record-indicator').textContent='■ '+stamp;$('record-indicator').disabled=!!state.stopping;if(state.active)$('record-status').textContent=`录制中 ${stamp} · ${state.format==='mp4'?'MP4':'WebM'} · ${state.width} × ${state.height} · ${state.fps} FPS`;refreshRecordingOptions();},
+    onReady:(blob,state)=>{const url=URL.createObjectURL(blob),extension=blob.type.includes('mp4')?'mp4':'webm';download(url,`cell-arena-${snapshot.scene}-${state.width}x${state.height}-${Date.now()}.${extension}`);setTimeout(()=>URL.revokeObjectURL(url),60000);$('record-status').textContent=`视频已导出 · ${extension==='mp4'?'MP4':'WebM'} · ${state.width} × ${state.height} · ${Math.round(state.elapsed)} 秒 · ${(blob.size/1024/1024).toFixed(1)} MB`;},
+    onError:error=>{$('record-status').textContent=String(error.message||error);},
+    onResolution:scale=>{if(Math.abs(recordingScale-scale)>.001){recordingScale=scale;if(scale>0)render();else dirty=true;}}
   });
-  $('record-video').addEventListener('click',()=>{try{if(video.status.active)void video.stop();else{render();video.start();}}catch(error){$('record-status').textContent=String(error.message||error);}});$('record-indicator').addEventListener('click',()=>void video.stop());
-  if(!CellLabVideo.ArenaRecorder.supported()){$('record-video').disabled=true;$('record-status').textContent='浏览器不支持视频录制，请使用新版 Chrome、Edge 或 Safari';}
+  $('record-video').addEventListener('click',()=>{try{if(video.status.active)void video.stop();else{render();video.start({quality:$('record-quality').value,format:$('record-format').value});}}catch(error){$('record-status').textContent=String(error.message||error);}});$('record-indicator').addEventListener('click',()=>void video.stop());
+  for(const id of ['record-format','record-quality'])$(id).addEventListener('change',refreshRecordingOptions);refreshRecordingOptions();
   $('snapshot').addEventListener('click',()=>{render();download(canvas.toDataURL('image/png'),`cell-arena-${snapshot.scene}-${snapshot.time}.png`);});
   function displaySettings(){return {cellColors:CellLabDisplay.normalizeColors(cellColors),fieldView:$('field-view').value,signalLayers:[...signalLayers],opacity:{...opacity},flags:Object.fromEntries(CellLabExperiment.flags.map(id=>[id,$(id).checked])),zoom:$('zoom').value,fit:$('view-fit').value,renderResolution:$('render-resolution').value};}
   async function exportData(){return {...await rpc('export'),display:displaySettings()};}
