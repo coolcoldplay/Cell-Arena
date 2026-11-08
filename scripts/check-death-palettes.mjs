@@ -34,7 +34,7 @@ try{
   await evaluate(`(async()=>{await artistooLab.rpc('start',{scene:'empty',width:96,height:72,warmup:0,seed:17,settings:{growth:0,immuneGrowth:0,metabolism:0,apoptosis:30,tumorMotility:0}});for(let y=10;y<70;y+=17)for(let x=10;x<94;x+=17)await artistooLab.rpc('seed',{kind:2,x,y});})()`);
   const initial=await evaluate('artistooLab.snapshot.cells.length');let pending;
   for(let n=0;n<120;n++){await evaluate(`artistooLab.rpc('advance',{steps:10})`);pending=await evaluate(`({d:artistooLab.snapshot.deaths.spontaneous,time:artistooLab.snapshot.time,count:Number(document.getElementById('death-count').textContent),progress:document.getElementById('death-progress').textContent})`);if(pending.d.clearing)break;}
-  check(pending.d.clearing>0&&pending.count===pending.d.started&&pending.d.started===pending.d.clearing+pending.d.cleared&&pending.progress.includes('清除中 '+pending.d.clearing),'Apoptosis appears at onset while the real body is still clearing',pending);
+  check(pending.d.clearing>0&&pending.count===pending.d.cleared&&pending.d.started===pending.d.clearing+pending.d.cleared&&pending.progress.includes('清除中 '+pending.d.clearing)&&pending.progress.includes('已触发 '+pending.d.started),'Clearance headline waits for body removal while onset and pending remain visible',pending);
   await click('#death-ledger > summary');await shot('death-pending');
   await evaluate(`artistooLab.rpc('advance',{steps:3000})`);
   const deathExport=await evaluate('artistooLab.exportData()'),d=deathExport.deaths.spontaneous;
@@ -42,6 +42,20 @@ try{
   check(deathExport.events.filter(e=>e.type==='removed'&&e.cause==='spontaneous').length===d.cleared,'Both removal paths retain the cause in completion events');
   check(await evaluate(`document.getElementById('recent-deaths').children.length===Math.min(8,artistooLab.snapshot.deaths.spontaneous.started)&&document.getElementById('death-summary').textContent.includes('自发凋亡：触发')`),'Recent records and separate cause totals are visible');
   await writeFile(out+'/death-history.json',JSON.stringify({deaths:deathExport.deaths,deathHistory:deathExport.deathHistory},null,2));await shot('death-completed');
+  // A starving culture can lose several bodies without a single random
+  // apoptosis event. The always-visible totals must explain those removals.
+  await evaluate(`(async()=>{await artistooLab.rpc('start',{scene:'empty',width:96,height:72,warmup:0,seed:17,settings:{growth:0,immuneGrowth:0,metabolism:2,supply:0,apoptosis:0,kill:0,stressMutation:0,tumorMotility:0}});await artistooLab.rpc('backend',{mode:'cpu'});for(let y=10;y<70;y+=17)for(let x=10;x<94;x+=17)await artistooLab.rpc('seed',{kind:2,x,y});})()`);
+  const environmentInitial=await evaluate('artistooLab.snapshot.cells.length');
+  for(let n=0;n<30;n++){await evaluate(`artistooLab.rpc('advance',{steps:100})`);if(await evaluate('artistooLab.snapshot.counters.environment>=3'))break;}
+  const environmentResult=await evaluate(`(()=>{const s=artistooLab.snapshot;return{time:s.time,remaining:s.cells.length,counters:s.counters,deaths:s.deaths,recent:s.recentClearances,total:Number(document.getElementById('total-death-count').textContent),spontaneous:Number(document.getElementById('death-count').textContent),environment:Number(document.getElementById('environment-death-count').textContent),message:document.getElementById('clearance-recent-summary').textContent};})()`);
+  check(environmentResult.environment>=3&&environmentResult.spontaneous===0&&environmentResult.counters.apoptosisStarted===0&&environmentResult.total===environmentInitial-environmentResult.remaining&&environmentResult.total===environmentResult.environment,'Several real environmental disappearances update the total and environment counts, not spontaneous apoptosis',{initial:environmentInitial,...environmentResult});
+  check(environmentResult.recent.length===Math.min(8,environmentResult.total)&&environmentResult.recent.every(r=>r.cause==='environment')&&environmentResult.message.includes('环境死亡 '+environmentResult.recent.length),'Recent clearance causes match the disappearing bodies');
+  await click('#death-ledger > summary');
+  await evaluate(`document.querySelector('.death-overview').scrollIntoView({block:'center'})`);await shot('environment-clearance');
+  check(await evaluate(`!document.getElementById('death-ledger').open&&['death-count','environment-death-count','kill-count'].every(id=>document.getElementById(id).checkVisibility())`),'All three causes remain visible with the detailed ledger collapsed');
+  await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+  check(await evaluate(`document.documentElement.scrollWidth<=392&&[...document.querySelectorAll('.death-causes>div')].every(e=>e.getBoundingClientRect().right<=390)`),'Death cause counts fit the mobile viewport');
+  await evaluate(`document.querySelector('.death-overview').scrollIntoView({block:'center'})`);await shot('environment-clearance-mobile');
   check(b.errors.length===0&&await evaluate('artistooLab.errors.length===0'),'No browser or Worker errors');
 }catch(error){console.error(error);checks.push({passed:false,error:String(error)});process.exitCode=1;await shot('failure');}
 finally{await writeFile(out+'/checks.json',JSON.stringify(checks,null,2));console.log(JSON.stringify(checks,null,2));await b.close();}

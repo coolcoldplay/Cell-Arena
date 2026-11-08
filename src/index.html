@@ -30,11 +30,20 @@
       <div class="field-legend"><span id="heat-key" hidden><i id="heat-ramp"></i><span id="heat-scale"></span></span><span id="field-legend">点击图层查看环境或信号；多种因子可以同时叠加。</span></div>
       <div class="viewport"><canvas id="world" width="960" height="720" aria-label="可拖动细胞、点击播种、添加信号或绘制障碍的交互培养皿"></canvas><div id="toast" role="status" aria-live="polite"></div><div class="canvas-note" id="canvas-note">选择「拖动细胞」，在细胞上按住鼠标移动。</div></div>
       <div class="legend"><span><i class="medium"></i>培养液</span><span><i class="normal"></i>正常 <b id="normal-count">0</b></span><span><i class="abnormal"></i>异常 <b id="abnormal-count">0</b></span><span><i class="tumor"></i>肿瘤 <b id="tumor-count">0</b></span><span><i class="immune"></i>免疫 <b id="immune-count">0</b></span><span><i class="immune-active"></i>其中激活 <b id="activated-immune-count">0</b></span><span class="proliferation-key" title="可遗传的增殖性状，固定范围 0.25–3；实际增殖还受营养、压力与全局生长参数影响"><i></i>肿瘤：灰 → 黑，增殖能力低 → 高</span><span class="edge-key"><i></i>Act：绿＝衰减中 → 红＝新生突起</span><span class="antigen-key">＋ 抗原可识别</span></div>
-      <div class="metrics"><div><b id="rate">—</b><span>实际 MCS / 秒</span></div><div><b id="division-count">0</b><span>总分裂（含免疫）</span></div><div><b id="recognition-count">0</b><span>接触识别</span></div><div><b id="kill-count">0</b><span>杀伤清除</span></div><div><b id="death-count">0</b><span>自发凋亡已触发</span><span id="death-progress">清除中 0 · 已清除 0</span></div></div>
+      <div class="metrics"><div><b id="rate">—</b><span>实际 MCS / 秒</span></div><div><b id="division-count">0</b><span>总分裂（含免疫）</span></div><div><b id="recognition-count">0</b><span>接触识别</span></div><div><b id="total-death-count">0</b><span>累计死亡清除</span><span id="total-death-progress">清除中 0 · 已触发 0</span></div></div>
+      <section class="death-overview" aria-label="死亡清除原因">
+        <div class="death-causes">
+          <div><span>自发凋亡清除</span><b id="death-count">0</b><small id="death-progress">清除中 0 · 已触发 0</small></div>
+          <div><span>环境死亡清除</span><b id="environment-death-count">0</b><small id="environment-death-progress">清除中 0 · 已触发 0</small></div>
+          <div><span>免疫杀伤清除</span><b id="kill-count">0</b><small id="kill-progress">清除中 0 · 已触发 0</small></div>
+        </div>
+        <p class="hint">胞体消失时计入清除；低氧、低糖、高酸造成的死亡计入「环境死亡」，不计入「自发凋亡」。</p>
+        <p id="clearance-recent-summary">本局尚无死亡清除。</p>
+      </section>
       <div class="performance-line"><span id="performance">目标 30 MCS / 秒 · 独立计算线程</span><span id="seed-label">种子 17</span></div>
       <div class="ecology-line"><span id="environment-count">环境死亡 0</span><span id="immune-division-count">免疫分裂 0</span><span id="mutation-count">性状突变 0</span><span id="grid-info">正在准备格点</span></div>
       <div class="ecology-line"><span id="abnormal-events">异常发生 0 · 恶性转变 0 · 异常免疫清除 0</span><span>悬停画布查看局部资源与因子浓度</span></div>
-      <details class="death-ledger" id="death-ledger"><summary>死亡记录 <span id="death-ledger-count">已触发 0 · 清除中 0</span></summary><p class="hint">触发后细胞逐渐缩小，消失时记为清除；三种原因分别统计。下方显示最近 8 次，导出实验数据包含从本局开始的完整死亡记录。</p><div id="death-summary"></div><ol id="recent-deaths"></ol></details>
+      <details class="death-ledger" id="death-ledger"><summary>死亡记录 <span id="death-ledger-count">已清除 0 · 清除中 0</span></summary><p class="hint">触发后细胞逐渐缩小，消失时记为清除；三种原因分别统计。下方按清除和触发分别显示最近 8 次，导出实验数据包含本局完整记录。</p><div id="death-summary"></div><h3>最近从画面清除</h3><ol id="recent-clearances"></ol><h3>最近触发死亡</h3><ol id="recent-deaths"></ol></details>
       <div class="chart-panel"><div><span class="eyebrow">POPULATION HISTORY</span><span id="history-range">全程 0 — 0 MCS</span><span id="order">极性一致度 —</span></div><canvas id="history" width="960" height="125" aria-label="正常、异常、肿瘤和免疫细胞数量随模型时间变化"></canvas><p class="hint">从开局到当前时刻；每 30 MCS 采样，手动新增／分裂即时记入，当前数量实时补齐。长记录绘图保留峰谷，导出包含完整采样。</p></div>
     </section>
     <aside>

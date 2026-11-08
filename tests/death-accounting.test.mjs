@@ -49,6 +49,34 @@ test('removing a healthy cell is not reclassified as spontaneous apoptosis',()=>
   assert.equal(s.counters.apoptosis,0);assert.equal(s.counters.apoptosisStarted,0);assert.equal(s.deathHistory.length,0);
 });
 
+test('several environmental deaths reduce the population without incrementing spontaneous apoptosis',()=>{
+  const s=make(),ids=[s.seed(1,12,24,4),s.seed(2,28,24,4),s.seed(3,44,24,4)];
+  assert.ok(ids.every(Boolean));
+  for(const id of ids)s.cells[id].stress=.999;
+  s.fields.oxygen.values.fill(0);s.fields.glucose.values.fill(0);s.fields.acid.values.fill(1);
+  s.updateMetabolism(4);
+  assert.equal(s.deathSummary().environment.started,3);
+  s.advance(150);
+  assert.equal(s.live().length,0);assert.equal(s.counters.apoptosisStarted,0);assert.equal(s.counters.apoptosis,0);
+  assert.equal(s.counters.environment,3);
+  const removed=s.snapshot().recentClearances;
+  assert.equal(removed.length,3);assert.ok(removed.every(d=>d.cause==='environment'&&d.clearedAt!==null));
+  assert.deepEqual(new Set(removed.map(d=>d.id)),new Set(ids));
+});
+
+test('recent disappearances follow clearance time, including an older slow-clearing death',()=>{
+  const s=make(),old=s.seed(2,12,24,4);s.beginDeath(old,'spontaneous');
+  for(let n=0;n<10;n++){
+    s.C.time++;const id=s.seed(2,40,24,4);s.beginDeath(id,'environment');s.eraseCell(id);
+  }
+  s.C.time++;s.eraseCell(old);s.eraseCell(old);
+  const recent=s.snapshot().recentClearances;
+  assert.equal(recent.length,8);assert.equal(recent.at(-1).id,old);assert.equal(recent.at(-1).cause,'spontaneous');
+  assert.ok(recent.every((d,i)=>!i||d.clearedAt>=recent[i-1].clearedAt));
+  assert.equal(s.deathHistory.length,11,'the short display buffer must not truncate the complete ledger');
+  assert.equal(s.deathSummary().spontaneous.cleared,1);
+});
+
 test('natural spontaneous deaths agree across JS and WASM and account for every missing body',async()=>{
   const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm')),runs=[];
   for(const kernel of ['fast','wasm']){

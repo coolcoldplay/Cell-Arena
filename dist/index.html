@@ -47,7 +47,9 @@ aside .section .section-body{padding:11px 7px 7px}
 .chart-panel>div{flex-wrap:wrap;gap:7px 14px}.chart-panel>div>span{white-space:nowrap}#history-range{font-variant-numeric:tabular-nums}
 .color-grid{display:grid;grid-template-columns:minmax(110px,1fr) 60px 60px;gap:12px 8px;align-items:center;margin:4px 0 20px;font-size:12px}.color-grid>span:nth-child(-n+3){font-size:10px;color:var(--muted)}.color-grid input[type=color]{width:50px;height:32px;padding:2px;border:1px solid var(--line);border-radius:5px;background:#18272d;cursor:pointer}.color-grid input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}#network-demo{width:100%;margin-bottom:8px}#branch-sliders[hidden]{display:none}
 .color-presets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.color-preset{display:flex;flex-direction:column;align-items:stretch;gap:8px;text-align:left;padding:10px 8px;background:#1e2c32;min-width:0}.color-preset b{font-size:11px;font-weight:500}.color-preset small{font-size:9px;line-height:1.6;color:var(--muted)}.color-preset.selected{border-color:var(--accent);background:#283b35}.palette-preview{display:flex;justify-content:space-between;gap:3px;padding:8px 5px;background:#f3f5f1;border-radius:5px}.palette-preview i{display:block;position:relative;background:var(--body);width:17px;height:19px;border-radius:45% 55% 42% 58%;border:1px solid #273b3d55;flex-shrink:0}.palette-preview i::after{content:'';position:absolute;inset:5px 4px;border-radius:50%;border:1.5px solid var(--nucleus)}.palette-key{margin:0 0 16px;font-size:9px}#palette-status{color:#d0ddc9;margin-bottom:4px}
-.death-ledger{padding:11px 16px;border-top:1px solid var(--line);font-size:11px}.death-ledger summary{cursor:pointer;color:#d5dfd8}.death-ledger summary span{float:right;color:var(--muted);font-size:10px}.death-ledger #death-summary{white-space:pre-line;line-height:1.9;color:#d4c7b5}.death-ledger ol{list-style:none;margin:8px 0 0;padding:0;font-size:10px;line-height:1.9;color:var(--muted)}#death-progress{font-variant-numeric:tabular-nums;line-height:1.5}
+.metrics{grid-template-columns:repeat(4,minmax(0,1fr))}.death-overview{padding:14px 16px 10px;border-top:1px solid var(--line);background:#1a292f}.death-causes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.death-causes>div{border-left:2px solid #879e99;padding-left:10px;min-width:0}.death-causes>div:nth-child(2){border-color:#d8ab71}.death-causes>div:nth-child(3){border-color:#bf8795}.death-causes span{font-size:11px;color:#cddbd4}.death-causes b{display:block;font:22px Consolas,monospace;margin:5px 0}.death-causes small{display:block;color:var(--muted);font-size:10px;line-height:1.7;font-variant-numeric:tabular-nums}.death-overview .hint{margin-bottom:4px}#clearance-recent-summary{color:#d6cbb4;font-size:11px;margin:4px 0;font-variant-numeric:tabular-nums}
+.death-ledger{padding:11px 16px;border-top:1px solid var(--line);font-size:11px}.death-ledger summary{cursor:pointer;color:#d5dfd8}.death-ledger summary span{float:right;color:var(--muted);font-size:10px}.death-ledger #death-summary{white-space:pre-line;line-height:1.9;color:#d4c7b5}.death-ledger h3{font-size:11px;font-weight:500;margin:14px 0 5px;color:#cbd9d1}.death-ledger ol{list-style:none;margin:8px 0 0;padding:0;font-size:10px;line-height:1.9;color:var(--muted)}#death-progress{font-variant-numeric:tabular-nums;line-height:1.5}
+@media(max-width:760px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 0}.metrics>div:nth-child(2){border-right:0}.death-overview{padding:12px 10px}.death-causes{gap:8px}.death-causes>div{padding-left:7px}.death-causes span,.death-causes small{font-size:10px}#clearance-recent-summary{font-size:10px}}
 @media(max-width:1050px){.scenes{grid-template-columns:repeat(3,minmax(0,1fr))}#opacity-sliders{grid-template-columns:1fr 1fr}}
 @media(max-width:760px){.scenes{grid-template-columns:1fr}.scenes button{padding:10px 12px}.scenario-guide{padding:11px 12px}.scenario-heading{gap:6px 12px}.scenario-heading button{font-size:10px}.layer-settings{padding:9px 10px}.layer-settings-foot{flex-direction:column;gap:5px}#opacity-sliders{gap:10px 16px}}
 </style></head>
@@ -80,11 +82,20 @@ aside .section .section-body{padding:11px 7px 7px}
       <div class="field-legend"><span id="heat-key" hidden><i id="heat-ramp"></i><span id="heat-scale"></span></span><span id="field-legend">点击图层查看环境或信号；多种因子可以同时叠加。</span></div>
       <div class="viewport"><canvas id="world" width="960" height="720" aria-label="可拖动细胞、点击播种、添加信号或绘制障碍的交互培养皿"></canvas><div id="toast" role="status" aria-live="polite"></div><div class="canvas-note" id="canvas-note">选择「拖动细胞」，在细胞上按住鼠标移动。</div></div>
       <div class="legend"><span><i class="medium"></i>培养液</span><span><i class="normal"></i>正常 <b id="normal-count">0</b></span><span><i class="abnormal"></i>异常 <b id="abnormal-count">0</b></span><span><i class="tumor"></i>肿瘤 <b id="tumor-count">0</b></span><span><i class="immune"></i>免疫 <b id="immune-count">0</b></span><span><i class="immune-active"></i>其中激活 <b id="activated-immune-count">0</b></span><span class="proliferation-key" title="可遗传的增殖性状，固定范围 0.25–3；实际增殖还受营养、压力与全局生长参数影响"><i></i>肿瘤：灰 → 黑，增殖能力低 → 高</span><span class="edge-key"><i></i>Act：绿＝衰减中 → 红＝新生突起</span><span class="antigen-key">＋ 抗原可识别</span></div>
-      <div class="metrics"><div><b id="rate">—</b><span>实际 MCS / 秒</span></div><div><b id="division-count">0</b><span>总分裂（含免疫）</span></div><div><b id="recognition-count">0</b><span>接触识别</span></div><div><b id="kill-count">0</b><span>杀伤清除</span></div><div><b id="death-count">0</b><span>自发凋亡已触发</span><span id="death-progress">清除中 0 · 已清除 0</span></div></div>
+      <div class="metrics"><div><b id="rate">—</b><span>实际 MCS / 秒</span></div><div><b id="division-count">0</b><span>总分裂（含免疫）</span></div><div><b id="recognition-count">0</b><span>接触识别</span></div><div><b id="total-death-count">0</b><span>累计死亡清除</span><span id="total-death-progress">清除中 0 · 已触发 0</span></div></div>
+      <section class="death-overview" aria-label="死亡清除原因">
+        <div class="death-causes">
+          <div><span>自发凋亡清除</span><b id="death-count">0</b><small id="death-progress">清除中 0 · 已触发 0</small></div>
+          <div><span>环境死亡清除</span><b id="environment-death-count">0</b><small id="environment-death-progress">清除中 0 · 已触发 0</small></div>
+          <div><span>免疫杀伤清除</span><b id="kill-count">0</b><small id="kill-progress">清除中 0 · 已触发 0</small></div>
+        </div>
+        <p class="hint">胞体消失时计入清除；低氧、低糖、高酸造成的死亡计入「环境死亡」，不计入「自发凋亡」。</p>
+        <p id="clearance-recent-summary">本局尚无死亡清除。</p>
+      </section>
       <div class="performance-line"><span id="performance">目标 30 MCS / 秒 · 独立计算线程</span><span id="seed-label">种子 17</span></div>
       <div class="ecology-line"><span id="environment-count">环境死亡 0</span><span id="immune-division-count">免疫分裂 0</span><span id="mutation-count">性状突变 0</span><span id="grid-info">正在准备格点</span></div>
       <div class="ecology-line"><span id="abnormal-events">异常发生 0 · 恶性转变 0 · 异常免疫清除 0</span><span>悬停画布查看局部资源与因子浓度</span></div>
-      <details class="death-ledger" id="death-ledger"><summary>死亡记录 <span id="death-ledger-count">已触发 0 · 清除中 0</span></summary><p class="hint">触发后细胞逐渐缩小，消失时记为清除；三种原因分别统计。下方显示最近 8 次，导出实验数据包含从本局开始的完整死亡记录。</p><div id="death-summary"></div><ol id="recent-deaths"></ol></details>
+      <details class="death-ledger" id="death-ledger"><summary>死亡记录 <span id="death-ledger-count">已清除 0 · 清除中 0</span></summary><p class="hint">触发后细胞逐渐缩小，消失时记为清除；三种原因分别统计。下方按清除和触发分别显示最近 8 次，导出实验数据包含本局完整记录。</p><div id="death-summary"></div><h3>最近从画面清除</h3><ol id="recent-clearances"></ol><h3>最近触发死亡</h3><ol id="recent-deaths"></ol></details>
       <div class="chart-panel"><div><span class="eyebrow">POPULATION HISTORY</span><span id="history-range">全程 0 — 0 MCS</span><span id="order">极性一致度 —</span></div><canvas id="history" width="960" height="125" aria-label="正常、异常、肿瘤和免疫细胞数量随模型时间变化"></canvas><p class="hint">从开局到当前时刻；每 30 MCS 采样，手动新增／分裂即时记入，当前数量实时补齐。长记录绘图保留峰谷，导出包含完整采样。</p></div>
     </section>
     <aside>
@@ -11848,7 +11859,7 @@ var CPM = (function (exports, module$1) {
       // no biological meaning and must not influence this run or its report.
       delete this.settings.capacity;
       this.cells=[];this.contacts=new Map();this.histories=new Map();this.events=[];this.history=[];this.wallID=0;this.version=0;
-      this.counters={divisions:0,immuneDivisions:0,kills:0,apoptosis:0,environment:0,apoptosisStarted:0,killStarted:0,environmentStarted:0,recognitions:0,mutations:0,abnormalInitiations:0,malignantTransitions:0,abnormalKills:0,normalEnvironmentDeaths:0,abnormalEnvironmentDeaths:0};this.birthSerial=0;this.lineage=[];this.deathHistory=[];
+      this.counters={divisions:0,immuneDivisions:0,kills:0,apoptosis:0,environment:0,apoptosisStarted:0,killStarted:0,environmentStarted:0,recognitions:0,mutations:0,abnormalInitiations:0,malignantTransitions:0,abnormalKills:0,normalEnvironmentDeaths:0,abnormalEnvironmentDeaths:0};this.birthSerial=0;this.lineage=[];this.deathHistory=[];this.recentClearances=[];
       const s=this.settings;
       this.C=new CPM.CPM([width,height],{
         seed,torus:[this.wrap,this.wrap],T:s.temperature,
@@ -12254,7 +12265,12 @@ var CPM = (function (exports, module$1) {
       const keys=DEATH_COUNTERS[cause];if(keys)this.counters[keys[1]]++;
       if(cause==='kill'&&m.state==='abnormal')this.counters.abnormalKills++;
       if(cause==='environment'){if(m.state==='normal')this.counters.normalEnvironmentDeaths++;if(m.state==='abnormal')this.counters.abnormalEnvironmentDeaths++;}
-      if(m.deathRecord)m.deathRecord.clearedAt=this.C.time;
+      if(m.deathRecord){
+        m.deathRecord.clearedAt=this.C.time;
+        // Completion order differs from onset order. Keep a bounded display
+        // buffer rather than sorting the full lifetime ledger every frame.
+        this.recentClearances.push(m.deathRecord);if(this.recentClearances.length>8)this.recentClearances.shift();
+      }
       this.log('removed',m.id,0,{cause,birth:m.birth,startedAt:m.deathStartedAt});
     }
     deathSummary(){
@@ -12454,7 +12470,7 @@ var CPM = (function (exports, module$1) {
       for(const c of cells){const m=this.cells[c.id];for(const key of ['sectionFraction','sectionPressure','planarTarget','offPlaneTarget','hasNucleus','nucleusX','nucleusY','nucleusRadius','state','origin','abnormalSince','abnormalAge','transformedAt','adversity','immuneCue','morphologyMode','branchCount','networkDegree','deathStartedAt'])c[key]=m[key];}
       const fields={};for(const [key,f] of Object.entries(this.fields))fields[key]={width:f.width,height:f.height,values:f.values.slice()};
       const history=this.populationHistory(true),historySamples=this.history.length+(history.at(-1)===this.history.at(-1)?0:1);
-      return {kernel:this.kernel,width:this.width,height:this.height,worldWidth:this.worldWidth,worldHeight:this.worldHeight,refinement:this.scale,fieldScale:this.fieldScale,fieldMask:this.fields.oxygen.blocked.slice(),scene:this.scene,scenario:this.scenarioReport(),boundary:this.boundary,time:this.C.time,seed:this.seedValue,settings:{...this.settings},counters:{...this.counters},deaths:this.deathSummary(),recentDeaths:this.deathHistory.slice(-8).map(d=>({...d})),grid,activity,walls,orphans,cells,fields,history,historySamples,events:this.events.slice(-12)};
+      return {kernel:this.kernel,width:this.width,height:this.height,worldWidth:this.worldWidth,worldHeight:this.worldHeight,refinement:this.scale,fieldScale:this.fieldScale,fieldMask:this.fields.oxygen.blocked.slice(),scene:this.scene,scenario:this.scenarioReport(),boundary:this.boundary,time:this.C.time,seed:this.seedValue,settings:{...this.settings},counters:{...this.counters},deaths:this.deathSummary(),recentDeaths:this.deathHistory.slice(-8).map(d=>({...d})),recentClearances:this.recentClearances.map(d=>({...d})),grid,activity,walls,orphans,cells,fields,history,historySamples,events:this.events.slice(-12)};
     }
   }
   globalThis.CellLab={Simulation,SignalField,StepClock,DEFAULTS,PRESETS,BODY_COLORS,TYPE_NAMES,NORMAL,TUMOR,IMMUNE,WALL,sampleHistory};
@@ -12833,11 +12849,23 @@ tick();
     $('normal-count').textContent=counts[1]-abnormal;$('abnormal-count').textContent=abnormal;$('tumor-count').textContent=counts[2];$('immune-count').textContent=counts[3];
     $('activated-immune-count').textContent=activated;
     $('seed-status').textContent=`当前 ${s.cells.length} 颗 · 按局部空间尝试加入`;
-    $('division-count').textContent=s.counters.divisions;$('recognition-count').textContent=s.counters.recognitions;$('kill-count').textContent=s.counters.kills;$('death-count').textContent=s.counters.apoptosisStarted;
-    $('death-progress').textContent=`清除中 ${s.deaths.spontaneous.clearing} · 已清除 ${s.deaths.spontaneous.cleared}`;
+    $('division-count').textContent=s.counters.divisions;$('recognition-count').textContent=s.counters.recognitions;
     const deathNames={spontaneous:'自发凋亡',kill:'免疫杀伤',environment:'环境死亡'},totals=Object.values(s.deaths);
-    $('death-ledger-count').textContent=`已触发 ${totals.reduce((n,d)=>n+d.started,0)} · 清除中 ${totals.reduce((n,d)=>n+d.clearing,0)}`;
+    const totalCleared=totals.reduce((n,d)=>n+d.cleared,0),totalClearing=totals.reduce((n,d)=>n+d.clearing,0);
+    $('total-death-count').textContent=totalCleared;
+    $('total-death-progress').textContent=`清除中 ${totalClearing} · 已触发 ${totalCleared+totalClearing}`;
+    for(const [cause,prefix] of [['spontaneous','death'],['environment','environment-death'],['kill','kill']]){
+      const d=s.deaths[cause];$(prefix+'-count').textContent=d.cleared;$(prefix+'-progress').textContent=`清除中 ${d.clearing} · 已触发 ${d.started}`;
+    }
+    $('death-ledger-count').textContent=`已清除 ${totalCleared} · 清除中 ${totalClearing}`;
     $('death-summary').textContent=Object.entries(s.deaths).map(([cause,d])=>`${deathNames[cause]}：触发 ${d.started} · 清除中 ${d.clearing} · 已清除 ${d.cleared}`).join('\n');
+    const recent=s.recentClearances,clearanceText=JSON.stringify(recent);
+    if($('recent-clearances').dataset.records!==clearanceText){
+      $('recent-clearances').dataset.records=clearanceText;$('recent-clearances').replaceChildren();
+      $('clearance-recent-summary').textContent=recent.length?`最近 ${recent.length} 颗清除：`+Object.entries(deathNames).map(([cause,name])=>`${name} ${recent.filter(d=>d.cause===cause).length}`).join(' · '):'本局尚无死亡清除。';
+      for(const d of recent.slice().reverse()){const li=document.createElement('li');li.textContent=`${d.clearedAt} MCS · #${d.id} · ${deathNames[d.cause]} · 已清除（${d.startedAt} MCS 触发）`;$('recent-clearances').append(li);}
+      if(!recent.length){const li=document.createElement('li');li.textContent='尚无胞体完成死亡清除。';$('recent-clearances').append(li);}
+    }
     const deathText=JSON.stringify(s.recentDeaths);
     if($('recent-deaths').dataset.records!==deathText){
       $('recent-deaths').dataset.records=deathText;$('recent-deaths').replaceChildren();
@@ -12853,7 +12881,7 @@ tick();
     $('population-load').textContent=`当前 ${s.cells.length} 颗 · ${s.width} × ${s.height} 格点。${s.cells.length>=1000?'细胞较多，计算和交互可能变慢。':''}不按细胞数量冻结生长或分裂。`;
     $('backend-status').textContent=`绘图：${gpuRenderer&&!gpuRenderer.lost?(gpuRenderer.hardware===false?'WebGL2 软件':gpuRenderer.hardware===true?'WebGL2 GPU':'WebGL2'):'Canvas2D'} · 形变：${s.kernel==='wasm'?'WebAssembly CPU':s.kernel==='fast'?'优化 JS CPU':'参考 JS CPU'} · 微环境：${s.compute?.active==='gpu'?'WebGPU':'CPU'}`;
     $('compute-note').textContent=(s.compute?.reason||'初始化计算后端…')+(s.kernelNote?' '+s.kernelNote:'');
-    const cell=s.cells.find(c=>c.id===selected),phases={search:cell?.kind===3?(cell.immuneCue>.05?'局部趋化':'分散巡逻'):'探索',scan:'接触扫描',kill:'识别后递送损伤',dying:'凋亡缩小'};
+    const cell=s.cells.find(c=>c.id===selected),phases={search:cell?.kind===3?(cell.immuneCue>.05?'局部趋化':'分散巡逻'):'探索',scan:'接触扫描',kill:'识别后递送损伤',dying:'死亡清除中'};
     $('selection-label').textContent=cell?'#'+cell.id+' '+CellLabDisplay.cellName(cell):'未选中';
     $('divide').disabled=!cell||cell.dying||cell.state==='abnormal';
     if(cell){
@@ -12864,7 +12892,7 @@ tick();
       if(cell.kind===3)lines.push(`第 ${cell.generation} 代 · 剩余分裂 ${cell.divisionsLeft} 次`,`激活 ${Math.ceil(cell.activation)} MCS · 招募 ${Math.ceil(cell.recruitment)} MCS`);
       if(cell.kind===2&&cell.origin==='normal')lines.push(`源自正常细胞 · ${cell.transformedAt} MCS 恶性转变`);
       if(cell.kind===2&&cell.morphologyMode)lines.push(`${cell.morphologyMode===2?'动态分枝':'梭形双极'} · 伸展／回缩中的突起 ${cell.branchCount} 处 · 稳定接触 ${cell.networkDegree||0} 个邻居`);
-      if(cell.dying)lines.push('死亡原因：'+({environment:'持续代谢压力',kill:'免疫递送损伤',spontaneous:'自发凋亡'}[cell.deathCause]||cell.deathCause),`开始凋亡：${cell.deathStartedAt} MCS · 清除中 ${s.time-cell.deathStartedAt} MCS`);
+      if(cell.dying)lines.push('死亡原因：'+({environment:'持续代谢压力',kill:'免疫递送损伤',spontaneous:'自发凋亡'}[cell.deathCause]||cell.deathCause),`触发死亡：${cell.deathStartedAt} MCS · 清除中 ${s.time-cell.deathStartedAt} MCS`);
       $('inspection').textContent=lines.join('\n');
     }else{selected=0;$('inspection').textContent='点击细胞，查看局部代谢、活性、抗原、遗传性状与剩余分裂次数。';}
   }
@@ -12949,7 +12977,7 @@ tick();
     if(clientX<Math.max(r.left,v.left)||clientX>=Math.min(r.right,v.right)||clientY<Math.max(r.top,v.top)||clientY>=Math.min(r.bottom,v.bottom)){box.hidden=true;return;}
     const [x,y]=point(hover),sample=CellLabDisplay.sample(snapshot,x,y);if(!sample){box.hidden=true;return;}
     $('probe-position').textContent=`位置 ${x}, ${y} · ${sample.time} MCS`;
-    $('probe-cell').textContent=sample.wall?'实体障碍':sample.cell?`#${sample.cell.id} ${CellLabDisplay.cellName(sample.cell)}${sample.cell.dying?' · 正在凋亡':''}`:'培养液';
+    $('probe-cell').textContent=sample.wall?'实体障碍':sample.cell?`#${sample.cell.id} ${CellLabDisplay.cellName(sample.cell)}${sample.cell.dying?' · 死亡清除中':''}`:'培养液';
     for(const key of ['oxygen','glucose','acid','cohesion','danger','trail'])$('probe-'+key).textContent=sample.blocked?'—':sample.values[key].toFixed(3);
     $('probe-note').textContent=sample.blocked?'该环境格被实体障碍阻断，暂无有效浓度。':'氧／糖／酸为 0–1 模型量；因子为模型浓度，无实验单位。读数来自当前位置的环境网格。';
     box.hidden=false;const rect=box.getBoundingClientRect();box.style.left=Math.max(8,Math.min(innerWidth-rect.width-8,clientX+15))+'px';box.style.top=Math.max(8,Math.min(innerHeight-rect.height-8,clientY+15))+'px';

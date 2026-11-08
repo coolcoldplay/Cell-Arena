@@ -142,11 +142,23 @@
     $('normal-count').textContent=counts[1]-abnormal;$('abnormal-count').textContent=abnormal;$('tumor-count').textContent=counts[2];$('immune-count').textContent=counts[3];
     $('activated-immune-count').textContent=activated;
     $('seed-status').textContent=`当前 ${s.cells.length} 颗 · 按局部空间尝试加入`;
-    $('division-count').textContent=s.counters.divisions;$('recognition-count').textContent=s.counters.recognitions;$('kill-count').textContent=s.counters.kills;$('death-count').textContent=s.counters.apoptosisStarted;
-    $('death-progress').textContent=`清除中 ${s.deaths.spontaneous.clearing} · 已清除 ${s.deaths.spontaneous.cleared}`;
+    $('division-count').textContent=s.counters.divisions;$('recognition-count').textContent=s.counters.recognitions;
     const deathNames={spontaneous:'自发凋亡',kill:'免疫杀伤',environment:'环境死亡'},totals=Object.values(s.deaths);
-    $('death-ledger-count').textContent=`已触发 ${totals.reduce((n,d)=>n+d.started,0)} · 清除中 ${totals.reduce((n,d)=>n+d.clearing,0)}`;
+    const totalCleared=totals.reduce((n,d)=>n+d.cleared,0),totalClearing=totals.reduce((n,d)=>n+d.clearing,0);
+    $('total-death-count').textContent=totalCleared;
+    $('total-death-progress').textContent=`清除中 ${totalClearing} · 已触发 ${totalCleared+totalClearing}`;
+    for(const [cause,prefix] of [['spontaneous','death'],['environment','environment-death'],['kill','kill']]){
+      const d=s.deaths[cause];$(prefix+'-count').textContent=d.cleared;$(prefix+'-progress').textContent=`清除中 ${d.clearing} · 已触发 ${d.started}`;
+    }
+    $('death-ledger-count').textContent=`已清除 ${totalCleared} · 清除中 ${totalClearing}`;
     $('death-summary').textContent=Object.entries(s.deaths).map(([cause,d])=>`${deathNames[cause]}：触发 ${d.started} · 清除中 ${d.clearing} · 已清除 ${d.cleared}`).join('\n');
+    const recent=s.recentClearances,clearanceText=JSON.stringify(recent);
+    if($('recent-clearances').dataset.records!==clearanceText){
+      $('recent-clearances').dataset.records=clearanceText;$('recent-clearances').replaceChildren();
+      $('clearance-recent-summary').textContent=recent.length?`最近 ${recent.length} 颗清除：`+Object.entries(deathNames).map(([cause,name])=>`${name} ${recent.filter(d=>d.cause===cause).length}`).join(' · '):'本局尚无死亡清除。';
+      for(const d of recent.slice().reverse()){const li=document.createElement('li');li.textContent=`${d.clearedAt} MCS · #${d.id} · ${deathNames[d.cause]} · 已清除（${d.startedAt} MCS 触发）`;$('recent-clearances').append(li);}
+      if(!recent.length){const li=document.createElement('li');li.textContent='尚无胞体完成死亡清除。';$('recent-clearances').append(li);}
+    }
     const deathText=JSON.stringify(s.recentDeaths);
     if($('recent-deaths').dataset.records!==deathText){
       $('recent-deaths').dataset.records=deathText;$('recent-deaths').replaceChildren();
@@ -162,7 +174,7 @@
     $('population-load').textContent=`当前 ${s.cells.length} 颗 · ${s.width} × ${s.height} 格点。${s.cells.length>=1000?'细胞较多，计算和交互可能变慢。':''}不按细胞数量冻结生长或分裂。`;
     $('backend-status').textContent=`绘图：${gpuRenderer&&!gpuRenderer.lost?(gpuRenderer.hardware===false?'WebGL2 软件':gpuRenderer.hardware===true?'WebGL2 GPU':'WebGL2'):'Canvas2D'} · 形变：${s.kernel==='wasm'?'WebAssembly CPU':s.kernel==='fast'?'优化 JS CPU':'参考 JS CPU'} · 微环境：${s.compute?.active==='gpu'?'WebGPU':'CPU'}`;
     $('compute-note').textContent=(s.compute?.reason||'初始化计算后端…')+(s.kernelNote?' '+s.kernelNote:'');
-    const cell=s.cells.find(c=>c.id===selected),phases={search:cell?.kind===3?(cell.immuneCue>.05?'局部趋化':'分散巡逻'):'探索',scan:'接触扫描',kill:'识别后递送损伤',dying:'凋亡缩小'};
+    const cell=s.cells.find(c=>c.id===selected),phases={search:cell?.kind===3?(cell.immuneCue>.05?'局部趋化':'分散巡逻'):'探索',scan:'接触扫描',kill:'识别后递送损伤',dying:'死亡清除中'};
     $('selection-label').textContent=cell?'#'+cell.id+' '+CellLabDisplay.cellName(cell):'未选中';
     $('divide').disabled=!cell||cell.dying||cell.state==='abnormal';
     if(cell){
@@ -173,7 +185,7 @@
       if(cell.kind===3)lines.push(`第 ${cell.generation} 代 · 剩余分裂 ${cell.divisionsLeft} 次`,`激活 ${Math.ceil(cell.activation)} MCS · 招募 ${Math.ceil(cell.recruitment)} MCS`);
       if(cell.kind===2&&cell.origin==='normal')lines.push(`源自正常细胞 · ${cell.transformedAt} MCS 恶性转变`);
       if(cell.kind===2&&cell.morphologyMode)lines.push(`${cell.morphologyMode===2?'动态分枝':'梭形双极'} · 伸展／回缩中的突起 ${cell.branchCount} 处 · 稳定接触 ${cell.networkDegree||0} 个邻居`);
-      if(cell.dying)lines.push('死亡原因：'+({environment:'持续代谢压力',kill:'免疫递送损伤',spontaneous:'自发凋亡'}[cell.deathCause]||cell.deathCause),`开始凋亡：${cell.deathStartedAt} MCS · 清除中 ${s.time-cell.deathStartedAt} MCS`);
+      if(cell.dying)lines.push('死亡原因：'+({environment:'持续代谢压力',kill:'免疫递送损伤',spontaneous:'自发凋亡'}[cell.deathCause]||cell.deathCause),`触发死亡：${cell.deathStartedAt} MCS · 清除中 ${s.time-cell.deathStartedAt} MCS`);
       $('inspection').textContent=lines.join('\n');
     }else{selected=0;$('inspection').textContent='点击细胞，查看局部代谢、活性、抗原、遗传性状与剩余分裂次数。';}
   }
@@ -258,7 +270,7 @@
     if(clientX<Math.max(r.left,v.left)||clientX>=Math.min(r.right,v.right)||clientY<Math.max(r.top,v.top)||clientY>=Math.min(r.bottom,v.bottom)){box.hidden=true;return;}
     const [x,y]=point(hover),sample=CellLabDisplay.sample(snapshot,x,y);if(!sample){box.hidden=true;return;}
     $('probe-position').textContent=`位置 ${x}, ${y} · ${sample.time} MCS`;
-    $('probe-cell').textContent=sample.wall?'实体障碍':sample.cell?`#${sample.cell.id} ${CellLabDisplay.cellName(sample.cell)}${sample.cell.dying?' · 正在凋亡':''}`:'培养液';
+    $('probe-cell').textContent=sample.wall?'实体障碍':sample.cell?`#${sample.cell.id} ${CellLabDisplay.cellName(sample.cell)}${sample.cell.dying?' · 死亡清除中':''}`:'培养液';
     for(const key of ['oxygen','glucose','acid','cohesion','danger','trail'])$('probe-'+key).textContent=sample.blocked?'—':sample.values[key].toFixed(3);
     $('probe-note').textContent=sample.blocked?'该环境格被实体障碍阻断，暂无有效浓度。':'氧／糖／酸为 0–1 模型量；因子为模型浓度，无实验单位。读数来自当前位置的环境网格。';
     box.hidden=false;const rect=box.getBoundingClientRect();box.style.left=Math.max(8,Math.min(innerWidth-rect.width-8,clientX+15))+'px';box.style.top=Math.max(8,Math.min(innerHeight-rect.height-8,clientY+15))+'px';
