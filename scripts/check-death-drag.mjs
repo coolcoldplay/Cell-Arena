@@ -42,14 +42,16 @@ try{
   let killed;
   for(let n=0;n<160;n++){await advance(4);killed=await evaluate(`artistooLab.snapshot.cells.find(m=>m.id===tumorID&&m.dying)`);if(killed)break;}
   check(!!killed&&killed.deathCause==='kill'&&killed.deathPhase==='rounding','Genuine antigen contact commits a kill with apoptosis set to zero',killed||{});
-  await evaluate(`saveFrame('免疫杀伤：圆化、开始变粉')`);await advance(64);
+  await evaluate(`saveFrame('免疫杀伤：圆化、开始变为橙黄色')`);await advance(64);
   const swollen=await evaluate(`artistooLab.snapshot.cells.find(m=>m.id===tumorID)`);
-  check(swollen?.deathIntact&&swollen.deathPhase==='swelling'&&swollen.area>killed.area*1.05,'The killed body remains occupied, rounds and swells before rupture',{before:killed.area,after:swollen?.area,progress:swollen?.deathProgress});await evaluate(`saveFrame('免疫杀伤：粉色肿胀')`);
+  check(swollen?.deathIntact&&swollen.deathPhase==='swelling'&&swollen.area>killed.area*1.05,'The killed body remains occupied, rounds and swells before rupture',{before:killed.area,after:swollen?.area,progress:swollen?.deathProgress});await evaluate(`saveFrame('免疫杀伤：橙黄色肿胀')`);
   // Sample actual pixels before context loss; the same pending death must be
   // rendered identically by GPU and CPU, with no biological time advance.
   await evaluate(`document.getElementById('cell-seams').checked=false;document.getElementById('nuclei').checked=false;artistooLab.render();window.samples=[];const c=document.getElementById('world'),ctx=c.getContext('2d'),s=artistooLab.snapshot;for(let y=4;y<s.height-4;y+=2)for(let x=4;x<s.width-4;x+=2){const px=Math.floor((x+.5)*c.width/s.width),py=Math.floor((y+.5)*c.height/s.height);samples.push([px,py,[...ctx.getImageData(px,py,1,1).data]]);}window.usedGPU=artistooLab.renderer.gpu;testGL.getExtension('WEBGL_lose_context').loseContext();`);await delay(100);await evaluate('artistooLab.render()');
   const parity=await evaluate(`({wasGPU:usedGPU,gpu:artistooLab.renderer.gpu,maxError:Math.max(...samples.flatMap(([x,y,old])=>[...document.getElementById('world').getContext('2d').getImageData(x,y,1,1).data].map((v,k)=>Math.abs(v-old[k]))))})`);
   check(parity.wasGPU&&!parity.gpu&&parity.maxError<=2,'The death gradient agrees between GPU and Canvas rendering',parity);
+  const amber=await evaluate(`(()=>{const s=artistooLab.snapshot,c=document.getElementById('world'),ctx=c.getContext('2d');for(let y=2;y<s.height-2;y++)for(let x=2;x<s.width-2;x++){const q=y*s.width+x;if(s.grid[q]===tumorID&&[q-1,q+1,q-s.width,q+s.width].every(j=>s.grid[j]===tumorID)){return [...ctx.getImageData(Math.floor((x+.5)*c.width/s.width),Math.floor((y+.5)*c.height/s.height),1,1).data].slice(0,3);}}return[];})()`);
+  check(amber[0]>amber[1]+25&&amber[1]>90&&amber[2]<amber[1]*.5,'Actual killed-cell pixels become orange-yellow, distinct from inactive pink immune cells',{amber});
   await evaluate(`document.getElementById('cell-seams').checked=true;document.getElementById('nuclei').checked=true;`);
   for(let n=0;n<30;n++){await advance(2);if(await evaluate('!artistooLab.snapshot.cells.some(m=>m.id===tumorID)'))break;}
   const cleared=await evaluate(`({effects:artistooLab.snapshot.deathEffects,counters:artistooLab.snapshot.counters,time:artistooLab.snapshot.time,remaining:artistooLab.snapshot.cells.length})`);

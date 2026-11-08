@@ -21,6 +21,7 @@
     "test:morphology": "node scripts/check-morphology-colors.mjs",
     "test:deaths": "node scripts/check-death-palettes.mjs",
     "test:death-drag": "node scripts/check-death-drag.mjs",
+    "test:workbench": "node scripts/check-workbench.mjs",
     "test:surveillance": "node scripts/check-surveillance.mjs",
     "test:gpu": "node scripts/check-gpu-v4.mjs",
     "test:hires": "node scripts/check-hires-interaction.mjs",

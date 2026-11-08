@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const clamp=x=>Math.max(0,Math.min(1,x));
-  const BODY_COLORS=[[243,245,241],[204,204,204],[0,0,0],[233,154,154],[93,108,111],[160,139,102],[153,0,0]];
+  const BODY_COLORS=[[246,240,226],[204,204,204],[0,0,0],[233,154,154],[93,108,111],[160,139,102],[153,0,0]];
   const immuneActive=m=>m?.kind===3&&m.activation>0;
   const displayKind=m=>m?.state==='abnormal'?5:immuneActive(m)?6:m?.kind||0;
   const COLOR_DEFAULTS={normal:{body:'#cccccc',nucleus:'#243b53'},abnormal:{body:'#a08b66',nucleus:'#243b53'},tumor:{body:'#000000',nucleus:'#f2d38a'},immune:{body:'#e99a9a',nucleus:'#8f3548'},activated:{body:'#990000',nucleus:'#f2d38a'},proliferationShading:true};
@@ -40,13 +40,22 @@
   function deathColor(rgb,m){
     if(!m?.dying)return rgb;
     const p=Math.round(clamp(m.deathProgress||0)*255)/255,code=deathCode(m);
-    const tint=code===2?[246,143,171]:code===3?[158,145,112]:[75,78,86];
+    const tint=code===2?[248,177,48]:code===3?[158,145,112]:[75,78,86];
     const weight=code===2?.15+.85*p:code===3?.4+.45*p:.2+.65*p;
     return rgb.map((v,i)=>v+(tint[i]-v)*weight);
   }
   const deathPhaseLabel=m=>({rounding:'免疫杀伤 · 圆化',swelling:'免疫杀伤 · 肿胀待裂解',rupture:'免疫杀伤 · 破裂',shrinking:'自发凋亡 · 皱缩',withering:'环境死亡 · 萎缩'}[m?.deathPhase]||'死亡清除中');
   const nucleusStyles={normal:{stroke:'#243b53',fill:'#243b531a'},patrol:{stroke:'#8f3548',fill:'#8f35481a'},dark:{stroke:'#f2d38a',fill:'#f2d38a1a'}};
   const nucleusStyle=(m,palette)=>{if(palette){const stroke=palette[colorKey(m)].nucleus;return {stroke,fill:stroke+'1a'};}return m.kind===1?nucleusStyles.normal:m.kind===3&&!immuneActive(m)?nucleusStyles.patrol:nucleusStyles.dark;};
+  const nuclearAngles=Array.from({length:32},(_,i)=>{const a=i*Math.PI/16;return [Math.cos(a),Math.sin(a),Math.cos(3*a),Math.sin(3*a),Math.cos(4*a),Math.sin(4*a)];});
+  function nucleusContour(m){
+    const phase=2*Math.PI*(((m.birth||m.id||1)*.61803398875+(m.kind||1)*.137)%1),rest=.10+.08*(.5+.5*Math.sin(phase*1.7));
+    const recovery=m.dying?1-clamp(m.deathProgress||0):1,qx=((m.nucleusStrainX||0)+rest*Math.cos(2*phase))*recovery,qy=((m.nucleusStrainY||0)+rest*Math.sin(2*phase))*recovery;
+    const angle=.5*Math.atan2(qy,qx),ratio=1+1.12*Math.min(.34,Math.hypot(qx,qy)),a=.82*m.nucleusRadius*Math.sqrt(ratio),b=.82*m.nucleusRadius/Math.sqrt(ratio),c=Math.cos(angle),s=Math.sin(angle),cp=Math.cos(phase),sp=Math.sin(phase);
+    // A small, static per-cell asymmetry; no wall-clock noise or simulation RNG.
+    // Even the largest contour stays inside the protected circular envelope.
+    return nuclearAngles.map(([ux,uy,c3,s3,c4,s4])=>{const r=1+recovery*(.015*(c3*cp-s3*sp)+.009*(s4*cp-c4*sp)),x=a*ux*r,y=b*uy*r;return [x*c-y*s,x*s+y*c];});
+  }
   // At ordinary opacity keep bodies legible; the upper half of each slider
   // deliberately releases that protection. 100% means a full-strength layer.
   const bodyOpacity=(u,protect=true)=>clamp(u)*(protect?.28+.72*clamp((u-.5)*2):1);
@@ -92,5 +101,5 @@
     const wall=!!s.walls[q],blocked=wall||!!s.fieldMask?.[bin];
     return {x,y,bin,time:s.time,cell:s.cells.find(m=>m.id===s.grid[q])||null,wall,blocked,values:blocked?null:Object.fromEntries(['oxygen','glucose','acid',...Object.keys(SIGNALS)].map(key=>[key,s.fields[key].values[bin]]))};
   }
-  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,bodyOpacity,adversity,signals,sample,Cache};
+  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,bodyOpacity,adversity,signals,sample,Cache};
 })();

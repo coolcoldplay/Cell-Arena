@@ -28,7 +28,7 @@
         if(fieldMode>0){float value=texelFetch(environment,p/fieldScale,0).r;int q=int(clamp(floor(value*255.+.5),0.,255.));rgb=mix(rgb,texelFetch(palette,ivec2(q,kind),0).rgb,kind>0?bodyEnvironmentOpacity:environmentOpacity);}
         if(showSignals==1){vec4 signal=kind>0?texelFetch(bodySignalLayer,p/fieldScale,0):texelFetch(signalLayer,p/fieldScale,0);rgb=mix(rgb,signal.rgb,signal.a);}
         if(texelFetch(walls,p,0).r>0u)rgb=(p.x+p.y)%7<2?vec3(66,83,87)/255.:body(4);
-        if(physicalKind>0&&physicalKind<4){if(m.g>0u){float p=float(m.a)/255.;vec3 tint=m.g==2u?vec3(246,143,171):m.g==3u?vec3(158,145,112):vec3(75,78,86);float weight=m.g==2u?.15+.85*p:m.g==3u?.4+.45*p:.2+.65*p;rgb=mix(rgb,tint/255.,weight);}else if(actFlags[physicalKind]>0){float a=float(texelFetch(activity,p,0).r);if(a>0.)rgb=vec3(min(255.,a*2.),min(255.,(255.-a)*2.),0.)/255.;}
+        if(physicalKind>0&&physicalKind<4){if(m.g>0u){float p=float(m.a)/255.;vec3 tint=m.g==2u?vec3(248,177,48):m.g==3u?vec3(158,145,112):vec3(75,78,86);float weight=m.g==2u?.15+.85*p:m.g==3u?.4+.45*p:.2+.65*p;rgb=mix(rgb,tint/255.,weight);}else if(actFlags[physicalKind]>0){float a=float(texelFetch(activity,p,0).r);if(a>0.)rgb=vec3(min(255.,a*2.),min(255.,(255.-a)*2.),0.)/255.;}
           if(seams==1||int(id)==selected){vec2 f=fract(xy),thin=min(vec2(.32),vec2(lattice)/viewport*.55*pixelRatio);bool edge=(f.x>1.-thin.x&&idAt(p+ivec2(1,0))!=id)||(f.x<thin.x&&idAt(p-ivec2(1,0))!=id)||(f.y>1.-thin.y&&idAt(p+ivec2(0,1))!=id)||(f.y<thin.y&&idAt(p-ivec2(0,1))!=id);if(edge)rgb=mix(rgb,physicalKind==1?vec3(98,110,109)/255.:kind==3?vec3(128,61,70)/255.:vec3(225,230,225)/255.,.9);}
         }color=vec4(rgb,1);
       }`;

@@ -5,6 +5,7 @@
 (() => {
   'use strict';
   const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+  const nucleusSpokes=Array.from({length:12},(_,i)=>{const a=i*Math.PI/6;return [Math.cos(a),Math.sin(a),Math.cos(2*a),Math.sin(2*a)];});
   class SectionMechanics {
     constructor(sim){this.s=sim;this.disks=new Map();this.junctions=new Map();}
     delta(x,length){if(this.s.wrap){if(x>length/2)x-=length;else if(x< -length/2)x+=length;}return x;}
@@ -171,6 +172,19 @@
         m.nucleusX=x;m.nucleusY=y;this.compileProcesses(m);s.updateMechanics(m);
       }else{m.nucleusX=x;m.nucleusY=y;}
     }
+    updateNucleusShape(m,dt){
+      if(!m.hasNucleus||dt<=0||m.dying)return;
+      // Local cytoplasmic clearances drive a slowly relaxing shape tensor.
+      // The original protected nuclear disk remains a conservative envelope:
+      // this bounded contour never grants extra passage through a narrow gap.
+      const s=this.s,limit=4*m.nucleusRadius,step=Math.max(1,s.scale);let xx=0,xy=0,total=0;
+      for(const [ux,uy,qx,qy]of nucleusSpokes){let reach=m.nucleusRadius;
+        for(let d=m.nucleusRadius+step;d<=limit;d+=step){const i=this.at(Math.round(m.nucleusX+ux*d),Math.round(m.nucleusY+uy*d));if(i<0||s.C.grid._pixels[i]!==m.id)break;reach=d;}
+        const weight=reach*reach;xx+=weight*qx;xy+=weight*qy;total+=weight;
+      }
+      const gain=1.35*(1+.35*(m.sectionPressure||0))/Math.max(1,total);let tx=xx*gain,ty=xy*gain,norm=Math.hypot(tx,ty);if(norm>.34){tx*=.34/norm;ty*=.34/norm;}
+      const blend=-Math.expm1(-dt/32);m.nucleusStrainX=(m.nucleusStrainX||0)+(tx-(m.nucleusStrainX||0))*blend;m.nucleusStrainY=(m.nucleusStrainY||0)+(ty-(m.nucleusStrainY||0))*blend;
+    }
     update(dt){
       const s=this.s,live=s.live(),next=[];
       this.updateJunctions(dt);this.updateBranches(dt);
@@ -198,6 +212,7 @@
           if(cost<score&&this.fits(m,nx,ny)){score=cost;x=nx;y=ny;}
         }
         this.rebaseNucleus(m,x,y);
+        if(s.C.time%4===0)this.updateNucleusShape(m,4*dt);
       }
     }
     allowed(src,tgt,a,b){

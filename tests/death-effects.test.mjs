@@ -23,8 +23,8 @@ test('lytic surface tension rounds an elongated lattice body rather than drawing
 test('death colours distinguish kill, apoptosis and environmental stress independently of the living palette',()=>{
   const base=[30,40,50],style=cause=>CellLabDisplay.deathColor(base,{dying:true,deathCause:cause,deathProgress:1});
   assert.equal(typeof CellLabDisplay.deathColor,'function');
-  const pink=style('kill');assert.ok(pink[0]>220&&pink[2]>140&&pink[1]<200);
-  assert.notDeepEqual(pink,style('spontaneous'));assert.notDeepEqual(style('spontaneous'),style('environment'));
+  const amber=style('kill');assert.ok(amber[0]>220&&amber[1]>140&&amber[1]<210&&amber[2]<90);
+  assert.notDeepEqual(amber,style('spontaneous'));assert.notDeepEqual(style('spontaneous'),style('environment'));
   assert.deepEqual(CellLabDisplay.deathColor(base,{dying:false}),base);
 });
 test('kill rupture effects expire in model time and do not create extra deaths',()=>{
