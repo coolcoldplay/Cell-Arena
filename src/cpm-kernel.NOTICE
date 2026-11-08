@@ -1,0 +1,23 @@
+Source attribution for cpm-kernel.c and build/cpm-kernel.wasm
+
+The sequential CPM proposal/acceptance loop and specialized constraint energy
+calculations are adapted from Artistoo at commit
+e997d81213a5dcdfc40ad976a18958f412f00cc9:
+https://github.com/ingewortel/artistoo/blob/e997d81213a5dcdfc40ad976a18958f412f00cc9/build/artistoo.js
+
+Copyright (c) 2019 Johannes Textor & Inge Wortel.
+The complete MIT notice for those portions is in ../vendor/LICENSE.
+
+random_value ports the MT19937 state transition and output transformation
+carried by that bundle. Its original implementation is credited to:
+Copyright (C) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura,
+All rights reserved.
+The bundle also credits Sean McCullough for its JavaScript namespace wrapper.
+The complete BSD three-clause notice for the MT19937 portions is in
+../vendor/MT19937-LICENSE.txt.
+
+This implementation additionally integrates Cell-Arena-specific constraints.
+The original notices are retained, supplied alongside source and binary,
+and embedded in both distributed HTML entry points. This sidecar supplements
+the unchanged C source and compiled binary; it is not a claim of upstream
+authorship or endorsement of Cell-Arena's extensions.

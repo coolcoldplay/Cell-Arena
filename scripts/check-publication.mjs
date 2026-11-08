@@ -14,6 +14,11 @@ try{
   check(initial.title.startsWith('Cell-Arena')&&initial.brand==='Cell-Arena','Published title and branding are Cell-Arena',initial);
   check(initial.scene==='oncogenesis'&&initial.kernel==='wasm'&&initial.networkScripts===0,'The self-contained model and WASM Worker start successfully');
   check(!remote||initial.secure,'The public website runs in a secure context');
+  await click('#about');await click('#code-credits > summary');await click('#code-credits details:last-child > summary');
+  const notices=await evaluate(`({artistoo:document.getElementById('license-artistoo').textContent,mt:document.getElementById('license-mt19937').textContent,visible:document.getElementById('license-mt19937').getBoundingClientRect().height>0,link:document.querySelector('footer a[href$="THIRD_PARTY_NOTICES.md"]').href})`);
+  check(notices.artistoo===await readFile('vendor/LICENSE','utf8')&&notices.mt===await readFile('vendor/MT19937-LICENSE.txt','utf8')&&notices.visible,'The source dialog presents the complete Artistoo and MT19937 licenses');
+  check(notices.link==='https://github.com/coolcoldplay/Cell-Arena/blob/main/THIRD_PARTY_NOTICES.md','The footer links directly to the file-by-file attribution inventory');
+  await click('#close-about');
   await click('[data-scene="hot"]');await waitFor('artistooLab.snapshot.scene==="hot"');await evaluate(`artistooLab.rpc('playing',{value:false})`);
   check(await evaluate('artistooLab.snapshot.scenario.initial.tumor===37&&artistooLab.snapshot.scenario.initial.immune===18'),'Scenario buttons load the full hot-tumor initial population');
   const time=await evaluate('artistooLab.snapshot.time');await click('#play');await waitFor(`artistooLab.snapshot.time>${time+3}`);await click('#play');

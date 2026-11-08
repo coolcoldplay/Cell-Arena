@@ -12,6 +12,13 @@ assert.match(html,/id="worker-source"/);
 assert.match(html,/globalThis.CELL_LAB_WASM=/);
 assert.match(html,/id="history-range"/);
 assert.match(html,/Copyright \(c\) 2019 Johannes Textor &amp; Inge Wortel/);
+const escaped=text=>text.replaceAll('&','&amp;').replaceAll('<','&lt;');
+for(const [source,id,notice] of [['vendor/LICENSE','license-artistoo','licenses/Artistoo-MIT.txt'],['vendor/MT19937-LICENSE.txt','license-mt19937','licenses/MT19937-BSD-3-Clause.txt']]){
+  const license=await readFile(source,'utf8');
+  assert.ok(html.includes(`<pre id="${id}">${escaped(license)}</pre>`),'The complete license must appear in the visible page markup: '+source);
+  assert.equal(await readFile('dist/'+notice,'utf8'),license,'Standalone license download must preserve the original text');
+  assert.ok(manifest.thirdPartyLicenses.some(entry=>entry.notice===notice),'Manifest must list each bundled license');
+}
 assert.doesNotMatch(html,/\/\* INLINE_/,'No unresolved build placeholders');
 // Skip inline script bodies: upstream API documentation contains inert HTML examples.
 const scripts=[...html.matchAll(/<script\b([^>]*)>[\s\S]*?<\/script>/gi)];

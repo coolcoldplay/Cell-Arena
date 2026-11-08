@@ -1,4 +1,6 @@
 /* Algebraically equivalent specializations of Artistoo constraints.
+ * Portions adapted from Artistoo, copyright (c) 2019 Johannes Textor & Inge Wortel.
+ * MIT notice: ../vendor/LICENSE; exact upstream revision: ../THIRD_PARTY_NOTICES.md.
  * The official bundle stays unchanged. The reference kernel is retained for
  * energy/trajectory comparison; no copy attempts or biological steps are skipped. */
 (() => {

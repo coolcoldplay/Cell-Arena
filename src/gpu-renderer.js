@@ -1,5 +1,7 @@
 /* Display-only WebGL2 rasterizer. All cell copies and contacts stay in the
- * simulation Worker. A lost/unsupported context falls back to Canvas2D. */
+ * simulation Worker. A lost/unsupported context falls back to Canvas2D.
+ * Act color mapping follows Artistoo Canvas.drawActivityValues (MIT):
+ * copyright (c) 2019 Johannes Textor & Inge Wortel. See ../THIRD_PARTY_NOTICES.md. */
 (() => {
   'use strict';
   class GPURenderer {

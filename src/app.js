@@ -81,7 +81,8 @@
     }
   };
   worker.onerror=e=>fail(e.message);
-  // Same normalized Act palette as Artistoo drawActivityValues. Zero is body color.
+  // Act palette adapted from Artistoo Canvas.drawActivityValues (MIT; Textor & Wortel,
+  // 2019). Source revision and full notice: ../THIRD_PARTY_NOTICES.md. Zero is body color.
   const activityPalette=Array.from({length:256},(_,a)=>[Math.min(255,a*2),Math.min(255,(255-a)*2),0]);
   function updateOverlayButtons(){for(const button of document.querySelectorAll('[data-layer]')){const key=button.dataset.layer,on=key==='adversity'?$('field-view').value==='adversity':signalLayers.has(key);button.setAttribute('aria-pressed',on);button.classList.toggle('selected',on);}}
   function sync(){

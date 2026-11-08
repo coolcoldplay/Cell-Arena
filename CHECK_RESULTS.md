@@ -2,7 +2,16 @@
 
 日期：2026-11-08。Windows / Node 24 / Chrome，NVIDIA GeForce RTX 4050 Laptop GPU，驱动 560.94。对象为 Artistoo 独立二维切面演示；原 2.5D 表面模型未修改。
 
-## Cell-Arena 静态发布构建（当前产物）
+## 来源归属与许可补全（当前产物）
+
+单文件 **571,736 字节**，SHA-256 为 `ab496f996ba6d5836224728c84a933ff0a019e1dc39072e391ea6c81afc34072`。本次只补充来源说明、许可文本、源码注释与构建检查；`src/cpm-kernel.c`、WASM 二进制和模拟规则未修改。
+
+- 上游固定提交的 `build/artistoo.js` Git blob 与本地 `vendor/artistoo.js` 同为 `0ebf46bc3b16ea71eec7093c92070bc944a0c47e`。来源清单区分原样包含、优化／移植和视觉／论文参考，并列出对应文件。
+- MT19937 完整条款单列为 `vendor/MT19937-LICENSE.txt`；忽略缩进和换行后与原包内版权及许可段落一致。保留 Matsumoto、Nishimura 和包内 Sean McCullough 的封装署名，C/WASM 移植范围见 `src/cpm-kernel.NOTICE`。
+- 两份许可证均完整内嵌在页面的独立可展开区域，并复制到 `dist/licenses/`。构建清单分别记录 MIT 与 BSD-3-Clause；构建检查逐字核对可见区域、下载副本和组件清单，避免只在隐藏脚本中保留声明。
+- 本地 **12/12 浏览器检查通过**，包括实际展开许可证、来源清单入口和原有模拟交互。证据为 `output/attribution/source-check.json` 与 `local-checks.json`；公开部署继续通过既有 GitHub Actions 测试及构建流程。
+
+## Cell-Arena 静态发布构建（前次产物）
 
 页面、项目元数据与导出文件名统一为 **Cell-Arena**。`dist/index.html` 是静态托管入口，兼容入口 `dist/artistoo-playground.html` 保留；两者逐字节相同，均为 **568,628 字节**，SHA-256 为 `4d5a282838d782377ec973a83331d02519feaa49adf79bc8f5ac8f94d3b46cc5`。上游 Artistoo、WASM 二进制与模型规则未修改。
 

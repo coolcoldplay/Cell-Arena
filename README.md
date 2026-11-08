@@ -4,6 +4,8 @@
 
 在浏览器里探索细胞形变、肿瘤进化、免疫接触杀伤与微环境。选择情境，拖动或新增细胞、释放趋化信号、绘制障碍，观察局部规则产生的群体行为。无需登录或安装，计算在访问者的浏览器内完成。
 
+基于 [Artistoo](https://github.com/ingewortel/artistoo)（Johannes Textor、Inge Wortel）构建。直接包含的库、改写／移植的内核、MT19937 随机数实现及其完整许可范围见 [代码来源与第三方声明](THIRD_PARTY_NOTICES.md)。
+
 直接打开 `dist/index.html`（或兼容入口 `dist/artistoo-playground.html`）即可离线运行。官方 Artistoo、WebAssembly、GPU 着色器、模型、Worker 和页面均内嵌，无 npm 依赖或 CDN。
 
 本地开发使用 Node.js 24 或更高版本，无需 `npm install`：
@@ -130,4 +132,6 @@ npm run benchmark
 
 ## 上游与许可
 
-官方仓库 [ingewortel/artistoo](https://github.com/ingewortel/artistoo)，固定提交 `e997d81213a5dcdfc40ad976a18958f412f00cc9`。`vendor/artistoo.js` 未修改，SHA-256 `cf324da4b8a475853f02bcc842662ade65140132fe11d6db4e034ea17a5ca7e5`。MIT 许可证随包和页面附带。模型扩展、交互及渲染在 `src/`；构建清单在 `dist/manifest.json`。旧 v2 单文件留存于 `output/artistoo-v2.html`。
+官方仓库 [ingewortel/artistoo](https://github.com/ingewortel/artistoo)，固定提交 `e997d81213a5dcdfc40ad976a18958f412f00cc9`。`vendor/artistoo.js` 未修改，SHA-256 `cf324da4b8a475853f02bcc842662ade65140132fe11d6db4e034ea17a5ca7e5`；其作者和完整 MIT 文本保留在 [vendor/LICENSE](vendor/LICENSE)。优化 JS 约束及 WASM 内核包含对上游代码的改写／移植，具体文件与范围见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+
+随上游带入的 MT19937 随机数实现还保留 Matsumoto／Nishimura 的版权、Sean McCullough 的封装署名及 [BSD 三条款原文](vendor/MT19937-LICENSE.txt)。两个许可证均内嵌到网页“模型与来源 → 代码来源、版本与许可”，并输出到 `dist/licenses/`。构建清单按第三方组件列出许可，不将所有组件笼统写成 MIT。视觉参考与论文依据另列于来源说明和 [MODEL.md](MODEL.md)。旧 v2 单文件留存于本地 `output/artistoo-v2.html`。

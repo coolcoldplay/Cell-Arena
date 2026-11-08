@@ -1,4 +1,6 @@
-/* WASM executes the exact sequential proposal loop; Artistoo owns the state. */
+/* WASM executes the exact sequential proposal loop; Artistoo owns the state.
+ * Kernel provenance and MIT / MT19937 BSD notices: cpm-kernel.NOTICE and
+ * ../THIRD_PARTY_NOTICES.md. This file bridges the port to Artistoo hooks. */
 (() => {
   'use strict';
   const stride=24,MAX_SITES=1048576;
