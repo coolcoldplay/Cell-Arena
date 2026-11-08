@@ -55,10 +55,20 @@
     'other-sliders':['sectionYield','temperature','alignment','repulsion','noise']
   },moduleFor=Object.fromEntries(Object.entries(modules).flatMap(([id,names])=>names.map(name=>[name,id])));
   for(let i=0;i<controls.length;i++){
-    const [name,label,min,max,step,hint,suffix]=controls[i],row=document.createElement('label');row.className='slider';row.title=hint;
-    row.innerHTML=`<span>${label}<output id="${name}-out" for="${name}">—</output></span><input id="${name}" type="range" min="${min}" max="${max}" step="${step}" aria-describedby="${name}-hint"><small id="${name}-hint">${hint}</small>`;
+    const [name,label,min,max,step,hint,suffix]=controls[i],row=document.createElement('div');row.className='slider model-slider'+(suffix==='%'?' percentage-slider':'');row.title=hint;
+    const numberEntry=suffix==='%'?'':`<span class="parameter-entry"><input id="${name}-number" type="number" min="${min}" max="${max}" step="${step}" inputmode="${Number.isInteger(step)?'numeric':'decimal'}" aria-labelledby="${name}-label" aria-describedby="${name}-hint"><span>${suffix.trim()}</span></span>`;
+    row.innerHTML=`<span><label id="${name}-label" for="${name}">${label}</label><output id="${name}-out" for="${name}">—</output>${numberEntry}</span><div class="slider-track"><button id="${name}-decrease" class="parameter-step" type="button" aria-label="减小${label}">−</button><input id="${name}" type="range" min="${min}" max="${max}" step="${step}" aria-labelledby="${name}-label" aria-describedby="${name}-hint"><button id="${name}-increase" class="parameter-step" type="button" aria-label="增大${label}">＋</button></div><small id="${name}-hint">${hint}</small>`;
     $(moduleFor[name]).append(row);
-    $(name).addEventListener('input',e=>{const value=Number(e.target.value);$(name+'-out').textContent=value+suffix;rpc('set',{name,value}).catch(fail);});
+    $(name).addEventListener('input',e=>{const value=Number(e.target.value);$(name+'-out').textContent=value+suffix;syncParameterInput(name);rpc('set',{name,value}).catch(fail);});
+    for(const [id,direction]of [['decrease',-1],['increase',1]])$(name+'-'+id).addEventListener('click',()=>{$(name).stepUp(direction);$(name).dispatchEvent(new Event('input',{bubbles:true}));});
+    $(name+'-number')?.addEventListener('change',e=>{const value=e.target.valueAsNumber;if(!Number.isFinite(value)){e.target.value=$(name).value;return;}const bounded=Math.max(min,Math.min(max,value));$(name).value=Number((min+Math.round((bounded-min)/step)*step).toFixed(8));e.target.value=$(name).value;$(name).dispatchEvent(new Event('input',{bubbles:true}));});
+    $(name+'-number')?.addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur();});
+    $(name+'-number')?.addEventListener('focus',e=>requestAnimationFrame(()=>{if(document.activeElement===e.target)e.target.select();}));
+  }
+  function syncParameterInput(name){
+    const slider=$(name),number=$(name+'-number'),value=Number(slider.value);
+    if(number){if(document.activeElement!==number)number.value=slider.value;number.disabled=slider.disabled;}
+    $(name+'-decrease').disabled=slider.disabled||value<=Number(slider.min);$(name+'-increase').disabled=slider.disabled||value>=Number(slider.max);
   }
   for(const [key,label] of [['environment','环境热图'],['cohesion','细胞凝聚因子'],['danger','损伤因子'],['trail','免疫招募因子']]){
     const row=document.createElement('label');row.className='slider';row.innerHTML=`<span id="opacity-label-${key}">${label}<output id="opacity-${key}-out" for="opacity-${key}"></output></span><input id="opacity-${key}" type="range" min="0" max="100" step="1" value="${(key==='environment'?.35:.45)*100}">`;
@@ -133,12 +143,13 @@
     }
     $('seed-label').textContent='种子 '+s.seed;
     for(const b of document.querySelectorAll('[data-scene]')){const active=b.dataset.scene===s.scene;b.classList.toggle('active',active);b.setAttribute('aria-pressed',active);}
-    for(const [name,,,,,,suffix] of controls){if(document.activeElement!==$(name))$(name).value=s.settings[name];$(name+'-out').textContent=Number($(name).value)+suffix;}
-    if(document.activeElement!==$('speed'))$('speed').value=s.speed;$('speed-out').textContent=s.speed+'×';
+    for(const [name,,,,,,suffix] of controls){if(document.activeElement!==$(name)&&!$(name).dataset.touchEditing)$(name).value=s.settings[name];$(name+'-out').textContent=Number($(name).value)+suffix;syncParameterInput(name);}
+    if(document.activeElement!==$('speed')&&!$('speed').dataset.touchEditing)$('speed').value=s.speed;$('speed-out').textContent=s.speed+'×';
     $('boundary').value=s.boundary;
     $('tumor-morphology').value=s.settings.tumorMorphology;$('branch-sliders').hidden=!s.settings.tumorMorphology;
     $('networkAdhesion').disabled=s.settings.tumorMorphology!==2;
     $('branching').disabled=s.settings.tumorMorphology!==2;
+    syncParameterInput('networkAdhesion');syncParameterInput('branching');
     $('network-status').textContent=s.settings.tumorMorphology===2?`当前稳定接触 ${s.cells.reduce((n,m)=>n+(m.networkDegree||0),0)/2} 对；各细胞保持独立胞体。`:'示例会重新播种一片肿瘤细胞，观察突起逐渐形成与连接。';
     const counts=[0,0,0,0];let abnormal=0,activated=0;for(const m of s.cells){counts[m.kind]++;if(m.state==='abnormal')abnormal++;if(CellLabDisplay.immuneActive(m))activated++;}
     $('normal-count').textContent=counts[1]-abnormal;$('abnormal-count').textContent=abnormal;$('tumor-count').textContent=counts[2];$('immune-count').textContent=counts[3];
@@ -331,7 +342,7 @@
     if(!snapshot||e.button!==0)return;e.preventDefault();$('field-probe').hidden=true;const p=point(e),id=snapshot.grid[p[1]*snapshot.width+p[0]],m=snapshot.cells.find(c=>c.id===id);
     canvas.setPointerCapture(e.pointerId);stroke={previous:p,id:m?.id||0,token:++dragSerial,offset:[0,0],warned:false,drag:tool==='move'};if(tool==='remove'){hover={clientX:e.clientX,clientY:e.clientY};probeDirty=true;}
     if(tool==='move'||tool==='inspect'){selected=m?.id||0;sync();dirty=true;}
-    if(tool==='inspect')$('cell-inspector').open=true;
+    if(tool==='inspect'){$('cell-inspector').open=true;if(mobileUI.isMobile)mobileUI.focus('cell-inspector');}
     if(tool==='move'){
       if(!m||m.dying){stroke=null;toast('请在一个存活的细胞上按住拖动');return;}
       stroke.offset=[m.x-p[0],m.y-p[1]];canvas.style.cursor='grabbing';lastAction=rpc('beginDrag',{id:m.id,token:stroke.token}).catch(fail);
@@ -360,7 +371,7 @@
     await rpc('start',{scene,seed,worldWidth,worldHeight:Number($('world-size').selectedOptions[0]?.dataset.height)||worldWidth*.75,refinement,boundary:$('boundary').value,settings:preserve?snapshot?.settings||{}:{},...(scene==='empty'?{warmup:0}:{})});
     if(preset||scene==='empty'){signalLayers.clear();$('field-view').value=scene==='oncogenesis'?'adversity':'none';if(scene==='hot')signalLayers.add('trail');updateOverlayButtons();dirty=true;await rpc('speed',{value:scene==='oncogenesis'?4:scene==='network'?3:1});await rpc('playing',{value:scene!=='empty'});}
     else if(scene==='stress'||scene==='surveillance'){$('field-view').value='adversity';dirty=true;}
-    if(scene==='empty'){view.x=0;view.y=0;$('zoom').value='100';$('seed-kind').value='1';setTool('seed');dirty=true;}
+    if(scene==='empty'){view.x=0;view.y=0;$('zoom').value='100';$('seed-kind').value='1';setTool('seed');if(mobileUI.isMobile)mobileUI.focus('mobile-tools');dirty=true;}
   }
   document.querySelectorAll('[data-scene]').forEach(b=>b.addEventListener('click',()=>start(b.dataset.scene,{preset:true}).catch(fail)));
   $('restore-scenario').addEventListener('click',()=>start(undefined,{preset:true}).then(()=>toast('已恢复当前情境的参数、种子与初始细胞')).catch(fail));
@@ -375,20 +386,22 @@
   $('reset').addEventListener('click',()=>start(undefined,{preserve:true}).catch(fail));$('shuffle').addEventListener('click',()=>start('random',{shuffle:true}).catch(fail));
   $('play').addEventListener('click',()=>rpc('playing',{value:!snapshot?.playing}).catch(fail));$('step').addEventListener('click',()=>rpc('advance',{steps:1}).catch(fail));
   $('speed').addEventListener('input',e=>{$('speed-out').textContent=e.target.value+'×';rpc('speed',{value:Number(e.target.value)}).catch(fail);});
-  $('sprinkle').addEventListener('click',()=>rpc('sprinkle',{kind:Number($('seed-kind').value),manual:true}).then(seedFeedback).catch(fail));
+  $('sprinkle').addEventListener('click',async()=>{
+    const count=$('seed-count').valueAsNumber,button=$('sprinkle');
+    if(!Number.isSafeInteger(count)||count<1){toast('请输入正整数数量');$('seed-count').focus();return;}
+    button.disabled=true;button.textContent='加入中…';
+    try{seedFeedback(await rpc('sprinkle',{kind:Number($('seed-kind').value),count,manual:true}));}catch(error){fail(error);}finally{button.disabled=false;button.textContent='＋ 加入';}
+  });
   $('clear-walls').addEventListener('click',()=>rpc('clearWalls').then(()=>toast('障碍已清除')).catch(fail));
   $('divide').addEventListener('click',()=>{if(!selected){toast('请先点击选中一颗细胞');return;}rpc('divide',{id:selected}).then(id=>toast(id?'已分裂出细胞 #'+id:'面积不足、免疫分裂次数耗尽或轮廓受限')).catch(fail);});
   for(const id of ['field-view','edge-activity','normal-activity','tumor-activity','immune-activity','cell-seams','arrows','antigen-marks','nuclei','protect-bodies'])$(id).addEventListener('change',()=>dirty=true);
   document.querySelectorAll('[data-layer]').forEach(button=>button.addEventListener('click',()=>{const key=button.dataset.layer;if(key==='adversity')$('field-view').value=$('field-view').value==='adversity'?'none':'adversity';else if(signalLayers.has(key))signalLayers.delete(key);else signalLayers.add(key);updateOverlayButtons();dirty=true;}));
   $('clear-overlays').addEventListener('click',()=>{signalLayers.clear();$('field-view').value='none';updateOverlayButtons();dirty=true;});
   const sections=[...document.querySelectorAll('aside details.section')];
+  const mobileUI=CellLabMobile.mount();
   for(const section of sections)section.addEventListener('toggle',()=>{if(section.open)for(const other of sections)if(other!==section)other.open=false;});
   $('collapse-modules').addEventListener('click',()=>sections.forEach(section=>section.open=false));
-  document.querySelectorAll('[data-panel]').forEach(button=>button.addEventListener('click',()=>{
-    const id=button.dataset.panel,target=$(id);if(target.tagName==='DETAILS')target.open=true;
-    document.querySelectorAll('[data-panel]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
-    requestAnimationFrame(()=>{const pane=$('sidebar-scroll');pane.scrollTo({top:pane.scrollTop+target.getBoundingClientRect().top-pane.getBoundingClientRect().top-5,behavior:'auto'});});
-  }));
+  document.querySelectorAll('[data-panel]').forEach(button=>button.addEventListener('click',()=>mobileUI.focus(button.dataset.panel)));
   $('compute-backend').addEventListener('change',()=>rpc('backend',{mode:$('compute-backend').value}).catch(fail));
   const modes={wander:{alignment:0,cohesion:0,repulsion:1.2,noise:1.2,normalMotility:.9},cluster:{alignment:.4,cohesion:2.6,repulsion:.3,noise:.4,normalMotility:.45},flock:{alignment:2.7,cohesion:1.1,repulsion:.5,noise:.25,normalMotility:1}};
   document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',async()=>{for(const [name,value] of Object.entries(modes[b.dataset.mode]))await rpc('set',{name,value});toast('局部规则已更新；变化会逐步形成');}));

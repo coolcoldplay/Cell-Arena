@@ -1,0 +1,77 @@
+import {openBrowser,delay} from './browser-session.mjs';
+import {mkdir,writeFile,readFile} from 'node:fs/promises';import assert from 'node:assert/strict';
+const target=process.argv[2]||'dist/index.html',out='output/mobile/'+(target.startsWith('https:')?'live':'local');await mkdir(out,{recursive:true});
+const b=await openBrowser(target,9398,{gpu:true}),checks=[];
+const check=(name,condition,data={})=>{checks.push({name,passed:!!condition,...data});assert.ok(condition,name+': '+JSON.stringify(data));};
+const wait=async expression=>{for(let i=0;i<150;i++){if(await b.evaluate(expression))return;await delay(100);}throw Error(expression);};
+const frame=()=>b.evaluate('new Promise(requestAnimationFrame)');
+async function settleScroll(){let last=-1,stable=0;for(let i=0;i<60;i++){const next=await b.evaluate('document.querySelector("#sidebar-scroll").scrollTop');stable=Math.abs(next-last)<.5?stable+1:0;if(stable>=3)return;last=next;await delay(40);}throw Error('Touch scrolling did not settle');}
+async function position(selector){return b.evaluate(`(()=>{const e=document.querySelector(${JSON.stringify(selector)}),r=e.getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2}})()`);}
+async function tap(selector,{reveal=false}={}){
+ if(reveal){await b.evaluate(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});for(let p=e.parentElement;p;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;e.scrollIntoView({block:'nearest'});})()`);await delay(100);}
+ const p=await position(selector);await b.call('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...p,id:1}]});await b.call('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await delay(100);
+}
+const shot=async name=>{const r=await b.call('Page.captureScreenshot',{format:'png'});await writeFile(out+'/'+name+'.png',Buffer.from(r.data,'base64'));};
+async function size(width,height){await b.call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});await delay(150);}
+async function swipe(from,to){await b.call('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...from,id:1}]});for(let i=1;i<=8;i++){await b.call('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:from.x+(to.x-from.x)*i/8,y:from.y+(to.y-from.y)*i/8,id:1}]});await delay(25);}await b.call('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await delay(180);}
+try{
+ await wait('!!window.artistooLab?.snapshot');await b.evaluate('artistooLab.ready');await b.evaluate('artistooLab.rpc("playing",{value:false})');
+ await b.evaluate('(()=>{const e=document.querySelector("#language");e.value="zh";e.dispatchEvent(new Event("change",{bubbles:true}))})()');
+ await b.call('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});await size(390,700);
+ const original=await b.evaluate('JSON.stringify({time:artistooLab.snapshot.time,grid:Array.from(artistooLab.snapshot.grid),settings:artistooLab.snapshot.settings})');
+ const layout=await b.evaluate('({body:document.documentElement.scrollHeight,scroll:document.querySelector("#sidebar-scroll").clientHeight,arena:document.querySelector(".simulation").clientHeight,tools:document.querySelector(".quick-tools").parentElement.id,scenes:document.querySelector(".scenes").parentElement.id})');
+ check('Phone places scene and tool palettes inside scrollable disclosures',layout.tools==='mobile-tools-host'&&layout.scenes==='mobile-scenes-host'&&layout.scroll>200&&layout.body<=700,layout);await shot('phone-overview');
+ await tap('[data-panel=parameter-groups]');
+ const expanded=await b.evaluate('({expanded:document.body.classList.contains("panel-expanded"),scroll:document.querySelector("#sidebar-scroll").clientHeight,arena:document.querySelector(".simulation").clientHeight})');
+ check('Parameter tab expands the editor while keeping an arena preview',expanded.expanded&&expanded.scroll>420&&expanded.arena>=64&&expanded.arena<=100,expanded);
+ await tap('[data-module=module-tumor]');
+ check('Tumor shortcut opens the relevant group and puts growth controls in view',await b.evaluate('document.querySelector("#module-tumor").open&&document.querySelector("#growth-number").checkVisibility()&&document.querySelector("#growth-number").getBoundingClientRect().bottom<innerHeight'));
+ check('Layout changes do not reset or advance the experiment',await b.evaluate('JSON.stringify({time:artistooLab.snapshot.time,grid:Array.from(artistooLab.snapshot.grid),settings:artistooLab.snapshot.settings})')===original);
+ const touchTargets=await b.evaluate('({range:document.querySelector("#growth").getBoundingClientRect().height,minus:document.querySelector("#growth-decrease").getBoundingClientRect().height,plus:document.querySelector("#growth-increase").getBoundingClientRect().width,number:getComputedStyle(document.querySelector("#growth-number")).fontSize})');
+ check('Sliders and step buttons provide finger-sized targets with readable numeric entry',touchTargets.range>=44&&touchTargets.minus>=44&&touchTargets.plus>=44&&touchTargets.number==='16px',touchTargets);
+ await tap('#growth-increase');await wait('artistooLab.snapshot.settings.growth===1.25');
+ check('Touch plus changes the model by exactly one slider step',await b.evaluate('document.querySelector("#growth-number").value==="1.25"'));
+ await tap('#growth-decrease');await wait('artistooLab.snapshot.settings.growth===1.2');
+ await tap('#growth-number');await b.call('Input.dispatchKeyEvent',{type:'keyDown',key:'a',code:'KeyA',modifiers:2,windowsVirtualKeyCode:65,commands:['selectAll']});await b.call('Input.dispatchKeyEvent',{type:'keyUp',key:'a',code:'KeyA',modifiers:2,windowsVirtualKeyCode:65});await b.call('Input.insertText',{text:'1.65'});check('Native numeric field accepts typed replacement text',await b.evaluate('document.querySelector("#growth-number").value==="1.65"'));await b.call('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter'});await b.call('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter'});await wait('artistooLab.snapshot.settings.growth===1.65');
+ check('Typing a numeric value and confirming updates the actual simulation parameter',await b.evaluate('document.querySelector("#growth").value==="1.65"&&document.querySelector("#growth-out").textContent==="1.65"'));
+ const percentage=await b.evaluate('(()=>{const e=document.querySelector("#apoptosis").closest(".model-slider");return{height:e.getBoundingClientRect().height,margin:parseFloat(getComputedStyle(e).marginBottom),input:!!e.querySelector("input[type=number]"),visible:document.querySelector("#apoptosis-out").checkVisibility()}})()');
+ check('Percentage rows are compact readouts without numeric input boxes',!percentage.input&&percentage.visible&&percentage.height+percentage.margin<=76,percentage);
+ await tap('#apoptosis-increase');await wait('artistooLab.snapshot.settings.apoptosis===3');check('Percentage readout follows touch adjustments to the actual model',await b.evaluate('document.querySelector("#apoptosis-out").textContent==="3%"'));await tap('#apoptosis-decrease');await wait('artistooLab.snapshot.settings.apoptosis===2');
+ await shot('phone-tumor-editor');
+ await b.evaluate('(()=>{const e=document.querySelector("#growth-number");e.value="9";e.dispatchEvent(new Event("change",{bubbles:true}));})()');await wait('artistooLab.snapshot.settings.growth===2');
+ check('Numeric entry clamps to valid limits and disables the increment at maximum',await b.evaluate('document.querySelector("#growth-number").value==="2"&&document.querySelector("#growth-increase").disabled'));
+ await b.evaluate('(()=>{const e=document.querySelector("#growth-number");e.value="";e.dispatchEvent(new Event("change",{bubbles:true}));})()');
+ check('Clearing a number does not send a non-finite or accidental zero value',await b.evaluate('artistooLab.snapshot.settings.growth===2&&document.querySelector("#growth-number").value==="2"'));
+ const range=await b.evaluate('(()=>{const r=document.querySelector("#growth").getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height}})()');
+ await swipe({x:range.x+range.width*.8,y:range.y+range.height/2},{x:range.x+range.width*.35,y:range.y+range.height/2});await delay(100);
+ check('Horizontal touch dragging changes the parameter',await b.evaluate('artistooLab.snapshot.settings.growth<1.2&&artistooLab.snapshot.settings.growth>.3'));
+ const tapPoint={x:range.x+range.width*.75,y:range.y+range.height/2};await b.call('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...tapPoint,id:1}]});await b.call('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await delay(150);
+ check('A deliberate tap on the slider also commits its value',await b.evaluate('artistooLab.snapshot.settings.growth>1.2&&!document.querySelector("#growth").dataset.touchEditing'));
+ const beforeScroll=await b.evaluate('({scroll:document.querySelector("#sidebar-scroll").scrollTop,time:artistooLab.snapshot.time,grid:JSON.stringify(Array.from(artistooLab.snapshot.grid)),growth:artistooLab.snapshot.settings.growth})');
+ const currentRange=await position('#growth');await swipe(currentRange,{x:currentRange.x,y:currentRange.y-170});
+ const afterScroll=await b.evaluate('({scroll:document.querySelector("#sidebar-scroll").scrollTop,time:artistooLab.snapshot.time,grid:JSON.stringify(Array.from(artistooLab.snapshot.grid)),growth:artistooLab.snapshot.settings.growth,page:scrollY})');
+ check('Vertical touch scrolling stays in the editor and leaves the arena unchanged',afterScroll.scroll>beforeScroll.scroll+40&&afterScroll.time===beforeScroll.time&&afterScroll.grid===beforeScroll.grid&&afterScroll.page===0,{before:beforeScroll.scroll,after:afterScroll.scroll,growthBefore:beforeScroll.growth,growthAfter:afterScroll.growth});
+ check('A vertical swipe starting on a slider does not edit its value',afterScroll.growth===beforeScroll.growth);
+ await settleScroll();await tap('[data-module=module-immune]');await wait('document.querySelector("#module-immune").open');check('Sticky group shortcuts remain reachable after scrolling',await b.evaluate('document.querySelector("#immuneMotility-number").getBoundingClientRect().bottom<innerHeight'));
+ await tap('#mobile-expand');check('Back to arena restores the larger viewing area',await b.evaluate('!document.body.classList.contains("panel-expanded")&&document.querySelector(".simulation").clientHeight>250'));
+ await tap('[data-panel=mobile-tools]');await tap('[data-tool=remove]');
+ check('Tool tab exposes the eraser and its options without shrinking the editor with permanent palettes',await b.evaluate('document.querySelector("#eraser-radius").checkVisibility()&&!document.body.classList.contains("panel-expanded")'));
+ await tap('[data-tool=seed]');await tap('#seed-count',{reveal:true});await b.call('Input.dispatchKeyEvent',{type:'keyDown',key:'a',code:'KeyA',modifiers:2,windowsVirtualKeyCode:65,commands:['selectAll']});await b.call('Input.dispatchKeyEvent',{type:'keyUp',key:'a',code:'KeyA',modifiers:2,windowsVirtualKeyCode:65});await b.call('Input.insertText',{text:'7'});
+ const batchBefore=await b.evaluate('({count:artistooLab.snapshot.cells.length,immune:artistooLab.snapshot.cells.filter(m=>m.kind===3).length,time:artistooLab.snapshot.time})');await tap('#sprinkle');await wait('!document.querySelector("#sprinkle").disabled&&artistooLab.snapshot.cells.length==='+ (batchBefore.count+7));
+ check('Phone batch insertion uses the editable count and selected cell type',await b.evaluate('artistooLab.snapshot.cells.filter(m=>m.kind===3).length=== '+(batchBefore.immune+7)+'&&artistooLab.snapshot.time==='+batchBefore.time));
+ check('Cell type, quantity and Add button share one compact mobile row',await b.evaluate('(()=>{const a=document.querySelector("#seed-kind").getBoundingClientRect(),b=document.querySelector("#seed-count").getBoundingClientRect(),c=document.querySelector("#sprinkle").getBoundingClientRect();return Math.abs(a.bottom-b.bottom)<1&&Math.abs(a.bottom-c.bottom)<1&&c.right<=innerWidth&&a.right<b.left&&b.right<c.left})()'));await shot('phone-cell-batch');
+ await tap('[data-panel=parameter-groups]');check('Returning from a tool gives the full parameter editor back',await b.evaluate('document.body.classList.contains("panel-expanded")&&document.querySelector("#sidebar-scroll").clientHeight>420'));
+ await b.evaluate('(()=>{const e=document.querySelector("#language");e.value="en";e.dispatchEvent(new Event("change",{bubbles:true}))})()');await delay(100);
+ await tap('[data-module=module-normal]');await shot('phone-english-editor');
+ check('English labels, number controls and panel toggle are translated',await b.evaluate('document.querySelector("#mobile-expand").textContent.includes("Back")&&document.querySelector("#normalMotility-decrease").getAttribute("aria-label").startsWith("Decrease")&&document.documentElement.scrollWidth===390'));
+ check('Batch controls are translated with their editable quantity intact',await b.evaluate('document.querySelector("#sprinkle").textContent==="+ Add"&&document.querySelector("#seed-count").value==="7"&&document.querySelector("#seed-count").parentElement.textContent.trim()==="Count"'));
+ await tap('#about',{reveal:true});await wait('document.querySelector("#about-dialog").open');
+ check('Mobile sources dialog leads with Artistoo and offers concise features and instructions',await b.evaluate('(()=>{const d=document.querySelector("#about-dialog"),e=d.querySelector("[data-language=en]");return !e.hidden&&e.querySelector("a").href==="https://doi.org/10.7554/eLife.61288"&&e.textContent.includes("Main additions")&&e.textContent.includes("Getting started")&&e.textContent.length<3000&&!document.querySelector("#code-credits").open&&d.getBoundingClientRect().right<=innerWidth&&document.querySelector("#close-about").getBoundingClientRect().height>=44})()'));await shot('phone-sources');await tap('#close-about');await tap('[data-panel=parameter-groups]');
+ await size(320,568);check('Small phones retain a usable expanded parameter area',await b.evaluate('document.documentElement.scrollWidth<=320&&document.querySelector("#sidebar-scroll").clientHeight>=300'));await shot('small-phone');
+ await size(844,390);check('Landscape phones use side-by-side arena and controls',await b.evaluate('document.querySelector(".simulation").clientHeight>=380&&document.querySelector("#sidebar-scroll").clientHeight>170&&document.documentElement.scrollWidth<=844'));await shot('phone-landscape');
+ await size(1440,1000);await b.call('Emulation.setTouchEmulationEnabled',{enabled:false,maxTouchPoints:1});
+ check('Resizing back restores original desktop controls without duplicating IDs',await b.evaluate('document.querySelector(".scenes").parentElement.tagName==="ASIDE"&&document.querySelector(".quick-tools").parentElement.tagName==="ASIDE"&&document.querySelector("#reset").parentElement.classList.contains("transport")&&!document.querySelector("#growth-number").checkVisibility()&&new Set([...document.querySelectorAll("[id]")].map(e=>e.id)).size===document.querySelectorAll("[id]").length'));
+ check('No browser or worker errors',b.errors.length===0&&await b.evaluate('artistooLab.errors.length===0'));
+ console.log(JSON.stringify({checks:checks.length,results:checks},null,2));
+}catch(error){console.error(error);process.exitCode=1;await shot('failure');}
+finally{await writeFile(out+'/checks.json',JSON.stringify(checks,null,2));await writeFile(out+'/tested-manifest.json',await readFile('dist/manifest.json'));await b.close();}

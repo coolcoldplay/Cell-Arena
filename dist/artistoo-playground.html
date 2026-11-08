@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#eee4d2"><meta name="description" content="Cell-Arena：在浏览器中探索细胞形变、肿瘤进化、免疫接触杀伤与微环境。拖动细胞、释放信号、绘制障碍，观察局部规则产生的群体行为。"><meta property="og:title" content="Cell-Arena · 细胞生态竞技场"><meta property="og:description" content="可交互的肿瘤微环境模拟：从细胞前沿，到微环境演化。"><meta property="og:type" content="website"><title>Cell-Arena · 细胞生态竞技场</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23c4ec9b'/%3E%3Ccircle cx='32' cy='32' r='20' fill='%2324333a'/%3E%3Ccircle cx='34' cy='30' r='8' fill='%23c4ec9b'/%3E%3C/svg%3E"><style>:root{color-scheme:light;--bg:#eee4d2;--paper:#f7f0e3;--panel:#ede1cc;--line:#c2ae8f;--ink:#40382c;--muted:#766953;--accent:#74543a;--selected:#ded0ac;--shadow:#a79170;font-family:"Segoe UI","Microsoft YaHei",sans-serif;font-size:12px}
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#eee4d2"><meta name="description" content="Cell-Arena：在浏览器中探索细胞形变、肿瘤进化、免疫接触杀伤与微环境。拖动细胞、释放信号、绘制障碍，观察局部规则产生的群体行为。"><meta property="og:title" content="Cell-Arena · 细胞生态竞技场"><meta property="og:description" content="可交互的肿瘤微环境模拟：从细胞前沿，到微环境演化。"><meta property="og:type" content="website"><title>Cell-Arena · 细胞生态竞技场</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23c4ec9b'/%3E%3Ccircle cx='32' cy='32' r='20' fill='%2324333a'/%3E%3Ccircle cx='34' cy='30' r='8' fill='%23c4ec9b'/%3E%3C/svg%3E"><style>:root{color-scheme:light;--bg:#eee4d2;--paper:#f7f0e3;--panel:#ede1cc;--line:#c2ae8f;--ink:#40382c;--muted:#766953;--accent:#74543a;--selected:#ded0ac;--shadow:#a79170;font-family:"Segoe UI","Microsoft YaHei",sans-serif;font-size:12px}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{background:var(--bg);color:var(--ink)}[hidden]{display:none!important}
 button,select,input{font:inherit;color:inherit}button,select{border:1px solid var(--line);border-radius:0;background:var(--paper);min-height:28px;padding:5px 8px}button{cursor:pointer;box-shadow:1px 1px 0 var(--shadow)}button:hover{background:#e4d5b9;border-color:var(--accent)}button:active{box-shadow:none;translate:1px 1px}button:disabled{opacity:.45;cursor:default}button.quiet{background:transparent;box-shadow:none;color:var(--muted);border-color:transparent}button.primary{background:var(--accent);border-color:var(--accent);color:#fff8eb;font-weight:600}button.selected,button.active,button[aria-pressed=true]{background:var(--selected);border-color:var(--accent);color:#44351f}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid #966d34;outline-offset:2px}a{color:#70532e;text-underline-offset:3px}p{margin:6px 0;line-height:1.65}h2,h3{margin:8px 0;font-size:14px}input[type=checkbox]{accent-color:var(--accent);margin:0}select{min-width:0;max-width:100%;font-size:12px}
@@ -33,6 +33,68 @@ dialog{max-width:700px;width:calc(100% - 32px);max-height:86dvh;overflow:auto;ov
 #brush-preview{position:absolute;z-index:4;pointer-events:none;transform:translate(-50%,-50%);border:1px dashed #a24d37;border-radius:50%;background:#b966411c}.manual-removal{font-size:12px;color:var(--muted)}#eraser-options .slider{display:block;margin:4px 0}#eraser-options .slider>span{display:flex;width:100%}.modes{margin-bottom:12px}
 .exports{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}#import-status{color:#885226;overflow-wrap:anywhere}#import-dialog{max-width:500px}#record-status:empty{display:none}
 #language{font-size:11px;max-width:76px;padding:3px;margin-left:auto;min-height:26px}#about{white-space:nowrap;padding:3px;font-size:11px}.panel-head{gap:6px}#record-indicator{color:#a43726;white-space:nowrap;font:11px Consolas,monospace;padding:2px;min-height:22px}.dish-head>div:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}html[lang=en] .tools button{font-size:11px}html[lang=en] .section>summary>span{font-size:10px}html[lang=en] .transport button{font-size:11px}#import-summary{overflow-wrap:anywhere}#code-credits pre{white-space:pre-wrap;overflow-wrap:anywhere}
+/* Mobile editing gets its own space; desktop keeps the compact sidebar. */
+.mobile-only,.parameter-entry,.parameter-step{display:none}
+.seed-row{display:grid;grid-template-columns:minmax(0,1fr) 56px auto;gap:6px;align-items:end}.tool-options .seed-row label{display:flex;flex-direction:column;align-items:stretch;gap:3px;min-width:0;min-height:0;font-size:12px}.seed-row select,.seed-row input{width:100%;min-width:0;height:30px;min-height:30px;margin:0}.seed-row input{padding:4px;border:1px solid var(--line);background:var(--paper);border-radius:0;text-align:right}.seed-row button{min-height:30px;white-space:nowrap}
+@media(max-width:850px){
+  dialog{font-size:14px;padding:18px;line-height:1.7}dialog ul,dialog ol{padding-left:22px}dialog li{margin-bottom:8px}dialog .close{position:sticky;top:0;min-width:44px;min-height:44px;font-size:22px;z-index:1}
+  .workspace{grid-template-rows:minmax(160px,40%) minmax(0,1fr)}
+  body.panel-expanded .workspace{grid-template-rows:clamp(64px,12%,100px) minmax(0,1fr)}
+  aside{padding:0 env(safe-area-inset-right) max(6px,env(safe-area-inset-bottom)) env(safe-area-inset-left)}
+  .mobile-only{display:block}
+  .overlay-bar button,.modes button,.color-presets button,#apply-grid,#network-demo{min-height:44px}
+  .panel-head{padding:4px 8px;min-height:48px;gap:6px}.panel-head .brand{min-width:0}.panel-head .brand b{white-space:nowrap}
+  #language{font-size:16px;min-height:40px;max-width:92px;margin-left:auto}
+  #mobile-expand{font-size:12px;min-height:40px;padding:5px 7px;white-space:nowrap;flex-shrink:0;border-color:var(--accent);background:var(--selected)}
+  .dish-head{min-height:20px;padding:0 9px 3px;font-size:11px}
+  .transport{padding:0 8px 4px;gap:6px;align-items:center;flex-wrap:nowrap}
+  .transport #play{flex:0 0 76px;min-height:44px;font-size:13px;padding:4px}
+  .transport #step{flex:0 0 44px;min-height:44px;font-size:12px;padding:3px}
+  .transport .speed-label{min-width:0;height:44px;gap:6px;flex:1;font-size:12px}
+  .transport .speed-label input{width:0;min-width:0;flex:1}.transport .speed-label output{min-width:26px}
+  .panel-nav{padding:0 8px;gap:0}.panel-nav button{min-height:44px;font-size:13px;padding:5px 3px}
+  .sidebar-scroll{padding:0 10px 14px;scroll-padding-top:52px;-webkit-overflow-scrolling:touch}
+  .parameter-heading{padding:2px 0}.parameter-heading b{display:none}.parameter-heading button{margin-left:auto;min-height:32px}
+  #mobile-module-nav{display:flex;position:sticky;top:0;z-index:8;background:var(--bg);gap:3px;padding:5px 0;border-bottom:1px solid var(--line)}
+  #mobile-module-nav button{flex:1;min-width:0;min-height:44px;padding:4px 1px;font-size:12px;box-shadow:none}
+  .section>summary{min-height:48px;padding:9px}.section>summary>b{font-size:14px}.section>summary>span{font-size:11px}
+  .section-body{padding:8px 10px 2px}.subsection>summary,.panel-details>summary{min-height:44px;display:flex;align-items:center;font-size:14px}
+  .model-slider{margin-bottom:6px;padding-bottom:2px;border-bottom:1px solid #d6c6aa80}
+  .model-slider>span{font-size:14px;gap:8px;min-height:22px}.model-slider>span>label{flex:1;line-height:1.4}
+  .model-slider>span>output{display:none}
+  .percentage-slider>span>output{display:block;flex-shrink:0;font-size:14px}
+  .model-slider .parameter-entry{display:flex;align-items:center;gap:3px;flex-shrink:0;font-size:12px}
+  .model-slider .parameter-entry input{width:64px;height:32px;margin:0;padding:3px 5px;font-size:16px;text-align:right;border:1px solid var(--line);background:var(--paper);border-radius:0}
+  .parameter-entry input::-webkit-inner-spin-button,.parameter-entry input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+  .parameter-entry input{-moz-appearance:textfield}
+  .slider-track{display:flex;align-items:center;gap:6px;margin-top:0}
+  .slider-track .parameter-step{display:block;flex:0 0 44px;min-height:44px;padding:0;font-size:20px;line-height:1}
+  .slider-track input[type=range]{flex:1;width:0;min-width:0;margin:0}
+  input[type=range]{height:44px;touch-action:pan-y}
+  input[type=range]::-webkit-slider-thumb{width:22px;height:24px;margin-top:-9px}
+  input[type=range]::-moz-range-thumb{width:22px;height:24px}
+  input[type=range]::-webkit-slider-runnable-track{height:7px}
+  .select-row{font-size:14px;gap:8px;min-height:44px}.select-row select,.tool-options select{font-size:16px;min-height:44px}
+  .checks{gap:10px;font-size:14px}.checks label{min-height:40px}.checks input[type=checkbox]{width:20px;height:20px}
+  #opacity-sliders{grid-template-columns:1fr}.slider>span{font-size:14px}
+  .color-grid{grid-template-columns:1fr 64px 64px;font-size:14px}.color-grid input[type=color]{width:58px;height:44px}
+  .quick-tools{padding:5px 0;border:0}.tools{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  .tools button,html[lang=en] .tools button{min-height:44px;font-size:14px;padding:5px}
+  .tool-options{padding:8px 0}.tool-options label{font-size:14px;min-height:44px}.tool-options>button{min-height:44px;font-size:14px}
+  .tool-options .seed-row label{font-size:12px;min-height:0}.seed-row select,.seed-row input{height:44px;min-height:44px;font-size:16px}.seed-row button{min-height:44px;font-size:14px;padding-inline:8px}
+  #mobile-tools,#mobile-session{margin-top:8px}#mobile-tools[open]>summary,#mobile-session[open]>summary{border-bottom:1px solid var(--line)}
+  #mobile-session .scenes{margin:8px 0;gap:6px}#mobile-session .scenes button{min-height:44px;font-size:13px}
+  #mobile-session-actions{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}#mobile-session-actions button{flex:1;min-height:44px;font-size:13px;padding:5px}
+  .exports{gap:8px}.exports button{min-height:44px;font-size:13px}.dialog-actions button{min-height:44px}
+  .inspection{font-size:14px}#divide{min-height:44px;font-size:14px}
+  html[lang=en] .section>summary>span{font-size:10px}
+}
+@media(max-width:360px){.panel-head .mark{display:none}.panel-head .brand b{font-size:13px}#language{max-width:88px}.transport .speed-label{gap:4px}.transport #play{flex-basis:68px}}
+@media(min-width:600px) and (max-width:850px) and (orientation:landscape){
+  .workspace{grid-template-columns:minmax(0,1fr) minmax(320px,46%);grid-template-rows:minmax(0,1fr)}
+  body.panel-expanded .workspace{grid-template-columns:minmax(64px,18%) minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+  aside{border-top:0;border-left:2px solid #af9c7e}
+}
 </style></head>
 <body>
 <main class="workspace">
@@ -40,19 +102,19 @@ dialog{max-width:700px;width:calc(100% - 32px);max-height:86dvh;overflow:auto;ov
     <div class="viewport"><canvas id="world" title="中键或 Alt + 左键拖动平移视野" width="960" height="720" aria-label="可拖动细胞、点击播种、添加信号或绘制障碍的交互培养皿"></canvas><div id="brush-preview" hidden aria-hidden="true"></div><div id="toast" role="status" aria-live="polite"></div></div>
   </section>
   <aside aria-label="模拟控制面板">
-    <div class="panel-head"><a class="brand" href="https://github.com/coolcoldplay/Cell-Arena" target="_blank" rel="noreferrer"><span class="mark" aria-hidden="true">C</span><b>Cell-Arena</b></a><select id="language" aria-label="Language / 语言" data-no-i18n><option value="zh">中文</option><option value="en">English</option></select><button id="about" class="quiet">模型与来源</button></div>
+    <div class="panel-head"><a class="brand" href="https://github.com/coolcoldplay/Cell-Arena" target="_blank" rel="noreferrer"><span class="mark" aria-hidden="true">C</span><b>Cell-Arena</b></a><select id="language" aria-label="Language / 语言" data-no-i18n><option value="zh">中文</option><option value="en">English</option></select><button id="mobile-expand" class="mobile-only" aria-expanded="false" aria-controls="sidebar-scroll">↑ 展开面板</button><button id="about" class="quiet">模型与来源</button></div>
     <div class="dish-head"><div><span id="status-dot" class="status-dot"></span><b id="scene-title">肿瘤发生发展</b><span id="run-state">正在准备</span></div><button id="record-indicator" class="quiet" title="停止录制并下载" hidden>■ 00:00</button><div><span id="clock">0</span> <span class="unit">MCS</span></div></div>
     <nav class="scenes" aria-label="实验场景"><button data-scene="oncogenesis" class="active" title="肿瘤发生发展">发生发展</button><button data-scene="cold" title="免疫冷肿瘤扩散转移">冷肿瘤</button><button data-scene="hot" title="免疫热肿瘤治愈">热肿瘤</button><button data-scene="empty" title="空白自建：暂停摆放细胞，准备好后开始模拟">空白自建</button></nav>
     <div class="transport"><button id="play" class="primary">Ⅱ 暂停</button><button id="step">单步</button><button id="reset">↺ 重来</button><label class="speed-label">播放 <input id="speed" type="range" min="0.25" max="8" step="0.25" value="1"><output id="speed-out">1×</output></label><button id="shuffle" class="quiet" title="在合理模型范围内随机生成参数与细胞布局">随机生成</button></div>
     <div class="quick-tools"><div class="tools" role="group" aria-label="鼠标工具"><button data-tool="move" class="selected">↔ 拖动细胞</button><button data-tool="seed">＋ 新增细胞</button><button data-tool="signal">◉ 释放信号</button><button data-tool="wall">▥ 绘制障碍</button><button data-tool="erase">⌫ 擦除障碍</button><button data-tool="inspect">⌾ 观察细胞</button><button data-tool="remove">⌫ 擦除细胞</button><button data-tool="pan">✥ 平移视野</button></div>
       <p id="tool-hint" class="hint compact-hint">拖动时暂停 · 邻居让位 · 实体墙阻挡</p>
-      <div id="seed-options" class="tool-options" hidden><label>新增类型<select id="seed-kind"><option value="1">正常细胞</option><option value="2">肿瘤细胞</option><option value="3" selected>免疫细胞</option></select></label><button id="sprinkle">空隙随机加入 5 颗</button><p id="seed-status" class="hint"></p><p class="hint">单击加入一颗，可挤入已有细胞区域；邻居变形、核区逐格让位，切面缩小不超过设定上限，总目标量保留。只检查局部空间，不按总数量拒绝新增；挤入失败不改动原有细胞。</p></div>
+      <div id="seed-options" class="tool-options" hidden><div class="seed-row"><label>新增类型<select id="seed-kind"><option value="1">正常细胞</option><option value="2">肿瘤细胞</option><option value="3" selected>免疫细胞</option></select></label><label>数量<input id="seed-count" type="number" min="1" step="1" value="5" inputmode="numeric" required></label><button id="sprinkle" title="在空隙中随机加入所选类型的细胞">＋ 加入</button></div><p id="seed-status" class="hint"></p><p class="hint">单击加入一颗，可挤入已有细胞区域；邻居变形、核区逐格让位，切面缩小不超过设定上限，总目标量保留。只检查局部空间，不按总数量拒绝新增；挤入失败不改动原有细胞。</p></div>
       <div id="signal-options" class="tool-options" hidden><label>信号种类<select id="signal-kind"><option value="danger">损伤趋化因子 → 免疫细胞</option><option value="cohesion">凝聚因子 → 正常细胞为主</option><option value="trail">免疫招募因子 → 免疫细胞</option></select></label><p class="hint">点击释放，拖动画出信号带；随后自然扩散、衰减。</p></div>
       <div id="eraser-options" class="tool-options" hidden><label class="slider"><span>擦除半径<output id="eraser-radius-out" for="eraser-radius">12</output></span><input id="eraser-radius" type="range" min="4" max="32" value="12" step="1" title="笔刷触及的整颗细胞会被移除，不计入生物学死亡"></label></div><div id="wall-options" class="tool-options" hidden><button id="clear-walls">清除全部障碍</button></div></div>
-    <nav class="panel-nav" aria-label="面板导航"><button data-panel="parameter-groups" aria-pressed="true">参数</button><button data-panel="statistics-panel" aria-pressed="false">统计</button><button data-panel="cell-inspector" aria-pressed="false">选中细胞</button></nav>
+    <nav class="panel-nav" aria-label="面板导航"><button data-panel="parameter-groups" aria-pressed="true">参数</button><button data-panel="statistics-panel" aria-pressed="false">统计</button><button data-panel="cell-inspector" aria-pressed="false">选中细胞</button><button id="mobile-tools-tab" class="mobile-only" data-panel="mobile-tools" aria-pressed="false">工具</button></nav>
     <div class="sidebar-scroll" id="sidebar-scroll" tabindex="0" aria-label="参数与统计滚动区">
       <details class="subsection" id="cell-inspector"><summary>细胞详情与操作 <span id="selection-label">未选中</span></summary><div class="section-body"><div class="utility"><button id="divide" class="quiet">选中细胞分裂</button></div><div id="inspection" class="inspection">点击细胞，查看抗原、受损程度与接触状态。</div></div></details>
-      <section id="parameter-groups" aria-label="六组参数"><div class="parameter-heading"><b>参数</b><button id="collapse-modules" class="quiet">全部收起</button></div><details class="section" name="parameters" id="module-display"><summary><b>显示调整</b><span>视野 / 图层 / 配色</span></summary><div class="section-body"><details class="subsection" id="module-layers"><summary>观察图层</summary><div class="overlay-bar" role="group" aria-label="可视化图层">
+      <section id="parameter-groups" aria-label="六组参数"><nav id="mobile-module-nav" class="mobile-only" aria-label="参数分组快捷入口"><button data-module="module-display">显示</button><button data-module="module-environment">环境</button><button data-module="module-normal">正常</button><button data-module="module-tumor">肿瘤</button><button data-module="module-immune">免疫</button><button data-module="module-other">其他</button></nav><div class="parameter-heading"><b>参数</b><button id="collapse-modules" class="quiet">全部收起</button></div><details class="section" name="parameters" id="module-display"><summary><b>显示调整</b><span>视野 / 图层 / 配色</span></summary><div class="section-body"><details class="subsection" id="module-layers"><summary>观察图层</summary><div class="overlay-bar" role="group" aria-label="可视化图层">
         <span class="overlay-title">观察图层</span>
         <button data-layer="adversity" aria-pressed="false"><i class="adversity-key"></i>环境恶劣度</button>
         <button data-layer="cohesion" aria-pressed="false" title="正常细胞分泌的局部凝聚信号"><i style="--signal:#24ab84"></i>细胞凝聚因子</button>
@@ -100,6 +162,7 @@ dialog{max-width:700px;width:calc(100% - 32px);max-height:86dvh;overflow:auto;ov
     <p id="scenario-description"></p><div id="scenario-metrics" class="scenario-metrics"></div><small id="scenario-setup"></small>
   </section>
 </details></details>
+      <details id="mobile-tools" class="panel-details mobile-only"><summary>画布工具</summary><div id="mobile-tools-host"></div></details><details id="mobile-session" class="panel-details mobile-only"><summary>场景与开局</summary><div id="mobile-scenes-host"></div><div id="mobile-session-actions"></div></details>
       <div class="exports"><button id="snapshot">保存画面 ↓</button><button id="export-data">导出实验数据 ↓</button><button id="import-data">导入实验参数 ↑</button><button id="record-video">● 录制视频</button></div>
       <input id="import-file" type="file" accept=".json,application/json" hidden><p id="record-status" class="hint" role="status"></p><footer><a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/THIRD_PARTY_NOTICES.md" target="_blank" rel="noreferrer">Artistoo · 来源与许可</a><span>二维模型 · MCS 非真实时间</span></footer>
     </div>
@@ -107,57 +170,43 @@ dialog{max-width:700px;width:calc(100% - 32px);max-height:86dvh;overflow:auto;ov
 </main>
 <div id="field-probe" class="field-probe" role="tooltip" hidden><b id="probe-position"></b><div id="probe-cell"></div><dl><dt>氧可用量</dt><dd id="probe-oxygen"></dd><dt>葡萄糖可用量</dt><dd id="probe-glucose"></dd><dt>酸负荷</dt><dd id="probe-acid"></dd><dt class="probe-cohesion">细胞凝聚因子</dt><dd id="probe-cohesion"></dd><dt class="probe-danger">损伤趋化因子</dt><dd id="probe-danger"></dd><dt class="probe-trail">免疫招募因子</dt><dd id="probe-trail"></dd></dl><small id="probe-note"></small></div>
 <dialog id="import-dialog"><h2>导入实验参数</h2><div id="import-summary" class="inspection"></div><p>加载后按文件中的情境、种子和参数重新开局并暂停，不恢复导出时的细胞布置、障碍、浓度场或统计历史。</p><p id="import-status" role="status"></p><div class="dialog-actions"><button id="cancel-import">取消</button><button id="confirm-import" class="primary">加载参数并重新开局</button></div></dialog>
-<dialog id="about-dialog"><button id="close-about" class="close" aria-label="关闭">×</button><div data-language="zh"><div class="eyebrow">LOCAL RULES, NOT GLOBAL TARGETS</div><h2>局部通讯如何改变行为</h2>
-  <p>可选的间质样形态使用动态局部前缘：突起的数量、长度与方向随伸展、转弯、侧枝萌生和回缩而变。实际胞质跟上前缘后才继续伸长；成熟膜接触稳定局部连接，分离或死亡即解除。所有突起仍由真实占据格点组成，保留核区、有限宽度和实体墙约束。U87 的形态受培养条件影响，本模式未经细胞系实验标定，也没有微管内部运输或钙波机制。<a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MORPHOLOGY.md" target="_blank" rel="noreferrer">完整形态模型与证据边界</a>。</p>
-  <p>形态参考：<a href="https://doi.org/10.1002/adbi.202300029" target="_blank" rel="noreferrer">U87 形态与培养基底（Andrade Mier et al., 2023）</a> · <a href="https://doi.org/10.1038/nature16071" target="_blank" rel="noreferrer">脑肿瘤微管网络（Osswald et al., 2015）</a> · <a href="https://arxiv.org/abs/2104.14954" target="_blank" rel="noreferrer">U87 节点—连接形态观察（Awan et al., 2021）</a>。未复制这些研究的图像、视频或代码。</p>
-  <p>细胞形状与排斥来自官方 Artistoo Cellular Potts 内核。额外规则借鉴方向协同、局部吸引与接触后转向；这些是现象学参数，不把细胞直接当作鸟或蚂蚁。</p>
-  <p>三种简化信号场有分泌、扩散、衰减。凝聚信号主要影响正常细胞；肿瘤和异常中间态释放损伤相关信号，识别靶细胞的免疫细胞释放招募信号。运动决策采样本地梯度和实际接触邻居，不查询最近肿瘤坐标。实体墙同时阻断运动和信号传播。</p>
-  <p>免疫基础状态采用带方向持续性的分散巡逻，不使用同类无条件方向协同；免疫之间的界面不再提供强贴靠优势。独立的同类接触分离在局部损伤／招募梯度增强时减弱，真实抗原接触扫描和杀伤期间暂停。它不改变免疫与正常、异常或肿瘤细胞之间的界面能、形变约束或接触杀伤规则。新分裂出的免疫子细胞继承激活与分裂预算，但需要自己的接触识别才能分泌招募信号；已有分泌者的短期招募记忆继续衰减。</p>
-  <p>正常灰、异常褐，肿瘤从深灰到黑表示可遗传的增殖性状由低到高：固定范围 0.25–3 映射到灰度 88–0。它表示固有增殖能力；实际生长还受全局生长参数、营养和累积压力调制。免疫未激活为淡红、激活为深红。深红读取真实的抗原接触识别后激活记忆；该记忆及其克隆子代的剩余激活期结束后恢复淡红。单纯趋化或尚未完成识别的扫描不触发变色。默认显示细胞核，正常核区使用深蓝轮廓与浅填色，深色胞体的核区用浅金，均来自实际力学核区。图层透明度独立调整：低强度保护胞体色，超过 50% 逐步放宽，100% 完整显示图层；核区和边界最后绘制。因子采用固定的非线性显示增强，悬停返回原始浓度。各类 Act 仍可分别开启：红表示新扩展的高活性格点，随后变黄、变绿并衰减回胞体色；它是骨架极化代理，不是测得的 F-actin 浓度。</p>
-  <p>单击新增可以在已有细胞区域尝试局部挤入：先在草稿格点中让周围胞体变形，核区沿连续可容纳的逐格路径让位，减少的切面面积受剩余让位预算约束，总目标生物量保留。确认所有胞体连通、核区完整且不碰墙后一次提交；失败保持原状。该操作是手动组织编辑，不推进 MCS，也不是自发迁移机制。新细胞仍占据真实格点，接触识别需从实际新接触重新累积。</p>
-  <p>受邻居推挤时，可见目标面积在设定上限内逐步减少，压力解除后恢复；总目标生物量保留，切面外部分继续计入局部代谢负担。实际面积低于目标切面面积时，新生长逐步减慢；低于 90% 时暂停新增生物量，得到空间后恢复，避免硬面积下限随无空间的生长不断抬高而锁住整个组织。这不直接关停运动，也不减少已有生物量。胞体保持四邻接连通，短突起必须变宽才能继续延伸。受保护的核区只能在实际胞体内逐格移动，过窄狭缝和实体墙仍然阻挡通行。切面外储量没有独立位置，也不产生隐藏接触。</p>
-  <p>胞核轮廓有稳定的个体差异，随附近真实胞体伸长和挤压产生有限变形，并逐渐恢复；暂停时不变化。轮廓保留在原圆形保护核区内，原有碰撞和过缝限制不变，并非完整核膜力学。参考 <a href="https://doi.org/10.1083/jcb.201210152" target="_blank" rel="noreferrer">受限迁移与胞核形变（Wolf 等，JCB 2013）</a>。</p>
-  <p>空白自建从 0 MCS 暂停开始，摆放细胞、信号和障碍后点击开始。「擦除细胞」移除触及的整颗胞体，单独记录手动清除；不混入自发凋亡、环境死亡或免疫杀伤。已触发的死亡被擦除时保留触发档案并标记手动中止。</p>
-  <p>氧、葡萄糖与酸负荷随细胞实际占据面积的局部密度而变化，包含扩散、消耗、清除和培养液补给。低氧、低糖和高酸持续累积损伤，降低增殖和免疫运动／杀伤；可运动细胞沿局部资源梯度逃逸。三项量均为归一化模型量，酸负荷不是实验 pH，补给也不是血管网络。</p>
-  <p>免疫细胞必须在真实共享格点边缘上持续接触抗原阳性的肿瘤或异常中间态，才进入识别和损伤递送；不会攻击健康正常细胞。接触识别激活短期招募信号与有限克隆扩增；仅感到趋化信号的细胞不自动分泌招募因子。脱离后停止杀伤，但招募记忆可以短暂保留。免疫分裂预算沿谱系递减，肿瘤没有代数上限。</p>
-  <p>「微环境 → 炎性信号促癌」以局部损伤与免疫招募场作为炎症代理，持续暴露累积后增加正常 → 异常中间态的随机风险；0 关闭此通路。它与代谢压力通路独立，后续仍需异常态停留及第二次转变，免疫可提前识别。发生发展预设为 1，其余情境默认 0，可自行调高。参考 <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2783826/" target="_blank" rel="noreferrer">NF-κB／IL-6 与细胞转化（Iliopoulos 等，2009）</a>及 <a href="https://pubmed.ncbi.nlm.nih.gov/19185845/" target="_blank" rel="noreferrer">IL-6／STAT3 与炎症相关肿瘤（Grivennikov 等，2009）</a>。这是未标定的情境假设，不把招募因子等同于 IL-6，也不意味着所有炎症或免疫招募均会致癌。</p>
-  <p>正常细胞同样会因持续低氧、低糖或高酸累积压力而死亡。另设两个随机步骤：持续压力提高正常细胞进入异常中间态的风险；异常细胞具有部分抗原，但仍使用正常运动／代谢规则，不自动扩增，也不能手动分裂。至少保留 160 MCS 后，才可能经独立随机事件进一步成为肿瘤，启用肿瘤增殖、侵袭与遗传。转变保留位置、胞体、总目标量、既有损伤和接触；异常中间态可被免疫细胞提前清除，也可环境致死或持续停留。</p>
-  <p>上述癌变风险是未标定的模型假设，不是现实发病概率。缺氧与 DNA 修复变化、癌前细胞免疫监视的研究仅提供机制启发，不证明任何缺氧、低糖或高酸都会导致癌变。本模型的统一接触杀伤细胞，也不复现癌前监视中多类免疫细胞的分工。</p>
-  <p>三个情境只设置初始细胞、参数和补给空间分布，不按时间强制癌变、播散或清除。「肿瘤发生发展」的酸清除系数从中心 0.05 平滑过渡到外围 1，氧糖补给系数为 0.65＋0.35×该系数；局部酸积累造成持续压力，外围仍可支持克隆存活。两阶段风险倍率设为 8 以缩短演示等待；新生肿瘤的初始遗传耐受范围为 2.04–2.76，仍继承已有损伤，仍会环境致死。「冷肿瘤」从局部 19 颗肿瘤和外围 3 颗免疫细胞开始；远端统计只跟踪原始肿瘤克隆：距原灶中心超过 55 个模型长度的存活细胞，以及在该区域实际发生的分裂。这是二维播散代理，不包含血管运输或跨器官转移。「热肿瘤治愈」从中心 37 颗肿瘤团和周边 18 颗免疫细胞开始；完成提示需要当前区域全部肿瘤胞体消失，并继续观察 150 MCS，不代表真实临床治愈。冷、热情境关闭新的环境诱发异常，以观察已有肿瘤的结局。</p>
-  <p>肿瘤的耐受、增殖、侵袭和抗原表达随分裂遗传，并可随机突变。环境改变不同性状的存活机会，不会主动把细胞变成“需要的突变”。初始抗原阳性比例只影响新播种的肿瘤；已有克隆的表达由遗传决定。没有全局细胞数量预算；旧配置中的数量预算不再生效。生长受营养、压力与遗传性状调制，分裂还需实际胞体面积、核区和有效几何分割；免疫细胞仍受激活状态和谱系剩余分裂次数约束。性能提示不改变这些规则。</p>
-  <p>免疫杀伤采用便于区分的裂解示意：实际胞体先圆化，目标切面面积有限增加，逐渐变为橙黄色，随后破裂清除。自发凋亡皱缩消失，环境死亡用灰褐萎缩表示；死亡原因与死亡形态是两个不同层次。真实免疫杀伤可导致凋亡，也可在特定条件下引起焦亡；这里没有模拟 gasdermin 通路，橙黄色并非实验染色。参考 <a href="https://www.nature.com/articles/s41586-020-2071-9" target="_blank" rel="noreferrer">GSDME 与细胞毒淋巴细胞介导的焦亡（Zhang 等，Nature 2020）</a>。破裂余迹不计为存活细胞。</p>
-  <p>这是二维切面代理模型，核区和切面让位均为简化约束。它不等同于原项目的 2.5D 表面爬行或完整三维实体瘤浸润，也没有核膜力学或真实三维体积求解。信号名称、浓度和参数尚未经生物实验标定。鼠标拖动是人工操作：拖动期间所有模型时钟暂停，只做局部几何让位；松手后按原播放状态继续，邻居的可见面积由原有力学逐渐恢复。</p>
-  <p>预热 35 MCS，计入画面时间。GPU 负责显示；WebAssembly 在 CPU 上按原顺序执行形变尝试。可选 WebGPU 微环境执行同样的扩散反应方程，自动模式把传输和读回纳入测速，选择更快的后端。倍率只改变每秒推进多少 MCS；算力不足时显示实际速率与限制，不跳过形变、接触或代谢步骤。</p>
-  <p><a href="https://doi.org/10.7554/eLife.61288" target="_blank" rel="noreferrer">Artistoo</a> · <a href="https://doi.org/10.1371/journal.pcbi.1004280" target="_blank" rel="noreferrer">Act 模型</a> · <a href="https://elifesciences.org/articles/56554" target="_blank" rel="noreferrer">CTL 同类招募</a> · <a href="https://pubmed.ncbi.nlm.nih.gov/26321679/" target="_blank" rel="noreferrer">代谢竞争</a> · <a href="https://www.nature.com/articles/s42255-022-00730-6" target="_blank" rel="noreferrer">酸度与 T 细胞功能</a> · <a href="https://www.nature.com/articles/s41467-021-25282-3" target="_blank" rel="noreferrer">累积细胞毒性</a></p>
-  <p>可视化参照：<a href="https://artistoo.net/examples/CancerInvasion.html" target="_blank" rel="noreferrer">Artistoo · Cancer Invasion</a>。该示例关闭 Act 着色；本演示保留独立的类型开关。</p>
-  <p>转变机制参考：<a href="https://pubmed.ncbi.nlm.nih.gov/16026872/" target="_blank" rel="noreferrer">缺氧下 DNA 修复基因表达（Meng et al., 2005）</a> · <a href="https://www.nature.com/articles/nature10599" target="_blank" rel="noreferrer">癌前肝细胞的衰老监视（Kang et al., 2011）</a>。</p>
-  </div><div data-language="en" hidden><div class="eyebrow">LOCAL RULES, NOT GLOBAL TARGETS</div><h2>How local communication shapes behavior</h2>
-<p>Cell shape and exclusion use the official Artistoo Cellular Potts engine. Additional alignment, local attraction and contact-turning rules are phenomenological parameters inspired by collective systems; cells are not treated literally as birds or ants.</p>
-<p>Optional mesenchymal shapes use dynamic local fronts. Protrusion number, length and direction change through extension, turning, lateral branching and retraction. A front extends further only when actual cytoplasm catches up. Sustained membrane contacts stabilize connections, which break on separation or death. Protrusions consist of occupied grid sites and retain nuclear, minimum-width and solid-wall constraints. U87 morphology depends on culture conditions; this mode is not calibrated to a cell line and does not model microtube transport or calcium waves. <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MORPHOLOGY.md" target="_blank" rel="noreferrer">Morphology model and evidence limits</a>.</p>
-<p>Morphology references: <a href="https://doi.org/10.1002/adbi.202300029" target="_blank" rel="noreferrer">U87 morphology and substrates (Andrade Mier et al., 2023)</a> · <a href="https://doi.org/10.1038/nature16071" target="_blank" rel="noreferrer">Brain tumor microtube networks (Osswald et al., 2015)</a> · <a href="https://arxiv.org/abs/2104.14954" target="_blank" rel="noreferrer">U87 node-link morphology (Awan et al., 2021)</a>. No images, videos or code were copied from these studies.</p>
-<p>Three simplified signal fields undergo secretion, diffusion and decay. Cohesion primarily affects normal cells. Tumor and abnormal cells release damage cues; immune cells release recruitment signals after recognizing a target. Movement samples local gradients and actual contact neighbors without looking up the nearest tumor. Solid walls block both movement and signal diffusion.</p>
-<p>Resting immune cells patrol with directional persistence, without unconditional alignment or strong adhesion to other immune cells. Their separate contact-separation response weakens under damage/recruitment gradients and pauses during antigen scanning or killing. This does not alter immune–target interface energies, deformation constraints or contact killing. Immune daughters inherit activation and remaining divisions but require their own contact recognition to recruit others; existing recruitment memory decays.</p>
-<p>Default normal cells are gray and abnormal cells brown. Tumors darken from gray to black as their inherited proliferation trait increases from 0.25 to 3 (gray level 88 to 0). Actual growth also depends on nutrients, stress and the global growth parameter. Resting immune cells are pale red; contact recognition turns them deep red until activation memory expires, including inherited memory in daughters. Chemotaxis or incomplete scanning alone does not change their color.</p>
-<p>Nuclei are shown by default. Their blue, red or pale-gold contours come from the mechanical nuclear regions. Colors are independently editable. Low overlay opacity protects body colors; above 50% this protection gradually relaxes, reaching full overlay intensity at 100%. Outlines and nuclei are drawn last. Signal display uses a fixed nonlinear enhancement; hover readings report raw concentrations. Act is optional by cell type: red marks newly expanded active pixels, then yellow and green fade back to body color. This is a cytoskeletal polarity proxy, not measured F-actin concentration.</p>
-<p>Manual insertion attempts local yielding in a draft grid. Bodies deform and nuclei move along continuous valid pixel paths. Section-area reduction is limited, preserving total target biomass. Changes commit only if all bodies remain connected, nuclei intact and walls respected; failure leaves the scene unchanged. This is tissue editing without advancing MCS, not a migration mechanism. Inserted cells occupy real grid sites and must accumulate recognition through new physical contacts.</p>
-<p>Under crowding, visible target area gradually decreases within the yielding limit and recovers when pressure is released. Total target biomass is retained, including off-plane metabolic demand. Growth slows when actual area lags the section target; below 90%, new biomass pauses until space returns. This avoids growth raising hard area constraints indefinitely in packed tissue. It neither stops movement directly nor removes existing biomass. Bodies remain four-neighbor connected; short protrusions must widen before extending. Protected nuclei move one grid site at a time within their bodies. Narrow gaps and walls still block passage. Off-plane reserve has no separate position or hidden contacts.</p>
-<p>Nuclear contours have stable individual variation and limited, gradual deformation with nearby body elongation or compression. Pausing freezes them. Contours remain inside the original protected nuclear disk, preserving collision and passage limits; this is not full nuclear-envelope mechanics. Reference: <a href="https://doi.org/10.1083/jcb.201210152" target="_blank" rel="noreferrer">Constrained migration and nuclear deformation (Wolf et al., JCB 2013)</a>.</p>
-<p>Custom scenes start empty and paused at 0 MCS. Place cells, signals and walls, then start. The cell eraser removes whole touched bodies and counts manual removals separately from biological deaths. Erasing an already dying cell preserves its trigger record and marks it manually interrupted. Randomize samples moderate model parameter ranges and a seeded mixture of normal, tumor and immune founders; it does not guarantee a particular biological outcome.</p>
-<p>Oxygen, glucose and acid load depend on local occupied area, with diffusion, consumption, clearance and medium supply. Sustained hypoxia, nutrient shortage and acidity accumulate damage, reducing proliferation and immune motility/killing. Motile cells can escape along local resource gradients. These are normalized model quantities; acid load is not experimental pH and supply is not a vascular network.</p>
-<p>Immune cells must sustain physical contact along a shared grid edge with an antigen-positive tumor or abnormal cell before recognition and damage delivery. Healthy normal cells are not attacked. Recognition enables temporary recruitment and limited clonal expansion. Chemotaxis alone does not activate recruitment. Killing stops upon separation; recruitment memory may briefly persist. Immune division capacity decreases along lineages; tumor generations are unlimited.</p>
-<p>The inflammation-associated transformation control treats local damage and recruitment signals as an inflammation proxy. Sustained exposure increases stochastic normal → abnormal risk; 0 disables this pathway independently of metabolic stress. Further transformation still requires time in the abnormal state and a second random event; immune surveillance may intervene first. The onset preset uses 1; other presets use 0. References: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2783826/" target="_blank" rel="noreferrer">NF-κB/IL-6 and transformation (Iliopoulos et al., 2009)</a> and <a href="https://pubmed.ncbi.nlm.nih.gov/19185845/" target="_blank" rel="noreferrer">IL-6/STAT3 and inflammation-associated cancer (Grivennikov et al., 2009)</a>. This uncalibrated scenario hypothesis does not equate recruitment signals with IL-6 or imply that all inflammation causes cancer.</p>
-<p>Normal cells can die from sustained metabolic stress. Transformation uses two stochastic stages. First, stress can create an abnormal cell with some antigen but normal movement/metabolism, no automatic expansion and no manual division. After at least 160 MCS, an independent event may activate tumor growth, invasion and inheritance. Position, body, total target mass, existing damage and contacts are preserved. Abnormal cells may be killed by immune cells, die from stress or remain abnormal.</p>
-<p>Transformation probabilities are uncalibrated model assumptions, not real disease risks. Hypoxia/DNA-repair and precancer immune-surveillance studies motivate mechanisms without proving that all hypoxia, glucose shortage or acidity causes cancer. The single contact-killing immune type does not reproduce the division of labor among real immune populations.</p>
-<p>Presets set founders, parameters and supply geometry without scheduling forced transformation, spread or clearance. Onset uses a central acid-clearance factor of 0.05, smoothly reaching 1 outside; nutrient supply scales as 0.65 + 0.35 times that factor. Both transformation-risk multipliers are 8 to shorten demonstration time. New tumors have baseline tolerance 2.04–2.76 but retain damage and may still die. Cold tumors begin with 19 tumor founders and 3 peripheral immune cells. Distal statistics track original tumor clones beyond radius 55 and divisions occurring there; this 2D spread proxy excludes vascular transport and cross-organ metastasis. Hot tumors begin with 37 central tumors and 18 immune cells. Clearance requires all tumor bodies to disappear and 150 more MCS of observation; it is not a claim of clinical cure. Cold/hot presets disable new stress-induced abnormality.</p>
-<p>Tumor tolerance, proliferation, invasion and antigen expression are inherited and may mutate independently at division. The environment selects among variants without producing directed mutations. Initial antigen fraction affects new founders only. There is no global population budget: space, nutrition, stress, actual body area, protected nuclei and valid geometric division determine growth and division. Immune activation and lineage division limits still apply. Performance warnings do not change these rules.</p>
-<p>Immune killing uses a distinctive lysis illustration: rounding, limited section-area expansion, an amber color transition, then rupture and clearance. Spontaneous apoptosis shrinks away; environmental death uses gray-brown withering. Cause and morphology are separate concepts. Real cytotoxic killing may cause apoptosis or, under some conditions, pyroptosis. No gasdermin pathway is modeled and amber is not an experimental stain. Reference: <a href="https://www.nature.com/articles/s41586-020-2071-9" target="_blank" rel="noreferrer">GSDME and cytotoxic lymphocyte-mediated pyroptosis (Zhang et al., Nature 2020)</a>. Rupture remnants are not living cells.</p>
-<p>This is a 2D section proxy with simplified nuclei and area yielding. It is not the original 2.5D surface-crawling model or full 3D tumor infiltration, and it does not solve real 3D volume or nuclear-envelope mechanics. Signals and parameters are uncalibrated. Manual dragging pauses all model clocks and performs local geometric yielding; releasing resumes the previous playback state and neighbor areas recover mechanically.</p>
-<p>The 35 MCS warmup is included in model time. The GPU renders the display; CPU WebAssembly preserves sequential deformation attempts. Optional WebGPU fields use the same reaction-diffusion equations; automatic benchmarking includes transfer/readback and selects the faster backend. Playback changes MCS per wall-clock second without skipping deformation, contact or metabolic steps.</p>
-<p>Experiment imports restore validated parameters as a new paused run, not a checkpoint. Current exports do not contain full lattice, field and random-generator state. Video recording captures only the visible arena, including pan/zoom, at a target 30 FPS and up to 1920 × 1080. The browser chooses a supported WebM or MP4 codec. Recording does not change model speed. Language switching is saved locally and does not reset the simulation.</p>
-<p><a href="https://doi.org/10.7554/eLife.61288" target="_blank" rel="noreferrer">Artistoo</a> · <a href="https://doi.org/10.1371/journal.pcbi.1004280" target="_blank" rel="noreferrer">Act model</a> · <a href="https://elifesciences.org/articles/56554" target="_blank" rel="noreferrer">CTL recruitment</a> · <a href="https://pubmed.ncbi.nlm.nih.gov/26321679/" target="_blank" rel="noreferrer">Metabolic competition</a> · <a href="https://www.nature.com/articles/s42255-022-00730-6" target="_blank" rel="noreferrer">Acidity and T cell function</a> · <a href="https://www.nature.com/articles/s41467-021-25282-3" target="_blank" rel="noreferrer">Cumulative cytotoxicity</a></p>
-<p>Visual reference: <a href="https://artistoo.net/examples/CancerInvasion.html" target="_blank" rel="noreferrer">Artistoo · Cancer Invasion</a>. That example disables Act coloring; this demo retains separate switches by cell type. Transformation references: <a href="https://pubmed.ncbi.nlm.nih.gov/16026872/" target="_blank" rel="noreferrer">Hypoxia and DNA repair expression (Meng et al., 2005)</a> · <a href="https://www.nature.com/articles/nature10599" target="_blank" rel="noreferrer">Senescence surveillance in premalignant liver cells (Kang et al., 2011)</a>.</p>
+<dialog id="about-dialog"><button id="close-about" class="close" aria-label="关闭">×</button><div data-language="zh">
+  <h2>模型与来源</h2>
+  <p>Cell-Arena 基于 <a href="https://doi.org/10.7554/eLife.61288" target="_blank" rel="noreferrer"><strong>Artistoo</strong>（Wortel 与 Textor，eLife，2021）</a> 构建。Artistoo 是在浏览器中模拟细胞与组织的开源 JavaScript 库；本网页使用其细胞 Potts 模型（CPM）实现胞体形变与相互作用，并沿用 Act 活性着色。可视化参考其 <a href="https://artistoo.net/examples/CancerInvasion.html" target="_blank" rel="noreferrer">Cancer Invasion 示例</a>。Artistoo 使用 MIT 许可，代码来源和完整许可保留在下方。</p>
+  <h3>本网页的主要扩展</h3>
+  <ul>
+    <li><strong>微环境与通讯：</strong>局部氧、糖、酸负荷，以及凝聚、损伤和免疫招募信号共同影响细胞运动、生长与存活。</li>
+    <li><strong>免疫监视：</strong>分散巡逻、局部趋化、抗原接触识别、累积杀伤、识别后招募与有限克隆扩增。</li>
+    <li><strong>肿瘤演化：</strong>正常 → 异常中间态 → 肿瘤；增殖、侵袭、耐受和抗原表达可遗传、突变，并区分不同死亡过程。</li>
+    <li><strong>形态与穿行：</strong>有限切面让位、核区约束、可变形胞核，以及可选的间质样分枝与接触成网。</li>
+  </ul>
+  <h3>怎么使用</h3>
+  <ol>
+    <li>选择内置情境直接运行，或在「空白自建」中摆放细胞后开始；「随机生成」可探索不同开局。</li>
+    <li>用画布工具添加、拖动或擦除细胞，绘制障碍、释放信号；「观察细胞」查看选中细胞和局部环境。</li>
+    <li>按六个参数分组调整细胞和环境。手机点「参数」展开面板，可直接输入数值或用 ＋／− 微调，点「返回画布」继续观察。</li>
+  </ol>
+  <p>「统计」查看全程数量变化；面板底部可导出／导入实验参数、保存画面和录制视频。导入参数会重新开局，不恢复中途状态。</p>
+  <p class="hint">这是未经实验标定的二维切面演示，MCS 为模拟步数，不等同于真实时间或完整三维肿瘤。<a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MODEL.md" target="_blank" rel="noreferrer">详细模型与机制参考</a> · <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MORPHOLOGY.md" target="_blank" rel="noreferrer">形态模型</a></p>
+  </div><div data-language="en" hidden><h2>Model &amp; sources</h2>
+<p>Cell-Arena is built on <a href="https://doi.org/10.7554/eLife.61288" target="_blank" rel="noreferrer"><strong>Artistoo</strong> (Wortel &amp; Textor, eLife, 2021)</a>, an open-source JavaScript library for simulating cells and tissues in the browser. This page uses its Cellular Potts Model (CPM) for cell deformation and interactions, and its Act activity colors. The <a href="https://artistoo.net/examples/CancerInvasion.html" target="_blank" rel="noreferrer">Cancer Invasion example</a> informed the visualization. Artistoo uses the MIT license; code credits and full licenses are preserved below.</p>
+<h3>Main additions</h3>
+<ul>
+  <li><strong>Environment and communication:</strong> local oxygen, glucose, acid load, cohesion, damage and immune recruitment signals influence movement, growth and survival.</li>
+  <li><strong>Immune surveillance:</strong> dispersed patrol, local chemotaxis, contact-based antigen recognition, cumulative killing, recruitment after recognition and limited clonal expansion.</li>
+  <li><strong>Tumor evolution:</strong> normal → abnormal → tumor transitions; inherited and mutable growth, invasion, tolerance and antigen traits, with distinct death processes.</li>
+  <li><strong>Shape and passage:</strong> limited section-area yielding, nuclear constraints, deformable nuclei, and optional mesenchymal branching and contact networks.</li>
+</ul>
+<h3>Getting started</h3>
+<ol>
+  <li>Choose a preset to run, or place cells in a Blank setup before starting. Randomize explores different starting conditions.</li>
+  <li>Use arena tools to add, drag or erase cells, draw barriers and release signals. Inspect cell shows the selected cell and local environment.</li>
+  <li>Adjust cells and their environment in six parameter groups. On phones, tap Parameters to expand the editor, type a value or use + / −, then tap Back to arena.</li>
+</ol>
+<p>Statistics shows the full population history. At the bottom of the panel, export or import parameters, save an image or record a video. Importing parameters starts a fresh run; it does not restore a checkpoint.</p>
+<p class="hint">This is an uncalibrated 2D section demo. MCS counts simulation steps, not real time or full 3D tumor dynamics. <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MODEL.md" target="_blank" rel="noreferrer">Detailed model and references</a> · <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MORPHOLOGY.md" target="_blank" rel="noreferrer">Morphology model</a></p>
 </div>
-  <details id="code-credits"><summary>代码来源、版本与许可</summary><p>Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定提交 e997d81213a5dcdfc40ad976a18958f412f00cc9 的官方文件原样内嵌。优化 JS 约束与 WebAssembly 内核包含对 Artistoo 顺序 CPM 与约束代码的专门化／移植，Act 配色沿用其 Canvas.drawActivityValues。</p><p>随 Artistoo 带入的 MT19937 随机数实现由 Makoto Matsumoto 与 Takuji Nishimura 编写，包内另保留 Sean McCullough 的 JavaScript 封装署名，采用 BSD 三条款许可；WASM 随机数部分移植同一实现。两个完整许可证均保留在本页面。</p><p>逐文件范围见 <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/THIRD_PARTY_NOTICES.md" target="_blank" rel="noreferrer">代码来源与第三方声明</a>。通讯、代谢、遗传、切面约束和交互为模型扩展；上列论文是机制参考，Cancer Invasion 是视觉参考，参数未经实验标定。</p><details><summary>Artistoo · MIT 完整许可证</summary><pre id="license-artistoo">MIT License
+  <details id="code-credits"><summary>代码来源、版本与许可</summary><p>Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定提交 e997d81213a5dcdfc40ad976a18958f412f00cc9 的官方文件原样内嵌。优化 JS 约束与 WebAssembly 内核包含对 Artistoo 顺序 CPM 与约束代码的专门化／移植，Act 配色沿用其 Canvas.drawActivityValues。</p><p>随 Artistoo 带入的 MT19937 随机数实现由 Makoto Matsumoto 与 Takuji Nishimura 编写，包内另保留 Sean McCullough 的 JavaScript 封装署名，采用 BSD 三条款许可；WASM 随机数部分移植同一实现。两个完整许可证均保留在本页面。</p><p>逐文件范围见 <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/THIRD_PARTY_NOTICES.md" target="_blank" rel="noreferrer">代码来源与第三方声明</a>。通讯、代谢、遗传、切面约束和交互为本网页的模型扩展；详细机制参考见模型文档。</p><details><summary>Artistoo · MIT 完整许可证</summary><pre id="license-artistoo">MIT License
 
 Copyright (c) 2019 Johannes Textor &amp; Inge Wortel
 
@@ -12757,8 +12806,15 @@ async function handle(event){
     else if(command==='advance'){if(dragSession)value=false;else{playing=false;resetClock();const steps=Math.min(10000,Math.max(1,payload.steps||1));if(backend.active==='gpu')await sim.advanceAsync(steps,backend);else sim.advance(steps);}}
     else if(command==='seed'){const radius=(payload.kind===3?3:4)*sim.scale;value=payload.manual&&payload.push?sim.insert(payload.kind,payload.x,payload.y,radius):sim.seed(payload.kind,payload.x,payload.y,radius);if(payload.manual)value={...sim.lastSeedResult};}
     else if(command==='sprinkle'){
-      value=0;let reason='space';for(let i=0;i<600&&value<5;i++){const cell=sim.seed(payload.kind,sim.C.ran(5,sim.width-6),sim.C.ran(5,sim.height-6),(payload.kind===3?3:4)*sim.scale);if(cell)value++;else if(sim.lastSeedResult.reason==='invalid'){reason='invalid';break;}}
-      if(payload.manual)value={added:value,requested:5,reason:value===5?'':reason,population:sim.live().length};
+      const requested=payload.count===undefined?5:Number(payload.count);value=0;let reason='space';
+      if(!Number.isSafeInteger(requested)||requested<1)reason='invalid';
+      else for(let attempts=0,misses=0;value<requested&&misses<600;attempts++){
+        const cell=sim.seed(payload.kind,sim.C.ran(5,sim.width-6),sim.C.ran(5,sim.height-6),(payload.kind===3?3:4)*sim.scale);
+        // Bound failed searches in crowded cultures, without a population quota.
+        if(cell){value++;misses=0;}else if(sim.lastSeedResult.reason==='invalid'){reason='invalid';break;}else misses++;
+        if(attempts%128===127)await new Promise(resolve=>setTimeout(resolve,0));
+      }
+      if(payload.manual)value={added:value,requested,reason:reason==='invalid'?'invalid':value===requested?'':reason,population:sim.live().length};
     }else if(command==='stroke'){
       value=0;for(const p of payload.points||[])value+=sim.paint(p[0],p[1],(payload.erase?5:2)*sim.scale,!!payload.erase,false);sim.rebuildMask();
     }else if(command==='eraseCells')value=sim.eraseCells(payload.points,(Number(payload.radius)||12)*sim.scale);
@@ -12834,6 +12890,15 @@ Arena 培养皿|Arena culture dish
 ↺ 重来|↺ Reset
 播放|Speed
 鼠标工具|Mouse tools
+↑ 展开面板|↑ Expand panel
+↓ 返回画布|↓ Back to arena
+工具|Tools
+画布工具|Arena tools
+场景与开局|Scenario & setup
+参数分组快捷入口|Parameter group shortcuts
+显示|Display
+环境|Environment
+次|times
 ↔ 拖动细胞|↔ Move
 ＋ 新增细胞|＋ Add cells
 ◉ 释放信号|◉ Signals
@@ -12862,7 +12927,11 @@ Arena 培养皿|Arena culture dish
 已激活免疫|Activated immune
 培养液|Medium
 实体障碍|Solid wall
-空隙随机加入 5 颗|Add 5 in available space
+数量|Count
+＋ 加入|+ Add
+加入中…|Adding…
+请输入正整数数量|Enter a positive whole number
+在空隙中随机加入所选类型的细胞|Randomly add the selected cell type in available space
 信号种类|Signal type
 损伤趋化因子 → 免疫细胞|Damage cue → immune cells
 凝聚因子 → 正常细胞为主|Cohesion cue → mainly normal cells
@@ -13310,9 +13379,10 @@ GPU（含传输）|GPU (including transfers)\u0020
 Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定提交 e997d81213a5dcdfc40ad976a18958f412f00cc9 的官方文件原样内嵌。优化 JS 约束与 WebAssembly 内核包含对 Artistoo 顺序 CPM 与约束代码的专门化／移植，Act 配色沿用其 Canvas.drawActivityValues。|Artistoo is by Johannes Textor and Inge Wortel, under the MIT license. Its official file at commit e997d81213a5dcdfc40ad976a18958f412f00cc9 is embedded unchanged. Optimized JavaScript constraints and the WebAssembly kernel specialize or port Artistoo sequential CPM and constraint code. Act coloring follows Canvas.drawActivityValues.
 随 Artistoo 带入的 MT19937 随机数实现由 Makoto Matsumoto 与 Takuji Nishimura 编写，包内另保留 Sean McCullough 的 JavaScript 封装署名，采用 BSD 三条款许可；WASM 随机数部分移植同一实现。两个完整许可证均保留在本页面。|The MT19937 implementation bundled with Artistoo is by Makoto Matsumoto and Takuji Nishimura; the package also preserves Sean McCullough's JavaScript wrapper credit, under the BSD 3-Clause license. The WASM random generator ports the same implementation. Both complete licenses are retained on this page.
 逐文件范围见|For file-by-file attribution, see\u0020
-。通讯、代谢、遗传、切面约束和交互为模型扩展；上列论文是机制参考，Cancer Invasion 是视觉参考，参数未经实验标定。|. Communication, metabolism, inheritance, section constraints and interaction are model extensions. The papers inform mechanisms; Cancer Invasion is a visual reference. Parameters are not experimentally calibrated.
+。通讯、代谢、遗传、切面约束和交互为本网页的模型扩展；详细机制参考见模型文档。|. Communication, metabolism, inheritance, section constraints and interaction are extensions in this page; detailed mechanism references are in the model documentation.
 `);
   const templates=[
+    [/^(减小|增大)(.+)$/,(_,action,name)=>`${action==='减小'?'Decrease':'Increase'} ${translate(name)}`],
     [/^(正常细胞|异常中间态|肿瘤细胞|未激活免疫|已激活免疫)(胞体|胞核)颜色$/,(_,type,part)=>`${dictionary.get(type)} ${dictionary.get(part).toLowerCase()} color`],
     [/^应用(.+)配色$/,(_,name)=>`Apply ${translate(name)} palette`],
     [/^最近 (\d+) 颗清除：(.+)$/,(_,n,causes)=>`${n} recent clearances: ${translate(causes)}`],
@@ -13621,6 +13691,87 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
   globalThis.CellLabVideo={ArenaRecorder,framing,finalizeWebM};
 })();
 
+/* Responsive controls only. Moving existing DOM nodes preserves input state,
+ * listeners, selected tools and the running simulation. */
+(() => {
+  'use strict';
+  function protectRange(range){
+    let gesture=null;
+    // Native range inputs jump on touch-down, before the browser can decide
+    // that a gesture is a vertical scroll. Hold that tentative value locally;
+    // only a tap or a deliberate horizontal drag reaches simulation listeners.
+    range.addEventListener('pointerdown',event=>{
+      if(event.pointerType==='touch'){gesture={id:event.pointerId,x:event.clientX,y:event.clientY,original:range.value,candidate:range.value,horizontal:false,vertical:false};range.dataset.touchEditing='true';}
+    },true);
+    range.addEventListener('pointermove',event=>{
+      if(!gesture||event.pointerId!==gesture.id||gesture.horizontal||gesture.vertical)return;
+      const dx=Math.abs(event.clientX-gesture.x),dy=Math.abs(event.clientY-gesture.y);
+      if(dy>8&&dy>=dx)gesture.vertical=true;
+      else if(dx>8&&dx>dy*1.25)gesture.horizontal=true;
+    },true);
+    range.addEventListener('input',event=>{
+      if(!gesture||gesture.horizontal)return;
+      gesture.candidate=range.value;range.value=gesture.original;event.stopImmediatePropagation();
+    },true);
+    range.addEventListener('pointerup',event=>{
+      if(!gesture||event.pointerId!==gesture.id)return;
+      const current=gesture;gesture=null;delete range.dataset.touchEditing;
+      if(current.vertical){range.value=current.original;return;}
+      if(!current.horizontal){range.value=current.candidate;range.dispatchEvent(new Event('input',{bubbles:true}));}
+    },true);
+    for(const event of ['pointercancel','lostpointercapture'])range.addEventListener(event,()=>{
+      if(gesture&&!gesture.horizontal)range.value=gesture.original;gesture=null;delete range.dataset.touchEditing;
+    },true);
+  }
+  function mount(){
+    const $=id=>document.getElementById(id),query=matchMedia('(max-width:850px)'),workspace=document.querySelector('.workspace');
+    const moves=[
+      [document.querySelector('.scenes'),$('mobile-scenes-host')],
+      [$('reset'),$('mobile-session-actions')],[$('shuffle'),$('mobile-session-actions')],
+      [$('about'),$('mobile-session-actions')],[document.querySelector('.quick-tools'),$('mobile-tools-host')]
+    ].map(([node,host])=>{const anchor=document.createComment('desktop control position');node.before(anchor);return{node,host,anchor};});
+    let expanded=false;
+    for(const range of document.querySelectorAll('input[type=range]'))protectRange(range);
+    function expand(value){
+      expanded=!!value&&query.matches;document.body.classList.toggle('panel-expanded',expanded);
+      $('mobile-expand').setAttribute('aria-expanded',String(expanded));
+      $('mobile-expand').textContent=expanded?'↓ 返回画布':'↑ 展开面板';
+    }
+    function selectTab(id){for(const button of document.querySelectorAll('[data-panel]'))button.setAttribute('aria-pressed',String(button.dataset.panel===id));}
+    function scrollTo(target){
+      requestAnimationFrame(()=>{const pane=$('sidebar-scroll'),offset=query.matches&&target.classList.contains('section')?$('mobile-module-nav').getBoundingClientRect().height:0;
+        pane.scrollTo({top:pane.scrollTop+target.getBoundingClientRect().top-pane.getBoundingClientRect().top-offset-5,behavior:'auto'});
+      });
+    }
+    function focus(id){
+      const target=$(id);if(!target)return;if(target.tagName==='DETAILS'&&!target.open)target.open=true;
+      if(query.matches)expand(id!=='mobile-tools');selectTab(id);scrollTo(target);
+    }
+    function focusModule(id){
+      const target=$(id);if(!target)return;if(!target.open)target.open=true;if(!query.matches)return;
+      expand(true);selectTab('parameter-groups');scrollTo(target);
+    }
+    function fitKeyboard(){
+      const v=window.visualViewport;workspace.style.height=query.matches&&v&&v.scale===1?Math.round(v.height)+'px':'';
+    }
+    function layout(){
+      for(const {node,host,anchor}of moves)if(query.matches)host.append(node);else anchor.after(node);
+      if(!query.matches){expand(false);if($('mobile-tools-tab').getAttribute('aria-pressed')==='true')selectTab('parameter-groups');}
+      fitKeyboard();
+    }
+    $('mobile-expand').addEventListener('click',()=>expand(!expanded));
+    for(const button of document.querySelectorAll('[data-module]'))button.addEventListener('click',()=>focusModule(button.dataset.module));
+    for(const section of document.querySelectorAll('#parameter-groups>details'))section.addEventListener('toggle',()=>{
+      for(const button of document.querySelectorAll('[data-module]'))button.setAttribute('aria-pressed',String($(button.dataset.module).open));
+      if(query.matches&&section.open)focusModule(section.id);
+    });
+    query.addEventListener('change',layout);window.visualViewport?.addEventListener('resize',fitKeyboard);
+    layout();expand(false);
+    return {focus,expand,get expanded(){return expanded;},get isMobile(){return query.matches;}};
+  }
+  globalThis.CellLabMobile={mount};
+})();
+
 (() => {
   'use strict';
   const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d',{alpha:false});
@@ -13678,10 +13829,20 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
     'other-sliders':['sectionYield','temperature','alignment','repulsion','noise']
   },moduleFor=Object.fromEntries(Object.entries(modules).flatMap(([id,names])=>names.map(name=>[name,id])));
   for(let i=0;i<controls.length;i++){
-    const [name,label,min,max,step,hint,suffix]=controls[i],row=document.createElement('label');row.className='slider';row.title=hint;
-    row.innerHTML=`<span>${label}<output id="${name}-out" for="${name}">—</output></span><input id="${name}" type="range" min="${min}" max="${max}" step="${step}" aria-describedby="${name}-hint"><small id="${name}-hint">${hint}</small>`;
+    const [name,label,min,max,step,hint,suffix]=controls[i],row=document.createElement('div');row.className='slider model-slider'+(suffix==='%'?' percentage-slider':'');row.title=hint;
+    const numberEntry=suffix==='%'?'':`<span class="parameter-entry"><input id="${name}-number" type="number" min="${min}" max="${max}" step="${step}" inputmode="${Number.isInteger(step)?'numeric':'decimal'}" aria-labelledby="${name}-label" aria-describedby="${name}-hint"><span>${suffix.trim()}</span></span>`;
+    row.innerHTML=`<span><label id="${name}-label" for="${name}">${label}</label><output id="${name}-out" for="${name}">—</output>${numberEntry}</span><div class="slider-track"><button id="${name}-decrease" class="parameter-step" type="button" aria-label="减小${label}">−</button><input id="${name}" type="range" min="${min}" max="${max}" step="${step}" aria-labelledby="${name}-label" aria-describedby="${name}-hint"><button id="${name}-increase" class="parameter-step" type="button" aria-label="增大${label}">＋</button></div><small id="${name}-hint">${hint}</small>`;
     $(moduleFor[name]).append(row);
-    $(name).addEventListener('input',e=>{const value=Number(e.target.value);$(name+'-out').textContent=value+suffix;rpc('set',{name,value}).catch(fail);});
+    $(name).addEventListener('input',e=>{const value=Number(e.target.value);$(name+'-out').textContent=value+suffix;syncParameterInput(name);rpc('set',{name,value}).catch(fail);});
+    for(const [id,direction]of [['decrease',-1],['increase',1]])$(name+'-'+id).addEventListener('click',()=>{$(name).stepUp(direction);$(name).dispatchEvent(new Event('input',{bubbles:true}));});
+    $(name+'-number')?.addEventListener('change',e=>{const value=e.target.valueAsNumber;if(!Number.isFinite(value)){e.target.value=$(name).value;return;}const bounded=Math.max(min,Math.min(max,value));$(name).value=Number((min+Math.round((bounded-min)/step)*step).toFixed(8));e.target.value=$(name).value;$(name).dispatchEvent(new Event('input',{bubbles:true}));});
+    $(name+'-number')?.addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur();});
+    $(name+'-number')?.addEventListener('focus',e=>requestAnimationFrame(()=>{if(document.activeElement===e.target)e.target.select();}));
+  }
+  function syncParameterInput(name){
+    const slider=$(name),number=$(name+'-number'),value=Number(slider.value);
+    if(number){if(document.activeElement!==number)number.value=slider.value;number.disabled=slider.disabled;}
+    $(name+'-decrease').disabled=slider.disabled||value<=Number(slider.min);$(name+'-increase').disabled=slider.disabled||value>=Number(slider.max);
   }
   for(const [key,label] of [['environment','环境热图'],['cohesion','细胞凝聚因子'],['danger','损伤因子'],['trail','免疫招募因子']]){
     const row=document.createElement('label');row.className='slider';row.innerHTML=`<span id="opacity-label-${key}">${label}<output id="opacity-${key}-out" for="opacity-${key}"></output></span><input id="opacity-${key}" type="range" min="0" max="100" step="1" value="${(key==='environment'?.35:.45)*100}">`;
@@ -13756,12 +13917,13 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
     }
     $('seed-label').textContent='种子 '+s.seed;
     for(const b of document.querySelectorAll('[data-scene]')){const active=b.dataset.scene===s.scene;b.classList.toggle('active',active);b.setAttribute('aria-pressed',active);}
-    for(const [name,,,,,,suffix] of controls){if(document.activeElement!==$(name))$(name).value=s.settings[name];$(name+'-out').textContent=Number($(name).value)+suffix;}
-    if(document.activeElement!==$('speed'))$('speed').value=s.speed;$('speed-out').textContent=s.speed+'×';
+    for(const [name,,,,,,suffix] of controls){if(document.activeElement!==$(name)&&!$(name).dataset.touchEditing)$(name).value=s.settings[name];$(name+'-out').textContent=Number($(name).value)+suffix;syncParameterInput(name);}
+    if(document.activeElement!==$('speed')&&!$('speed').dataset.touchEditing)$('speed').value=s.speed;$('speed-out').textContent=s.speed+'×';
     $('boundary').value=s.boundary;
     $('tumor-morphology').value=s.settings.tumorMorphology;$('branch-sliders').hidden=!s.settings.tumorMorphology;
     $('networkAdhesion').disabled=s.settings.tumorMorphology!==2;
     $('branching').disabled=s.settings.tumorMorphology!==2;
+    syncParameterInput('networkAdhesion');syncParameterInput('branching');
     $('network-status').textContent=s.settings.tumorMorphology===2?`当前稳定接触 ${s.cells.reduce((n,m)=>n+(m.networkDegree||0),0)/2} 对；各细胞保持独立胞体。`:'示例会重新播种一片肿瘤细胞，观察突起逐渐形成与连接。';
     const counts=[0,0,0,0];let abnormal=0,activated=0;for(const m of s.cells){counts[m.kind]++;if(m.state==='abnormal')abnormal++;if(CellLabDisplay.immuneActive(m))activated++;}
     $('normal-count').textContent=counts[1]-abnormal;$('abnormal-count').textContent=abnormal;$('tumor-count').textContent=counts[2];$('immune-count').textContent=counts[3];
@@ -13954,7 +14116,7 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
     if(!snapshot||e.button!==0)return;e.preventDefault();$('field-probe').hidden=true;const p=point(e),id=snapshot.grid[p[1]*snapshot.width+p[0]],m=snapshot.cells.find(c=>c.id===id);
     canvas.setPointerCapture(e.pointerId);stroke={previous:p,id:m?.id||0,token:++dragSerial,offset:[0,0],warned:false,drag:tool==='move'};if(tool==='remove'){hover={clientX:e.clientX,clientY:e.clientY};probeDirty=true;}
     if(tool==='move'||tool==='inspect'){selected=m?.id||0;sync();dirty=true;}
-    if(tool==='inspect')$('cell-inspector').open=true;
+    if(tool==='inspect'){$('cell-inspector').open=true;if(mobileUI.isMobile)mobileUI.focus('cell-inspector');}
     if(tool==='move'){
       if(!m||m.dying){stroke=null;toast('请在一个存活的细胞上按住拖动');return;}
       stroke.offset=[m.x-p[0],m.y-p[1]];canvas.style.cursor='grabbing';lastAction=rpc('beginDrag',{id:m.id,token:stroke.token}).catch(fail);
@@ -13983,7 +14145,7 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
     await rpc('start',{scene,seed,worldWidth,worldHeight:Number($('world-size').selectedOptions[0]?.dataset.height)||worldWidth*.75,refinement,boundary:$('boundary').value,settings:preserve?snapshot?.settings||{}:{},...(scene==='empty'?{warmup:0}:{})});
     if(preset||scene==='empty'){signalLayers.clear();$('field-view').value=scene==='oncogenesis'?'adversity':'none';if(scene==='hot')signalLayers.add('trail');updateOverlayButtons();dirty=true;await rpc('speed',{value:scene==='oncogenesis'?4:scene==='network'?3:1});await rpc('playing',{value:scene!=='empty'});}
     else if(scene==='stress'||scene==='surveillance'){$('field-view').value='adversity';dirty=true;}
-    if(scene==='empty'){view.x=0;view.y=0;$('zoom').value='100';$('seed-kind').value='1';setTool('seed');dirty=true;}
+    if(scene==='empty'){view.x=0;view.y=0;$('zoom').value='100';$('seed-kind').value='1';setTool('seed');if(mobileUI.isMobile)mobileUI.focus('mobile-tools');dirty=true;}
   }
   document.querySelectorAll('[data-scene]').forEach(b=>b.addEventListener('click',()=>start(b.dataset.scene,{preset:true}).catch(fail)));
   $('restore-scenario').addEventListener('click',()=>start(undefined,{preset:true}).then(()=>toast('已恢复当前情境的参数、种子与初始细胞')).catch(fail));
@@ -13998,20 +14160,22 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
   $('reset').addEventListener('click',()=>start(undefined,{preserve:true}).catch(fail));$('shuffle').addEventListener('click',()=>start('random',{shuffle:true}).catch(fail));
   $('play').addEventListener('click',()=>rpc('playing',{value:!snapshot?.playing}).catch(fail));$('step').addEventListener('click',()=>rpc('advance',{steps:1}).catch(fail));
   $('speed').addEventListener('input',e=>{$('speed-out').textContent=e.target.value+'×';rpc('speed',{value:Number(e.target.value)}).catch(fail);});
-  $('sprinkle').addEventListener('click',()=>rpc('sprinkle',{kind:Number($('seed-kind').value),manual:true}).then(seedFeedback).catch(fail));
+  $('sprinkle').addEventListener('click',async()=>{
+    const count=$('seed-count').valueAsNumber,button=$('sprinkle');
+    if(!Number.isSafeInteger(count)||count<1){toast('请输入正整数数量');$('seed-count').focus();return;}
+    button.disabled=true;button.textContent='加入中…';
+    try{seedFeedback(await rpc('sprinkle',{kind:Number($('seed-kind').value),count,manual:true}));}catch(error){fail(error);}finally{button.disabled=false;button.textContent='＋ 加入';}
+  });
   $('clear-walls').addEventListener('click',()=>rpc('clearWalls').then(()=>toast('障碍已清除')).catch(fail));
   $('divide').addEventListener('click',()=>{if(!selected){toast('请先点击选中一颗细胞');return;}rpc('divide',{id:selected}).then(id=>toast(id?'已分裂出细胞 #'+id:'面积不足、免疫分裂次数耗尽或轮廓受限')).catch(fail);});
   for(const id of ['field-view','edge-activity','normal-activity','tumor-activity','immune-activity','cell-seams','arrows','antigen-marks','nuclei','protect-bodies'])$(id).addEventListener('change',()=>dirty=true);
   document.querySelectorAll('[data-layer]').forEach(button=>button.addEventListener('click',()=>{const key=button.dataset.layer;if(key==='adversity')$('field-view').value=$('field-view').value==='adversity'?'none':'adversity';else if(signalLayers.has(key))signalLayers.delete(key);else signalLayers.add(key);updateOverlayButtons();dirty=true;}));
   $('clear-overlays').addEventListener('click',()=>{signalLayers.clear();$('field-view').value='none';updateOverlayButtons();dirty=true;});
   const sections=[...document.querySelectorAll('aside details.section')];
+  const mobileUI=CellLabMobile.mount();
   for(const section of sections)section.addEventListener('toggle',()=>{if(section.open)for(const other of sections)if(other!==section)other.open=false;});
   $('collapse-modules').addEventListener('click',()=>sections.forEach(section=>section.open=false));
-  document.querySelectorAll('[data-panel]').forEach(button=>button.addEventListener('click',()=>{
-    const id=button.dataset.panel,target=$(id);if(target.tagName==='DETAILS')target.open=true;
-    document.querySelectorAll('[data-panel]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
-    requestAnimationFrame(()=>{const pane=$('sidebar-scroll');pane.scrollTo({top:pane.scrollTop+target.getBoundingClientRect().top-pane.getBoundingClientRect().top-5,behavior:'auto'});});
-  }));
+  document.querySelectorAll('[data-panel]').forEach(button=>button.addEventListener('click',()=>mobileUI.focus(button.dataset.panel)));
   $('compute-backend').addEventListener('change',()=>rpc('backend',{mode:$('compute-backend').value}).catch(fail));
   const modes={wander:{alignment:0,cohesion:0,repulsion:1.2,noise:1.2,normalMotility:.9},cluster:{alignment:.4,cohesion:2.6,repulsion:.3,noise:.4,normalMotility:.45},flock:{alignment:2.7,cohesion:1.1,repulsion:.5,noise:.25,normalMotility:1}};
   document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',async()=>{for(const [name,value] of Object.entries(modes[b.dataset.mode]))await rpc('set',{name,value});toast('局部规则已更新；变化会逐步形成');}));

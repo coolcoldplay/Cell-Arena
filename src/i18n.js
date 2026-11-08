@@ -32,6 +32,15 @@ Arena 培养皿|Arena culture dish
 ↺ 重来|↺ Reset
 播放|Speed
 鼠标工具|Mouse tools
+↑ 展开面板|↑ Expand panel
+↓ 返回画布|↓ Back to arena
+工具|Tools
+画布工具|Arena tools
+场景与开局|Scenario & setup
+参数分组快捷入口|Parameter group shortcuts
+显示|Display
+环境|Environment
+次|times
 ↔ 拖动细胞|↔ Move
 ＋ 新增细胞|＋ Add cells
 ◉ 释放信号|◉ Signals
@@ -60,7 +69,11 @@ Arena 培养皿|Arena culture dish
 已激活免疫|Activated immune
 培养液|Medium
 实体障碍|Solid wall
-空隙随机加入 5 颗|Add 5 in available space
+数量|Count
+＋ 加入|+ Add
+加入中…|Adding…
+请输入正整数数量|Enter a positive whole number
+在空隙中随机加入所选类型的细胞|Randomly add the selected cell type in available space
 信号种类|Signal type
 损伤趋化因子 → 免疫细胞|Damage cue → immune cells
 凝聚因子 → 正常细胞为主|Cohesion cue → mainly normal cells
@@ -508,9 +521,10 @@ GPU（含传输）|GPU (including transfers)\u0020
 Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定提交 e997d81213a5dcdfc40ad976a18958f412f00cc9 的官方文件原样内嵌。优化 JS 约束与 WebAssembly 内核包含对 Artistoo 顺序 CPM 与约束代码的专门化／移植，Act 配色沿用其 Canvas.drawActivityValues。|Artistoo is by Johannes Textor and Inge Wortel, under the MIT license. Its official file at commit e997d81213a5dcdfc40ad976a18958f412f00cc9 is embedded unchanged. Optimized JavaScript constraints and the WebAssembly kernel specialize or port Artistoo sequential CPM and constraint code. Act coloring follows Canvas.drawActivityValues.
 随 Artistoo 带入的 MT19937 随机数实现由 Makoto Matsumoto 与 Takuji Nishimura 编写，包内另保留 Sean McCullough 的 JavaScript 封装署名，采用 BSD 三条款许可；WASM 随机数部分移植同一实现。两个完整许可证均保留在本页面。|The MT19937 implementation bundled with Artistoo is by Makoto Matsumoto and Takuji Nishimura; the package also preserves Sean McCullough's JavaScript wrapper credit, under the BSD 3-Clause license. The WASM random generator ports the same implementation. Both complete licenses are retained on this page.
 逐文件范围见|For file-by-file attribution, see\u0020
-。通讯、代谢、遗传、切面约束和交互为模型扩展；上列论文是机制参考，Cancer Invasion 是视觉参考，参数未经实验标定。|. Communication, metabolism, inheritance, section constraints and interaction are model extensions. The papers inform mechanisms; Cancer Invasion is a visual reference. Parameters are not experimentally calibrated.
+。通讯、代谢、遗传、切面约束和交互为本网页的模型扩展；详细机制参考见模型文档。|. Communication, metabolism, inheritance, section constraints and interaction are extensions in this page; detailed mechanism references are in the model documentation.
 `);
   const templates=[
+    [/^(减小|增大)(.+)$/,(_,action,name)=>`${action==='减小'?'Decrease':'Increase'} ${translate(name)}`],
     [/^(正常细胞|异常中间态|肿瘤细胞|未激活免疫|已激活免疫)(胞体|胞核)颜色$/,(_,type,part)=>`${dictionary.get(type)} ${dictionary.get(part).toLowerCase()} color`],
     [/^应用(.+)配色$/,(_,name)=>`Apply ${translate(name)} palette`],
     [/^最近 (\d+) 颗清除：(.+)$/,(_,n,causes)=>`${n} recent clearances: ${translate(causes)}`],

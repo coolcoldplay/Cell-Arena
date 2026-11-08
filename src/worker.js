@@ -44,8 +44,15 @@ async function handle(event){
     else if(command==='advance'){if(dragSession)value=false;else{playing=false;resetClock();const steps=Math.min(10000,Math.max(1,payload.steps||1));if(backend.active==='gpu')await sim.advanceAsync(steps,backend);else sim.advance(steps);}}
     else if(command==='seed'){const radius=(payload.kind===3?3:4)*sim.scale;value=payload.manual&&payload.push?sim.insert(payload.kind,payload.x,payload.y,radius):sim.seed(payload.kind,payload.x,payload.y,radius);if(payload.manual)value={...sim.lastSeedResult};}
     else if(command==='sprinkle'){
-      value=0;let reason='space';for(let i=0;i<600&&value<5;i++){const cell=sim.seed(payload.kind,sim.C.ran(5,sim.width-6),sim.C.ran(5,sim.height-6),(payload.kind===3?3:4)*sim.scale);if(cell)value++;else if(sim.lastSeedResult.reason==='invalid'){reason='invalid';break;}}
-      if(payload.manual)value={added:value,requested:5,reason:value===5?'':reason,population:sim.live().length};
+      const requested=payload.count===undefined?5:Number(payload.count);value=0;let reason='space';
+      if(!Number.isSafeInteger(requested)||requested<1)reason='invalid';
+      else for(let attempts=0,misses=0;value<requested&&misses<600;attempts++){
+        const cell=sim.seed(payload.kind,sim.C.ran(5,sim.width-6),sim.C.ran(5,sim.height-6),(payload.kind===3?3:4)*sim.scale);
+        // Bound failed searches in crowded cultures, without a population quota.
+        if(cell){value++;misses=0;}else if(sim.lastSeedResult.reason==='invalid'){reason='invalid';break;}else misses++;
+        if(attempts%128===127)await new Promise(resolve=>setTimeout(resolve,0));
+      }
+      if(payload.manual)value={added:value,requested,reason:reason==='invalid'?'invalid':value===requested?'':reason,population:sim.live().length};
     }else if(command==='stroke'){
       value=0;for(const p of payload.points||[])value+=sim.paint(p[0],p[1],(payload.erase?5:2)*sim.scale,!!payload.erase,false);sim.rebuildMask();
     }else if(command==='eraseCells')value=sim.eraseCells(payload.points,(Number(payload.radius)||12)*sim.scale);
