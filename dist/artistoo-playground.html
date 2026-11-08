@@ -48,6 +48,7 @@ aside .section .section-body{padding:11px 7px 7px}
 .color-grid{display:grid;grid-template-columns:minmax(110px,1fr) 60px 60px;gap:12px 8px;align-items:center;margin:4px 0 20px;font-size:12px}.color-grid>span:nth-child(-n+3){font-size:10px;color:var(--muted)}.color-grid input[type=color]{width:50px;height:32px;padding:2px;border:1px solid var(--line);border-radius:5px;background:#18272d;cursor:pointer}.color-grid input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}#network-demo{width:100%;margin-bottom:8px}#branch-sliders[hidden]{display:none}
 .color-presets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.color-preset{display:flex;flex-direction:column;align-items:stretch;gap:8px;text-align:left;padding:10px 8px;background:#1e2c32;min-width:0}.color-preset b{font-size:11px;font-weight:500}.color-preset small{font-size:9px;line-height:1.6;color:var(--muted)}.color-preset.selected{border-color:var(--accent);background:#283b35}.palette-preview{display:flex;justify-content:space-between;gap:3px;padding:8px 5px;background:#f3f5f1;border-radius:5px}.palette-preview i{display:block;position:relative;background:var(--body);width:17px;height:19px;border-radius:45% 55% 42% 58%;border:1px solid #273b3d55;flex-shrink:0}.palette-preview i::after{content:'';position:absolute;inset:5px 4px;border-radius:50%;border:1.5px solid var(--nucleus)}.palette-key{margin:0 0 16px;font-size:9px}#palette-status{color:#d0ddc9;margin-bottom:4px}
 .metrics{grid-template-columns:repeat(4,minmax(0,1fr))}.death-overview{padding:14px 16px 10px;border-top:1px solid var(--line);background:#1a292f}.death-causes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.death-causes>div{border-left:2px solid #879e99;padding-left:10px;min-width:0}.death-causes>div:nth-child(2){border-color:#d8ab71}.death-causes>div:nth-child(3){border-color:#bf8795}.death-causes span{font-size:11px;color:#cddbd4}.death-causes b{display:block;font:22px Consolas,monospace;margin:5px 0}.death-causes small{display:block;color:var(--muted);font-size:10px;line-height:1.7;font-variant-numeric:tabular-nums}.death-overview .hint{margin-bottom:4px}#clearance-recent-summary{color:#d6cbb4;font-size:11px;margin:4px 0;font-variant-numeric:tabular-nums}
+.death-visual-key{display:flex;gap:8px 18px;flex-wrap:wrap;font-size:10px;color:#c8d4ce}.death-visual-key span{display:flex;gap:6px;align-items:center}.death-visual-key i{width:8px;height:8px;border-radius:50%;display:inline-block}
 .death-ledger{padding:11px 16px;border-top:1px solid var(--line);font-size:11px}.death-ledger summary{cursor:pointer;color:#d5dfd8}.death-ledger summary span{float:right;color:var(--muted);font-size:10px}.death-ledger #death-summary{white-space:pre-line;line-height:1.9;color:#d4c7b5}.death-ledger h3{font-size:11px;font-weight:500;margin:14px 0 5px;color:#cbd9d1}.death-ledger ol{list-style:none;margin:8px 0 0;padding:0;font-size:10px;line-height:1.9;color:var(--muted)}#death-progress{font-variant-numeric:tabular-nums;line-height:1.5}
 @media(max-width:760px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 0}.metrics>div:nth-child(2){border-right:0}.death-overview{padding:12px 10px}.death-causes{gap:8px}.death-causes>div{padding-left:7px}.death-causes span,.death-causes small{font-size:10px}#clearance-recent-summary{font-size:10px}}
 @media(max-width:1050px){.scenes{grid-template-columns:repeat(3,minmax(0,1fr))}#opacity-sliders{grid-template-columns:1fr 1fr}}
@@ -89,7 +90,8 @@ aside .section .section-body{padding:11px 7px 7px}
           <div><span>环境死亡清除</span><b id="environment-death-count">0</b><small id="environment-death-progress">清除中 0 · 已触发 0</small></div>
           <div><span>免疫杀伤清除</span><b id="kill-count">0</b><small id="kill-progress">清除中 0 · 已触发 0</small></div>
         </div>
-        <p class="hint">胞体消失时计入清除；低氧、低糖、高酸造成的死亡计入「环境死亡」，不计入「自发凋亡」。</p>
+        <p class="hint">胞体消失时计入清除。自发凋亡设为 0% 只阻止新的随机凋亡；环境死亡、免疫杀伤和此前已触发的死亡仍会继续。</p>
+        <p class="death-visual-key"><span><i style="background:#4b4e56"></i>自发：皱缩消失</span><span><i style="background:#9e9170"></i>环境：灰褐萎缩</span><span><i style="background:#f68fab"></i>免疫杀伤：变粉、圆化肿胀、破裂</span></p>
         <p id="clearance-recent-summary">本局尚无死亡清除。</p>
       </section>
       <div class="performance-line"><span id="performance">目标 30 MCS / 秒 · 独立计算线程</span><span id="seed-label">种子 17</span></div>
@@ -101,7 +103,7 @@ aside .section .section-body{padding:11px 7px 7px}
     <aside>
       <div class="eyebrow">YOUR HAND IN THE DISH</div><h2>直接在画面上动手</h2>
       <div class="tools" role="group" aria-label="鼠标工具"><button data-tool="move" class="selected">↔ 拖动细胞</button><button data-tool="seed">＋ 新增细胞</button><button data-tool="signal">◉ 释放信号</button><button data-tool="wall">▥ 绘制障碍</button><button data-tool="erase">⌫ 擦除障碍</button><button data-tool="inspect">⌾ 观察细胞</button></div>
-      <p id="tool-hint" class="hint">拖动真实细胞轮廓，遇到其他细胞或墙会停下。拖动期间暂停，松手后恢复。</p>
+      <p id="tool-hint" class="hint">按住期间暂停，沿途细胞弹性变形、核区让位；松手后恢复原播放状态。实体墙仍阻挡。</p>
       <div id="seed-options" class="tool-options" hidden><label>新增类型<select id="seed-kind"><option value="1">正常细胞</option><option value="2">肿瘤细胞</option><option value="3" selected>免疫细胞</option></select></label><button id="sprinkle">空隙随机加入 5 颗</button><p id="seed-status" class="hint"></p><p class="hint">单击加入一颗，可挤入已有细胞区域；邻居变形、核区逐格让位，切面缩小不超过设定上限，总目标量保留。只检查局部空间，不按总数量拒绝新增；挤入失败不改动原有细胞。</p></div>
       <div id="signal-options" class="tool-options" hidden><label>信号种类<select id="signal-kind"><option value="danger">损伤趋化因子 → 免疫细胞</option><option value="cohesion">凝聚因子 → 正常细胞为主</option><option value="trail">免疫招募因子 → 免疫细胞</option></select></label><p class="hint">点击释放，拖动画出信号带；随后自然扩散、衰减。</p></div>
       <div id="wall-options" class="tool-options" hidden><button id="clear-walls">清除全部障碍</button></div>
@@ -148,7 +150,8 @@ aside .section .section-body{padding:11px 7px 7px}
   <p>上述癌变风险是未标定的模型假设，不是现实发病概率。缺氧与 DNA 修复变化、癌前细胞免疫监视的研究仅提供机制启发，不证明任何缺氧、低糖或高酸都会导致癌变。本模型的统一接触杀伤细胞，也不复现癌前监视中多类免疫细胞的分工。</p>
   <p>三个情境只设置初始细胞、参数和补给空间分布，不按时间强制癌变、播散或清除。「肿瘤发生发展」的酸清除系数从中心 0.05 平滑过渡到外围 1，氧糖补给系数为 0.65＋0.35×该系数；局部酸积累造成持续压力，外围仍可支持克隆存活。两阶段风险倍率设为 8 以缩短演示等待；新生肿瘤的初始遗传耐受范围为 2.04–2.76，仍继承已有损伤，仍会环境致死。「冷肿瘤」从局部 19 颗肿瘤和外围 3 颗免疫细胞开始；远端统计只跟踪原始肿瘤克隆：距原灶中心超过 55 个模型长度的存活细胞，以及在该区域实际发生的分裂。这是二维播散代理，不包含血管运输或跨器官转移。「热肿瘤治愈」从中心 37 颗肿瘤团和周边 18 颗免疫细胞开始；完成提示需要当前区域全部肿瘤胞体消失，并继续观察 150 MCS，不代表真实临床治愈。冷、热情境关闭新的环境诱发异常，以观察已有肿瘤的结局。</p>
   <p>肿瘤的耐受、增殖、侵袭和抗原表达随分裂遗传，并可随机突变。环境改变不同性状的存活机会，不会主动把细胞变成“需要的突变”。初始抗原阳性比例只影响新播种的肿瘤；已有克隆的表达由遗传决定。没有全局细胞数量预算；旧配置中的数量预算不再生效。生长受营养、压力与遗传性状调制，分裂还需实际胞体面积、核区和有效几何分割；免疫细胞仍受激活状态和谱系剩余分裂次数约束。性能提示不改变这些规则。</p>
-  <p>这是二维切面代理模型，核区和切面让位均为简化约束。它不等同于原项目的 2.5D 表面爬行或完整三维实体瘤浸润，也没有核膜力学或真实三维体积求解。信号名称、浓度和参数尚未经生物实验标定。</p>
+  <p>免疫杀伤采用便于区分的裂解示意：实际胞体先圆化，目标切面面积有限增加，逐渐变粉，随后破裂清除。自发凋亡皱缩消失，环境死亡用灰褐萎缩表示；死亡原因与死亡形态是两个不同层次。真实免疫杀伤可导致凋亡，也可在特定条件下引起焦亡；这里没有模拟 gasdermin 通路，粉色并非实验染色。参考 <a href="https://www.nature.com/articles/s41586-020-2071-9" target="_blank" rel="noreferrer">GSDME 与细胞毒淋巴细胞介导的焦亡（Zhang 等，Nature 2020）</a>。破裂余迹不计为存活细胞。</p>
+  <p>这是二维切面代理模型，核区和切面让位均为简化约束。它不等同于原项目的 2.5D 表面爬行或完整三维实体瘤浸润，也没有核膜力学或真实三维体积求解。信号名称、浓度和参数尚未经生物实验标定。鼠标拖动是人工操作：拖动期间所有模型时钟暂停，只做局部几何让位；松手后按原播放状态继续，邻居的可见面积由原有力学逐渐恢复。</p>
   <p>预热 35 MCS，计入画面时间。GPU 负责显示；WebAssembly 在 CPU 上按原顺序执行形变尝试。可选 WebGPU 微环境执行同样的扩散反应方程，自动模式把传输和读回纳入测速，选择更快的后端。倍率只改变每秒推进多少 MCS；算力不足时显示实际速率与限制，不跳过形变、接触或代谢步骤。</p>
   <p><a href="https://doi.org/10.7554/eLife.61288" target="_blank" rel="noreferrer">Artistoo</a> · <a href="https://doi.org/10.1371/journal.pcbi.1004280" target="_blank" rel="noreferrer">Act 模型</a> · <a href="https://elifesciences.org/articles/56554" target="_blank" rel="noreferrer">CTL 同类招募</a> · <a href="https://pubmed.ncbi.nlm.nih.gov/26321679/" target="_blank" rel="noreferrer">代谢竞争</a> · <a href="https://www.nature.com/articles/s42255-022-00730-6" target="_blank" rel="noreferrer">酸度与 T 细胞功能</a> · <a href="https://www.nature.com/articles/s41467-021-25282-3" target="_blank" rel="noreferrer">累积细胞毒性</a></p>
   <p>可视化参照：<a href="https://artistoo.net/examples/CancerInvasion.html" target="_blank" rel="noreferrer">Artistoo · Cancer Invasion</a>。该示例关闭 Act 着色；本演示保留独立的类型开关。</p>
@@ -11280,7 +11283,7 @@ var CPM = (function (exports, module$1) {
     // Every extension must still pass the ordinary adjacent-copy, connected
     // cytoplasm, finite width, nuclear disk, volume and obstacle constraints.
     shapePenalty(m,x,y){
-      if(!m?.hasNucleus||m.dying)return 0;
+      if(!m?.hasNucleus||(m.dying&&!m.deathIntact))return 0;
       const dx=this.delta(x-m.nucleusX,this.s.width),dy=this.delta(y-m.nucleusY,this.s.height),d2=dx*dx+dy*dy;
       if(!m.morphologyMode)return [0,5,10,18][m.kind]*Math.max(0,Math.sqrt(d2)/m.softReach-1)**2;
       const distance=Math.sqrt(d2);let outside=Math.max(0,distance-m.branchCore),processGap=Infinity;
@@ -11437,11 +11440,11 @@ var CPM = (function (exports, module$1) {
     }
     allowed(src,tgt,a,b){
       const s=this.s,grid=s.C.grid._pixels,source=s.cells[a],target=s.cells[b];
-      if(target&&!target.dying){
+      if(target&&(!target.dying||target.deathIntact)){
         if(s.C.getVolume(b)<=target.minVisibleArea)return false;
         if(target.hasNucleus&&this.distance2(s.xs[tgt],s.ys[tgt],target)<=target.nucleusRadius**2)return false;
       }
-      if(source&&!source.dying){
+      if(source&&(!source.dying||source.deathIntact)){
         if(source.hasNucleus&&this.distance2(s.xs[tgt],s.ys[tgt],source)>source.maxReach**2)return false;
         let attached=false;for(const j of s.faces[tgt])if(grid[j]===a){attached=true;break;}if(!attached)return false;
       }
@@ -11450,8 +11453,8 @@ var CPM = (function (exports, module$1) {
       // local articulation would freeze every rectangular cell.
       const own=(j,id)=>j>=0&&(j===tgt?a:grid[j])===id;
       const thick=(j,id)=>{const r=s.rings[j];for(const [p,q,k] of [[0,1,7],[2,1,3],[4,3,5],[6,5,7]])if(own(r[p],id)&&own(r[q],id)&&own(r[k],id))return true;return false;};
-      if(source&&!source.dying){let anchored=false;for(const j of s.faces[tgt])if(grid[j]===a&&thick(j,a)){anchored=true;break;}if(!anchored)return false;}
-      const check=j=>{const id=j===tgt?a:grid[j],m=s.cells[id];if(!m||m.dying||(id!==a&&id!==b))return true;
+      if(source&&(!source.dying||source.deathIntact)){let anchored=false;for(const j of s.faces[tgt])if(grid[j]===a&&thick(j,a)){anchored=true;break;}if(!anchored)return false;}
+      const check=j=>{const id=j===tgt?a:grid[j],m=s.cells[id];if(!m||(m.dying&&!m.deathIntact)||(id!==a&&id!==b))return true;
         let mask=0,faces=0;const ring=s.rings[j];for(let k=0;k<8;k++){const n=ring[k];if(n>=0&&(n===tgt?a:grid[n])===id){mask|=1<<k;if(k&1)faces++;}}
         if(faces<2||s.connected4[mask]===1)return true;
         // Ignore a single leaf tip. The remaining body must still connect
@@ -11459,7 +11462,7 @@ var CPM = (function (exports, module$1) {
         for(const k of [1,3,5,7])if(mask&(1<<k)){const n=ring[k];let degree=0;for(const f of s.faces[n])if(own(f,id))degree++;if(degree===1)mask&=~(1<<k);}
         return !mask||s.connected4[mask]===1;
       };
-      if(source&&!source.dying&&!check(tgt))return false;
+      if(source&&(!source.dying||source.deathIntact)&&!check(tgt))return false;
       for(const j of s.faces[tgt])if(!check(j))return false;
       return true;
     }
@@ -11505,7 +11508,7 @@ var CPM = (function (exports, module$1) {
       for(const id of this.previous)this.cells.fill(0,id*stride,(id+1)*stride);this.previous=[];
       for(const [key,kind] of Object.entries(C.t2k)){const id=Number(key);if(!id)continue;this.previous.push(id);this.cells[id*stride+1]=kind;}
       let segmentStart=0;for(const m of s.live()){
-        const values=[1,m.kind,m.dying?1:0,C.getVolume(m.id)||0,p.cellperimeters[m.id]||0,m.planarTarget,m.lambdaV,m.perimeter,m.lambdaP,m.activity,m.drive,m.px,m.py,m.targetID,m.genome?.invasion||1,m.hasNucleus?1:0,m.nucleusX||0,m.nucleusY||0,m.nucleusRadius||0,m.maxReach,m.softReach,m.minVisibleArea];
+        const values=[1,m.kind,m.dying&&!m.deathIntact?1:0,C.getVolume(m.id)||0,p.cellperimeters[m.id]||0,m.planarTarget,m.lambdaV,m.perimeter,m.lambdaP,m.activity,m.drive,m.px,m.py,m.targetID,m.genome?.invasion||1,m.hasNucleus?1:0,m.nucleusX||0,m.nucleusY||0,m.nucleusRadius||0,m.maxReach,m.softReach,m.minVisibleArea];
         this.cells.set(values,m.id*stride);
         if(m.morphologyMode){const segments=m.shapeSegments;if(segmentStart+segments.length>this.segments.length)throw Error('Protrusion geometry exceeds WASM storage; continuing on JS');this.segments.set(segments,segmentStart);this.cells.set([m.morphologyMode,m.branchCore,m.branchPenalty,segmentStart,segments.length/6,m.protrusionForce,s.scale],m.id*stride+22);segmentStart+=segments.length;}
       }
@@ -11638,19 +11641,96 @@ var CPM = (function (exports, module$1) {
     const reject=reason=>{s.lastSeedResult.reason=reason;return 0;};
     x=Math.round(x);y=Math.round(y);radius=Math.round(radius);
     if(radius<[0,2.1,2.3,1.7][kind]*s.scale)return reject('nucleus');
-    const at=(x,y)=>s.section.at(x,y),delta=(v,n)=>s.section.delta(v,n),original=s.C.grid._pixels,grid=original.slice(),reserved=new Set(),affected=new Set();
+    const reserved=new Set();
     for(const [dx,dy] of s.section.disk(radius)){
-      const i=at(x+dx,y+dy);if(i<0)return reject('edge');const id=grid[i];
-      if(id&&!s.cells[id])return reject('wall');reserved.add(i);if(id)affected.add(id);
+      const i=s.section.at(x+dx,y+dy);if(i<0)return reject('edge');reserved.add(i);
     }
-    const cells=new Map();for(const m of s.live())cells.set(m.id,{m,points:new Set(),nx:m.nucleusX,ny:m.nucleusY});
+    const plan=makeSpace(s,reserved,x,y,radius);if(!plan.ok)return reject(plan.reason);
+    const yielded=plan.commit(),id=s.seed(kind,x,y,radius,{manual:true});
+    if(!id)throw Error('Insertion draft failed its final geometry invariant');
+    finish(s,plan.changed);
+    s.lastSeedResult={...s.lastSeedResult,inserted:true,displaced:plan.changed.size,yielded};s.log('manual-insert',id,0,{displaced:plan.changed.size,yielded});return id;
+  }
+  function finish(s,changed){
+    for(const [key,h] of s.histories)if(changed.has(h.ctl)||changed.has(h.target))s.histories.delete(key);
+    s.scanContacts();s.section.updateJunctions(0);s.immuneInteractions(0);s.prepareEnvironment();
+  }
+  function shift(s,id,sx,sy,oldPoints,reference){
+    const m=s.cells[id],moved=oldPoints.map(i=>s.section.at(s.xs[i]+sx,s.ys[i]+sy));
+    if(moved.some(i=>i<0))return {ok:false,reason:'edge'};
+    const x=m.nucleusX+sx,y=m.nucleusY+sy,delta=(v,n)=>s.section.delta(v,n);
+    const radius=Math.sqrt(Math.max(...moved.map(i=>delta(s.xs[i]-x,s.width)**2+delta(s.ys[i]-y,s.height)**2)));
+    // Prefer displacement before repeated squeezing can wrap a neighbour into
+    // a crescent around the held body. Confined tissue still uses local yield.
+    let plan=pushAside(s,id,sx,sy,oldPoints,moved);
+    if(!plan.ok)plan=makeSpace(s,new Set(moved),x,y,radius,id,oldPoints,reference);
+    if(!plan.ok)return plan;
+    const activity=oldPoints.map(i=>s.act.pxact(i));plan.commit();for(let k=0;k<moved.length;k++)s.act.setActivity(moved[k],activity[k]);
+    return {ok:true,moved,changed:plan.changed};
+  }
+  // Repeated carving can wrap a neighbour around the dragged body. When no
+  // safe local deformation remains, move whole neighbouring bodies sideways
+  // in one-site steps. Contacting neighbours move together; nuclei and area
+  // move with them. This is an external manipulation, never autonomous motion.
+  function pushAside(s,movingID,sx,sy,oldPoints,moved){
+    const reserved=new Set(moved),held=new Set(oldPoints.filter(i=>reserved.has(i))),at=(x,y)=>s.section.at(x,y);
+    const origin=s.C.grid._pixels,body=new Map();
+    for(const m of s.live())if(m.id!==movingID)body.set(m.id,[]);
+    for(const i of s.positions)body.get(origin[i])?.push(i);
+    for(const sign of [1,-1]){
+      const dx=-sy*sign,dy=sx*sign,grid=origin.slice(),points=new Map([...body].map(([id,p])=>[id,p.slice()])),offsets=new Map(),changed=new Set();
+      for(const i of oldPoints)grid[i]=0;
+      let valid=true;
+      for(let step=0;step<Math.ceil(24*s.scale);step++){
+        const touching=new Set([...reserved].map(i=>grid[i]).filter(Boolean));if(!touching.size)break;
+        const group=new Set(touching),queue=[...touching],targets=new Map();
+        for(let q=0;q<queue.length&&valid;q++){
+          const id=queue[q],p=points.get(id);if(!p){valid=false;break;}
+          const next=p.map(i=>at(s.xs[i]+dx,s.ys[i]+dy));targets.set(id,next);
+          for(const i of next){
+            if(i<0||held.has(i)){valid=false;break;}
+            const other=grid[i];if(other&&other!==id&&!group.has(other)){group.add(other);queue.push(other);}
+          }
+        }
+        if(!valid)break;
+        for(const id of group)for(const i of points.get(id))grid[i]=0;
+        for(const id of group){const next=targets.get(id);points.set(id,next);for(const i of next)grid[i]=id;changed.add(id);offsets.set(id,(offsets.get(id)||0)+1);}
+      }
+      if(!valid||[...reserved].some(i=>grid[i]))continue;
+      for(const i of reserved)grid[i]=movingID;
+      return {ok:true,changed,commit(){
+        // Add final footprints before clearing vacated pixels to keep IDs live.
+        for(const i of s.positions)if(grid[i]&&grid[i]!==origin[i]){s.C.setpixi(i,grid[i]);s.act.setActivity(i,0);}
+        for(const i of s.positions)if(!grid[i]&&origin[i]){s.C.setpixi(i,0);s.act.setActivity(i,0);}
+        for(const id of changed){const m=s.cells[id],n=offsets.get(id);s.section.rebaseNucleus(m,m.nucleusX+dx*n,m.nucleusY+dy*n);s.updateMechanics(m);}
+        s.C.stat_values={};s.refreshPositions();
+      }};
+    }
+    return {ok:false,reason:'crowded'};
+  }
+  function makeSpace(s,reserved,x,y,radius,movingID=0,oldPoints=[],reference=new Map()){
+    const reject=reason=>({ok:false,reason});
+    const at=(x,y)=>s.section.at(x,y),delta=(v,n)=>s.section.delta(v,n),grid=s.C.grid._pixels.slice(),affected=new Set();
+    // The vacated trailing edge is available for elastic neighbour motion.
+    // No live pixels are edited until the entire one-site move is valid.
+    for(const i of oldPoints)grid[i]=0;
+    for(const i of reserved){const id=grid[i];if(id&&!s.cells[id])return reject('wall');if(id)affected.add(id);}
+    const cells=new Map();for(const m of s.live())if(m.id!==movingID)cells.set(m.id,{m,points:new Set(),nx:m.nucleusX,ny:m.nucleusY});
     for(const i of s.positions)cells.get(grid[i])?.points.add(i);
     for(const c of cells.values()){
       c.initial=c.points.size;c.fraction=c.m.sectionFraction;
       c.minimum=Math.ceil(Math.max(c.initial*Math.min(1,(1-s.settings.sectionYield)/c.fraction),Math.min(c.initial,c.m.minVisibleArea||0)));
+      if(movingID){
+        if(!reference.has(c.m.id))reference.set(c.m.id,{area:c.initial,fraction:c.fraction});c.reference=reference.get(c.m.id);
+        // Manual squeezing uses the visible area at gesture start. The
+        // automatic-growth target can exceed a newly seeded body's area and
+        // would otherwise prohibit all yielding before it has grown.
+        c.minimum=Math.ceil(Math.max(c.reference.area*(1-s.settings.sectionYield)/c.reference.fraction,Math.min(c.reference.area,s.section.disk(c.m.nucleusRadius).length+4*s.scale*s.scale)));
+        c.maximum=Math.max(c.reference.area,c.reference.area/c.reference.fraction);
+      }
     }
-    const fits=(c,x,y,exclude=false)=>s.section.disk(c.m.nucleusRadius).every(([dx,dy])=>{const i=at(x+dx,y+dy);return i>=0&&grid[i]===c.m.id&&(!exclude||!reserved.has(i));});
-    const changed=new Set(),changes=new Map();
+    const fits=(c,x,y,exclude=false)=>(c.m.dying&&!c.m.deathIntact)||s.section.disk(c.m.nucleusRadius).every(([dx,dy])=>{const i=at(x+dx,y+dy);return i>=0&&grid[i]===c.m.id&&(!exclude||!reserved.has(i));});
+    const changed=new Set(),changes=new Map(oldPoints.map(i=>[i,0]));
     const assign=(i,id)=>{const old=grid[i];if(old===id)return;cells.get(old)?.points.delete(i);cells.get(id)?.points.add(i);if(old)changed.add(old);if(id)changed.add(id);grid[i]=id;changes.set(i,id);};
     function connected(points){
       const first=points.values().next().value;if(first===undefined)return false;
@@ -11666,6 +11746,7 @@ var CPM = (function (exports, module$1) {
       return !mask||s.connected4[mask]===1;
     }
     function nucleusOutside(c){
+      if(c.m.dying&&!c.m.deathIntact)return [c.nx,c.ny];
       // A path of one-site moves fitting inside the current body. Never jump
       // a nucleus across another cell or through an impassable slit.
       const first=at(c.nx,c.ny);if(first<0||!fits(c,c.nx,c.ny))return null;
@@ -11681,16 +11762,36 @@ var CPM = (function (exports, module$1) {
       if(c.points.size-cut.length<c.minimum)return false;
       const nucleus=nucleusOutside(c);if(!nucleus)return false;
       for(const i of cut)grid[i]=0;
-      const remaining=new Set([...c.points].filter(i=>!reserved.has(i))),valid=connected(remaining)&&[...remaining].every(neckSafe);
-      for(const i of cut)grid[i]=c.m.id;
+      const remaining=new Set([...c.points].filter(i=>!reserved.has(i))),trim=[];
+      // A moving rounded footprint may leave a concave one-pixel spur that
+      // cannot be widened without filling the dragged cell. Retract that spur
+      // locally, preserving the whole connected body and the nuclear disk.
+      if(movingID)for(let pass=0;pass<4*s.scale;pass++){
+        let removed=false;
+        for(const i of [...remaining])if(!neckSafe(i)&&delta(s.xs[i]-nucleus[0],s.width)**2+delta(s.ys[i]-nucleus[1],s.height)**2>c.m.nucleusRadius**2){
+          remaining.delete(i);grid[i]=0;
+          if(connected(remaining)){trim.push(i);removed=true;}else{remaining.add(i);grid[i]=c.m.id;}
+        }
+        if(!removed)break;
+      }
+      const joined=connected(remaining),narrow=[...remaining].filter(i=>!neckSafe(i)),valid=remaining.size>=c.minimum&&(!movingID||remaining.size<=c.maximum+4*s.scale*s.scale)&&joined&&!narrow.length;
+      if(movingID)c.repair=narrow.length?narrow:!joined?[...remaining].filter(i=>s.faces[i].some(j=>reserved.has(j))):[];
+      for(const i of [...cut,...trim])grid[i]=c.m.id;
       if(!valid)return false;
-      c.nx=nucleus[0];c.ny=nucleus[1];for(const i of cut)assign(i,0);return true;
+      c.nx=nucleus[0];c.ny=nucleus[1];for(const i of [...cut,...trim])assign(i,0);return true;
     }
     function grow(c){
-      const id=c.m.id,dirX=delta(c.m.x-x,s.width),dirY=delta(c.m.y-y,s.height),norm=Math.hypot(dirX,dirY),ux=norm>.1?dirX/norm:1,uy=norm>.1?dirY/norm:0;
+      if(movingID&&c.points.size>c.maximum+reserved.size+4*s.scale*s.scale)return false;
+      // A nucleus can lie on the opposite side of the intruding body from its
+      // deformed centroid. Grow beside that nucleus so it has a continuous
+      // escape route, rather than inflating a distant lobe indefinitely.
+      const id=c.m.id,dirX=delta((movingID?c.nx:c.m.x)-x,s.width),dirY=delta((movingID?c.ny:c.m.y)-y,s.height),norm=Math.hypot(dirX,dirY),ux=norm>.1?dirX/norm:1,uy=norm>.1?dirY/norm:0;
       const distance=radius+c.m.nucleusRadius+s.scale,aimX=x+ux*distance,aimY=y+uy*distance,candidates=new Set();
       for(const i of c.points)for(const j of s.faces[i])if(grid[j]!==id&&!reserved.has(j))candidates.add(j);
-      const score=i=>delta(s.xs[i]-aimX,s.width)**2+delta(s.ys[i]-aimY,s.height)**2;
+      const score=i=>{
+        const aim=delta(s.xs[i]-aimX,s.width)**2+delta(s.ys[i]-aimY,s.height)**2;
+        return c.repair?.length?100*Math.min(...c.repair.map(j=>delta(s.xs[i]-s.xs[j],s.width)**2+delta(s.ys[i]-s.ys[j],s.height)**2))+.01*aim:aim;
+      };
       for(const i of [...candidates].sort((a,b)=>score(a)-score(b))){
         const other=grid[i],donor=cells.get(other);
         if(other&&!donor)continue;
@@ -11713,18 +11814,17 @@ var CPM = (function (exports, module$1) {
     // Validate the entire draft, including neighbours that donated area.
     for(const id of changed){const c=cells.get(id);if(!c||c.points.size<c.minimum||!connected(c.points)||!fits(c,c.nx,c.ny)||![...c.points].every(neckSafe))return reject('crowded');}
     if([...reserved].some(i=>grid[i]))return reject('crowded');
+    if(movingID)for(const i of reserved)changes.set(i,movingID);
+    return {ok:true,changed,commit(){
     // Add before removing, preserving each existing cell's ID and metadata.
     for(const [i,id] of changes)if(id){s.C.setpixi(i,id);s.act.setActivity(i,0);}
     for(const [i,id] of changes)if(!id){s.C.setpixi(i,0);s.act.setActivity(i,0);}
-    let yielded=0;for(const id of changed){const c=cells.get(id),m=c.m;s.section.rebaseNucleus(m,c.nx,c.ny);m.sectionFraction=c.fraction*Math.min(1,c.points.size/c.initial);if(m.sectionFraction<c.fraction)yielded++;s.updateMechanics(m);}
+    let yielded=0;for(const id of changed){const c=cells.get(id),m=c.m;s.section.rebaseNucleus(m,c.nx,c.ny);m.sectionFraction=movingID?Math.max(1-s.settings.sectionYield,Math.min(1,c.reference.fraction*c.points.size/c.reference.area)):c.fraction*Math.min(1,c.points.size/c.initial);if(m.sectionFraction<c.fraction)yielded++;s.updateMechanics(m);}
     s.C.stat_values={};s.refreshPositions();
-    const id=s.seed(kind,x,y,radius,{manual:true});
-    if(!id)throw Error('Insertion draft failed its final geometry invariant');
-    for(const [key,h] of s.histories)if(changed.has(h.ctl)||changed.has(h.target))s.histories.delete(key);
-    s.scanContacts();s.section.updateJunctions(0);s.immuneInteractions(0);s.prepareEnvironment();
-    s.lastSeedResult={...s.lastSeedResult,inserted:true,displaced:changed.size,yielded};s.log('manual-insert',id,0,{displaced:changed.size,yielded});return id;
+    return yielded;
+    }};
   }
-  globalThis.CellLabInsertion={insert};
+  globalThis.CellLabInsertion={insert,shift};
 })();
 
 /* Artistoo extensions. Biology, signal transport, and pacing are independent of rendering. */
@@ -11810,7 +11910,7 @@ var CPM = (function (exports, module$1) {
   class LocalTopology extends CPM.HardConstraint {
     constructor(sim){super({});this.sim=sim;this.stamp=0;this.visited=new Uint32Array(sim.C.grid._pixels.length);this.queue=new Uint32Array(this.visited.length);this.goals=new Uint32Array(this.visited.length);}
     fulfilled(src,tgt,source,target){
-      const cell=this.sim.cells[target];if(!target||!cell||cell.dying)return true;
+      const cell=this.sim.cells[target];if(!target||!cell||(cell.dying&&!cell.deathIntact))return true;
       const neighbors=this.sim.rings[tgt],grid=this.C.grid._pixels;let mask=0;
       for(let k=0;k<8;k++)if(neighbors[k]>=0&&grid[neighbors[k]]===target)mask|=1<<k;
       if((this.sim.section?connected4:connected)[mask])return true;
@@ -11860,6 +11960,7 @@ var CPM = (function (exports, module$1) {
       delete this.settings.capacity;
       this.cells=[];this.contacts=new Map();this.histories=new Map();this.events=[];this.history=[];this.wallID=0;this.version=0;
       this.counters={divisions:0,immuneDivisions:0,kills:0,apoptosis:0,environment:0,apoptosisStarted:0,killStarted:0,environmentStarted:0,recognitions:0,mutations:0,abnormalInitiations:0,malignantTransitions:0,abnormalKills:0,normalEnvironmentDeaths:0,abnormalEnvironmentDeaths:0};this.birthSerial=0;this.lineage=[];this.deathHistory=[];this.recentClearances=[];
+      this.deathEffects=[];
       const s=this.settings;
       this.C=new CPM.CPM([width,height],{
         seed,torus:[this.wrap,this.wrap],T:s.temperature,
@@ -11987,6 +12088,12 @@ var CPM = (function (exports, module$1) {
         m.perimeter=[0,155,195,90][m.kind]*this.scale*Math.sqrt(Math.max(1,m.planarTarget)/m.base);
         if(m.morphologyMode){m.lambdaP=.18/this.scale;m.perimeter+=2.8*(m.processLength||0);const hold=1/(1+.45*m.networkDegree);m.activity*=.25*hold;m.drive*=.4*hold;}
         if(m.kind===IMMUNE){m.activity*=125/240;m.drive*=35/25;}
+      }
+      if(m.deathIntact){
+        // Surface tension rounds the real lattice body. Swelling still pays
+        // volume/adhesion energy and cannot take a live neighbour's nucleus.
+        m.lambdaP=.45/this.scale;m.perimeter=10.8*Math.sqrt(Math.max(1,m.planarTarget??m.target));
+        m.softReach=.55*Math.sqrt(Math.max(1,m.planarTarget??m.target)/Math.PI);
       }
     }
     moment(m,i,sign){
@@ -12242,15 +12349,19 @@ var CPM = (function (exports, module$1) {
     beginDeath(id,cause){
       const m=this.cells[id];if(!m||m.dying)return false;
       m.dying=true;m.deathCause=cause;m.deathStartedAt=this.C.time;m.targetID=0;m.phase='dying';m.recruitment=0;
+      m.deathElapsed=0;m.deathProgress=0;m.deathArea=this.C.getVolume(id);m.deathIntact=cause==='kill';
+      m.deathPhase=cause==='kill'?'rounding':cause==='spontaneous'?'shrinking':'withering';
+      if(m.deathIntact)m.target=m.deathArea/(this.section?m.sectionFraction:1);
       // Keep a separate lifetime ledger: the rolling interaction log cannot
       // serve as a complete death history, and grid IDs may later be reused.
-      m.deathRecord={id,birth:m.birth,kind:m.kind,state:m.state,clone:m.clone,cause,startedAt:this.C.time,clearedAt:null};
+      m.deathRecord={id,birth:m.birth,kind:m.kind,state:m.state,clone:m.clone,cause,effect:cause==='kill'?'lysis':cause==='spontaneous'?'apoptosis':'stress',startedAt:this.C.time,clearedAt:null};
       this.deathHistory.push(m.deathRecord);const keys=DEATH_COUNTERS[cause];if(keys)this.counters[keys[0]]++;
       this.section?.forget(id);this.updateMechanics(m);this.log('death-start',id,0,{cause,birth:m.birth});
       for(const ctl of this.live())if(ctl.targetID===id){ctl.targetID=0;ctl.phase='search';this.updateMechanics(ctl);}return true;
     }
     eraseCell(id){
       const m=this.cells[id];
+      if(m?.dying)m.deathFinalArea=this.C.getVolume(id);
       this.section?.forget(id);
       const points=[...this.C.pixels()].filter(([,cid])=>cid===id).map(([p])=>p);for(const p of points)this.C.setpix(p,0);
       // Both zero-pixel cleanup and small-remnant removal converge here.
@@ -12265,6 +12376,10 @@ var CPM = (function (exports, module$1) {
       const keys=DEATH_COUNTERS[cause];if(keys)this.counters[keys[1]]++;
       if(cause==='kill'&&m.state==='abnormal')this.counters.abnormalKills++;
       if(cause==='environment'){if(m.state==='normal')this.counters.normalEnvironmentDeaths++;if(m.state==='abnormal')this.counters.abnormalEnvironmentDeaths++;}
+      if(cause==='kill'){
+        this.deathEffects.push({id:m.id,birth:m.birth,cause,x:m.x,y:m.y,radius:Math.sqrt((m.deathFinalArea||m.deathArea||1)/Math.PI),startedAt:this.C.time,duration:48});
+        if(this.deathEffects.length>128)this.deathEffects.shift(); // Temporary particles only; full death accounting is never truncated.
+      }
       if(m.deathRecord){
         m.deathRecord.clearedAt=this.C.time;
         // Completion order differs from onset order. Keep a bounded display
@@ -12291,11 +12406,24 @@ var CPM = (function (exports, module$1) {
       m.target+=Math.min(Math.max(0,ceiling-m.target),amount*available);
     }
     biology(dt){
+      this.deathEffects=this.deathEffects.filter(e=>this.C.time-e.startedAt<e.duration);
       const live=this.live();
       for(const m of live){
         m.age+=dt;
         m.activation=Math.max(0,m.activation-dt);m.recruitment=Math.max(0,m.recruitment-dt);
-        if(m.dying){m.target=Math.max(0,m.target-dt*Math.max(1.8*this.scale*this.scale,m.base*.025));this.updateMechanics(m);if(this.C.getVolume(m.id)<=3*this.scale*this.scale)this.eraseCell(m.id);continue;}
+        if(m.dying){
+          m.deathElapsed+=dt;
+          if(m.deathCause==='kill'){
+            m.deathProgress=clamp(m.deathElapsed/96);m.deathPhase=m.deathElapsed<28?'rounding':'swelling';
+            const t=clamp((m.deathElapsed-24)/72),swelling=t*t*(3-2*t);
+            m.target=m.deathArea*(1+.32*swelling)/(this.section?m.sectionFraction:1);
+            if(m.deathElapsed>=96){m.deathPhase='rupture';this.eraseCell(m.id);continue;}
+          }else{
+            m.target=Math.max(0,m.target-dt*Math.max(1.8*this.scale*this.scale,m.base*.025));
+            m.deathProgress=clamp(1-this.C.getVolume(m.id)/Math.max(1,m.deathArea));
+          }
+          this.updateMechanics(m);if(this.C.getVolume(m.id)<=3*this.scale*this.scale)this.eraseCell(m.id);continue;
+        }
         this.transformation(m,dt);
         if(m.kind===TUMOR){
           const hazard=this.settings.apoptosis/100/1000;
@@ -12372,16 +12500,20 @@ var CPM = (function (exports, module$1) {
       // Adhesive cohesion is local contact energy, complementary to the secreted field.
       if(name==='cohesion')this.C.conf.J[1][1]=Math.max(2,12-value*5);
     }
-    moveCell(id,x,y){
+    moveCell(id,x,y,{elastic=false,reference=new Map()}={}){
       const cell=this.cells[id];if(!cell||cell.dying)return {steps:0,blocked:true};
       this.refreshPositions();let dx=Math.round(x-cell.x),dy=Math.round(y-cell.y);
       if(this.wrap){if(dx>this.width/2)dx-=this.width;if(dx< -this.width/2)dx+=this.width;if(dy>this.height/2)dy-=this.height;if(dy< -this.height/2)dy+=this.height;}
       let occupied=[...this.C.pixels()].filter(([,cid])=>cid===id).map(([p])=>this.C.grid.p2i(p));
-      let steps=0,blocked=false;
+      let steps=0,blocked=false;const displaced=new Set();
       const shift=(sx,sy)=>{
         if(!sx&&!sy)return true;
         const moved=[];for(const i of occupied){let xx=this.xs[i]+sx,yy=this.ys[i]+sy;if(this.wrap){xx=(xx+this.width)%this.width;yy=(yy+this.height)%this.height;}if(xx<0||yy<0||xx>=this.width||yy>=this.height)return false;
-          const j=this.C.grid.p2i([xx,yy]),other=this.C.pixti(j);if(other&&other!==id)return false;moved.push(j);
+          const j=this.C.grid.p2i([xx,yy]),other=this.C.pixti(j);if(other&&other!==id){
+            if(!elastic||!this.section||!globalThis.CellLabInsertion)return false;
+            const result=CellLabInsertion.shift(this,id,sx,sy,occupied,reference);if(!result.ok)return false;
+            for(const other of result.changed)displaced.add(other);occupied=result.moved;steps++;return true;
+          }moved.push(j);
         }
         const next=new Set(moved),activity=occupied.map(i=>this.act.pxact(i));
         // Add before removing so the cell ID and volume bookkeeping survive.
@@ -12397,9 +12529,13 @@ var CPM = (function (exports, module$1) {
         if(!shift(sx,0)){blocked=true;break;}if(cell.hasNucleus)cell.nucleusX=(cell.nucleusX+sx+this.width)%this.width;
         if(!shift(0,sy)){blocked=true;break;}if(cell.hasNucleus)cell.nucleusY=(cell.nucleusY+sy+this.height)%this.height;doneX=xx;doneY=yy;
       }
-      for(const [key,h] of this.histories)if(h.ctl===id||h.target===id)this.histories.delete(key);
-      this.C.stat_values={};this.updateLocal(0);this.version++;
-      return {steps,blocked,x:cell.x,y:cell.y};
+      for(const [key,h] of this.histories)if(h.ctl===id||h.target===id||displaced.has(h.ctl)||displaced.has(h.target))this.histories.delete(key);
+      this.C.stat_values={};this.refreshPositions();this.scanContacts();this.section?.updateJunctions(0);
+      // Manual movement updates contact geometry, not stochastic search,
+      // recognition, damage or biological clocks while the gesture is held.
+      for(const m of this.live())if(m.targetID&&(m.id===id||displaced.has(m.id)||m.targetID===id||displaced.has(m.targetID)||!this.contacts.get(m.id)?.has(m.targetID))){m.targetID=0;m.phase=m.dying?'dying':'search';this.updateMechanics(m);}
+      if(displaced.size)this.prepareEnvironment();this.version++;
+      return {steps,blocked,displaced:displaced.size,x:cell.x,y:cell.y};
     }
     pulse(x,y,channel='danger'){if(SIGNALS.includes(channel))this.fields[channel].deposit(x/this.fieldScale,y/this.fieldScale,8);}
     mechanicalStep(){
@@ -12467,10 +12603,10 @@ var CPM = (function (exports, module$1) {
       this.refreshPositions();const grid=new Uint16Array(this.width*this.height),activity=new Uint8Array(grid.length),walls=new Uint8Array(grid.length);let orphans=0;
       for(let q=0;q<grid.length;q++){const i=this.positions[q],id=this.C.grid.pixti(i);grid[q]=id;const m=this.cells[id];if(m)activity[q]=Math.min(255,Math.round(this.act.pxact(i)/this.C.conf.MAX_ACT[m.kind]*255));else if(id){if(this.C.cellKind(id)===WALL)walls[q]=1;else orphans++;}}
       const cells=this.live().map(m=>({id:m.id,kind:m.kind,x:m.x,y:m.y,px:m.px,py:m.py,area:this.C.getVolume(m.id),target:m.target,antigen:m.antigen,antigenLevel:m.antigenLevel,damage:m.damage,dying:m.dying,deathCause:m.deathCause,phase:m.phase,targetID:m.targetID,age:m.age,genome:m.genome?{...m.genome}:null,clone:m.clone,generation:m.generation,divisionsLeft:m.divisionsLeft,activation:m.activation,recruitment:m.recruitment,oxygen:m.oxygen,glucose:m.glucose,acid:m.acid,stress:m.stress,fitness:m.fitness,confinement:m.confinement}));
-      for(const c of cells){const m=this.cells[c.id];for(const key of ['sectionFraction','sectionPressure','planarTarget','offPlaneTarget','hasNucleus','nucleusX','nucleusY','nucleusRadius','state','origin','abnormalSince','abnormalAge','transformedAt','adversity','immuneCue','morphologyMode','branchCount','networkDegree','deathStartedAt'])c[key]=m[key];}
+      for(const c of cells){const m=this.cells[c.id];for(const key of ['sectionFraction','sectionPressure','planarTarget','offPlaneTarget','hasNucleus','nucleusX','nucleusY','nucleusRadius','state','origin','abnormalSince','abnormalAge','transformedAt','adversity','immuneCue','morphologyMode','branchCount','networkDegree','deathStartedAt','deathPhase','deathProgress','deathIntact'])c[key]=m[key];}
       const fields={};for(const [key,f] of Object.entries(this.fields))fields[key]={width:f.width,height:f.height,values:f.values.slice()};
       const history=this.populationHistory(true),historySamples=this.history.length+(history.at(-1)===this.history.at(-1)?0:1);
-      return {kernel:this.kernel,width:this.width,height:this.height,worldWidth:this.worldWidth,worldHeight:this.worldHeight,refinement:this.scale,fieldScale:this.fieldScale,fieldMask:this.fields.oxygen.blocked.slice(),scene:this.scene,scenario:this.scenarioReport(),boundary:this.boundary,time:this.C.time,seed:this.seedValue,settings:{...this.settings},counters:{...this.counters},deaths:this.deathSummary(),recentDeaths:this.deathHistory.slice(-8).map(d=>({...d})),recentClearances:this.recentClearances.map(d=>({...d})),grid,activity,walls,orphans,cells,fields,history,historySamples,events:this.events.slice(-12)};
+      return {kernel:this.kernel,width:this.width,height:this.height,worldWidth:this.worldWidth,worldHeight:this.worldHeight,refinement:this.scale,fieldScale:this.fieldScale,fieldMask:this.fields.oxygen.blocked.slice(),scene:this.scene,scenario:this.scenarioReport(),boundary:this.boundary,time:this.C.time,seed:this.seedValue,settings:{...this.settings},counters:{...this.counters},deaths:this.deathSummary(),recentDeaths:this.deathHistory.slice(-8).map(d=>({...d})),recentClearances:this.recentClearances.map(d=>({...d})),deathEffects:this.deathEffects.map(e=>({...e})),grid,activity,walls,orphans,cells,fields,history,historySamples,events:this.events.slice(-12)};
     }
   }
   globalThis.CellLab={Simulation,SignalField,StepClock,DEFAULTS,PRESETS,BODY_COLORS,TYPE_NAMES,NORMAL,TUMOR,IMMUNE,WALL,sampleHistory};
@@ -12480,6 +12616,7 @@ var CPM = (function (exports, module$1) {
  * never the biological time step or probabilistic hazard per model step. */
 let sim=null,playing=true,visible=true,speed=1,clock=new CellLab.StepClock(30),pendingSteps=0;
 let previous=performance.now(),lastSnapshot=0,lastMeasure=previous,measuredSteps=0,rate=0,limited=false,revision=0;
+let dragSession=null;
 const backend=new CellLabGPU.ComputeBackend(),commands=[];let busy=false,wasmModule=null,kernelNote='';
 const turnQueue=new MessageChannel();turnQueue.port1.onmessage=()=>tick();
 try{wasmModule=CellLabWasm.load(Uint8Array.from(atob(globalThis.CELL_LAB_WASM),c=>c.charCodeAt(0))).catch(e=>{kernelNote=String(e);return null;});}catch(e){kernelNote=String(e);}
@@ -12497,22 +12634,29 @@ async function handle(event){
   try{
     let value=true;
     if(command==='start'){
+      if(dragSession){playing=dragSession.resume;dragSession=null;}
       sim=new CellLab.Simulation(payload);const module=await wasmModule;if(module&&payload.kernel!=='reference'&&payload.kernel!=='fast')try{await CellLabWasm.install(sim,module);}catch(e){kernelNote=String(e);}
       await backend.configure(sim,backend.mode);revision++;resetClock();
     }else if(!sim)throw Error('The model has not started');
-    else if(command==='playing'){playing=!!payload.value;resetClock();}
+    else if(command==='playing'){if(dragSession){dragSession.resume=!!payload.value;playing=false;}else playing=!!payload.value;resetClock();}
+    else if(command==='beginDrag'){
+      const m=sim.cells[payload.id];value=!!m&&!m.dying;
+      if(value){dragSession={token:payload.token,id:m.id,resume:dragSession?.resume??playing,reference:new Map()};playing=false;resetClock();}
+    }else if(command==='endDrag'){
+      if(dragSession?.token===payload.token){playing=dragSession.resume;dragSession=null;resetClock();}
+    }
     else if(command==='visible'){visible=!!payload.value;resetClock();}
     else if(command==='speed'){speed=Math.max(.25,Math.min(8,Number(payload.value)||1));clock.rate=30*speed;resetClock();}
     else if(command==='set')sim.set(payload.name,Number(payload.value));
     else if(command==='backend'){await backend.configure(sim,['auto','cpu','gpu'].includes(payload.mode)?payload.mode:'auto');resetClock();}
-    else if(command==='advance'){playing=false;resetClock();const steps=Math.min(10000,Math.max(1,payload.steps||1));if(backend.active==='gpu')await sim.advanceAsync(steps,backend);else sim.advance(steps);}
+    else if(command==='advance'){if(dragSession)value=false;else{playing=false;resetClock();const steps=Math.min(10000,Math.max(1,payload.steps||1));if(backend.active==='gpu')await sim.advanceAsync(steps,backend);else sim.advance(steps);}}
     else if(command==='seed'){const radius=(payload.kind===3?3:4)*sim.scale;value=payload.manual&&payload.push?sim.insert(payload.kind,payload.x,payload.y,radius):sim.seed(payload.kind,payload.x,payload.y,radius);if(payload.manual)value={...sim.lastSeedResult};}
     else if(command==='sprinkle'){
       value=0;let reason='space';for(let i=0;i<600&&value<5;i++){const cell=sim.seed(payload.kind,sim.C.ran(5,sim.width-6),sim.C.ran(5,sim.height-6),(payload.kind===3?3:4)*sim.scale);if(cell)value++;else if(sim.lastSeedResult.reason==='invalid'){reason='invalid';break;}}
       if(payload.manual)value={added:value,requested:5,reason:value===5?'':reason,population:sim.live().length};
     }else if(command==='stroke'){
       value=0;for(const p of payload.points||[])value+=sim.paint(p[0],p[1],(payload.erase?5:2)*sim.scale,!!payload.erase,false);sim.rebuildMask();
-    }else if(command==='move')value=sim.moveCell(payload.id,payload.x,payload.y);
+    }else if(command==='move')value=payload.token&&dragSession?.token!==payload.token?{steps:0,blocked:true,stale:true}:sim.moveCell(payload.id,payload.x,payload.y,{elastic:!!payload.elastic,reference:dragSession?.reference});
     else if(command==='pulse')sim.pulse(payload.x,payload.y,payload.channel);
     else if(command==='clearWalls')sim.clearWalls();
     else if(command==='divide'){
@@ -12588,6 +12732,15 @@ tick();
     return base.map(v=>Math.round(v+(255-v)*t));
   };
   const cellName=m=>m?.state==='abnormal'?'异常中间态':m?.kind===3?(immuneActive(m)?'已激活免疫细胞':'未激活免疫细胞'):['培养液','正常细胞','肿瘤细胞','免疫细胞','实体障碍'][m?.kind||0];
+  const deathCode=m=>m?.dying?({spontaneous:1,kill:2,environment:3}[m.deathCause]||1):0;
+  function deathColor(rgb,m){
+    if(!m?.dying)return rgb;
+    const p=Math.round(clamp(m.deathProgress||0)*255)/255,code=deathCode(m);
+    const tint=code===2?[246,143,171]:code===3?[158,145,112]:[75,78,86];
+    const weight=code===2?.15+.85*p:code===3?.4+.45*p:.2+.65*p;
+    return rgb.map((v,i)=>v+(tint[i]-v)*weight);
+  }
+  const deathPhaseLabel=m=>({rounding:'免疫杀伤 · 圆化',swelling:'免疫杀伤 · 肿胀待裂解',rupture:'免疫杀伤 · 破裂',shrinking:'自发凋亡 · 皱缩',withering:'环境死亡 · 萎缩'}[m?.deathPhase]||'死亡清除中');
   const nucleusStyles={normal:{stroke:'#243b53',fill:'#243b531a'},patrol:{stroke:'#8f3548',fill:'#8f35481a'},dark:{stroke:'#f2d38a',fill:'#f2d38a1a'}};
   const nucleusStyle=(m,palette)=>{if(palette){const stroke=palette[colorKey(m)].nucleus;return {stroke,fill:stroke+'1a'};}return m.kind===1?nucleusStyles.normal:m.kind===3&&!immuneActive(m)?nucleusStyles.patrol:nucleusStyles.dark;};
   // At ordinary opacity keep bodies legible; the upper half of each slider
@@ -12635,7 +12788,7 @@ tick();
     const wall=!!s.walls[q],blocked=wall||!!s.fieldMask?.[bin];
     return {x,y,bin,time:s.time,cell:s.cells.find(m=>m.id===s.grid[q])||null,wall,blocked,values:blocked?null:Object.fromEntries(['oxygen','glucose','acid',...Object.keys(SIGNALS)].map(key=>[key,s.fields[key].values[bin]]))};
   }
-  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,displayKind,tumorShade,bodyColor,cellName,nucleusStyle,bodyOpacity,adversity,signals,sample,Cache};
+  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,bodyOpacity,adversity,signals,sample,Cache};
 })();
 
 /* Display-only WebGL2 rasterizer. All cell copies and contacts stay in the
@@ -12664,11 +12817,11 @@ tick();
       void main(){
         vec2 xy=vec2(gl_FragCoord.x,viewport.y-gl_FragCoord.y)*vec2(lattice)/viewport;
         ivec2 p=clamp(ivec2(xy),ivec2(0),lattice-1);uint id=idAt(p);
-        uvec3 m=texelFetch(metadata,ivec2(int(id)&255,int(id)>>8),0).rgb;int kind=int(m.r),physicalKind=kind==5?1:kind==6?3:kind;vec3 base=body(kind);if(kind==2&&proliferationShading==1)base=mix(base,vec3(1),float(m.b)/255.);vec3 rgb=base;
+        uvec4 m=texelFetch(metadata,ivec2(int(id)&255,int(id)>>8),0);int kind=int(m.r),physicalKind=kind==5?1:kind==6?3:kind;vec3 base=body(kind);if(kind==2&&proliferationShading==1)base=mix(base,vec3(1),float(m.b)/255.);vec3 rgb=base;
         if(fieldMode>0){float value=texelFetch(environment,p/fieldScale,0).r;int q=int(clamp(floor(value*255.+.5),0.,255.));rgb=mix(rgb,texelFetch(palette,ivec2(q,kind),0).rgb,kind>0?bodyEnvironmentOpacity:environmentOpacity);}
         if(showSignals==1){vec4 signal=kind>0?texelFetch(bodySignalLayer,p/fieldScale,0):texelFetch(signalLayer,p/fieldScale,0);rgb=mix(rgb,signal.rgb,signal.a);}
         if(texelFetch(walls,p,0).r>0u)rgb=(p.x+p.y)%7<2?vec3(66,83,87)/255.:body(4);
-        if(physicalKind>0&&physicalKind<4){if(m.g>0u)rgb=rgb*.55+vec3(110./255.);else if(actFlags[physicalKind]>0){float a=float(texelFetch(activity,p,0).r);if(a>0.)rgb=vec3(min(255.,a*2.),min(255.,(255.-a)*2.),0.)/255.;}
+        if(physicalKind>0&&physicalKind<4){if(m.g>0u){float p=float(m.a)/255.;vec3 tint=m.g==2u?vec3(246,143,171):m.g==3u?vec3(158,145,112):vec3(75,78,86);float weight=m.g==2u?.15+.85*p:m.g==3u?.4+.45*p:.2+.65*p;rgb=mix(rgb,tint/255.,weight);}else if(actFlags[physicalKind]>0){float a=float(texelFetch(activity,p,0).r);if(a>0.)rgb=vec3(min(255.,a*2.),min(255.,(255.-a)*2.),0.)/255.;}
           if(seams==1||int(id)==selected){vec2 f=fract(xy),thin=min(vec2(.32),vec2(lattice)/viewport*.55*pixelRatio);bool edge=(f.x>1.-thin.x&&idAt(p+ivec2(1,0))!=id)||(f.x<thin.x&&idAt(p-ivec2(1,0))!=id)||(f.y>1.-thin.y&&idAt(p+ivec2(0,1))!=id)||(f.y<thin.y&&idAt(p-ivec2(0,1))!=id);if(edge)rgb=mix(rgb,physicalKind==1?vec3(98,110,109)/255.:kind==3?vec3(128,61,70)/255.:vec3(225,230,225)/255.,.9);}
         }color=vec4(rgb,1);
       }`;
@@ -12691,7 +12844,7 @@ tick();
       if(this.cellColors!==cellColors){g.uniform3fv(u['bodyColors[0]'],Float32Array.from((cellColors?CellLabDisplay.paletteBodies(cellColors):CellLabDisplay.BODY_COLORS).flat(),v=>v/255));this.cellColors=cellColors;}
       g.uniform1i(u.proliferationShading,cellColors?.proliferationShading===false?0:1);
       if(this.snapshot!==s){this.upload(0,s.width,s.height,g.R16UI,g.RED_INTEGER,g.UNSIGNED_SHORT,s.grid);this.upload(1,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.activity);this.upload(2,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.walls);
-        this.meta.fill(0);for(const m of s.cells){this.meta[m.id*4]=CellLabDisplay.displayKind(m);this.meta[m.id*4+1]=m.dying?1:0;this.meta[m.id*4+2]=m.kind===2?CellLabDisplay.tumorShade(m):0;}this.upload(3,256,256,g.RGBA8UI,g.RGBA_INTEGER,g.UNSIGNED_BYTE,this.meta);this.snapshot=s;this.field=null;}
+        this.meta.fill(0);for(const m of s.cells){this.meta[m.id*4]=CellLabDisplay.displayKind(m);this.meta[m.id*4+1]=CellLabDisplay.deathCode(m);this.meta[m.id*4+2]=m.kind===2?CellLabDisplay.tumorShade(m):0;this.meta[m.id*4+3]=Math.round(Math.max(0,Math.min(1,m.deathProgress||0))*255);}this.upload(3,256,256,g.RGBA8UI,g.RGBA_INTEGER,g.UNSIGNED_BYTE,this.meta);this.snapshot=s;this.field=null;}
       if(this.field!==field){if(field)this.upload(4,field.width,field.height,g.R32F,g.RED,g.FLOAT,field.values);else this.upload(4,1,1,g.R32F,g.RED,g.FLOAT,new Float32Array(1));this.field=field;}
       if(info!==this.info||!this.paletteReady){let p=this.palettes.get(info);if(!p&&info){p=Uint8Array.from(info.palette.flat(2));this.palettes.set(info,p);}this.upload(5,256,7,g.RGB8,g.RGB,g.UNSIGNED_BYTE,p||new Uint8Array(256*7*3));this.info=info;this.paletteReady=true;}
       if(this.signal!==signal||!this.signalReady){this.upload(6,signal?.width||1,signal?.height||1,g.RGBA8,g.RGBA,g.UNSIGNED_BYTE,signal?.rgba||new Uint8Array(4));this.signal=signal;this.signalReady=true;}
@@ -12881,7 +13034,7 @@ tick();
     $('population-load').textContent=`当前 ${s.cells.length} 颗 · ${s.width} × ${s.height} 格点。${s.cells.length>=1000?'细胞较多，计算和交互可能变慢。':''}不按细胞数量冻结生长或分裂。`;
     $('backend-status').textContent=`绘图：${gpuRenderer&&!gpuRenderer.lost?(gpuRenderer.hardware===false?'WebGL2 软件':gpuRenderer.hardware===true?'WebGL2 GPU':'WebGL2'):'Canvas2D'} · 形变：${s.kernel==='wasm'?'WebAssembly CPU':s.kernel==='fast'?'优化 JS CPU':'参考 JS CPU'} · 微环境：${s.compute?.active==='gpu'?'WebGPU':'CPU'}`;
     $('compute-note').textContent=(s.compute?.reason||'初始化计算后端…')+(s.kernelNote?' '+s.kernelNote:'');
-    const cell=s.cells.find(c=>c.id===selected),phases={search:cell?.kind===3?(cell.immuneCue>.05?'局部趋化':'分散巡逻'):'探索',scan:'接触扫描',kill:'识别后递送损伤',dying:'死亡清除中'};
+    const cell=s.cells.find(c=>c.id===selected),phases={search:cell?.kind===3?(cell.immuneCue>.05?'局部趋化':'分散巡逻'):'探索',scan:'接触扫描',kill:'识别后递送损伤',dying:CellLabDisplay.deathPhaseLabel(cell)};
     $('selection-label').textContent=cell?'#'+cell.id+' '+CellLabDisplay.cellName(cell):'未选中';
     $('divide').disabled=!cell||cell.dying||cell.state==='abnormal';
     if(cell){
@@ -12928,7 +13081,7 @@ tick();
       if(signal){const layer=m?bodySignal:signal,p=(Math.floor(y/s.fieldScale)*layer.width+Math.floor(x/s.fieldScale))*4,a=layer.rgba[p+3]/255;rgb=rgb.map((v,k)=>v+(layer.rgba[p+k]-v)*a);}
       if(s.walls[q]){const hatch=(x+y)%7<2;rgb=hatch?[66,83,87]:colors[4];}
       if(m){
-        if(m.dying)rgb=rgb.map(c=>c*.55+110);
+        if(m.dying)rgb=CellLabDisplay.deathColor(rgb,m);
         else if(actFlags[m.kind]&&s.activity[q]>0)rgb=activityPalette[s.activity[q]];
       }
       const k=q*4;data[k]=rgb[0];data[k+1]=rgb[1];data[k+2]=rgb[2];data[k+3]=255;
@@ -12946,7 +13099,17 @@ tick();
       ctx.strokeStyle='#803d46e6';ctx.stroke(paths[2]);
     }
     if(selected){const m=meta[selected];if(m){ctx.strokeStyle='#daae35';ctx.lineWidth=1.2*pixelRatio;ctx.beginPath();ctx.arc(m.x*scale,m.y*scale,5*pixelRatio,0,2*Math.PI);ctx.stroke();}}
-    if($('nuclei').checked){ctx.lineWidth=1.5*pixelRatio;for(const m of s.cells)if(m.hasNucleus&&!m.dying){const style=CellLabDisplay.nucleusStyle(m,cellColors);ctx.strokeStyle=style.stroke;ctx.fillStyle=style.fill;const offsetsX=wrap?[-w,0,w]:[0],offsetsY=wrap?[-h,0,h]:[0];for(const dx of offsetsX)for(const dy of offsetsY){const x=(m.nucleusX+dx+.5)*scale,y=(m.nucleusY+dy+.5)*scale;ctx.beginPath();ctx.arc(x,y,m.nucleusRadius*scale,0,2*Math.PI);ctx.fill();ctx.stroke();}}}
+    if($('nuclei').checked){ctx.lineWidth=1.5*pixelRatio;for(const m of s.cells)if(m.hasNucleus&&(!m.dying||m.deathIntact)){const style=m.dying?{stroke:'#ad4267',fill:'#fbe1ed40'}:CellLabDisplay.nucleusStyle(m,cellColors);ctx.strokeStyle=style.stroke;ctx.fillStyle=style.fill;const offsetsX=wrap?[-w,0,w]:[0],offsetsY=wrap?[-h,0,h]:[0];for(const dx of offsetsX)for(const dy of offsetsY){const x=(m.nucleusX+dx+.5)*scale,y=(m.nucleusY+dy+.5)*scale;ctx.beginPath();ctx.arc(x,y,m.nucleusRadius*scale,0,2*Math.PI);ctx.fill();ctx.stroke();}}}
+    // Post-clearance membrane fragments are cosmetic, never extra cells.
+    // Their age uses model time, so pausing also freezes the rupture effect.
+    ctx.save();ctx.lineWidth=Math.max(1,pixelRatio);
+    for(const effect of s.deathEffects||[]){const t=Math.max(0,(s.time-effect.startedAt)/effect.duration);if(t>=1)continue;ctx.globalAlpha=(1-t)*.85;ctx.strokeStyle='#e889ac';ctx.fillStyle='#efadc4';
+      const count=11+effect.birth%7,variation=n=>{const v=Math.sin(n*12.9898+effect.birth*78.233)*43758.5453;return v-Math.floor(v);};
+      for(let n=0;n<count;n++){const angle=(n+variation(n)*.75)*2*Math.PI/count+effect.birth*.37,radius=effect.radius*(.45+variation(n+21)*.55+t*(.4+variation(n+43)));let x=effect.x+Math.cos(angle)*radius,y=effect.y+Math.sin(angle)*radius;
+        if(wrap){x=(x+w)%w;y=(y+h)%h;}if(x<0||y<0||x>=w||y>=h)continue;const q=Math.floor(y)*w+Math.floor(x);if(s.walls[q]||s.grid[q])continue;
+        const size=(.45+variation(n+67))*(1-.6*t)*s.refinement;ctx.beginPath();ctx.ellipse((x+.5)*scale,(y+.5)*scale,size*scale,size*(.3+.4*variation(n+83))*scale,angle+variation(n+97)*Math.PI+t,0,Math.PI*2);ctx.fill();ctx.stroke();
+      }
+    }ctx.restore();
     if($('antigen-marks').checked){ctx.font=`bold ${13*pixelRatio}px Consolas, monospace`;ctx.textAlign='center';ctx.fillStyle='#f4e7b2';for(const m of s.cells)if((m.kind===2||m.state==='abnormal')&&m.antigen&&!m.dying)ctx.fillText('+',m.x*scale,m.y*scale+4*pixelRatio);}
     if($('arrows').checked){ctx.strokeStyle='#203731a6';ctx.lineWidth=1.6*pixelRatio;for(const m of s.cells)if(!m.dying){const x=m.x*scale,y=m.y*scale,dx=m.px*14*pixelRatio,dy=m.py*14*pixelRatio;ctx.beginPath();ctx.moveTo(x-dx*.35,y-dy*.35);ctx.lineTo(x+dx,y+dy);ctx.lineTo(x+dx*.6-dy*.22,y+dy*.6+dx*.22);ctx.moveTo(x+dx,y+dy);ctx.lineTo(x+dx*.6+dy*.22,y+dy*.6-dx*.22);ctx.stroke();}}
     if(s.boundary==='solid'){const edge=5*pixelRatio;ctx.strokeStyle='#546668';ctx.lineWidth=edge;ctx.strokeRect(edge/2,edge/2,canvas.width-edge,canvas.height-edge);}
@@ -12963,8 +13126,9 @@ tick();
     chart.setAttribute('aria-label',`正常、异常、肿瘤和免疫细胞数量：从 0 到 ${end} MCS 的完整过程`);
     $('order').textContent='极性一致度 '+last.order.toFixed(2);
   }
-  const hints={move:'拖动真实细胞轮廓，遇到其他细胞或墙会停下。拖动期间暂停，松手后恢复。',seed:'单击加入一颗细胞；已有细胞处会尝试局部挤入，让邻居变形和有限切面让位。实体障碍仍阻挡。',signal:'点击释放所选因子，拖动画出信号带。信号影响方向，不会直接触发识别或杀伤。',wall:'在空白处按住拖动画墙。墙同时阻断细胞运动与信号扩散，不覆盖已有细胞。',erase:'按住拖动擦除实体障碍，打开通路。',inspect:'点击细胞查看类型、抗原、受损程度与当前接触状态。'};
+  const hints={move:'按住期间暂停，沿途细胞弹性变形、核区让位；松手后恢复原播放状态。实体墙与无法容纳核区的狭窄处仍阻挡。',seed:'单击加入一颗细胞；已有细胞处会尝试局部挤入，让邻居变形和有限切面让位。实体障碍仍阻挡。',signal:'点击释放所选因子，拖动画出信号带。信号影响方向，不会直接触发识别或杀伤。',wall:'在空白处按住拖动画墙。墙同时阻断细胞运动与信号扩散，不覆盖已有细胞。',erase:'按住拖动擦除实体障碍，打开通路。',inspect:'点击细胞查看类型、抗原、受损程度与当前接触状态。'};
   function setTool(value){
+    if(stroke&&!stroke.ending)void endStroke();
     tool=value;for(const b of document.querySelectorAll('[data-tool]')){const on=b.dataset.tool===tool;b.classList.toggle('selected',on);b.setAttribute('aria-pressed',on);}
     $('tool-hint').textContent=hints[tool];$('canvas-note').textContent=hints[tool];
     $('seed-options').hidden=tool!=='seed';$('signal-options').hidden=tool!=='signal';$('wall-options').hidden=!['wall','erase'].includes(tool);
@@ -12977,12 +13141,12 @@ tick();
     if(clientX<Math.max(r.left,v.left)||clientX>=Math.min(r.right,v.right)||clientY<Math.max(r.top,v.top)||clientY>=Math.min(r.bottom,v.bottom)){box.hidden=true;return;}
     const [x,y]=point(hover),sample=CellLabDisplay.sample(snapshot,x,y);if(!sample){box.hidden=true;return;}
     $('probe-position').textContent=`位置 ${x}, ${y} · ${sample.time} MCS`;
-    $('probe-cell').textContent=sample.wall?'实体障碍':sample.cell?`#${sample.cell.id} ${CellLabDisplay.cellName(sample.cell)}${sample.cell.dying?' · 死亡清除中':''}`:'培养液';
+    $('probe-cell').textContent=sample.wall?'实体障碍':sample.cell?`#${sample.cell.id} ${CellLabDisplay.cellName(sample.cell)}${sample.cell.dying?' · '+CellLabDisplay.deathPhaseLabel(sample.cell):''}`:'培养液';
     for(const key of ['oxygen','glucose','acid','cohesion','danger','trail'])$('probe-'+key).textContent=sample.blocked?'—':sample.values[key].toFixed(3);
     $('probe-note').textContent=sample.blocked?'该环境格被实体障碍阻断，暂无有效浓度。':'氧／糖／酸为 0–1 模型量；因子为模型浓度，无实验单位。读数来自当前位置的环境网格。';
     box.hidden=false;const rect=box.getBoundingClientRect();box.style.left=Math.max(8,Math.min(innerWidth-rect.width-8,clientX+15))+'px';box.style.top=Math.max(8,Math.min(innerHeight-rect.height-8,clientY+15))+'px';
   }
-  let stroke=null,queuedPoint=null,flushTimer=0,lastAction=Promise.resolve();
+  let stroke=null,queuedPoint=null,flushTimer=0,lastAction=Promise.resolve(),dragSerial=0;
   function seedFeedback(result){
     const reasons={occupied:'此处完整胞体会碰到已有细胞',crowded:'局部挤入失败：核区或切面让位额度不足，周围细胞保持原状',wall:'此处被实体障碍挡住',edge:'胞体会超出实体边界，请向内移动',nucleus:'这处空间放不下完整核区',invalid:'新增参数无效',space:'随机尝试未找到足够空隙，可在画布上单击尝试挤入'};
     const added=result.added??(result.id?1:0),message=added?(result.id?'加入了细胞 #'+result.id:`加入了 ${added} / ${result.requested} 颗细胞`):'未加入细胞';
@@ -12991,7 +13155,7 @@ tick();
   function applyPointer(p,first=false){
     if(!stroke||!snapshot)return;
     if(tool==='move'){
-      if(stroke.id){lastAction=rpc('move',{id:stroke.id,x:p[0]+stroke.offset[0],y:p[1]+stroke.offset[1]}).then(r=>{if(r.blocked&&!stroke?.warned){toast('前方被细胞或实体边界挡住了');if(stroke)stroke.warned=true;}}).catch(fail);}
+      if(stroke.id){lastAction=rpc('move',{id:stroke.id,token:stroke.token,elastic:true,x:p[0]+stroke.offset[0],y:p[1]+stroke.offset[1]}).then(r=>{if(r.blocked&&!r.stale&&!stroke?.warned){toast('前方是实体边界，或局部空间不足以容纳完整核区');if(stroke)stroke.warned=true;}}).catch(fail);}
     }else if(tool==='wall'||tool==='erase'){
       const before=stroke.previous||p,n=Math.max(Math.abs(p[0]-before[0]),Math.abs(p[1]-before[1]),1),points=[];
       for(let i=0;i<=n;i++)points.push([Math.round(before[0]+(p[0]-before[0])*i/n),Math.round(before[1]+(p[1]-before[1])*i/n)]);
@@ -13005,19 +13169,19 @@ tick();
   function flush(){clearTimeout(flushTimer);flushTimer=0;if(queuedPoint){const p=queuedPoint;queuedPoint=null;applyPointer(p);}return lastAction;}
   canvas.addEventListener('pointerdown',e=>{
     if(!snapshot||e.button!==0)return;e.preventDefault();$('field-probe').hidden=true;const p=point(e),id=snapshot.grid[p[1]*snapshot.width+p[0]],m=snapshot.cells.find(c=>c.id===id);
-    canvas.setPointerCapture(e.pointerId);stroke={previous:p,id:m?.id||0,resume:false,offset:[0,0],warned:false};
+    canvas.setPointerCapture(e.pointerId);stroke={previous:p,id:m?.id||0,token:++dragSerial,offset:[0,0],warned:false,drag:tool==='move'};
     if(tool==='move'||tool==='inspect'){selected=m?.id||0;sync();dirty=true;}
     if(tool==='inspect')$('cell-inspector').open=true;
     if(tool==='move'){
       if(!m||m.dying){stroke=null;toast('请在一个存活的细胞上按住拖动');return;}
-      stroke.offset=[m.x-p[0],m.y-p[1]];stroke.resume=snapshot.playing;canvas.style.cursor='grabbing';rpc('playing',{value:false}).catch(fail);
+      stroke.offset=[m.x-p[0],m.y-p[1]];canvas.style.cursor='grabbing';lastAction=rpc('beginDrag',{id:m.id,token:stroke.token}).catch(fail);
     }else applyPointer(p,true);
   });
-  canvas.addEventListener('pointermove',e=>{if(e.pointerType!=='touch'){hover={clientX:e.clientX,clientY:e.clientY};probeDirty=true;}if(!stroke||!snapshot||tool==='inspect'||tool==='seed')return;queuedPoint=point(e);if(!flushTimer)flushTimer=setTimeout(flush,25);});
+  canvas.addEventListener('pointermove',e=>{if(e.pointerType!=='touch'){hover={clientX:e.clientX,clientY:e.clientY};probeDirty=true;}if(!stroke||stroke.ending||!snapshot||tool==='inspect'||tool==='seed')return;queuedPoint=point(e);if(!flushTimer)flushTimer=setTimeout(flush,25);});
   canvas.addEventListener('pointerleave',()=>{hover=null;probeDirty=true;});
-  window.addEventListener('blur',()=>{hover=null;probeDirty=true;});document.addEventListener('scroll',()=>probeDirty=true,true);window.addEventListener('resize',()=>{probeDirty=true;dirty=true;});
+  window.addEventListener('blur',()=>{hover=null;probeDirty=true;void endStroke();});document.addEventListener('scroll',()=>probeDirty=true,true);window.addEventListener('resize',()=>{probeDirty=true;dirty=true;});
   new ResizeObserver(()=>dirty=true).observe(canvas);document.addEventListener('fullscreenchange',()=>dirty=true);
-  async function endStroke(){if(!stroke||stroke.ending)return;const current=stroke;current.ending=true;const resume=current.resume;await flush();if(stroke===current)stroke=null;canvas.style.cursor=tool==='move'?'grab':tool==='inspect'?'pointer':'crosshair';if(resume&&!stroke)rpc('playing',{value:true}).catch(fail);}
+  async function endStroke(){if(!stroke||stroke.ending)return;const current=stroke;current.ending=true;await flush();if(current.drag)await rpc('endDrag',{token:current.token}).catch(fail);if(stroke===current)stroke=null;canvas.style.cursor=tool==='move'?'grab':tool==='inspect'?'pointer':'crosshair';}
   for(const event of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(event,endStroke);
   document.querySelectorAll('[data-tool]').forEach(b=>b.addEventListener('click',()=>setTool(b.dataset.tool)));
   function gridPreview(){

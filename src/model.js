@@ -81,7 +81,7 @@
   class LocalTopology extends CPM.HardConstraint {
     constructor(sim){super({});this.sim=sim;this.stamp=0;this.visited=new Uint32Array(sim.C.grid._pixels.length);this.queue=new Uint32Array(this.visited.length);this.goals=new Uint32Array(this.visited.length);}
     fulfilled(src,tgt,source,target){
-      const cell=this.sim.cells[target];if(!target||!cell||cell.dying)return true;
+      const cell=this.sim.cells[target];if(!target||!cell||(cell.dying&&!cell.deathIntact))return true;
       const neighbors=this.sim.rings[tgt],grid=this.C.grid._pixels;let mask=0;
       for(let k=0;k<8;k++)if(neighbors[k]>=0&&grid[neighbors[k]]===target)mask|=1<<k;
       if((this.sim.section?connected4:connected)[mask])return true;
@@ -131,6 +131,7 @@
       delete this.settings.capacity;
       this.cells=[];this.contacts=new Map();this.histories=new Map();this.events=[];this.history=[];this.wallID=0;this.version=0;
       this.counters={divisions:0,immuneDivisions:0,kills:0,apoptosis:0,environment:0,apoptosisStarted:0,killStarted:0,environmentStarted:0,recognitions:0,mutations:0,abnormalInitiations:0,malignantTransitions:0,abnormalKills:0,normalEnvironmentDeaths:0,abnormalEnvironmentDeaths:0};this.birthSerial=0;this.lineage=[];this.deathHistory=[];this.recentClearances=[];
+      this.deathEffects=[];
       const s=this.settings;
       this.C=new CPM.CPM([width,height],{
         seed,torus:[this.wrap,this.wrap],T:s.temperature,
@@ -258,6 +259,12 @@
         m.perimeter=[0,155,195,90][m.kind]*this.scale*Math.sqrt(Math.max(1,m.planarTarget)/m.base);
         if(m.morphologyMode){m.lambdaP=.18/this.scale;m.perimeter+=2.8*(m.processLength||0);const hold=1/(1+.45*m.networkDegree);m.activity*=.25*hold;m.drive*=.4*hold;}
         if(m.kind===IMMUNE){m.activity*=125/240;m.drive*=35/25;}
+      }
+      if(m.deathIntact){
+        // Surface tension rounds the real lattice body. Swelling still pays
+        // volume/adhesion energy and cannot take a live neighbour's nucleus.
+        m.lambdaP=.45/this.scale;m.perimeter=10.8*Math.sqrt(Math.max(1,m.planarTarget??m.target));
+        m.softReach=.55*Math.sqrt(Math.max(1,m.planarTarget??m.target)/Math.PI);
       }
     }
     moment(m,i,sign){
@@ -513,15 +520,19 @@
     beginDeath(id,cause){
       const m=this.cells[id];if(!m||m.dying)return false;
       m.dying=true;m.deathCause=cause;m.deathStartedAt=this.C.time;m.targetID=0;m.phase='dying';m.recruitment=0;
+      m.deathElapsed=0;m.deathProgress=0;m.deathArea=this.C.getVolume(id);m.deathIntact=cause==='kill';
+      m.deathPhase=cause==='kill'?'rounding':cause==='spontaneous'?'shrinking':'withering';
+      if(m.deathIntact)m.target=m.deathArea/(this.section?m.sectionFraction:1);
       // Keep a separate lifetime ledger: the rolling interaction log cannot
       // serve as a complete death history, and grid IDs may later be reused.
-      m.deathRecord={id,birth:m.birth,kind:m.kind,state:m.state,clone:m.clone,cause,startedAt:this.C.time,clearedAt:null};
+      m.deathRecord={id,birth:m.birth,kind:m.kind,state:m.state,clone:m.clone,cause,effect:cause==='kill'?'lysis':cause==='spontaneous'?'apoptosis':'stress',startedAt:this.C.time,clearedAt:null};
       this.deathHistory.push(m.deathRecord);const keys=DEATH_COUNTERS[cause];if(keys)this.counters[keys[0]]++;
       this.section?.forget(id);this.updateMechanics(m);this.log('death-start',id,0,{cause,birth:m.birth});
       for(const ctl of this.live())if(ctl.targetID===id){ctl.targetID=0;ctl.phase='search';this.updateMechanics(ctl);}return true;
     }
     eraseCell(id){
       const m=this.cells[id];
+      if(m?.dying)m.deathFinalArea=this.C.getVolume(id);
       this.section?.forget(id);
       const points=[...this.C.pixels()].filter(([,cid])=>cid===id).map(([p])=>p);for(const p of points)this.C.setpix(p,0);
       // Both zero-pixel cleanup and small-remnant removal converge here.
@@ -536,6 +547,10 @@
       const keys=DEATH_COUNTERS[cause];if(keys)this.counters[keys[1]]++;
       if(cause==='kill'&&m.state==='abnormal')this.counters.abnormalKills++;
       if(cause==='environment'){if(m.state==='normal')this.counters.normalEnvironmentDeaths++;if(m.state==='abnormal')this.counters.abnormalEnvironmentDeaths++;}
+      if(cause==='kill'){
+        this.deathEffects.push({id:m.id,birth:m.birth,cause,x:m.x,y:m.y,radius:Math.sqrt((m.deathFinalArea||m.deathArea||1)/Math.PI),startedAt:this.C.time,duration:48});
+        if(this.deathEffects.length>128)this.deathEffects.shift(); // Temporary particles only; full death accounting is never truncated.
+      }
       if(m.deathRecord){
         m.deathRecord.clearedAt=this.C.time;
         // Completion order differs from onset order. Keep a bounded display
@@ -562,11 +577,24 @@
       m.target+=Math.min(Math.max(0,ceiling-m.target),amount*available);
     }
     biology(dt){
+      this.deathEffects=this.deathEffects.filter(e=>this.C.time-e.startedAt<e.duration);
       const live=this.live();
       for(const m of live){
         m.age+=dt;
         m.activation=Math.max(0,m.activation-dt);m.recruitment=Math.max(0,m.recruitment-dt);
-        if(m.dying){m.target=Math.max(0,m.target-dt*Math.max(1.8*this.scale*this.scale,m.base*.025));this.updateMechanics(m);if(this.C.getVolume(m.id)<=3*this.scale*this.scale)this.eraseCell(m.id);continue;}
+        if(m.dying){
+          m.deathElapsed+=dt;
+          if(m.deathCause==='kill'){
+            m.deathProgress=clamp(m.deathElapsed/96);m.deathPhase=m.deathElapsed<28?'rounding':'swelling';
+            const t=clamp((m.deathElapsed-24)/72),swelling=t*t*(3-2*t);
+            m.target=m.deathArea*(1+.32*swelling)/(this.section?m.sectionFraction:1);
+            if(m.deathElapsed>=96){m.deathPhase='rupture';this.eraseCell(m.id);continue;}
+          }else{
+            m.target=Math.max(0,m.target-dt*Math.max(1.8*this.scale*this.scale,m.base*.025));
+            m.deathProgress=clamp(1-this.C.getVolume(m.id)/Math.max(1,m.deathArea));
+          }
+          this.updateMechanics(m);if(this.C.getVolume(m.id)<=3*this.scale*this.scale)this.eraseCell(m.id);continue;
+        }
         this.transformation(m,dt);
         if(m.kind===TUMOR){
           const hazard=this.settings.apoptosis/100/1000;
@@ -643,16 +671,20 @@
       // Adhesive cohesion is local contact energy, complementary to the secreted field.
       if(name==='cohesion')this.C.conf.J[1][1]=Math.max(2,12-value*5);
     }
-    moveCell(id,x,y){
+    moveCell(id,x,y,{elastic=false,reference=new Map()}={}){
       const cell=this.cells[id];if(!cell||cell.dying)return {steps:0,blocked:true};
       this.refreshPositions();let dx=Math.round(x-cell.x),dy=Math.round(y-cell.y);
       if(this.wrap){if(dx>this.width/2)dx-=this.width;if(dx< -this.width/2)dx+=this.width;if(dy>this.height/2)dy-=this.height;if(dy< -this.height/2)dy+=this.height;}
       let occupied=[...this.C.pixels()].filter(([,cid])=>cid===id).map(([p])=>this.C.grid.p2i(p));
-      let steps=0,blocked=false;
+      let steps=0,blocked=false;const displaced=new Set();
       const shift=(sx,sy)=>{
         if(!sx&&!sy)return true;
         const moved=[];for(const i of occupied){let xx=this.xs[i]+sx,yy=this.ys[i]+sy;if(this.wrap){xx=(xx+this.width)%this.width;yy=(yy+this.height)%this.height;}if(xx<0||yy<0||xx>=this.width||yy>=this.height)return false;
-          const j=this.C.grid.p2i([xx,yy]),other=this.C.pixti(j);if(other&&other!==id)return false;moved.push(j);
+          const j=this.C.grid.p2i([xx,yy]),other=this.C.pixti(j);if(other&&other!==id){
+            if(!elastic||!this.section||!globalThis.CellLabInsertion)return false;
+            const result=CellLabInsertion.shift(this,id,sx,sy,occupied,reference);if(!result.ok)return false;
+            for(const other of result.changed)displaced.add(other);occupied=result.moved;steps++;return true;
+          }moved.push(j);
         }
         const next=new Set(moved),activity=occupied.map(i=>this.act.pxact(i));
         // Add before removing so the cell ID and volume bookkeeping survive.
@@ -668,9 +700,13 @@
         if(!shift(sx,0)){blocked=true;break;}if(cell.hasNucleus)cell.nucleusX=(cell.nucleusX+sx+this.width)%this.width;
         if(!shift(0,sy)){blocked=true;break;}if(cell.hasNucleus)cell.nucleusY=(cell.nucleusY+sy+this.height)%this.height;doneX=xx;doneY=yy;
       }
-      for(const [key,h] of this.histories)if(h.ctl===id||h.target===id)this.histories.delete(key);
-      this.C.stat_values={};this.updateLocal(0);this.version++;
-      return {steps,blocked,x:cell.x,y:cell.y};
+      for(const [key,h] of this.histories)if(h.ctl===id||h.target===id||displaced.has(h.ctl)||displaced.has(h.target))this.histories.delete(key);
+      this.C.stat_values={};this.refreshPositions();this.scanContacts();this.section?.updateJunctions(0);
+      // Manual movement updates contact geometry, not stochastic search,
+      // recognition, damage or biological clocks while the gesture is held.
+      for(const m of this.live())if(m.targetID&&(m.id===id||displaced.has(m.id)||m.targetID===id||displaced.has(m.targetID)||!this.contacts.get(m.id)?.has(m.targetID))){m.targetID=0;m.phase=m.dying?'dying':'search';this.updateMechanics(m);}
+      if(displaced.size)this.prepareEnvironment();this.version++;
+      return {steps,blocked,displaced:displaced.size,x:cell.x,y:cell.y};
     }
     pulse(x,y,channel='danger'){if(SIGNALS.includes(channel))this.fields[channel].deposit(x/this.fieldScale,y/this.fieldScale,8);}
     mechanicalStep(){
@@ -738,10 +774,10 @@
       this.refreshPositions();const grid=new Uint16Array(this.width*this.height),activity=new Uint8Array(grid.length),walls=new Uint8Array(grid.length);let orphans=0;
       for(let q=0;q<grid.length;q++){const i=this.positions[q],id=this.C.grid.pixti(i);grid[q]=id;const m=this.cells[id];if(m)activity[q]=Math.min(255,Math.round(this.act.pxact(i)/this.C.conf.MAX_ACT[m.kind]*255));else if(id){if(this.C.cellKind(id)===WALL)walls[q]=1;else orphans++;}}
       const cells=this.live().map(m=>({id:m.id,kind:m.kind,x:m.x,y:m.y,px:m.px,py:m.py,area:this.C.getVolume(m.id),target:m.target,antigen:m.antigen,antigenLevel:m.antigenLevel,damage:m.damage,dying:m.dying,deathCause:m.deathCause,phase:m.phase,targetID:m.targetID,age:m.age,genome:m.genome?{...m.genome}:null,clone:m.clone,generation:m.generation,divisionsLeft:m.divisionsLeft,activation:m.activation,recruitment:m.recruitment,oxygen:m.oxygen,glucose:m.glucose,acid:m.acid,stress:m.stress,fitness:m.fitness,confinement:m.confinement}));
-      for(const c of cells){const m=this.cells[c.id];for(const key of ['sectionFraction','sectionPressure','planarTarget','offPlaneTarget','hasNucleus','nucleusX','nucleusY','nucleusRadius','state','origin','abnormalSince','abnormalAge','transformedAt','adversity','immuneCue','morphologyMode','branchCount','networkDegree','deathStartedAt'])c[key]=m[key];}
+      for(const c of cells){const m=this.cells[c.id];for(const key of ['sectionFraction','sectionPressure','planarTarget','offPlaneTarget','hasNucleus','nucleusX','nucleusY','nucleusRadius','state','origin','abnormalSince','abnormalAge','transformedAt','adversity','immuneCue','morphologyMode','branchCount','networkDegree','deathStartedAt','deathPhase','deathProgress','deathIntact'])c[key]=m[key];}
       const fields={};for(const [key,f] of Object.entries(this.fields))fields[key]={width:f.width,height:f.height,values:f.values.slice()};
       const history=this.populationHistory(true),historySamples=this.history.length+(history.at(-1)===this.history.at(-1)?0:1);
-      return {kernel:this.kernel,width:this.width,height:this.height,worldWidth:this.worldWidth,worldHeight:this.worldHeight,refinement:this.scale,fieldScale:this.fieldScale,fieldMask:this.fields.oxygen.blocked.slice(),scene:this.scene,scenario:this.scenarioReport(),boundary:this.boundary,time:this.C.time,seed:this.seedValue,settings:{...this.settings},counters:{...this.counters},deaths:this.deathSummary(),recentDeaths:this.deathHistory.slice(-8).map(d=>({...d})),recentClearances:this.recentClearances.map(d=>({...d})),grid,activity,walls,orphans,cells,fields,history,historySamples,events:this.events.slice(-12)};
+      return {kernel:this.kernel,width:this.width,height:this.height,worldWidth:this.worldWidth,worldHeight:this.worldHeight,refinement:this.scale,fieldScale:this.fieldScale,fieldMask:this.fields.oxygen.blocked.slice(),scene:this.scene,scenario:this.scenarioReport(),boundary:this.boundary,time:this.C.time,seed:this.seedValue,settings:{...this.settings},counters:{...this.counters},deaths:this.deathSummary(),recentDeaths:this.deathHistory.slice(-8).map(d=>({...d})),recentClearances:this.recentClearances.map(d=>({...d})),deathEffects:this.deathEffects.map(e=>({...e})),grid,activity,walls,orphans,cells,fields,history,historySamples,events:this.events.slice(-12)};
     }
   }
   globalThis.CellLab={Simulation,SignalField,StepClock,DEFAULTS,PRESETS,BODY_COLORS,TYPE_NAMES,NORMAL,TUMOR,IMMUNE,WALL,sampleHistory};

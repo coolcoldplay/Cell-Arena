@@ -45,7 +45,7 @@
     // Every extension must still pass the ordinary adjacent-copy, connected
     // cytoplasm, finite width, nuclear disk, volume and obstacle constraints.
     shapePenalty(m,x,y){
-      if(!m?.hasNucleus||m.dying)return 0;
+      if(!m?.hasNucleus||(m.dying&&!m.deathIntact))return 0;
       const dx=this.delta(x-m.nucleusX,this.s.width),dy=this.delta(y-m.nucleusY,this.s.height),d2=dx*dx+dy*dy;
       if(!m.morphologyMode)return [0,5,10,18][m.kind]*Math.max(0,Math.sqrt(d2)/m.softReach-1)**2;
       const distance=Math.sqrt(d2);let outside=Math.max(0,distance-m.branchCore),processGap=Infinity;
@@ -202,11 +202,11 @@
     }
     allowed(src,tgt,a,b){
       const s=this.s,grid=s.C.grid._pixels,source=s.cells[a],target=s.cells[b];
-      if(target&&!target.dying){
+      if(target&&(!target.dying||target.deathIntact)){
         if(s.C.getVolume(b)<=target.minVisibleArea)return false;
         if(target.hasNucleus&&this.distance2(s.xs[tgt],s.ys[tgt],target)<=target.nucleusRadius**2)return false;
       }
-      if(source&&!source.dying){
+      if(source&&(!source.dying||source.deathIntact)){
         if(source.hasNucleus&&this.distance2(s.xs[tgt],s.ys[tgt],source)>source.maxReach**2)return false;
         let attached=false;for(const j of s.faces[tgt])if(grid[j]===a){attached=true;break;}if(!attached)return false;
       }
@@ -215,8 +215,8 @@
       // local articulation would freeze every rectangular cell.
       const own=(j,id)=>j>=0&&(j===tgt?a:grid[j])===id;
       const thick=(j,id)=>{const r=s.rings[j];for(const [p,q,k] of [[0,1,7],[2,1,3],[4,3,5],[6,5,7]])if(own(r[p],id)&&own(r[q],id)&&own(r[k],id))return true;return false;};
-      if(source&&!source.dying){let anchored=false;for(const j of s.faces[tgt])if(grid[j]===a&&thick(j,a)){anchored=true;break;}if(!anchored)return false;}
-      const check=j=>{const id=j===tgt?a:grid[j],m=s.cells[id];if(!m||m.dying||(id!==a&&id!==b))return true;
+      if(source&&(!source.dying||source.deathIntact)){let anchored=false;for(const j of s.faces[tgt])if(grid[j]===a&&thick(j,a)){anchored=true;break;}if(!anchored)return false;}
+      const check=j=>{const id=j===tgt?a:grid[j],m=s.cells[id];if(!m||(m.dying&&!m.deathIntact)||(id!==a&&id!==b))return true;
         let mask=0,faces=0;const ring=s.rings[j];for(let k=0;k<8;k++){const n=ring[k];if(n>=0&&(n===tgt?a:grid[n])===id){mask|=1<<k;if(k&1)faces++;}}
         if(faces<2||s.connected4[mask]===1)return true;
         // Ignore a single leaf tip. The remaining body must still connect
@@ -224,7 +224,7 @@
         for(const k of [1,3,5,7])if(mask&(1<<k)){const n=ring[k];let degree=0;for(const f of s.faces[n])if(own(f,id))degree++;if(degree===1)mask&=~(1<<k);}
         return !mask||s.connected4[mask]===1;
       };
-      if(source&&!source.dying&&!check(tgt))return false;
+      if(source&&(!source.dying||source.deathIntact)&&!check(tgt))return false;
       for(const j of s.faces[tgt])if(!check(j))return false;
       return true;
     }

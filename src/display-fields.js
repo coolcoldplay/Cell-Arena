@@ -36,6 +36,15 @@
     return base.map(v=>Math.round(v+(255-v)*t));
   };
   const cellName=m=>m?.state==='abnormal'?'异常中间态':m?.kind===3?(immuneActive(m)?'已激活免疫细胞':'未激活免疫细胞'):['培养液','正常细胞','肿瘤细胞','免疫细胞','实体障碍'][m?.kind||0];
+  const deathCode=m=>m?.dying?({spontaneous:1,kill:2,environment:3}[m.deathCause]||1):0;
+  function deathColor(rgb,m){
+    if(!m?.dying)return rgb;
+    const p=Math.round(clamp(m.deathProgress||0)*255)/255,code=deathCode(m);
+    const tint=code===2?[246,143,171]:code===3?[158,145,112]:[75,78,86];
+    const weight=code===2?.15+.85*p:code===3?.4+.45*p:.2+.65*p;
+    return rgb.map((v,i)=>v+(tint[i]-v)*weight);
+  }
+  const deathPhaseLabel=m=>({rounding:'免疫杀伤 · 圆化',swelling:'免疫杀伤 · 肿胀待裂解',rupture:'免疫杀伤 · 破裂',shrinking:'自发凋亡 · 皱缩',withering:'环境死亡 · 萎缩'}[m?.deathPhase]||'死亡清除中');
   const nucleusStyles={normal:{stroke:'#243b53',fill:'#243b531a'},patrol:{stroke:'#8f3548',fill:'#8f35481a'},dark:{stroke:'#f2d38a',fill:'#f2d38a1a'}};
   const nucleusStyle=(m,palette)=>{if(palette){const stroke=palette[colorKey(m)].nucleus;return {stroke,fill:stroke+'1a'};}return m.kind===1?nucleusStyles.normal:m.kind===3&&!immuneActive(m)?nucleusStyles.patrol:nucleusStyles.dark;};
   // At ordinary opacity keep bodies legible; the upper half of each slider
@@ -83,5 +92,5 @@
     const wall=!!s.walls[q],blocked=wall||!!s.fieldMask?.[bin];
     return {x,y,bin,time:s.time,cell:s.cells.find(m=>m.id===s.grid[q])||null,wall,blocked,values:blocked?null:Object.fromEntries(['oxygen','glucose','acid',...Object.keys(SIGNALS)].map(key=>[key,s.fields[key].values[bin]]))};
   }
-  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,displayKind,tumorShade,bodyColor,cellName,nucleusStyle,bodyOpacity,adversity,signals,sample,Cache};
+  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,bodyOpacity,adversity,signals,sample,Cache};
 })();

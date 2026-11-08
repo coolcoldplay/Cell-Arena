@@ -174,7 +174,7 @@
     $('population-load').textContent=`当前 ${s.cells.length} 颗 · ${s.width} × ${s.height} 格点。${s.cells.length>=1000?'细胞较多，计算和交互可能变慢。':''}不按细胞数量冻结生长或分裂。`;
     $('backend-status').textContent=`绘图：${gpuRenderer&&!gpuRenderer.lost?(gpuRenderer.hardware===false?'WebGL2 软件':gpuRenderer.hardware===true?'WebGL2 GPU':'WebGL2'):'Canvas2D'} · 形变：${s.kernel==='wasm'?'WebAssembly CPU':s.kernel==='fast'?'优化 JS CPU':'参考 JS CPU'} · 微环境：${s.compute?.active==='gpu'?'WebGPU':'CPU'}`;
     $('compute-note').textContent=(s.compute?.reason||'初始化计算后端…')+(s.kernelNote?' '+s.kernelNote:'');
-    const cell=s.cells.find(c=>c.id===selected),phases={search:cell?.kind===3?(cell.immuneCue>.05?'局部趋化':'分散巡逻'):'探索',scan:'接触扫描',kill:'识别后递送损伤',dying:'死亡清除中'};
+    const cell=s.cells.find(c=>c.id===selected),phases={search:cell?.kind===3?(cell.immuneCue>.05?'局部趋化':'分散巡逻'):'探索',scan:'接触扫描',kill:'识别后递送损伤',dying:CellLabDisplay.deathPhaseLabel(cell)};
     $('selection-label').textContent=cell?'#'+cell.id+' '+CellLabDisplay.cellName(cell):'未选中';
     $('divide').disabled=!cell||cell.dying||cell.state==='abnormal';
     if(cell){
@@ -221,7 +221,7 @@
       if(signal){const layer=m?bodySignal:signal,p=(Math.floor(y/s.fieldScale)*layer.width+Math.floor(x/s.fieldScale))*4,a=layer.rgba[p+3]/255;rgb=rgb.map((v,k)=>v+(layer.rgba[p+k]-v)*a);}
       if(s.walls[q]){const hatch=(x+y)%7<2;rgb=hatch?[66,83,87]:colors[4];}
       if(m){
-        if(m.dying)rgb=rgb.map(c=>c*.55+110);
+        if(m.dying)rgb=CellLabDisplay.deathColor(rgb,m);
         else if(actFlags[m.kind]&&s.activity[q]>0)rgb=activityPalette[s.activity[q]];
       }
       const k=q*4;data[k]=rgb[0];data[k+1]=rgb[1];data[k+2]=rgb[2];data[k+3]=255;
@@ -239,7 +239,17 @@
       ctx.strokeStyle='#803d46e6';ctx.stroke(paths[2]);
     }
     if(selected){const m=meta[selected];if(m){ctx.strokeStyle='#daae35';ctx.lineWidth=1.2*pixelRatio;ctx.beginPath();ctx.arc(m.x*scale,m.y*scale,5*pixelRatio,0,2*Math.PI);ctx.stroke();}}
-    if($('nuclei').checked){ctx.lineWidth=1.5*pixelRatio;for(const m of s.cells)if(m.hasNucleus&&!m.dying){const style=CellLabDisplay.nucleusStyle(m,cellColors);ctx.strokeStyle=style.stroke;ctx.fillStyle=style.fill;const offsetsX=wrap?[-w,0,w]:[0],offsetsY=wrap?[-h,0,h]:[0];for(const dx of offsetsX)for(const dy of offsetsY){const x=(m.nucleusX+dx+.5)*scale,y=(m.nucleusY+dy+.5)*scale;ctx.beginPath();ctx.arc(x,y,m.nucleusRadius*scale,0,2*Math.PI);ctx.fill();ctx.stroke();}}}
+    if($('nuclei').checked){ctx.lineWidth=1.5*pixelRatio;for(const m of s.cells)if(m.hasNucleus&&(!m.dying||m.deathIntact)){const style=m.dying?{stroke:'#ad4267',fill:'#fbe1ed40'}:CellLabDisplay.nucleusStyle(m,cellColors);ctx.strokeStyle=style.stroke;ctx.fillStyle=style.fill;const offsetsX=wrap?[-w,0,w]:[0],offsetsY=wrap?[-h,0,h]:[0];for(const dx of offsetsX)for(const dy of offsetsY){const x=(m.nucleusX+dx+.5)*scale,y=(m.nucleusY+dy+.5)*scale;ctx.beginPath();ctx.arc(x,y,m.nucleusRadius*scale,0,2*Math.PI);ctx.fill();ctx.stroke();}}}
+    // Post-clearance membrane fragments are cosmetic, never extra cells.
+    // Their age uses model time, so pausing also freezes the rupture effect.
+    ctx.save();ctx.lineWidth=Math.max(1,pixelRatio);
+    for(const effect of s.deathEffects||[]){const t=Math.max(0,(s.time-effect.startedAt)/effect.duration);if(t>=1)continue;ctx.globalAlpha=(1-t)*.85;ctx.strokeStyle='#e889ac';ctx.fillStyle='#efadc4';
+      const count=11+effect.birth%7,variation=n=>{const v=Math.sin(n*12.9898+effect.birth*78.233)*43758.5453;return v-Math.floor(v);};
+      for(let n=0;n<count;n++){const angle=(n+variation(n)*.75)*2*Math.PI/count+effect.birth*.37,radius=effect.radius*(.45+variation(n+21)*.55+t*(.4+variation(n+43)));let x=effect.x+Math.cos(angle)*radius,y=effect.y+Math.sin(angle)*radius;
+        if(wrap){x=(x+w)%w;y=(y+h)%h;}if(x<0||y<0||x>=w||y>=h)continue;const q=Math.floor(y)*w+Math.floor(x);if(s.walls[q]||s.grid[q])continue;
+        const size=(.45+variation(n+67))*(1-.6*t)*s.refinement;ctx.beginPath();ctx.ellipse((x+.5)*scale,(y+.5)*scale,size*scale,size*(.3+.4*variation(n+83))*scale,angle+variation(n+97)*Math.PI+t,0,Math.PI*2);ctx.fill();ctx.stroke();
+      }
+    }ctx.restore();
     if($('antigen-marks').checked){ctx.font=`bold ${13*pixelRatio}px Consolas, monospace`;ctx.textAlign='center';ctx.fillStyle='#f4e7b2';for(const m of s.cells)if((m.kind===2||m.state==='abnormal')&&m.antigen&&!m.dying)ctx.fillText('+',m.x*scale,m.y*scale+4*pixelRatio);}
     if($('arrows').checked){ctx.strokeStyle='#203731a6';ctx.lineWidth=1.6*pixelRatio;for(const m of s.cells)if(!m.dying){const x=m.x*scale,y=m.y*scale,dx=m.px*14*pixelRatio,dy=m.py*14*pixelRatio;ctx.beginPath();ctx.moveTo(x-dx*.35,y-dy*.35);ctx.lineTo(x+dx,y+dy);ctx.lineTo(x+dx*.6-dy*.22,y+dy*.6+dx*.22);ctx.moveTo(x+dx,y+dy);ctx.lineTo(x+dx*.6+dy*.22,y+dy*.6-dx*.22);ctx.stroke();}}
     if(s.boundary==='solid'){const edge=5*pixelRatio;ctx.strokeStyle='#546668';ctx.lineWidth=edge;ctx.strokeRect(edge/2,edge/2,canvas.width-edge,canvas.height-edge);}
@@ -256,8 +266,9 @@
     chart.setAttribute('aria-label',`正常、异常、肿瘤和免疫细胞数量：从 0 到 ${end} MCS 的完整过程`);
     $('order').textContent='极性一致度 '+last.order.toFixed(2);
   }
-  const hints={move:'拖动真实细胞轮廓，遇到其他细胞或墙会停下。拖动期间暂停，松手后恢复。',seed:'单击加入一颗细胞；已有细胞处会尝试局部挤入，让邻居变形和有限切面让位。实体障碍仍阻挡。',signal:'点击释放所选因子，拖动画出信号带。信号影响方向，不会直接触发识别或杀伤。',wall:'在空白处按住拖动画墙。墙同时阻断细胞运动与信号扩散，不覆盖已有细胞。',erase:'按住拖动擦除实体障碍，打开通路。',inspect:'点击细胞查看类型、抗原、受损程度与当前接触状态。'};
+  const hints={move:'按住期间暂停，沿途细胞弹性变形、核区让位；松手后恢复原播放状态。实体墙与无法容纳核区的狭窄处仍阻挡。',seed:'单击加入一颗细胞；已有细胞处会尝试局部挤入，让邻居变形和有限切面让位。实体障碍仍阻挡。',signal:'点击释放所选因子，拖动画出信号带。信号影响方向，不会直接触发识别或杀伤。',wall:'在空白处按住拖动画墙。墙同时阻断细胞运动与信号扩散，不覆盖已有细胞。',erase:'按住拖动擦除实体障碍，打开通路。',inspect:'点击细胞查看类型、抗原、受损程度与当前接触状态。'};
   function setTool(value){
+    if(stroke&&!stroke.ending)void endStroke();
     tool=value;for(const b of document.querySelectorAll('[data-tool]')){const on=b.dataset.tool===tool;b.classList.toggle('selected',on);b.setAttribute('aria-pressed',on);}
     $('tool-hint').textContent=hints[tool];$('canvas-note').textContent=hints[tool];
     $('seed-options').hidden=tool!=='seed';$('signal-options').hidden=tool!=='signal';$('wall-options').hidden=!['wall','erase'].includes(tool);
@@ -270,12 +281,12 @@
     if(clientX<Math.max(r.left,v.left)||clientX>=Math.min(r.right,v.right)||clientY<Math.max(r.top,v.top)||clientY>=Math.min(r.bottom,v.bottom)){box.hidden=true;return;}
     const [x,y]=point(hover),sample=CellLabDisplay.sample(snapshot,x,y);if(!sample){box.hidden=true;return;}
     $('probe-position').textContent=`位置 ${x}, ${y} · ${sample.time} MCS`;
-    $('probe-cell').textContent=sample.wall?'实体障碍':sample.cell?`#${sample.cell.id} ${CellLabDisplay.cellName(sample.cell)}${sample.cell.dying?' · 死亡清除中':''}`:'培养液';
+    $('probe-cell').textContent=sample.wall?'实体障碍':sample.cell?`#${sample.cell.id} ${CellLabDisplay.cellName(sample.cell)}${sample.cell.dying?' · '+CellLabDisplay.deathPhaseLabel(sample.cell):''}`:'培养液';
     for(const key of ['oxygen','glucose','acid','cohesion','danger','trail'])$('probe-'+key).textContent=sample.blocked?'—':sample.values[key].toFixed(3);
     $('probe-note').textContent=sample.blocked?'该环境格被实体障碍阻断，暂无有效浓度。':'氧／糖／酸为 0–1 模型量；因子为模型浓度，无实验单位。读数来自当前位置的环境网格。';
     box.hidden=false;const rect=box.getBoundingClientRect();box.style.left=Math.max(8,Math.min(innerWidth-rect.width-8,clientX+15))+'px';box.style.top=Math.max(8,Math.min(innerHeight-rect.height-8,clientY+15))+'px';
   }
-  let stroke=null,queuedPoint=null,flushTimer=0,lastAction=Promise.resolve();
+  let stroke=null,queuedPoint=null,flushTimer=0,lastAction=Promise.resolve(),dragSerial=0;
   function seedFeedback(result){
     const reasons={occupied:'此处完整胞体会碰到已有细胞',crowded:'局部挤入失败：核区或切面让位额度不足，周围细胞保持原状',wall:'此处被实体障碍挡住',edge:'胞体会超出实体边界，请向内移动',nucleus:'这处空间放不下完整核区',invalid:'新增参数无效',space:'随机尝试未找到足够空隙，可在画布上单击尝试挤入'};
     const added=result.added??(result.id?1:0),message=added?(result.id?'加入了细胞 #'+result.id:`加入了 ${added} / ${result.requested} 颗细胞`):'未加入细胞';
@@ -284,7 +295,7 @@
   function applyPointer(p,first=false){
     if(!stroke||!snapshot)return;
     if(tool==='move'){
-      if(stroke.id){lastAction=rpc('move',{id:stroke.id,x:p[0]+stroke.offset[0],y:p[1]+stroke.offset[1]}).then(r=>{if(r.blocked&&!stroke?.warned){toast('前方被细胞或实体边界挡住了');if(stroke)stroke.warned=true;}}).catch(fail);}
+      if(stroke.id){lastAction=rpc('move',{id:stroke.id,token:stroke.token,elastic:true,x:p[0]+stroke.offset[0],y:p[1]+stroke.offset[1]}).then(r=>{if(r.blocked&&!r.stale&&!stroke?.warned){toast('前方是实体边界，或局部空间不足以容纳完整核区');if(stroke)stroke.warned=true;}}).catch(fail);}
     }else if(tool==='wall'||tool==='erase'){
       const before=stroke.previous||p,n=Math.max(Math.abs(p[0]-before[0]),Math.abs(p[1]-before[1]),1),points=[];
       for(let i=0;i<=n;i++)points.push([Math.round(before[0]+(p[0]-before[0])*i/n),Math.round(before[1]+(p[1]-before[1])*i/n)]);
@@ -298,19 +309,19 @@
   function flush(){clearTimeout(flushTimer);flushTimer=0;if(queuedPoint){const p=queuedPoint;queuedPoint=null;applyPointer(p);}return lastAction;}
   canvas.addEventListener('pointerdown',e=>{
     if(!snapshot||e.button!==0)return;e.preventDefault();$('field-probe').hidden=true;const p=point(e),id=snapshot.grid[p[1]*snapshot.width+p[0]],m=snapshot.cells.find(c=>c.id===id);
-    canvas.setPointerCapture(e.pointerId);stroke={previous:p,id:m?.id||0,resume:false,offset:[0,0],warned:false};
+    canvas.setPointerCapture(e.pointerId);stroke={previous:p,id:m?.id||0,token:++dragSerial,offset:[0,0],warned:false,drag:tool==='move'};
     if(tool==='move'||tool==='inspect'){selected=m?.id||0;sync();dirty=true;}
     if(tool==='inspect')$('cell-inspector').open=true;
     if(tool==='move'){
       if(!m||m.dying){stroke=null;toast('请在一个存活的细胞上按住拖动');return;}
-      stroke.offset=[m.x-p[0],m.y-p[1]];stroke.resume=snapshot.playing;canvas.style.cursor='grabbing';rpc('playing',{value:false}).catch(fail);
+      stroke.offset=[m.x-p[0],m.y-p[1]];canvas.style.cursor='grabbing';lastAction=rpc('beginDrag',{id:m.id,token:stroke.token}).catch(fail);
     }else applyPointer(p,true);
   });
-  canvas.addEventListener('pointermove',e=>{if(e.pointerType!=='touch'){hover={clientX:e.clientX,clientY:e.clientY};probeDirty=true;}if(!stroke||!snapshot||tool==='inspect'||tool==='seed')return;queuedPoint=point(e);if(!flushTimer)flushTimer=setTimeout(flush,25);});
+  canvas.addEventListener('pointermove',e=>{if(e.pointerType!=='touch'){hover={clientX:e.clientX,clientY:e.clientY};probeDirty=true;}if(!stroke||stroke.ending||!snapshot||tool==='inspect'||tool==='seed')return;queuedPoint=point(e);if(!flushTimer)flushTimer=setTimeout(flush,25);});
   canvas.addEventListener('pointerleave',()=>{hover=null;probeDirty=true;});
-  window.addEventListener('blur',()=>{hover=null;probeDirty=true;});document.addEventListener('scroll',()=>probeDirty=true,true);window.addEventListener('resize',()=>{probeDirty=true;dirty=true;});
+  window.addEventListener('blur',()=>{hover=null;probeDirty=true;void endStroke();});document.addEventListener('scroll',()=>probeDirty=true,true);window.addEventListener('resize',()=>{probeDirty=true;dirty=true;});
   new ResizeObserver(()=>dirty=true).observe(canvas);document.addEventListener('fullscreenchange',()=>dirty=true);
-  async function endStroke(){if(!stroke||stroke.ending)return;const current=stroke;current.ending=true;const resume=current.resume;await flush();if(stroke===current)stroke=null;canvas.style.cursor=tool==='move'?'grab':tool==='inspect'?'pointer':'crosshair';if(resume&&!stroke)rpc('playing',{value:true}).catch(fail);}
+  async function endStroke(){if(!stroke||stroke.ending)return;const current=stroke;current.ending=true;await flush();if(current.drag)await rpc('endDrag',{token:current.token}).catch(fail);if(stroke===current)stroke=null;canvas.style.cursor=tool==='move'?'grab':tool==='inspect'?'pointer':'crosshair';}
   for(const event of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(event,endStroke);
   document.querySelectorAll('[data-tool]').forEach(b=>b.addEventListener('click',()=>setTool(b.dataset.tool)));
   function gridPreview(){

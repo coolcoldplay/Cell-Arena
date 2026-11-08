@@ -37,7 +37,8 @@
           <div><span>环境死亡清除</span><b id="environment-death-count">0</b><small id="environment-death-progress">清除中 0 · 已触发 0</small></div>
           <div><span>免疫杀伤清除</span><b id="kill-count">0</b><small id="kill-progress">清除中 0 · 已触发 0</small></div>
         </div>
-        <p class="hint">胞体消失时计入清除；低氧、低糖、高酸造成的死亡计入「环境死亡」，不计入「自发凋亡」。</p>
+        <p class="hint">胞体消失时计入清除。自发凋亡设为 0% 只阻止新的随机凋亡；环境死亡、免疫杀伤和此前已触发的死亡仍会继续。</p>
+        <p class="death-visual-key"><span><i style="background:#4b4e56"></i>自发：皱缩消失</span><span><i style="background:#9e9170"></i>环境：灰褐萎缩</span><span><i style="background:#f68fab"></i>免疫杀伤：变粉、圆化肿胀、破裂</span></p>
         <p id="clearance-recent-summary">本局尚无死亡清除。</p>
       </section>
       <div class="performance-line"><span id="performance">目标 30 MCS / 秒 · 独立计算线程</span><span id="seed-label">种子 17</span></div>
@@ -49,7 +50,7 @@
     <aside>
       <div class="eyebrow">YOUR HAND IN THE DISH</div><h2>直接在画面上动手</h2>
       <div class="tools" role="group" aria-label="鼠标工具"><button data-tool="move" class="selected">↔ 拖动细胞</button><button data-tool="seed">＋ 新增细胞</button><button data-tool="signal">◉ 释放信号</button><button data-tool="wall">▥ 绘制障碍</button><button data-tool="erase">⌫ 擦除障碍</button><button data-tool="inspect">⌾ 观察细胞</button></div>
-      <p id="tool-hint" class="hint">拖动真实细胞轮廓，遇到其他细胞或墙会停下。拖动期间暂停，松手后恢复。</p>
+      <p id="tool-hint" class="hint">按住期间暂停，沿途细胞弹性变形、核区让位；松手后恢复原播放状态。实体墙仍阻挡。</p>
       <div id="seed-options" class="tool-options" hidden><label>新增类型<select id="seed-kind"><option value="1">正常细胞</option><option value="2">肿瘤细胞</option><option value="3" selected>免疫细胞</option></select></label><button id="sprinkle">空隙随机加入 5 颗</button><p id="seed-status" class="hint"></p><p class="hint">单击加入一颗，可挤入已有细胞区域；邻居变形、核区逐格让位，切面缩小不超过设定上限，总目标量保留。只检查局部空间，不按总数量拒绝新增；挤入失败不改动原有细胞。</p></div>
       <div id="signal-options" class="tool-options" hidden><label>信号种类<select id="signal-kind"><option value="danger">损伤趋化因子 → 免疫细胞</option><option value="cohesion">凝聚因子 → 正常细胞为主</option><option value="trail">免疫招募因子 → 免疫细胞</option></select></label><p class="hint">点击释放，拖动画出信号带；随后自然扩散、衰减。</p></div>
       <div id="wall-options" class="tool-options" hidden><button id="clear-walls">清除全部障碍</button></div>
@@ -96,7 +97,8 @@
   <p>上述癌变风险是未标定的模型假设，不是现实发病概率。缺氧与 DNA 修复变化、癌前细胞免疫监视的研究仅提供机制启发，不证明任何缺氧、低糖或高酸都会导致癌变。本模型的统一接触杀伤细胞，也不复现癌前监视中多类免疫细胞的分工。</p>
   <p>三个情境只设置初始细胞、参数和补给空间分布，不按时间强制癌变、播散或清除。「肿瘤发生发展」的酸清除系数从中心 0.05 平滑过渡到外围 1，氧糖补给系数为 0.65＋0.35×该系数；局部酸积累造成持续压力，外围仍可支持克隆存活。两阶段风险倍率设为 8 以缩短演示等待；新生肿瘤的初始遗传耐受范围为 2.04–2.76，仍继承已有损伤，仍会环境致死。「冷肿瘤」从局部 19 颗肿瘤和外围 3 颗免疫细胞开始；远端统计只跟踪原始肿瘤克隆：距原灶中心超过 55 个模型长度的存活细胞，以及在该区域实际发生的分裂。这是二维播散代理，不包含血管运输或跨器官转移。「热肿瘤治愈」从中心 37 颗肿瘤团和周边 18 颗免疫细胞开始；完成提示需要当前区域全部肿瘤胞体消失，并继续观察 150 MCS，不代表真实临床治愈。冷、热情境关闭新的环境诱发异常，以观察已有肿瘤的结局。</p>
   <p>肿瘤的耐受、增殖、侵袭和抗原表达随分裂遗传，并可随机突变。环境改变不同性状的存活机会，不会主动把细胞变成“需要的突变”。初始抗原阳性比例只影响新播种的肿瘤；已有克隆的表达由遗传决定。没有全局细胞数量预算；旧配置中的数量预算不再生效。生长受营养、压力与遗传性状调制，分裂还需实际胞体面积、核区和有效几何分割；免疫细胞仍受激活状态和谱系剩余分裂次数约束。性能提示不改变这些规则。</p>
-  <p>这是二维切面代理模型，核区和切面让位均为简化约束。它不等同于原项目的 2.5D 表面爬行或完整三维实体瘤浸润，也没有核膜力学或真实三维体积求解。信号名称、浓度和参数尚未经生物实验标定。</p>
+  <p>免疫杀伤采用便于区分的裂解示意：实际胞体先圆化，目标切面面积有限增加，逐渐变粉，随后破裂清除。自发凋亡皱缩消失，环境死亡用灰褐萎缩表示；死亡原因与死亡形态是两个不同层次。真实免疫杀伤可导致凋亡，也可在特定条件下引起焦亡；这里没有模拟 gasdermin 通路，粉色并非实验染色。参考 <a href="https://www.nature.com/articles/s41586-020-2071-9" target="_blank" rel="noreferrer">GSDME 与细胞毒淋巴细胞介导的焦亡（Zhang 等，Nature 2020）</a>。破裂余迹不计为存活细胞。</p>
+  <p>这是二维切面代理模型，核区和切面让位均为简化约束。它不等同于原项目的 2.5D 表面爬行或完整三维实体瘤浸润，也没有核膜力学或真实三维体积求解。信号名称、浓度和参数尚未经生物实验标定。鼠标拖动是人工操作：拖动期间所有模型时钟暂停，只做局部几何让位；松手后按原播放状态继续，邻居的可见面积由原有力学逐渐恢复。</p>
   <p>预热 35 MCS，计入画面时间。GPU 负责显示；WebAssembly 在 CPU 上按原顺序执行形变尝试。可选 WebGPU 微环境执行同样的扩散反应方程，自动模式把传输和读回纳入测速，选择更快的后端。倍率只改变每秒推进多少 MCS；算力不足时显示实际速率与限制，不跳过形变、接触或代谢步骤。</p>
   <p><a href="https://doi.org/10.7554/eLife.61288" target="_blank" rel="noreferrer">Artistoo</a> · <a href="https://doi.org/10.1371/journal.pcbi.1004280" target="_blank" rel="noreferrer">Act 模型</a> · <a href="https://elifesciences.org/articles/56554" target="_blank" rel="noreferrer">CTL 同类招募</a> · <a href="https://pubmed.ncbi.nlm.nih.gov/26321679/" target="_blank" rel="noreferrer">代谢竞争</a> · <a href="https://www.nature.com/articles/s42255-022-00730-6" target="_blank" rel="noreferrer">酸度与 T 细胞功能</a> · <a href="https://www.nature.com/articles/s41467-021-25282-3" target="_blank" rel="noreferrer">累积细胞毒性</a></p>
   <p>可视化参照：<a href="https://artistoo.net/examples/CancerInvasion.html" target="_blank" rel="noreferrer">Artistoo · Cancer Invasion</a>。该示例关闭 Act 着色；本演示保留独立的类型开关。</p>
