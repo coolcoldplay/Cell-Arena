@@ -1,0 +1,94 @@
+import { spawn } from 'node:child_process';
+import path from 'node:path';
+import { pathToFileURL, fileURLToPath } from 'node:url';
+import { writeFile, readFile, mkdir } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const output = path.join(root, 'output');
+await mkdir(output, { recursive:true });
+const browser = spawn('C:/Program Files/Google/Chrome/Application/chrome.exe', ['--headless=new','--disable-gpu','--no-first-run','--disable-background-networking','--remote-debugging-port=9352','--remote-allow-origins=*','--user-data-dir='+path.join(root,'.browser-profile'),'about:blank'], { windowsHide:true, stdio:'ignore' });
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+const errors = [], requests = [], checks = [];
+let socket, call;
+const assert = (condition, label, details = {}) => { checks.push({ label, passed:!!condition, ...details }); if(!condition) throw Error(label+' '+JSON.stringify(details)); };
+try {
+  let targets;
+  for(let i=0; i<100; i++){ try{targets=await(await fetch('http://127.0.0.1:9352/json')).json();break;}catch{await delay(100);} }
+  if(!targets) throw Error('Chrome did not start');
+  socket = new WebSocket(targets.find(t=>t.type==='page').webSocketDebuggerUrl);
+  await new Promise(resolve=>socket.onopen=resolve);
+  const pending = new Map(); let serial = 0;
+  socket.onmessage = e => { const m=JSON.parse(e.data); if(m.id){ const p=pending.get(m.id); pending.delete(m.id); m.error?p.reject(Error(JSON.stringify(m.error))):p.resolve(m.result); }else if(m.method==='Runtime.exceptionThrown')errors.push(m.params.exceptionDetails); else if(m.method==='Network.requestWillBeSent' && /^https?:/.test(m.params.request.url)) requests.push(m.params.request.url); };
+  call = (method, params={}) => new Promise((resolve,reject)=>{const id=++serial;pending.set(id,{resolve,reject});socket.send(JSON.stringify({id,method,params}));});
+  const evaluate = async expression => {const r=await call('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;};
+  await call('Page.enable'); await call('Runtime.enable'); await call('Network.enable');
+  await call('Emulation.setDeviceMetricsOverride',{width:1440,height:1230,deviceScaleFactor:1,mobile:false});
+  await call('Page.navigate',{url:pathToFileURL(path.join(root,'dist/artistoo-playground.html')).href});
+  for(let i=0;i<100;i++){if(await evaluate('!!window.artistooLab'))break;await delay(100);}
+  await evaluate('artistooLab.setPlaying(false)');
+  const initial = await evaluate('({engine:artistooLab.model.constructor.name, cells:artistooLab.ids().length, time:artistooLab.model.time, constraints:[...artistooLab.model.soft_constraints,...artistooLab.model.hard_constraints].map(c=>c.constructor.name)})');
+  assert(initial.engine==='CPM' && initial.cells>=8 && initial.constraints.includes('ActivityConstraint') && initial.constraints.includes('BarrierConstraint'), 'Official CPM and actual constraints running', initial);
+  await evaluate('window.gridHash=()=>{let h=2166136261;for(const [p,id] of artistooLab.model.pixels()){h=Math.imul(h^(p[0]+p[1]*220+id*40000),16777619)>>>0;}return h;};window.volume=()=>artistooLab.ids().reduce((sum,id)=>sum+artistooLab.model.getVolume(id),0);window.beforeHash=gridHash();window.beforeTime=artistooLab.model.time;artistooLab.advance(160);artistooLab.draw();');
+  const motion = await evaluate('({changed:beforeHash!==gridHash(), steps:artistooLab.model.time-beforeTime})');
+  assert(motion.changed && motion.steps===160, 'CPM pixel evolution', motion);
+  await evaluate('document.getElementById("activity").value=450;document.getElementById("activity").dispatchEvent(new Event("input"));document.getElementById("memory").value=16;document.getElementById("memory").dispatchEvent(new Event("input"));');
+  const liveParameters = await evaluate('({activity:artistooLab.model.conf.LAMBDA_ACT[1],memory:artistooLab.model.conf.MAX_ACT[1],maxStored:Math.max(...Object.values(artistooLab.activity.cellpixelsact))})');
+  assert(liveParameters.activity===450 && liveParameters.memory===16 && liveParameters.maxStored<=16, 'Sliders update energy and activity memory', liveParameters);
+  await evaluate('artistooLab.start("crawl",false,true);artistooLab.advance(180);artistooLab.draw()');
+  const shot = async name => {await evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');const r=await call('Page.captureScreenshot',{format:'png'});await writeFile(path.join(output,name+'.png'),Buffer.from(r.data,'base64'));};
+  await shot('crawl-desktop');
+  const raw = await evaluate('document.getElementById("world").toDataURL("image/png").split(",")[1]');
+  await writeFile(path.join(output,'cells.png'),Buffer.from(raw,'base64'));
+  const free = await evaluate('(()=>{const C=artistooLab.model;for(let x=12;x<208;x+=14)for(let y=12;y<168;y+=14){let ok=true;for(let a=-9;a<=9;a++)for(let b=-9;b<=9;b++)if(C.pixt([x+a,y+b]))ok=false;if(ok){const r=document.getElementById("world").getBoundingClientRect();return {x:r.x+(x+.5)/220*r.width,y:r.y+(y+.5)/180*r.height,grid:[x,y]};}}})()');
+  assert(!!free, 'Free point for real pointer input');
+  await evaluate('window.cellsBefore=artistooLab.ids().length;document.querySelector("[data-tool=seed]").click()');
+  await call('Input.dispatchMouseEvent',{type:'mousePressed',x:free.x,y:free.y,button:'left',clickCount:1});
+  await call('Input.dispatchMouseEvent',{type:'mouseReleased',x:free.x,y:free.y,button:'left',clickCount:1});
+  assert(await evaluate('artistooLab.ids().length===cellsBefore+1'), 'Canvas pointer adds a real CPM cell');
+  await evaluate('window.volumeBefore=volume();window.cellsBefore=artistooLab.ids().length;document.getElementById("divide").click()');
+  const division = await evaluate('({conserved:volume()===volumeBefore, added:artistooLab.ids().length-cellsBefore,events:artistooLab.state.divisions})');
+  assert(division.conserved && division.added===1 && division.events===1, 'Division conserves occupied pixels', division);
+  await evaluate('document.querySelector("[data-scene=maze]").click();window.wallState=[...artistooLab.model.pixels()].filter(([,id])=>artistooLab.model.cellKind(id)===3).map(([p,id])=>[p,id]);artistooLab.advance(250)');
+  const barriers = await evaluate('({pixels:wallState.length,unchanged:wallState.every(([p,id])=>artistooLab.model.pixt(p)===id)})');
+  assert(barriers.pixels>1000 && barriers.unchanged, 'Solid barriers stay occupied through 250 MCS', barriers);
+  await evaluate('artistooLab.draw()'); await shot('maze-desktop');
+  // An actual drag paints a wall in the free left margin; erase restores it.
+  const wallPoint = await evaluate('(()=>{const r=document.getElementById("world").getBoundingClientRect();return {x:r.x+3/220*r.width,y:r.y+20/180*r.height,dy:20/180*r.height};})()');
+  await evaluate('document.querySelector("[data-tool=wall]").click();window.wallsBefore=[...artistooLab.model.pixels()].filter(([,id])=>artistooLab.model.cellKind(id)===3).length');
+  await call('Input.dispatchMouseEvent',{type:'mousePressed',x:wallPoint.x,y:wallPoint.y,button:'left',clickCount:1});
+  await call('Input.dispatchMouseEvent',{type:'mouseMoved',x:wallPoint.x,y:wallPoint.y+wallPoint.dy,button:'left',buttons:1});
+  await call('Input.dispatchMouseEvent',{type:'mouseReleased',x:wallPoint.x,y:wallPoint.y+wallPoint.dy,button:'left',clickCount:1});
+  assert(await evaluate('[...artistooLab.model.pixels()].filter(([,id])=>artistooLab.model.cellKind(id)===3).length>wallsBefore'), 'Drag creates CPM barrier pixels');
+  await evaluate('document.getElementById("clear-walls").click()');
+  assert(await evaluate('[...artistooLab.model.pixels()].every(([,id])=>artistooLab.model.cellKind(id)!==3)'), 'Clear barrier tool removes geometry');
+  await evaluate('document.querySelector("[data-scene=sort]").click();window.mixRatio=()=>{const C=artistooLab.model;let all=0,mixed=0;for(const [p,id] of C.pixels())for(const d of [[1,0],[0,1]]){const next=[p[0]+d[0],p[1]+d[1]];if(next[0]>=220||next[1]>=180)continue;const other=C.pixt(next);if(other&&other!==id){all++;if(C.cellKind(id)!==C.cellKind(other))mixed++;}}return mixed/all;};window.initialMix=mixRatio();artistooLab.advance(500);artistooLab.draw()');
+  const sorting = await evaluate('({scene:artistooLab.state.scene,cells:artistooLab.ids().length,kinds:[...new Set(artistooLab.ids().map(id=>artistooLab.model.cellKind(id)))],time:artistooLab.model.time})');
+  assert(sorting.scene==='sort' && sorting.cells===56 && sorting.kinds.length===2, 'Sorting preset maintains both populations', sorting);
+  const sortingMix=await evaluate('({before:initialMix,after:mixRatio()})');
+  assert(sortingMix.after<sortingMix.before, 'Differential adhesion reduces unlike-cell contact', sortingMix);
+  await shot('sorting-desktop');
+  await evaluate('document.querySelector("[data-scene=grow]").click();artistooLab.advance(800);artistooLab.draw()');
+  const growing = await evaluate('({scene:artistooLab.state.scene,cells:artistooLab.ids().length,divisions:artistooLab.state.divisions,finite:artistooLab.ids().every(id=>Number.isFinite(artistooLab.model.getVolume(id))&&artistooLab.model.getVolume(id)>0)})');
+  assert(growing.scene==='grow' && growing.cells>6 && growing.divisions>0 && growing.finite, 'Growth drives automatic cell divisions', growing);
+  await shot('growth-desktop');
+  await evaluate('artistooLab.start("crawl",false,true);artistooLab.advance(60);window.firstHash=gridHash();document.getElementById("reset").click();artistooLab.advance(60)');
+  assert(await evaluate('gridHash()===firstHash'), 'Seeded reset is reproducible');
+  await evaluate('artistooLab.setPlaying(true)'); await delay(1800); await evaluate('artistooLab.setPlaying(false)');
+  const performance = await evaluate('({time:artistooLab.model.time,overflows:document.documentElement.scrollWidth>innerWidth})');
+  assert(performance.time>140 && !performance.overflows, 'Live playback advances without desktop overflow', performance);
+  await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+  await evaluate('artistooLab.draw()');
+  assert(await evaluate('document.documentElement.scrollWidth<=innerWidth'), 'Mobile layout stays within viewport');
+  await shot('mobile');
+  assert(errors.length===0 && requests.length===0,'Offline page has no runtime errors or external requests',{errors,requests});
+} catch(error) { errors.push({message:String(error),stack:error.stack}); console.error(error); }
+finally {
+  const engine=await readFile(path.join(root,'vendor/artistoo.js'));
+  const gitBlob=createHash('sha1').update(Buffer.from('blob '+engine.length+'\0')).update(engine).digest('hex');
+  checks.push({label:'Vendored engine matches official Git blob',passed:gitBlob==='0ebf46bc3b16ea71eec7093c92070bc944a0c47e',gitBlob});
+  const report={passed:!errors.length&&checks.every(c=>c.passed),checks,errors,externalRequests:requests,htmlSHA256:createHash('sha256').update(await readFile(path.join(root,'dist/artistoo-playground.html'))).digest('hex')};
+  await writeFile(path.join(output,'checks.json'),JSON.stringify(report,null,2)); console.log(JSON.stringify(report,null,2));
+  if(call){try{await call('Browser.close');}catch{}}
+  socket?.close(); browser.kill();
+  if(!report.passed)process.exitCode=1;
+}

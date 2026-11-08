@@ -1,0 +1,58 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import vm from 'node:vm';
+import {readFile} from 'node:fs/promises';
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm'));
+const make=async(scene,settings={},extra={})=>{const s=new CellLab.Simulation({scene,seed:17,worldWidth:240,worldHeight:180,refinement:1.5,settings,...extra});await CellLabWasm.install(s,module);return s;};
+
+test('guided scenarios start from honest phenotypes and retain intended immune populations at supported dish sizes',()=>{
+  for(const worldWidth of [192,240,384]){
+    const options={worldWidth,worldHeight:worldWidth*.75,refinement:1.5,warmup:0};
+    const a=new CellLab.Simulation({...options,scene:'oncogenesis'}),cold=new CellLab.Simulation({...options,scene:'cold'}),hot=new CellLab.Simulation({...options,scene:'hot'});
+    assert.ok(a.live().filter(m=>m.kind===1).length>=30);assert.equal(a.live().filter(m=>m.kind===2).length,0);assert.equal(a.live().filter(m=>m.state==='abnormal').length,0);assert.equal(a.scenarioReport().initial.immune,4);assert.ok(a.live().every(m=>m.stress===0));
+    assert.ok(a.fields.oxygen.values.every(v=>v===1));assert.ok(a.fields.acid.values.every(v=>v===0));
+    assert.equal(cold.scenarioReport().initial.immune,3);assert.equal(hot.scenarioReport().initial.immune,18);
+    assert.equal(cold.scenarioReport().initial.tumor,19);assert.equal(hot.scenarioReport().initial.tumor,37);assert.equal(hot.scenarioReport().initial.antigenPositive,37);
+    assert.ok(cold.supplyMap.every(v=>v===1));assert.ok(hot.supplyMap.every(v=>v===1));assert.ok(hot.live().every(m=>hot.section.fits(m,m.nucleusX,m.nucleusY)));
+  }
+});
+
+test('fixed core profile changes actual reaction rates without changing field geometry or advancing time',()=>{
+  const s=new CellLab.Simulation({width:64,height:48,scene:'empty',warmup:0});s.prepareEnvironment();
+  for(const key of ['oxygen','glucose','acid'])s.fields[key].values.fill(.5);
+  s.supplyMap[0]=.05;const profile=s.supplyMap.slice();s.integrateEnvironment(1);
+  const f=s.fields,supply=s.settings.supply;
+  assert.ok(Math.abs(f.oxygen.values[0]-(.5+.012*supply*(.65+.35*.05)*.5))<1e-7);
+  assert.ok(Math.abs(f.acid.values[0]-(.5-.009*supply*.05*.5))<1e-7);
+  assert.ok(f.oxygen.values[0]<f.oxygen.values[1]);assert.ok(f.acid.values[0]>f.acid.values[1]);assert.deepEqual(s.supplyMap,profile);assert.equal(s.C.time,0);
+});
+
+test('oncogenesis emerges through stress, intermediate state and viable clonal expansion without planted tumors',async()=>{
+  const s=await make('oncogenesis');s.advance(3000);const report=s.scenarioReport();
+  assert.ok(report.achieved);assert.ok(report.tumorDivisions>0);assert.ok(report.tumor>0);assert.equal(report.customized,false);assert.equal(s.snapshot().orphans,0);
+  const malignant=s.events.filter(e=>e.type==='malignant');assert.ok(malignant.length>0);
+  for(const event of malignant){const first=s.events.find(e=>e.type==='abnormal'&&e.id===event.id);assert.ok(first);assert.ok(first.stress>.06);assert.ok(event.time-first.time>=160);assert.ok(event.genome.tolerance>=2.04&&event.genome.tolerance<=2.76);}
+  assert.ok(s.live().filter(m=>m.kind===2).every(m=>m.origin==='normal'));
+});
+
+test('turning off environmental metabolism or the first mutation gate prevents scheduled cancer emergence',async()=>{
+  for(const settings of [{metabolism:0},{stressMutation:0}]){const s=await make('oncogenesis',settings);s.advance(2200);assert.equal(s.counters.abnormalInitiations,0);assert.equal(s.counters.malignantTransitions,0);assert.equal(s.scenarioReport().tumor,0);assert.equal(s.scenarioReport().achieved,false);if(settings.stressMutation===0)assert.ok(s.scenarioReport().maxAdversity>.15);}
+});
+
+test('cold tumor spreads and divides beyond the original lesion using existing mechanics',async()=>{
+  const s=await make('cold');s.advance(1000);const report=s.scenarioReport();assert.equal(report.initial.immune,3);assert.ok(report.tumor>report.initial.tumor);assert.ok(report.farTumor>0);assert.ok(report.distalDivisions>0);assert.ok(report.achieved);assert.equal(s.snapshot().orphans,0);
+  const before=report.farTumor;const id=s.seed(2,4*s.scale,4*s.scale,3*s.scale);if(id){assert.ok(!report.initial.clones.includes(s.cells[id].clone));assert.equal(s.scenarioReport().farTumor,before,'unrelated manual seeds are not scored as primary-clone spread');}
+});
+
+test('hot tumor clearance requires real killing and an observation interval; living or dying targets prevent success',async()=>{
+  const s=await make('hot');s.advance(1500);const report=s.scenarioReport();assert.ok(report.tumorDivisions>0);assert.equal(s.counters.kills,37+report.tumorDivisions);assert.equal(s.counters.environment,0);assert.equal(s.counters.apoptosis,0);assert.equal(report.tumorBodies,0);assert.ok(report.achieved);assert.ok(report.clearanceElapsed>=150);assert.ok(s.counters.recognitions>0);assert.ok(s.counters.immuneDivisions>0);assert.ok(s.live().filter(m=>m.kind===3).every(m=>m.divisionsLeft>=0));
+  const id=s.seed(2,4*s.scale,4*s.scale,3*s.scale);assert.ok(id);assert.equal(s.scenarioReport().achieved,false);s.updateScenarioState();assert.equal(s.scenarioReport().clearanceAt,null);s.beginDeath(id,'kill');assert.equal(s.scenarioReport().achieved,false);
+  const control=await make('hot',{kill:0});control.advance(1500);assert.equal(control.counters.kills,0);assert.ok(control.scenarioReport().tumorBodies>37);assert.equal(control.scenarioReport().achieved,false);
+});
+
+test('reporting is read-only and preset restoration has no parameter leakage',async()=>{
+  const s=await make('oncogenesis');const before=s.C.mt.mt.slice(),time=s.C.time,grid=s.C.grid._pixels.slice();for(let i=0;i<20;i++)s.scenarioReport();assert.deepEqual(s.C.mt.mt,before);assert.deepEqual(s.C.grid._pixels,grid);assert.equal(s.C.time,time);
+  s.set('stressMutation',12);assert.equal(s.settings.stressMutation,12);s.set('growth',0);assert.equal(s.scenarioReport().customized,true);
+  const hot=await make('hot');assert.equal(hot.settings.growth,.75);assert.equal(hot.settings.stressMutation,0);assert.equal(hot.scenarioReport().customized,false);
+});

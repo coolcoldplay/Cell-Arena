@@ -1,0 +1,26 @@
+{
+  "name": "cell-arena",
+  "version": "4.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Interactive cell and tumor microenvironment simulation powered by Artistoo, WebAssembly and GPU rendering.",
+  "homepage": "https://coolcoldplay.github.io/Cell-Arena/",
+  "repository": {"type": "git", "url": "https://github.com/coolcoldplay/Cell-Arena.git"},
+  "engines": {"node": ">=24"},
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "verify:build": "node scripts/verify-build.mjs",
+    "build:wasm": "node scripts/build-wasm.mjs",
+    "dev": "node scripts/serve.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "test:publication": "node scripts/check-publication.mjs",
+    "test:browser": "node scripts/check-scenarios.mjs",
+    "test:interactions": "node scripts/check-v4.mjs",
+    "probe:scenarios": "node scripts/probe-scenarios.mjs",
+    "test:display": "node scripts/check-display-v4.mjs",
+    "test:surveillance": "node scripts/check-surveillance.mjs",
+    "test:gpu": "node scripts/check-gpu-v4.mjs",
+    "test:hires": "node scripts/check-hires-interaction.mjs",
+    "benchmark": "node scripts/benchmark-v4.mjs"
+  }
+}

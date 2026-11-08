@@ -1,0 +1,23 @@
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import { createHash } from 'node:crypto';
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const read = file => readFile(path.join(root, file), 'utf8');
+let html = await read('src/index.html');
+const [css, engine, model, worker, app, license,fast,section,wasm,gpu,renderer] = await Promise.all(['src/style.css','vendor/artistoo.js','src/model.js','src/worker.js','src/app.js','vendor/LICENSE','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/gpu-fields.js','src/gpu-renderer.js'].map(read));
+const binary=await readFile(path.join(root,'build/cpm-kernel.wasm'));
+const display=await read('src/display-fields.js'),insertion=await read('src/insertion.js');
+const wasmMeta=JSON.parse(await read('build/cpm-kernel.meta.json'));
+if(wasmMeta.sourceSHA256!==createHash('sha256').update(await read('src/cpm-kernel.c')).digest('hex')||wasmMeta.wasmSHA256!==createHash('sha256').update(binary).digest('hex'))throw Error('WASM source/binary mismatch. Run npm run build:wasm.');
+for (const [slot, text] of Object.entries({ STYLE: css, WORKER: `globalThis.CELL_LAB_WASM='${binary.toString('base64')}';\n`+[engine,fast,section,wasm,gpu,insertion,model,worker].join('\n'), APP: display+'\n'+renderer+'\n'+app, LICENSE: license })) {
+  const safe = slot === 'LICENSE' ? text.replaceAll('&','&amp;').replaceAll('<','&lt;') : text.replace(/<\/script/gi, '<\\/script');
+  html = html.replace(`/* INLINE_${slot} */`, () => safe);
+}
+await mkdir(path.join(root,'dist'), { recursive: true });
+await writeFile(path.join(root,'dist/index.html'), html);
+await writeFile(path.join(root,'dist/artistoo-playground.html'), html);
+await writeFile(path.join(root,'dist/.nojekyll'), '');
+const manifest = { name: 'Cell-Arena', version: '4.0.0', engine: 'Artistoo', upstream: 'https://github.com/ingewortel/artistoo', commit: 'e997d81213a5dcdfc40ad976a18958f412f00cc9', license: 'MIT', engineSHA256: createHash('sha256').update(engine).digest('hex'), wasmSHA256:createHash('sha256').update(binary).digest('hex'), htmlSHA256: createHash('sha256').update(html).digest('hex'), bytes: Buffer.byteLength(html) };
+await writeFile(path.join(root,'dist/manifest.json'), JSON.stringify(manifest,null,2)+'\n');
+console.log(JSON.stringify(manifest,null,2));

@@ -1,0 +1,35 @@
+import {openBrowser,delay} from './browser-session.mjs';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+const target=process.argv[2]||'dist/index.html',remote=target.startsWith('https://');
+const out='output/publication/'+(remote?'live':'local');await mkdir(out,{recursive:true});
+const b=await openBrowser(target,9390,{gpu:true}),{evaluate,call}=b,checks=[];
+const check=(ok,name,details={})=>{checks.push({name,passed:!!ok,...details});if(!ok)throw Error(name);};
+const waitFor=async expression=>{for(let n=0;n<200;n++){if(await evaluate(expression))return;await delay(100);}throw Error('Timed out: '+expression);};
+const click=async selector=>{const p=await evaluate(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});e.scrollIntoView({block:'center'});const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);for(const type of ['mousePressed','mouseReleased'])await call('Input.dispatchMouseEvent',{type,...p,button:'left',buttons:type==='mousePressed'?1:0,clickCount:1});await delay(100);};
+const shot=async name=>{const png=await call('Page.captureScreenshot',{format:'png'});await writeFile(out+'/'+name+'.png',Buffer.from(png.data,'base64'));};
+try{
+  await waitFor('!!window.artistooLab?.snapshot&&artistooLab.snapshot.speed===4');
+  await evaluate(`artistooLab.rpc('playing',{value:false})`);
+  const initial=await evaluate(`({title:document.title,brand:document.querySelector('.brand b').textContent,scene:artistooLab.snapshot.scene,kernel:artistooLab.snapshot.kernel,secure:isSecureContext,renderer:artistooLab.renderer,networkScripts:document.querySelectorAll('script[src]').length})`);
+  check(initial.title.startsWith('Cell-Arena')&&initial.brand==='Cell-Arena','Published title and branding are Cell-Arena',initial);
+  check(initial.scene==='oncogenesis'&&initial.kernel==='wasm'&&initial.networkScripts===0,'The self-contained model and WASM Worker start successfully');
+  check(!remote||initial.secure,'The public website runs in a secure context');
+  await click('[data-scene="hot"]');await waitFor('artistooLab.snapshot.scene==="hot"');await evaluate(`artistooLab.rpc('playing',{value:false})`);
+  check(await evaluate('artistooLab.snapshot.scenario.initial.tumor===37&&artistooLab.snapshot.scenario.initial.immune===18'),'Scenario buttons load the full hot-tumor initial population');
+  const time=await evaluate('artistooLab.snapshot.time');await click('#play');await waitFor(`artistooLab.snapshot.time>${time+3}`);await click('#play');
+  check(await evaluate('!artistooLab.snapshot.playing'),'Play and pause advance real simulation time');
+  await click('[data-tool="seed"]');await evaluate(`document.getElementById('seed-kind').value='3'`);
+  const population=await evaluate('artistooLab.snapshot.cells.length');
+  const point=await evaluate(`(()=>{const s=artistooLab.snapshot,e=document.getElementById('world');e.scrollIntoView({block:'center'});const r=e.getBoundingClientRect();for(let y=12;y<s.height-12;y+=4)for(let x=12;x<s.width-12;x+=4){let free=true;for(let dy=-8;dy<=8;dy++)for(let dx=-8;dx<=8;dx++)if(s.grid[(y+dy)*s.width+x+dx]||s.walls[(y+dy)*s.width+x+dx])free=false;if(free)return{x:r.left+(x+.5)/s.width*r.width,y:r.top+(y+.5)/s.height*r.height};}throw Error('No empty insertion point');})()`);
+  for(const type of ['mousePressed','mouseReleased'])await call('Input.dispatchMouseEvent',{type,...point,button:'left',buttons:type==='mousePressed'?1:0,clickCount:1});
+  await waitFor(`artistooLab.snapshot.cells.length===${population+1}`);
+  check(await evaluate('artistooLab.snapshot.orphans===0'),'Mouse insertion adds a single immune cell without orphaned geometry');
+  const exported=await evaluate(`artistooLab.rpc('export')`);
+  check(exported.history[0].time===0&&exported.history.at(-1).time===exported.time&&exported.cells.length===population+1,'Export includes full population history and the manually added cell');
+  await evaluate('window.scrollTo(0,0)');await delay(100);await shot('cell-arena-desktop');
+  await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await delay(100);
+  check(await evaluate('document.documentElement.scrollWidth<=392&&document.querySelector(".brand b").getBoundingClientRect().right<390'),'Public branding and layout fit a mobile screen');await shot('cell-arena-mobile');
+  check(b.errors.length===0&&await evaluate('artistooLab.errors.length===0'),'No browser or Worker runtime errors');
+  check(remote?b.requests.every(url=>new URL(url).origin===new URL(target).origin):b.requests.length===0,'No third-party runtime downloads or login dependencies',{requests:b.requests});
+}catch(error){checks.push({passed:false,error:String(error)});console.error(error);process.exitCode=1;}
+finally{await writeFile(out+'/checks.json',JSON.stringify({target,checks},null,2));await writeFile(out+'/tested-manifest.json',await readFile('dist/manifest.json'));console.log(JSON.stringify(checks,null,2));await b.close();}

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#111a20"><meta name="description" content="Cell-Arena：在浏览器中探索细胞形变、肿瘤进化、免疫接触杀伤与微环境。拖动细胞、释放信号、绘制障碍，观察局部规则产生的群体行为。"><meta property="og:title" content="Cell-Arena · 细胞生态竞技场"><meta property="og:description" content="可交互的肿瘤微环境模拟：从细胞前沿，到微环境演化。"><meta property="og:type" content="website"><title>Cell-Arena · 细胞生态竞技场</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23c4ec9b'/%3E%3Ccircle cx='32' cy='32' r='20' fill='%2324333a'/%3E%3Ccircle cx='34' cy='30' r='8' fill='%23c4ec9b'/%3E%3C/svg%3E"><style>/* INLINE_STYLE */</style></head>
+<body>
+<header><a class="brand" href="#"><span class="mark">C.</span><b>Cell-Arena</b><span>细胞生态竞技场</span></a><div class="version">LOCAL RULES / COLLECTIVE LIFE</div><button id="about" class="quiet">模型与来源 ↗</button></header>
+<main>
+  <div class="intro"><div><div class="eyebrow">TUMOR ECOLOGY · 04</div><h1>从细胞前沿，到微环境演化。</h1><p>观察形变穿行、局部招募与克隆竞争。每颗细胞只感知附近的环境和接触。</p></div><div class="intro-note">● Artistoo CPM ＋ 代谢与通讯场</div></div>
+  <nav class="scenes" aria-label="实验场景">
+    <button data-scene="oncogenesis" class="active"><span>01</span><b>肿瘤发生发展</b><small>恶劣环境 → 异常中间态 → 肿瘤</small></button>
+    <button data-scene="cold"><span>02</span><b>免疫冷肿瘤扩散转移</b><small>低免疫浸润 · 低抗原 · 播散增殖</small></button>
+    <button data-scene="hot"><span>03</span><b>免疫热肿瘤治愈</b><small>接触识别 → 局部招募 → 肿瘤清除</small></button>
+  </nav>
+  <section id="scenario-guide" class="scenario-guide" aria-label="情境设定与实际进度">
+    <div class="scenario-heading"><b id="scenario-phase">正在准备情境</b><span id="scenario-configuration">预设参数</span><button id="restore-scenario" class="quiet" title="恢复当前情境的参数和种子 17，保留区域、精细度与边界选择">恢复情境设定 ↺</button></div>
+    <p id="scenario-description"></p><div id="scenario-metrics" class="scenario-metrics"></div><small id="scenario-setup"></small>
+  </section>
+  <div class="workspace">
+    <section class="simulation">
+      <div class="dish-head"><div><span id="status-dot" class="status-dot"></span><b id="scene-title">肿瘤发生发展</b><span id="run-state">正在准备</span></div><div><span id="clock">0</span> <span class="unit">MCS</span></div></div>
+      <div class="transport"><button id="play" class="primary">Ⅱ 暂停</button><button id="step">单步</button><button id="reset">↺ 重来</button><label class="speed-label">播放 <input id="speed" type="range" min="0.25" max="8" step="0.25" value="1"><output id="speed-out">1×</output></label><button id="shuffle" class="quiet">换个开局</button></div>
+      <div class="overlay-bar" role="group" aria-label="可视化图层">
+        <span class="overlay-title">观察图层</span>
+        <button data-layer="adversity" aria-pressed="false"><i class="adversity-key"></i>环境恶劣度</button>
+        <button data-layer="cohesion" aria-pressed="false" title="正常细胞分泌的局部凝聚信号"><i style="--signal:#24ab84"></i>细胞凝聚因子</button>
+        <button data-layer="danger" aria-pressed="false"><i style="--signal:#ef8c2a"></i>损伤因子</button>
+        <button data-layer="trail" aria-pressed="false"><i style="--signal:#9d64db"></i>免疫招募因子</button>
+        <button id="clear-overlays" class="quiet">关闭叠加</button>
+      </div>
+      <details id="layer-settings" class="layer-settings"><summary>图层透明度与细胞保护</summary><div id="opacity-sliders"></div><div class="layer-settings-foot"><label><input id="protect-bodies" type="checkbox" checked>低强度时保护胞体颜色</label><span>0% 隐藏，50% 以下保留胞体本色；超过 50% 逐步增强，100% 完整显示图层，可覆盖胞体色。细胞核和边界仍保留；各通道独立调节，环境分量分别记忆。</span></div></details>
+      <div class="field-legend"><span id="heat-key" hidden><i id="heat-ramp"></i><span id="heat-scale"></span></span><span id="field-legend">点击图层查看环境或信号；多种因子可以同时叠加。</span></div>
+      <div class="viewport"><canvas id="world" width="960" height="720" aria-label="可拖动细胞、点击播种、添加信号或绘制障碍的交互培养皿"></canvas><div id="toast" role="status" aria-live="polite"></div><div class="canvas-note" id="canvas-note">选择「拖动细胞」，在细胞上按住鼠标移动。</div></div>
+      <div class="legend"><span><i class="medium"></i>培养液</span><span><i class="normal"></i>正常 <b id="normal-count">0</b></span><span><i class="abnormal"></i>异常 <b id="abnormal-count">0</b></span><span><i class="tumor"></i>肿瘤 <b id="tumor-count">0</b></span><span><i class="immune"></i>免疫 <b id="immune-count">0</b></span><span><i class="immune-active"></i>其中激活 <b id="activated-immune-count">0</b></span><span class="proliferation-key" title="可遗传的增殖性状，固定范围 0.25–3；实际增殖还受营养、压力与全局生长参数影响"><i></i>肿瘤：灰 → 黑，增殖能力低 → 高</span><span class="edge-key"><i></i>Act：绿＝衰减中 → 红＝新生突起</span><span class="antigen-key">＋ 抗原可识别</span></div>
+      <div class="metrics"><div><b id="rate">—</b><span>实际 MCS / 秒</span></div><div><b id="division-count">0</b><span>总分裂（含免疫）</span></div><div><b id="recognition-count">0</b><span>接触识别</span></div><div><b id="kill-count">0</b><span>杀伤清除</span></div><div><b id="death-count">0</b><span>自发凋亡</span></div></div>
+      <div class="performance-line"><span id="performance">目标 30 MCS / 秒 · 独立计算线程</span><span id="seed-label">种子 17</span></div>
+      <div class="ecology-line"><span id="environment-count">环境死亡 0</span><span id="immune-division-count">免疫分裂 0</span><span id="mutation-count">性状突变 0</span><span id="grid-info">正在准备格点</span></div>
+      <div class="ecology-line"><span id="abnormal-events">异常发生 0 · 恶性转变 0 · 异常免疫清除 0</span><span>悬停画布查看局部资源与因子浓度</span></div>
+      <div class="chart-panel"><div><span class="eyebrow">POPULATION HISTORY</span><span id="history-range">全程 0 — 0 MCS</span><span id="order">极性一致度 —</span></div><canvas id="history" width="960" height="125" aria-label="正常、异常、肿瘤和免疫细胞数量随模型时间变化"></canvas><p class="hint">从开局到当前时刻；每 30 MCS 采样，手动新增／分裂即时记入，当前数量实时补齐。长记录绘图保留峰谷，导出包含完整采样。</p></div>
+    </section>
+    <aside>
+      <div class="eyebrow">YOUR HAND IN THE DISH</div><h2>直接在画面上动手</h2>
+      <div class="tools" role="group" aria-label="鼠标工具"><button data-tool="move" class="selected">↔ 拖动细胞</button><button data-tool="seed">＋ 新增细胞</button><button data-tool="signal">◉ 释放信号</button><button data-tool="wall">▥ 绘制障碍</button><button data-tool="erase">⌫ 擦除障碍</button><button data-tool="inspect">⌾ 观察细胞</button></div>
+      <p id="tool-hint" class="hint">拖动真实细胞轮廓，遇到其他细胞或墙会停下。拖动期间暂停，松手后恢复。</p>
+      <div id="seed-options" class="tool-options" hidden><label>新增类型<select id="seed-kind"><option value="1">正常细胞</option><option value="2">肿瘤细胞</option><option value="3" selected>免疫细胞</option></select></label><button id="sprinkle">空隙随机加入 5 颗</button><p id="seed-status" class="hint"></p><p class="hint">单击加入一颗，可挤入已有细胞区域；邻居变形、核区逐格让位，切面缩小不超过设定上限，总目标量保留。只检查局部空间，不按总数量拒绝新增；挤入失败不改动原有细胞。</p></div>
+      <div id="signal-options" class="tool-options" hidden><label>信号种类<select id="signal-kind"><option value="danger">损伤趋化因子 → 免疫细胞</option><option value="cohesion">凝聚因子 → 正常细胞为主</option><option value="trail">免疫招募因子 → 免疫细胞</option></select></label><p class="hint">点击释放，拖动画出信号带；随后自然扩散、衰减。</p></div>
+      <div id="wall-options" class="tool-options" hidden><button id="clear-walls">清除全部障碍</button></div>
+      <div class="parameter-heading"><b>参数模块</b><button id="collapse-modules" class="quiet">全部收起</button></div>
+      <details class="section" name="parameters" id="cell-inspector"><summary>细胞详情与操作 <span id="selection-label">未选中</span></summary><div class="section-body"><div class="utility"><button id="divide" class="quiet">选中细胞分裂</button></div><div id="inspection" class="inspection">点击细胞，查看抗原、受损程度与接触状态。</div></div></details>
+      <details class="section" name="parameters" id="module-view"><summary>视野与边界 <span>区域 · 精细度 · 缩放</span></summary><div class="section-body">
+        <label class="select-row">视野边界<select id="boundary"><option value="solid">实体边界</option><option value="wrap">循环边界</option></select></label><p class="hint">切换边界会按当前参数重新开始。</p>
+        <label class="select-row">培养区域<select id="world-size"><option value="192">192 × 144</option><option value="240" selected>240 × 180</option><option value="256">256 × 192</option><option value="320">320 × 240</option><option value="384">384 × 288</option><option value="512">512 × 384</option></select></label>
+        <label class="select-row">格点精细度<select id="refinement"><option value="1">1× · 快速</option><option value="1.5" selected>1.5× · 精细</option><option value="2">2× · 更精细</option><option value="3">3× · 高细节</option><option value="4">4× · 最高细节</option></select></label>
+        <p id="grid-preview" class="hint"></p><button id="apply-grid">应用区域与精细度 · 重新开始</button><p class="hint">区域扩大空间；精细度增加真实形态格点，最高 1024 × 768。细胞物理尺寸近似保持；更大、更细会增加计算量。</p>
+        <label class="select-row">显示分辨率<select id="render-resolution"><option value="auto" selected>自动 · 适配屏幕与缩放</option><option value="1920">1920 × 1440</option><option value="2560">2560 × 1920</option><option value="3840">3840 × 2880</option></select></label><p id="render-info" class="hint"></p><p class="hint">显示分辨率即时生效，保存 PNG 使用同样尺寸；它不改变物理格点，也不重开模拟。</p>
+        <label class="select-row">画面放大<select id="zoom"><option value="100">100%</option><option value="150">150%</option><option value="200">200%</option><option value="300">300%</option></select><button id="fullscreen" class="quiet">全屏 ↗</button></label>
+      </div></details>
+      <details class="section" name="parameters" id="module-display"><summary>细胞与热图显示 <span>Act · 标记 · 环境分量</span></summary><div class="section-body">
+        <label class="select-row">环境热图<select id="field-view"><option value="none" selected>关闭</option><option value="adversity">综合恶劣度</option><option value="oxygen">氧可用量</option><option value="glucose">葡萄糖可用量</option><option value="acid">酸负荷</option><option value="density">局部细胞密度</option></select></label>
+        <div class="checks"><label><input id="edge-activity" type="checkbox" checked>启用所选类型的 Act 显示</label><label><input id="normal-activity" type="checkbox">正常细胞 Act</label><label><input id="tumor-activity" type="checkbox">肿瘤细胞 Act</label><label><input id="immune-activity" type="checkbox">免疫细胞 Act</label><label><input id="cell-seams" type="checkbox" checked>细分界线</label><label><input id="arrows" type="checkbox">极性箭头</label><label><input id="antigen-marks" type="checkbox">抗原标记</label><label><input id="nuclei" type="checkbox" checked>显示细胞核</label></div>
+        <p class="hint">免疫未激活为淡红，实际接触识别后的激活期为深红；趋化响应不等于激活。肿瘤增殖性状越高越黑，0.25–3 使用固定色标，点击细胞可看数值；不随局部营养瞬间变色。核区轮廓：正常／异常深蓝，未激活免疫深红，深色胞体浅金。各类 Act 可独立开启，开启后会覆盖局部胞体色。</p>
+      </div></details>
+      <details class="section" name="parameters" id="module-mechanics"><summary>形态与穿行 <span>让位 · 膜形变</span></summary><div class="section-body" id="mechanics-sliders"><p class="hint">邻居受挤时暂时减少切面目标面积；核区、胞体连通性和实体墙仍约束通行。切面外储量不移动、不识别靶细胞。</p></div></details>
+      <details class="section" name="parameters" id="module-communication"><summary>局部通讯与趋化 <span>巡逻 · 分离 · 招募</span></summary><div class="section-body"><div class="modes"><button data-mode="wander">分散探索</button><button data-mode="cluster">偏向凝聚</button><button data-mode="flock">偏向群迁</button></div><div id="communication-sliders"></div><p class="hint">免疫细胞默认分散巡逻，不无条件跟随同类；损伤／招募梯度可吸引它们聚集。免疫同类分离独立调节，不改变与其他细胞的接触和穿行规则。</p></div></details>
+      <details class="section" name="parameters" id="module-biology"><summary>细胞运动与行为 <span>生长 · 抗原 · 杀伤</span></summary><div class="section-body" id="biology-sliders"></div></details>
+      <details class="section" name="parameters" id="module-environment"><summary>微环境与生存 <span>供给 · 逃逸 · 癌变</span></summary><div class="section-body" id="environment-sliders"><p class="hint">正常细胞同样会因持续环境损伤死亡。异常中间态可表达抗原，但不自动分裂、不启用肿瘤侵袭；进一步随机转变后才获得肿瘤表型。下方风险倍率属于未标定的模型参数。</p></div></details>
+      <details class="section" name="parameters" id="module-lineage"><summary>克隆扩增与遗传 <span>分裂 · 突变</span></summary><div class="section-body" id="lineage-sliders"></div></details>
+      <details class="section" name="parameters" id="module-performance"><summary>性能与计算 <span>后端 · 实际速度</span></summary><div class="section-body"><label class="select-row">微环境计算<select id="compute-backend"><option value="auto">自动 · 实测选择</option><option value="cpu">CPU</option><option value="gpu">WebGPU</option></select></label><p id="backend-status" class="hint"></p><p id="compute-note" class="hint"></p><p id="population-load" class="hint" role="status"></p><p class="hint">增殖由空间、营养、累积压力与细胞自身状态决定。算力不足时提示实际速度，继续完整计算形变、接触和微环境；可降低播放倍率或绘图分辨率。</p></div></details>
+      <div class="exports"><button id="snapshot">保存画面 ↓</button><button id="export-data">导出实验数据 ↓</button></div>
+    </aside>
+  </div>
+  <footer><span><a href="https://github.com/coolcoldplay/Cell-Arena" target="_blank" rel="noreferrer">Cell-Arena 源码 ↗</a> · Powered by <a href="https://artistoo.net/" target="_blank" rel="noreferrer">Artistoo</a> · Textor &amp; Wortel · MIT</span><span>二维 CPM 机制演示 · MCS 为模型时间 · 参数未经实验标定</span></footer>
+</main>
+<div id="field-probe" class="field-probe" role="tooltip" hidden><b id="probe-position"></b><div id="probe-cell"></div><dl><dt>氧可用量</dt><dd id="probe-oxygen"></dd><dt>葡萄糖可用量</dt><dd id="probe-glucose"></dd><dt>酸负荷</dt><dd id="probe-acid"></dd><dt class="probe-cohesion">细胞凝聚因子</dt><dd id="probe-cohesion"></dd><dt class="probe-danger">损伤趋化因子</dt><dd id="probe-danger"></dd><dt class="probe-trail">免疫招募因子</dt><dd id="probe-trail"></dd></dl><small id="probe-note"></small></div>
+<dialog id="about-dialog"><button id="close-about" class="close" aria-label="关闭">×</button><div class="eyebrow">LOCAL RULES, NOT GLOBAL TARGETS</div><h2>局部通讯如何改变行为</h2>
+  <p>细胞形状与排斥来自官方 Artistoo Cellular Potts 内核。额外规则借鉴方向协同、局部吸引与接触后转向；这些是现象学参数，不把细胞直接当作鸟或蚂蚁。</p>
+  <p>三种简化信号场有分泌、扩散、衰减。凝聚信号主要影响正常细胞；肿瘤和异常中间态释放损伤相关信号，识别靶细胞的免疫细胞释放招募信号。运动决策采样本地梯度和实际接触邻居，不查询最近肿瘤坐标。实体墙同时阻断运动和信号传播。</p>
+  <p>免疫基础状态采用带方向持续性的分散巡逻，不使用同类无条件方向协同；免疫之间的界面不再提供强贴靠优势。独立的同类接触分离在局部损伤／招募梯度增强时减弱，真实抗原接触扫描和杀伤期间暂停。它不改变免疫与正常、异常或肿瘤细胞之间的界面能、形变约束或接触杀伤规则。新分裂出的免疫子细胞继承激活与分裂预算，但需要自己的接触识别才能分泌招募信号；已有分泌者的短期招募记忆继续衰减。</p>
+  <p>正常灰、异常褐，肿瘤从深灰到黑表示可遗传的增殖性状由低到高：固定范围 0.25–3 映射到灰度 88–0。它表示固有增殖能力；实际生长还受全局生长参数、营养和累积压力调制。免疫未激活为淡红、激活为深红。深红读取真实的抗原接触识别后激活记忆；该记忆及其克隆子代的剩余激活期结束后恢复淡红。单纯趋化或尚未完成识别的扫描不触发变色。默认显示细胞核，正常核区使用深蓝轮廓与浅填色，深色胞体的核区用浅金，均来自实际力学核区。图层透明度独立调整：低强度保护胞体色，超过 50% 逐步放宽，100% 完整显示图层；核区和边界最后绘制。因子采用固定的非线性显示增强，悬停返回原始浓度。各类 Act 仍可分别开启：红表示新扩展的高活性格点，随后变黄、变绿并衰减回胞体色；它是骨架极化代理，不是测得的 F-actin 浓度。</p>
+  <p>单击新增可以在已有细胞区域尝试局部挤入：先在草稿格点中让周围胞体变形，核区沿连续可容纳的逐格路径让位，减少的切面面积受剩余让位预算约束，总目标生物量保留。确认所有胞体连通、核区完整且不碰墙后一次提交；失败保持原状。该操作是手动组织编辑，不推进 MCS，也不是自发迁移机制。新细胞仍占据真实格点，接触识别需从实际新接触重新累积。</p>
+  <p>受邻居推挤时，可见目标面积在设定上限内逐步减少，压力解除后恢复；总目标生物量保留，切面外部分继续计入局部代谢负担。实际面积低于目标切面面积时，新生长逐步减慢；低于 90% 时暂停新增生物量，得到空间后恢复，避免硬面积下限随无空间的生长不断抬高而锁住整个组织。这不直接关停运动，也不减少已有生物量。胞体保持四邻接连通，短突起必须变宽才能继续延伸。受保护的核区只能在实际胞体内逐格移动，过窄狭缝和实体墙仍然阻挡通行。切面外储量没有独立位置，也不产生隐藏接触。</p>
+  <p>氧、葡萄糖与酸负荷随细胞实际占据面积的局部密度而变化，包含扩散、消耗、清除和培养液补给。低氧、低糖和高酸持续累积损伤，降低增殖和免疫运动／杀伤；可运动细胞沿局部资源梯度逃逸。三项量均为归一化模型量，酸负荷不是实验 pH，补给也不是血管网络。</p>
+  <p>免疫细胞必须在真实共享格点边缘上持续接触抗原阳性的肿瘤或异常中间态，才进入识别和损伤递送；不会攻击健康正常细胞。接触识别激活短期招募信号与有限克隆扩增；仅感到趋化信号的细胞不自动分泌招募因子。脱离后停止杀伤，但招募记忆可以短暂保留。免疫分裂预算沿谱系递减，肿瘤没有代数上限。</p>
+  <p>正常细胞同样会因持续低氧、低糖或高酸累积压力而死亡。另设两个随机步骤：持续压力提高正常细胞进入异常中间态的风险；异常细胞具有部分抗原，但仍使用正常运动／代谢规则，不自动扩增，也不能手动分裂。至少保留 160 MCS 后，才可能经独立随机事件进一步成为肿瘤，启用肿瘤增殖、侵袭与遗传。转变保留位置、胞体、总目标量、既有损伤和接触；异常中间态可被免疫细胞提前清除，也可环境致死或持续停留。</p>
+  <p>上述癌变风险是未标定的模型假设，不是现实发病概率。缺氧与 DNA 修复变化、癌前细胞免疫监视的研究仅提供机制启发，不证明任何缺氧、低糖或高酸都会导致癌变。本模型的统一接触杀伤细胞，也不复现癌前监视中多类免疫细胞的分工。</p>
+  <p>三个情境只设置初始细胞、参数和补给空间分布，不按时间强制癌变、播散或清除。「肿瘤发生发展」的酸清除系数从中心 0.05 平滑过渡到外围 1，氧糖补给系数为 0.65＋0.35×该系数；局部酸积累造成持续压力，外围仍可支持克隆存活。两阶段风险倍率设为 8 以缩短演示等待；新生肿瘤的初始遗传耐受范围为 2.04–2.76，仍继承已有损伤，仍会环境致死。「冷肿瘤」从局部 19 颗肿瘤和外围 3 颗免疫细胞开始；远端统计只跟踪原始肿瘤克隆：距原灶中心超过 55 个模型长度的存活细胞，以及在该区域实际发生的分裂。这是二维播散代理，不包含血管运输或跨器官转移。「热肿瘤治愈」从中心 37 颗肿瘤团和周边 18 颗免疫细胞开始；完成提示需要当前区域全部肿瘤胞体消失，并继续观察 150 MCS，不代表真实临床治愈。冷、热情境关闭新的环境诱发异常，以观察已有肿瘤的结局。</p>
+  <p>肿瘤的耐受、增殖、侵袭和抗原表达随分裂遗传，并可随机突变。环境改变不同性状的存活机会，不会主动把细胞变成“需要的突变”。初始抗原阳性比例只影响新播种的肿瘤；已有克隆的表达由遗传决定。没有全局细胞数量预算；旧配置中的数量预算不再生效。生长受营养、压力与遗传性状调制，分裂还需实际胞体面积、核区和有效几何分割；免疫细胞仍受激活状态和谱系剩余分裂次数约束。性能提示不改变这些规则。</p>
+  <p>这是二维切面代理模型，核区和切面让位均为简化约束。它不等同于原项目的 2.5D 表面爬行或完整三维实体瘤浸润，也没有核膜力学或真实三维体积求解。信号名称、浓度和参数尚未经生物实验标定。</p>
+  <p>预热 35 MCS，计入画面时间。GPU 负责显示；WebAssembly 在 CPU 上按原顺序执行形变尝试。可选 WebGPU 微环境执行同样的扩散反应方程，自动模式把传输和读回纳入测速，选择更快的后端。倍率只改变每秒推进多少 MCS；算力不足时显示实际速率与限制，不跳过形变、接触或代谢步骤。</p>
+  <p><a href="https://doi.org/10.7554/eLife.61288" target="_blank" rel="noreferrer">Artistoo</a> · <a href="https://doi.org/10.1371/journal.pcbi.1004280" target="_blank" rel="noreferrer">Act 模型</a> · <a href="https://elifesciences.org/articles/56554" target="_blank" rel="noreferrer">CTL 同类招募</a> · <a href="https://pubmed.ncbi.nlm.nih.gov/26321679/" target="_blank" rel="noreferrer">代谢竞争</a> · <a href="https://www.nature.com/articles/s42255-022-00730-6" target="_blank" rel="noreferrer">酸度与 T 细胞功能</a> · <a href="https://www.nature.com/articles/s41467-021-25282-3" target="_blank" rel="noreferrer">累积细胞毒性</a></p>
+  <p>可视化参照：<a href="https://artistoo.net/examples/CancerInvasion.html" target="_blank" rel="noreferrer">Artistoo · Cancer Invasion</a>。该示例关闭 Act 着色；本演示保留独立的类型开关。</p>
+  <p>转变机制参考：<a href="https://pubmed.ncbi.nlm.nih.gov/16026872/" target="_blank" rel="noreferrer">缺氧下 DNA 修复基因表达（Meng et al., 2005）</a> · <a href="https://www.nature.com/articles/nature10599" target="_blank" rel="noreferrer">癌前肝细胞的衰老监视（Kang et al., 2011）</a>。</p>
+  <details><summary>版本与许可</summary><p>v4 · Artistoo 提交 e997d81213a5dcdfc40ad976a18958f412f00cc9，官方文件原样内嵌。默认使用本项目的等价 WebAssembly 复制循环和优化约束；保留 JS 回退。通讯、代谢、遗传、切面约束和交互为扩展，参数未经实验标定，不作定量预测。</p><pre>/* INLINE_LICENSE */</pre></details>
+</dialog>
+<script id="worker-source" type="text/plain">/* INLINE_WORKER */</script><script>/* INLINE_APP */</script>
+</body></html>

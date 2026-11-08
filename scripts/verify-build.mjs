@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+const index=await readFile('dist/index.html'),legacy=await readFile('dist/artistoo-playground.html');
+const manifest=JSON.parse(await readFile('dist/manifest.json','utf8'));
+assert.ok(index.equals(legacy),'Hosted entry and offline entry must use the same model');
+assert.equal(createHash('sha256').update(index).digest('hex'),manifest.htmlSHA256);
+assert.equal(index.length,manifest.bytes);
+const html=index.toString('utf8');
+assert.match(html,/<title>Cell-Arena/);
+assert.match(html,/id="worker-source"/);
+assert.match(html,/globalThis.CELL_LAB_WASM=/);
+assert.match(html,/id="history-range"/);
+assert.match(html,/Copyright \(c\) 2019 Johannes Textor &amp; Inge Wortel/);
+assert.doesNotMatch(html,/\/\* INLINE_/,'No unresolved build placeholders');
+// Skip inline script bodies: upstream API documentation contains inert HTML examples.
+const scripts=[...html.matchAll(/<script\b([^>]*)>[\s\S]*?<\/script>/gi)];
+assert.equal(scripts.length,2,'The Worker source and app entry must both be present');
+assert.ok(scripts.every(match=>!(/\bsrc\s*=/i.test(match[1]))),'Runtime scripts must be self-contained');
+const markup=html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'');
+assert.ok(!(/<link\b(?=[^>]*\brel=["']stylesheet["'])/i.test(markup)),'Styles must be self-contained');
+console.log(JSON.stringify({name:manifest.name,entry:'dist/index.html',bytes:index.length,htmlSHA256:manifest.htmlSHA256,verified:true},null,2));

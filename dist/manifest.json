@@ -1,0 +1,12 @@
+{
+  "name": "Cell-Arena",
+  "version": "4.0.0",
+  "engine": "Artistoo",
+  "upstream": "https://github.com/ingewortel/artistoo",
+  "commit": "e997d81213a5dcdfc40ad976a18958f412f00cc9",
+  "license": "MIT",
+  "engineSHA256": "cf324da4b8a475853f02bcc842662ade65140132fe11d6db4e034ea17a5ca7e5",
+  "wasmSHA256": "236ced7bf6d4840fea34e1fdecb0dca6ad43d7df43062fd57634890b9c24bbb0",
+  "htmlSHA256": "4d5a282838d782377ec973a83331d02519feaa49adf79bc8f5ac8f94d3b46cc5",
+  "bytes": 568628
+}

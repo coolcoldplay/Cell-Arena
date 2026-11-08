@@ -1,0 +1,705 @@
+/* Artistoo extensions. Biology, signal transport, and pacing are independent of rendering. */
+(() => {
+  'use strict';
+  const NORMAL=1, TUMOR=2, IMMUNE=3, WALL=4, FIELD_SCALE=4;
+  const DEFAULTS={normalMotility:.08,tumorMotility:.7,immuneMotility:1,chemotaxis:1.6,alignment:.8,cohesion:1,repulsion:.7,immuneSeparation:1,noise:.6,halfLife:140,growth:.8,apoptosis:8,antigen:65,kill:1,temperature:12,supply:1.8,metabolism:1,escape:2,recruitment:1,immuneGrowth:.35,immuneDivisions:3,mutation:6,mutationSize:.16,sectionYield:.35,stressMutation:1,progression:1};
+  const clamp=(v,lo=0,hi=1)=>Math.max(lo,Math.min(hi,v));
+  const POPULATIONS=['normal','abnormal','tumor','immune'];
+  const sameHistoryRow=(a,b)=>!!a&&Object.keys(b).every(key=>a[key]===b[key]);
+  // Only the display is reduced. Keep each population's minimum and maximum
+  // in each time bin, plus both endpoints, in their original temporal order.
+  function sampleHistory(rows,bins=256){
+    if(rows.length<=bins*8+2)return rows.slice();
+    const first=rows[0].time,span=Math.max(1,rows.at(-1).time-first),extrema=new Int32Array(bins*8).fill(-1);
+    for(let i=0;i<rows.length;i++){
+      const offset=Math.min(bins-1,Math.floor((rows[i].time-first)/span*bins))*8;
+      for(let k=0;k<4;k++){const key=POPULATIONS[k],lo=offset+2*k,hi=lo+1;
+        if(extrema[lo]<0||rows[i][key]<rows[extrema[lo]][key])extrema[lo]=i;
+        if(extrema[hi]<0||rows[i][key]>rows[extrema[hi]][key])extrema[hi]=i;
+      }
+    }
+    const indices=new Set([0,rows.length-1]);for(const i of extrema)if(i>=0)indices.add(i);
+    return [...indices].sort((a,b)=>a-b).map(i=>rows[i]);
+  }
+  const SIGNALS=['cohesion','danger','trail'];
+  const PRESETS={
+    oncogenesis:{label:'肿瘤发生发展',environmentProfile:'poor-core',founderTolerance:2.4,description:'纯正常上皮，中心酸清除弱、氧糖补给略低，外围环境较好。局部代谢压力经异常中间态推动随机癌变；新生肿瘤采用较高遗传耐受基线，观察存活克隆向外围扩增。',settings:{supply:2.8,metabolism:1.2,stressMutation:8,progression:8,growth:1.2,apoptosis:2,tumorMotility:1.5,normalMotility:.05,cohesion:1.3,escape:4,immuneGrowth:.15,immuneDivisions:2,kill:1.2}},
+    cold:{label:'免疫冷肿瘤扩散转移',description:'中心 19 颗低抗原肿瘤，外围仅 3 颗免疫细胞，肿瘤保留快速生长与迁移。观察原灶外播散及远端增殖；这是二维扩散代理，不含血管运输或跨器官转移。',settings:{supply:2.4,metabolism:.8,stressMutation:0,progression:1,growth:1.4,apoptosis:2,tumorMotility:1.15,immuneMotility:.8,antigen:15,kill:1,chemotaxis:.6,recruitment:.35,immuneGrowth:.15,immuneDivisions:2,alignment:.2,noise:.85,mutation:8}},
+    hot:{label:'免疫热肿瘤治愈',description:'中心 37 颗肿瘤形成局部密集病灶，周边 18 颗免疫细胞，抗原暴露充分。依靠真实接触识别、局部招募及有限克隆扩增，尝试清除当前区域肿瘤。',settings:{supply:2.8,metabolism:.65,stressMutation:0,progression:1,growth:.75,apoptosis:0,tumorMotility:.35,immuneMotility:1.2,antigen:100,kill:2,chemotaxis:2.5,recruitment:2.4,immuneGrowth:.65,immuneDivisions:3,noise:.45,halfLife:180,mutation:2,mutationSize:.05}},
+    ecosystem:{label:'免疫共培养',settings:{}},
+    collective:{label:'群体迁移',settings:{normalMotility:.85,alignment:2,cohesion:1.2,repulsion:.4,noise:.35,growth:0,apoptosis:0}},
+    invasion:{label:'肿瘤扩张',settings:{growth:.7,tumorMotility:1,apoptosis:10}},
+    maze:{label:'通道搜索',settings:{chemotaxis:2.3,halfLife:240,growth:.12,apoptosis:0}},
+    stress:{label:'密度与逃逸',settings:{supply:.8,metabolism:1.15,growth:.6,tumorMotility:.9,apoptosis:0,escape:3}},
+    surveillance:{label:'异常监视',settings:{supply:.8,metabolism:1.2,stressMutation:3,progression:.7,kill:2,apoptosis:0}}
+  };
+  const TYPE_NAMES=['培养液','正常细胞','肿瘤细胞','免疫细胞','实体障碍'];
+  const BODY_COLORS=[[239,242,237],[174,184,181],[48,56,65],[190,65,78],[93,108,111]];
+  const ringOffsets=[[-1,-1],[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0]];
+  // Fast local connectivity proof. Ambiguous masks receive an exact, early-exit
+  // flood fill: a ring can open if its two arms are still connected elsewhere.
+  const connected=new Uint8Array(256);
+  const connected4=new Uint8Array(256);
+  for(let mask=1;mask<256;mask++){
+    let reached=0,front=mask&-mask;
+    while(front){reached|=front;let next=0;for(let a=0;a<8;a++)if(front&(1<<a))for(let b=0;b<8;b++)if(mask&(1<<b)){
+      if(Math.abs(ringOffsets[a][0]-ringOffsets[b][0])<=1&&Math.abs(ringOffsets[a][1]-ringOffsets[b][1])<=1)next|=1<<b;
+    }front=next&~reached;}
+    connected[mask]=reached===mask?1:0;
+    reached=0;front=mask&-mask;while(front){reached|=front;let next=0;for(let a=0;a<8;a++)if(front&(1<<a))for(let b=0;b<8;b++)if(mask&(1<<b))if(Math.abs(ringOffsets[a][0]-ringOffsets[b][0])+Math.abs(ringOffsets[a][1]-ringOffsets[b][1])===1)next|=1<<b;front=next&~reached;}connected4[mask]=reached===mask?1:0;
+  }
+  class SignalField {
+    constructor(width,height,wrap=false){this.width=width;this.height=height;this.wrap=wrap;this.values=new Float32Array(width*height);this.next=new Float32Array(width*height);this.blocked=new Uint8Array(width*height);}
+    index(x,y){if(this.wrap){x=(x+this.width)%this.width;y=(y+this.height)%this.height;}else if(x<0||y<0||x>=this.width||y>=this.height)return -1;return y*this.width+x;}
+    step(diffusion,decay){
+      if(diffusion<0||diffusion>.25)throw Error('Explicit diffusion requires 0 <= D*dt <= 0.25');
+      const a=this.values,b=this.next,w=this.width,h=this.height,keep=Math.exp(-decay);
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+        const i=y*w+x;if(this.blocked[i]){b[i]=0;continue;}
+        const c=a[i];let sum=0;
+        const left=x?i-1:(this.wrap?i+w-1:-1),right=x<w-1?i+1:(this.wrap?i-w+1:-1),up=y?i-w:(this.wrap?i+(h-1)*w:-1),down=y<h-1?i+w:(this.wrap?x:-1);
+        if(left>=0&&!this.blocked[left])sum+=a[left]-c;if(right>=0&&!this.blocked[right])sum+=a[right]-c;
+        if(up>=0&&!this.blocked[up])sum+=a[up]-c;if(down>=0&&!this.blocked[down])sum+=a[down]-c;
+        b[i]=Math.max(0,(c+diffusion*sum)*keep);
+      }
+      this.values=b;this.next=a;
+    }
+    deposit(x,y,amount){const i=this.index(Math.floor(x),Math.floor(y));if(i>=0&&!this.blocked[i])this.values[i]=Math.min(30,this.values[i]+amount);}
+    gradient(x,y){
+      x=Math.floor(x);y=Math.floor(y);const i=this.index(x,y);if(i<0||this.blocked[i])return [0,0];
+      const sample=(xx,yy)=>{const j=this.index(xx,yy);return j<0||this.blocked[j]?this.values[i]:this.values[j];};
+      return [(sample(x+1,y)-sample(x-1,y))*.5,(sample(x,y+1)-sample(x,y-1))*.5];
+    }
+  }
+  class StepClock {
+    constructor(rate){this.rate=rate;this.debt=0;}
+    add(milliseconds){this.debt+=Math.max(0,milliseconds)*this.rate/1000;const n=Math.floor(this.debt+1e-9);this.debt-=n;return n;}
+    reset(){this.debt=0;}
+  }
+  class LocalTopology extends CPM.HardConstraint {
+    constructor(sim){super({});this.sim=sim;this.stamp=0;this.visited=new Uint32Array(sim.C.grid._pixels.length);this.queue=new Uint32Array(this.visited.length);this.goals=new Uint32Array(this.visited.length);}
+    fulfilled(src,tgt,source,target){
+      const cell=this.sim.cells[target];if(!target||!cell||cell.dying)return true;
+      const neighbors=this.sim.rings[tgt],grid=this.C.grid._pixels;let mask=0;
+      for(let k=0;k<8;k++)if(neighbors[k]>=0&&grid[neighbors[k]]===target)mask|=1<<k;
+      if((this.sim.section?connected4:connected)[mask])return true;
+      if(!mask)return false;
+      if(++this.stamp===4294967295){this.visited.fill(0);this.goals.fill(0);this.stamp=1;}
+      const stamp=this.stamp,visited=this.visited,queue=this.queue;
+      let head=0,tail=0,needed=0;
+      for(let k=0;k<8;k++)if(mask&(1<<k)){needed++;this.goals[neighbors[k]]=stamp;}
+      const seed=neighbors[Math.log2(mask&-mask)];queue[tail++]=seed;visited[seed]=stamp;
+      while(head<tail){const i=queue[head++];
+        if(this.goals[i]===stamp)needed--;
+        if(!needed)return true;
+        for(const n of (this.sim.section?this.sim.faces[i]:this.sim.neighbors[i]))if(n!==tgt&&grid[n]===target&&visited[n]!==stamp){visited[n]=stamp;queue[tail++]=n;}
+      }
+      return false;
+    }
+  }
+  class CellVolume extends CPM.SoftConstraint {
+    constructor(sim){super({});this.sim=sim;}
+    deltaH(src,tgt,a,b){
+      let energy=0;const ca=this.sim.cells[a],cb=this.sim.cells[b];
+      if(ca)energy+=ca.lambdaV*(2*(this.C.getVolume(a)-(ca.planarTarget??ca.target))+1);
+      if(cb)energy+=cb.lambdaV*(-2*(this.C.getVolume(b)-(cb.planarTarget??cb.target))+1);
+      return energy;
+    }
+  }
+  class LocalDirection extends CPM.SoftConstraint {
+    constructor(sim){super({});this.sim=sim;}
+    deltaH(src,tgt,id){
+      const m=this.sim.cells[id];if(!m||!m.drive||m.dying)return 0;
+      let dx=this.sim.xs[tgt]-this.sim.xs[src],dy=this.sim.ys[tgt]-this.sim.ys[src];
+      if(this.sim.wrap){if(dx>1)dx-=this.sim.width;else if(dx< -1)dx+=this.sim.width;if(dy>1)dy-=this.sim.height;else if(dy< -1)dy+=this.sim.height;}
+      return -m.drive*(dx*m.px+dy*m.py);
+    }
+  }
+  class Simulation {
+    constructor({width,height,worldWidth=240,worldHeight=180,refinement,scene='ecosystem',seed=17,boundary='solid',settings={},warmup=35,kernel='fast',sectionModel=true}={}){
+      this.scale=refinement??(width===undefined?1.5:1);
+      if(![1,1.5,2,3,4].includes(this.scale))throw Error('Unsupported lattice refinement');
+      width=width??Math.round(worldWidth*this.scale);height=height??Math.round(worldHeight*this.scale);
+      if(!Number.isInteger(width)||!Number.isInteger(height)||width<32||height<24||width>1024||height>768)throw Error('计算格点需在 32×24 至 1024×768 内，请降低区域或精细度');
+      this.worldWidth=width/this.scale;this.worldHeight=height/this.scale;this.fieldScale=FIELD_SCALE*this.scale;
+      this.width=width;this.height=height;this.scene=scene;this.seedValue=seed;this.wrap=boundary==='wrap';this.boundary=boundary;
+      this.settings={...DEFAULTS,...(PRESETS[scene]?.settings||{}),...settings};
+      // Legacy saved configurations may contain a population budget. It has
+      // no biological meaning and must not influence this run or its report.
+      delete this.settings.capacity;
+      this.cells=[];this.contacts=new Map();this.histories=new Map();this.events=[];this.history=[];this.wallID=0;this.version=0;
+      this.counters={divisions:0,immuneDivisions:0,kills:0,apoptosis:0,environment:0,recognitions:0,mutations:0,abnormalInitiations:0,malignantTransitions:0,abnormalKills:0,normalEnvironmentDeaths:0,abnormalEnvironmentDeaths:0};this.birthSerial=0;this.lineage=[];
+      const s=this.settings;
+      this.C=new CPM.CPM([width,height],{
+        seed,torus:[this.wrap,this.wrap],T:s.temperature,
+        // Neutral immune/immune interface: J_II = 2 J_I,medium. Chemotaxis,
+        // rather than constitutive homotypic adhesion, can gather patrol cells.
+        J:[[0,22,19,17,0],[22,7,18,12,28],[19,18,9,10,26],[17,12,10,34,26],[0,28,26,26,0]],
+        LAMBDA_P:[0,.25,.32,.18,0],P:[0,155,205,135,0],
+        LAMBDA_ACT:[0,50,180,240,0],MAX_ACT:[0,12,25,35,0],ACT_MEAN:'geometric',
+        IS_BARRIER:[false,false,false,false,true]
+      });
+      this.C.conf.J[1][1]=Math.max(2,12-s.cohesion*5);
+      const C=this.C,size=C.grid._pixels.length;
+      this.xs=new Int16Array(size);this.ys=new Int16Array(size);this.rings=new Array(size);this.neighbors=new Array(size);this.faces=new Array(size);this.connected4=connected4;
+      const neighbors=C.grid.neighi.bind(C.grid);
+      this.positions=new Uint32Array(width*height);
+      this.sinX=Float64Array.from({length:width},(_,x)=>Math.sin(x/width*2*Math.PI));this.cosX=Float64Array.from({length:width},(_,x)=>Math.cos(x/width*2*Math.PI));
+      this.sinY=Float64Array.from({length:height},(_,y)=>Math.sin(y/height*2*Math.PI));this.cosY=Float64Array.from({length:height},(_,y)=>Math.cos(y/height*2*Math.PI));
+      for(let x=0;x<width;x++)for(let y=0;y<height;y++){
+        const i=C.grid.p2i([x,y]);this.xs[i]=x;this.ys[i]=y;this.positions[y*width+x]=i;this.neighbors[i]=neighbors(i);
+        this.rings[i]=Int32Array.from(ringOffsets,([dx,dy])=>{let xx=x+dx,yy=y+dy;if(this.wrap){xx=(xx+width)%width;yy=(yy+height)%height;}return xx<0||yy<0||xx>=width||yy>=height?-1:C.grid.p2i([xx,yy]);});
+        this.faces[i]=[1,3,5,7].map(k=>this.rings[i][k]).filter(j=>j>=0);
+      }
+      // All enabled Artistoo constraints read, never mutate, neighbour arrays.
+      C.grid.neighi=i=>this.neighbors[i];
+      this.section=sectionModel&&globalThis.CellLabSection?new globalThis.CellLabSection(this):null;
+      if(this.section){const hard=new CPM.HardConstraint({});hard.fulfilled=(...args)=>this.section.allowed(...args);C.add(hard);const shape=new CPM.SoftConstraint({});shape.deltaH=(...args)=>this.section.energy(...args);C.add(shape);}
+      this.topology=new LocalTopology(this);C.add(new CellVolume(this));C.add(this.topology);C.add(new LocalDirection(this));
+      const make=C.makeNewCellID.bind(C);C.makeNewCellID=kind=>{const id=make(kind);if(kind!==WALL)this.register(id,kind);return id;};
+      C.post_setpix_listeners.push((i,old,id)=>{if(this.cells[old])this.moment(this.cells[old],i,-1);if(this.cells[id])this.moment(this.cells[id],i,1);});
+      this.act=C.getConstraint('ActivityConstraint');
+      this.act.cellParameter=(parameter,id)=>parameter==='LAMBDA_ACT'?(this.cells[id]?.activity||0):C.conf[parameter][C.cellKind(id)];
+      const p=C.getConstraint('PerimeterConstraint');p.cellParameter=(parameter,id)=>parameter==='P'?(this.cells[id]?.perimeter||0):parameter==='LAMBDA_P'?(this.cells[id]?.lambdaP||0):C.conf[parameter][C.cellKind(id)];
+      const adhesion=C.getConstraint('Adhesion');adhesion.J=(a,b)=>{
+        const ca=this.cells[a],cb=this.cells[b];if(a&&b&&(ca?.targetID===b||cb?.targetID===a))return 2;
+        if(ca&&cb&&ca.kind!==cb.kind){if(ca.kind===IMMUNE||cb.kind===IMMUNE)return 9;
+          const tumor=ca.kind===TUMOR?ca:cb.kind===TUMOR?cb:null;if(tumor)return Math.max(9,19-3*tumor.genome.invasion);}
+        return C.conf.J[C.cellKind(a)][C.cellKind(b)];
+      };
+      this.kernel='reference';
+      this.act.setActivity=(i,a)=>{if(a)this.act.cellpixelsact[i]=a;else delete this.act.cellpixelsact[i];};
+      if(kernel!=='reference'&&globalThis.CellLabFast)globalThis.CellLabFast.install(this);
+      this.gm=new CPM.GridManipulator(C);
+      this.fields={};for(const key of [...SIGNALS,'oxygen','glucose','acid','density'])this.fields[key]=new SignalField(Math.ceil(width/this.fieldScale),Math.ceil(height/this.fieldScale),this.wrap);
+      this.fields.oxygen.values.fill(1);this.fields.glucose.values.fill(1);
+      const bins=this.fields.oxygen.values.length;
+      // Fixed reservoir geometry, independent of time, cell identity and goals.
+      // Core acid clearance is limited more strongly than nutrient supply, so
+      // chronic injury can coexist with a viable, better supplied frontier.
+      this.supplyMap=new Float32Array(bins).fill(1);
+      if(PRESETS[scene]?.environmentProfile==='poor-core')for(let i=0;i<bins;i++){
+        const x=(i%this.fields.oxygen.width+.5)*this.fieldScale/this.scale,y=(Math.floor(i/this.fields.oxygen.width)+.5)*this.fieldScale/this.scale;
+        const radius=Math.hypot((x-this.worldWidth/2)/(this.worldWidth*.22),(y-this.worldHeight/2)/(this.worldHeight*.25));
+        this.supplyMap[i]=.05+.95*clamp((radius-.55)/.65);
+      }
+      this.occupancy=[null,new Float32Array(bins),new Float32Array(bins),new Float32Array(bins)];
+      this.densities=[null,new Float32Array(bins),new Float32Array(bins),new Float32Array(bins)];
+      this.densityFields=[null,...[1,2,3].map(()=>new SignalField(this.fields.oxygen.width,this.fields.oxygen.height,this.wrap))];
+      this.massFields=[null,...[1,2,3].map(()=>new SignalField(this.fields.oxygen.width,this.fields.oxygen.height,this.wrap))];
+      for(const f of this.densityFields.slice(1))f.blocked=this.fields.oxygen.blocked;
+      for(const f of this.massFields.slice(1))f.blocked=this.fields.oxygen.blocked;
+      this.binAreas=new Float32Array(bins);for(let y=0;y<height;y++)for(let x=0;x<width;x++)this.binAreas[this.fieldIndex(x,y)]++;
+      if(scene!=='empty')this.populate();
+      this.record(); // The initial population belongs at model time zero.
+      this.refreshPositions();for(let i=0;i<warmup;i++){if(C.borderpixels.length)C.timeStep();if(this.section){this.refreshPositions();this.scanContacts();this.section.update(1);}}
+      this.cleanup();this.refreshPositions();this.updateEnvironment(0);this.updateMetabolism(0);this.updateLocal(0);this.initializeScenario();this.record();
+    }
+    live(){return this.cells.filter(Boolean);}
+    register(id,kind){
+      const theta=this.C.random()*2*Math.PI,roll=this.C.random();
+      const base=[0,240,330,72][kind]*this.scale*this.scale;
+      const genome=kind===TUMOR?{tolerance:(.85+.3*this.C.random())*(PRESETS[this.scene]?.founderTolerance||1),proliferation:.85+.3*this.C.random(),invasion:.85+.3*this.C.random(),antigen:roll<this.settings.antigen/100?.45+.55*this.C.random():.04+.07*this.C.random()}:null;
+      const m={id,kind,name:TYPE_NAMES[kind],base,target:kind===TUMOR?base*.55:base,lambdaV:0,lambdaP:0,perimeter:0,activity:0,drive:0,px:Math.cos(theta),py:Math.sin(theta),x:0,y:0,sx:0,sy:0,sinX:0,cosX:0,sinY:0,cosY:0,age:0,antigenRoll:roll,antigen:false,antigenLevel:0,damage:0,dying:false,deathCause:'',targetID:0,phase:'search',genome,clone:id,generation:0,birth:++this.birthSerial,parentBirth:0,divisionsLeft:kind===IMMUNE?this.settings.immuneDivisions:null,activation:0,recruitment:0,stress:0,adversity:0,fitness:1,oxygen:1,glucose:1,acid:0,confinement:0};
+      m.state=kind===NORMAL?'normal':kind===TUMOR?'tumor':'immune';m.origin=m.state;m.abnormalAge=0;m.abnormalSince=null;m.transformedAt=null;m.immuneCue=0;
+      m.fieldBins=new Map();m.sectionFraction=1;m.sectionPressure=0;m.hasNucleus=false;if(genome)this.applyGenome(m);
+      this.cells[id]=m;this.contacts.set(id,new Map());this.updateMechanics(m);return m;
+    }
+    applyGenome(m){m.antigenLevel=m.genome.antigen;m.antigen=m.antigenLevel>=.18;}
+    immuneTarget(m){return !!m&&!m.dying&&(m.kind===TUMOR||(m.kind===NORMAL&&m.state==='abnormal'))&&m.antigen;}
+    beginAbnormal(id){
+      const m=this.cells[id];if(!m||m.dying||m.kind!==NORMAL||m.state!=='normal')return false;
+      // A first stochastic alteration exposes a weak antigen, but retains normal
+      // mechanics and metabolism. It does not grant a proliferative phenotype.
+      m.state='abnormal';m.name='异常中间态';m.abnormalSince=this.C.time;m.abnormalAge=0;
+      m.antigenLevel=.2+.35*this.C.random();m.antigen=m.antigenLevel>=.18;
+      this.counters.abnormalInitiations++;this.log('abnormal',id,0,{antigen:m.antigenLevel,stress:m.stress,adversity:m.adversity});return true;
+    }
+    becomeTumor(id){
+      const m=this.cells[id];if(!m||m.dying||m.kind!==NORMAL||m.state!=='abnormal')return false;
+      // Relabel the same occupied body. Preserve target mass, damage, contacts,
+      // lineage and the already occupied nuclear disk; never reseed or teleport.
+      for(const [bin,pixels] of m.fieldBins){this.occupancy[NORMAL][bin]-=pixels;this.occupancy[TUMOR][bin]+=pixels;}
+      this.C.setCellKind(id,TUMOR);m.kind=TUMOR;m.state='tumor';m.name=TYPE_NAMES[TUMOR];m.base=330*this.scale*this.scale;m.age=0;m.transformedAt=this.C.time;
+      m.genome={tolerance:(.85+.3*this.C.random())*(PRESETS[this.scene]?.founderTolerance||1),proliferation:.85+.3*this.C.random(),invasion:.85+.3*this.C.random(),antigen:m.antigenLevel};
+      this.applyGenome(m);this.updateMechanics(m);this.C.stat_values={};
+      this.counters.malignantTransitions++;this.log('malignant',id,0,{clone:m.clone,genome:{...m.genome}});return true;
+    }
+    transformation(m,dt){
+      if(m.kind!==NORMAL||m.dying||dt<=0)return;
+      if(m.state==='normal'){
+        // A per-MCS hazard, gated by sustained injury. Healthy tissue has zero
+        // initiation hazard; short exposure cannot directly jump to malignancy.
+        const hazard=.002*this.settings.stressMutation*m.adversity**2*clamp((m.stress-.06)/.24);
+        if(hazard>0&&this.C.random()<-Math.expm1(-hazard*dt))this.beginAbnormal(m.id);
+      }else{
+        const eligible=Math.max(0,m.abnormalAge+dt-160)-Math.max(0,m.abnormalAge-160);m.abnormalAge+=dt;
+        const hazard=.0006*this.settings.progression*(.2+.8*m.adversity);
+        if(eligible>0&&hazard>0&&this.C.random()<-Math.expm1(-hazard*eligible))this.becomeTumor(m.id);
+      }
+    }
+    updateMechanics(m){
+      if(this.section)this.section.sync(m);
+      const invasion=m.genome?.invasion||1;
+      const speed=this.settings[['','normalMotility','tumorMotility','immuneMotility'][m.kind]]*(m.kind===TUMOR?invasion:1)*(m.kind===IMMUNE?Math.max(.04,m.fitness):Math.max(.12,m.fitness));
+      m.activity=m.dying?0:[0,50,180,240][m.kind]*speed*(m.targetID?.08:1);
+      m.drive=m.dying?0:[0,7,17,25][m.kind]*speed*(m.targetID?.08:1);
+      m.lambdaV=(m.kind===IMMUNE?1.3/(1+m.confinement):m.kind===TUMOR?2.5/(.7+.3*invasion):2.7)/(this.scale*this.scale);
+      m.lambdaP=m.dying?0:[0,.25,.32,.18][m.kind]/(this.scale*(m.kind===TUMOR?Math.sqrt(invasion):m.kind===IMMUNE?1+m.confinement*.8:1));
+      m.perimeter=[0,155,205,135][m.kind]*this.scale*Math.sqrt(Math.max(1,m.target)/m.base);
+      if(this.section){
+        m.lambdaV=[0,4,4,4.5][m.kind]/(this.scale*this.scale);
+        m.lambdaP=m.dying?0:[0,.35,.42,.65][m.kind]/this.scale;
+        m.perimeter=[0,155,195,90][m.kind]*this.scale*Math.sqrt(Math.max(1,m.planarTarget)/m.base);
+        if(m.kind===IMMUNE){m.activity*=125/240;m.drive*=35/25;}
+      }
+    }
+    moment(m,i,sign){
+      const x=this.xs[i],y=this.ys[i];m.sx+=sign*x;m.sy+=sign*y;
+      if(this.wrap){m.sinX+=sign*this.sinX[x];m.cosX+=sign*this.cosX[x];m.sinY+=sign*this.sinY[y];m.cosY+=sign*this.cosY[y];}
+      if(this.occupancy){const bin=this.fieldIndex(x,y);this.occupancy[m.kind][bin]+=sign;const n=(m.fieldBins.get(bin)||0)+sign;if(n)m.fieldBins.set(bin,n);else m.fieldBins.delete(bin);}
+    }
+    refreshPositions(){for(const m of this.live()){
+      const v=this.C.getVolume(m.id);if(!v)continue;
+      m.x=this.wrap?((Math.atan2(m.sinX,m.cosX)/(2*Math.PI)+1)%1)*this.width:m.sx/v;
+      m.y=this.wrap?((Math.atan2(m.sinY,m.cosY)/(2*Math.PI)+1)%1)*this.height:m.sy/v;
+    }}
+    seed(kind,x,y,radius=4){
+      const population=this.live().length;
+      this.lastSeedResult={id:0,reason:'',population};
+      const reject=reason=>{this.lastSeedResult.reason=reason;return 0;};
+      if(![1,2,3].includes(kind)||![x,y,radius].every(Number.isFinite)||radius<=0)return reject('invalid');
+      x=Math.round(x);y=Math.round(y);radius=Math.round(radius);const points=[];
+      for(let dx=-radius;dx<=radius;dx++)for(let dy=-radius;dy<=radius;dy++)if(dx*dx+dy*dy<=radius*radius){
+        let xx=x+dx,yy=y+dy;if(this.wrap){xx=(xx+this.width)%this.width;yy=(yy+this.height)%this.height;}
+        if(xx<0||yy<0||xx>=this.width||yy>=this.height)return reject('edge');
+        const occupied=this.C.pixt([xx,yy]);if(occupied)return reject(this.C.cellKind(occupied)===WALL?'wall':'occupied');points.push([xx,yy]);
+      }
+      const id=this.C.makeNewCellID(kind);for(const p of points)this.C.setpix(p,id);this.C.stat_values={};this.refreshPositions();
+      if(this.section&&!this.section.initialize(this.cells[id],points.map(p=>this.C.grid.p2i(p)))){this.eraseCell(id);return reject('nucleus');}
+      this.lastSeedResult={id,reason:'',population:population+1};
+      this.version++;return id;
+    }
+    insert(kind,x,y,radius=4){return globalThis.CellLabInsertion.insert(this,kind,x,y,radius);}
+    populate(){
+      const W=this.worldWidth,H=this.worldHeight,C=this.C,r=this.scale;
+      const seed=(kind,x,y,radius)=>this.seed(kind,x*r,y*r,radius*r);
+      const background=points=>{for(const [x,y] of points)seed(NORMAL,x,y,8);};
+      if(this.scene==='oncogenesis'){
+        // Every epithelial body begins normal: no seeded tumor, abnormal state,
+        // preloaded stress or time-triggered transformation.
+        const points=[];for(let y=H*.18;y<H*.84;y+=20)for(let x=W*.18;x<W*.84;x+=20)points.push([x,y]);background(points);
+        for(const [x,y] of [[.1,.25],[.9,.35],[.1,.65],[.9,.75]])seed(IMMUNE,W*x,H*y,3);
+        return;
+      }
+      if(this.scene==='cold'||this.scene==='hot'){
+        // Compact hexagonal lesions: 19 cold / 37 hot tumor founders. The hot
+        // scene starts with substantial local burden, not scattered targets.
+        // These are initial positions only; subsequent sensing stays local.
+        const hot=this.scene==='hot',rings=hot?3:2;
+        const patrols=[[W*.08,H*.28],[W*.92,H*.5],[W*.08,H*.76]];
+        const points=[];for(let y=14;y<H-9;y+=23)for(let x=15;x<W-9;x+=23)if(Math.hypot(x-W/2,y-H/2)>(hot?78:52)&&(hot||patrols.every(([px,py])=>Math.hypot(x-px,y-py)>13)))points.push([x,y]);background(points);
+        for(let q=-rings;q<=rings;q++)for(let t=-rings;t<=rings;t++)if(Math.abs(q+t)<=rings)seed(TUMOR,W/2+17.5*(q+t/2),H/2+17.5*Math.sqrt(3)/2*t,7);
+        if(hot){
+          for(let i=0;i<18;i++){const a=i*Math.PI/9;seed(IMMUNE,W/2+64*Math.cos(a),H/2+64*Math.sin(a),3);}
+        }else{
+          for(const [x,y] of patrols)seed(IMMUNE,x,y,3);
+        }
+        return;
+      }
+      if(this.scene==='collective'){
+        for(let y=22;y<H-15;y+=29)for(let x=22;x<W-15;x+=26)seed(NORMAL,x+C.ran(-2,2),y+C.ran(-2,2),7);
+        return;
+      }
+      if(this.scene==='maze'){
+        for(let y=0;y<(H-26)*r;y++)this.paint(Math.round(W*.36*r),y,Math.ceil(r),false,false);
+        for(let y=28*r;y<H*r;y++)this.paint(Math.round(W*.68*r),y,Math.ceil(r),false,false);
+        this.rebuildMask();
+        for(let i=0;i<5;i++)seed(IMMUNE,20+(i%2)*18,20+i*(H-40)/5,4);
+        for(let i=0;i<4;i++)seed(TUMOR,W-30,27+i*(H-40)/4,7);
+        return;
+      }
+      if(this.scene==='stress'){
+        for(let y=H*.2;y<H*.8;y+=17)for(let x=W*.25;x<W*.75;x+=17)seed(C.random()<.7?TUMOR:NORMAL,x,y,7);
+        for(let i=0;i<8;i++)seed(IMMUNE,W*.15+(i%2)*W*.7,20+Math.floor(i/2)*(H-40)/4,4);
+        return;
+      }
+      if(this.scene==='surveillance'){
+        // All epithelial cells start normal; no pre-existing tumor is planted.
+        for(let y=H*.18;y<H*.84;y+=18)for(let x=W*.18;x<W*.84;x+=18)seed(NORMAL,x,y,8);
+        for(let i=0;i<10;i++)seed(IMMUNE,W*.1+(i%2)*W*.8,15+Math.floor(i/2)*(H-30)/5,4);
+        return;
+      }
+      for(let y=14;y<H-9;y+=23)for(let x=15;x<W-9;x+=23){
+        if(Math.hypot(x-W/2,y-H/2)<31)continue;seed(NORMAL,x,y,8);
+      }
+      for(const [dx,dy] of [[-11,-10],[10,-10],[-11,11],[10,11]])seed(TUMOR,W/2+dx,H/2+dy,7);
+      if(this.scene==='ecosystem'){
+        for(let x=26;x<W-10;x+=46){seed(IMMUNE,x,26,4);seed(IMMUNE,x,H-26,4);}
+      }
+    }
+    paint(x,y,radius=2,erase=false,rebuild=true){
+      const C=this.C;let changed=0;radius=Math.round(radius);
+      for(let dx=-radius;dx<=radius;dx++)for(let dy=-radius;dy<=radius;dy++){
+        if(dx*dx+dy*dy>radius*radius)continue;const xx=Math.round(x+dx),yy=Math.round(y+dy);if(xx<0||yy<0||xx>=this.width||yy>=this.height)continue;
+        const old=C.pixt([xx,yy]);
+        if(erase){if(old&&C.cellKind(old)===WALL){C.setpix([xx,yy],0);changed++;}}
+        else if(!old){if(!this.wallID||!C.getVolume(this.wallID))this.wallID=C.makeNewCellID(WALL);C.setpix([xx,yy],this.wallID);changed++;}
+      }
+      C.stat_values={};if(rebuild)this.rebuildMask();this.version++;return changed;
+    }
+    rebuildMask(){
+      for(const f of Object.values(this.fields))f.blocked.fill(0);
+      for(const [p,id] of this.C.pixels())if(this.C.cellKind(id)===WALL){const x=Math.floor(p[0]/this.fieldScale),y=Math.floor(p[1]/this.fieldScale);for(const f of Object.values(this.fields)){const i=y*f.width+x;f.blocked[i]=1;f.values[i]=0;}}
+    }
+    clearWalls(){const points=[...this.C.pixels()].filter(([,id])=>this.C.cellKind(id)===WALL).map(([p])=>p);for(const p of points)this.C.setpix(p,0);this.wallID=0;this.C.stat_values={};this.rebuildMask();}
+    scanContacts(){
+      const contacts=this.contacts,grid=this.C.grid._pixels;
+      for(const m of this.live()){let map=contacts.get(m.id);if(!map){map=new Map();contacts.set(m.id,map);}map.clear();}
+      const add=(a,b,dx,dy)=>{const map=contacts.get(a);let edge=map.get(b);if(!edge){edge={id:b,length:0,nx:0,ny:0};map.set(b,edge);}edge.length++;edge.nx+=dx;edge.ny+=dy;};
+      for(const i of this.C.borderpixels.elements){
+        const a=grid[i];if(!this.cells[a])continue;const ring=this.rings[i];
+        const right=ring[3],b=right<0?0:grid[right];if(a!==b&&this.cells[b]){add(a,b,1,0);add(b,a,-1,0);}
+        const down=ring[5],c=down<0?0:grid[down];if(a!==c&&this.cells[c]){add(a,c,0,1);add(c,a,0,-1);}
+      }
+      for(const m of this.live()){let length=0;for(const e of contacts.get(m.id).values())length+=e.length;m.confinement=clamp(length/Math.max(1,4*Math.sqrt(this.C.getVolume(m.id))));}
+      return this.contacts;
+    }
+    fieldIndex(x,y){return Math.floor(y/this.fieldScale)*this.fields.oxygen.width+Math.floor(x/this.fieldScale);}
+    prepareEnvironment(){
+      const {oxygen,glucose,acid,density}=this.fields,blocked=oxygen.blocked,n=oxygen.values.length;
+      for(let kind=1;kind<=3;kind++){
+        const field=this.densityFields[kind];
+        for(let i=0;i<n;i++)field.values[i]=blocked[i]?0:this.occupancy[kind][i]/this.binAreas[i];
+        // Two no-flux smoothing steps give density a local neighbourhood range.
+        field.step(.2,0);field.step(.2,0);this.densities[kind]=field.values;
+      }
+      const rn=this.densities[1],rt=this.densities[2],ri=this.densities[3];
+      for(let i=0;i<n;i++)density.values[i]=clamp(rn[i]+rt[i]+ri[i]);
+      // Yielding moves material out of the displayed slice, not out of the
+      // local metabolic budget. Keep its contribution in the same local bins.
+      this.loads=this.densities;
+      if(this.section){
+        for(let kind=1;kind<=3;kind++)this.massFields[kind].values.fill(0);
+        for(const m of this.live())for(const [i,pixels] of m.fieldBins)if(!blocked[i])this.massFields[m.kind].values[i]+=pixels/(Math.max(.5,m.sectionFraction)*this.binAreas[i]);
+        this.loads=[null];for(let kind=1;kind<=3;kind++){const f=this.massFields[kind];f.step(.2,0);f.step(.2,0);this.loads[kind]=f.values;}
+      }
+    }
+    integrateEnvironment(dt){
+      const {oxygen,glucose,acid}=this.fields,blocked=oxygen.blocked,n=oxygen.values.length;
+      const [_,rn,rt,ri]=this.loads;
+      for(let remaining=dt;remaining>0;remaining--){const sub=Math.min(1,remaining);
+        oxygen.step(.10*sub,0);glucose.step(.065*sub,0);acid.step(.045*sub,0);
+        for(let i=0;i<n;i++){
+          if(blocked[i])continue;
+          const o=oxygen.values[i],g=glucose.values[i],a=acid.values[i],s=this.settings.supply*(.65+.35*this.supplyMap[i]),clearance=this.settings.supply*this.supplyMap[i],k=this.settings.metabolism;
+          const loadO=.55*rn[i]+rt[i]+.7*ri[i],loadG=.4*rn[i]+1.35*rt[i]+.8*ri[i];
+          oxygen.values[i]=clamp(o+sub*(.012*s*(1-o)-.024*k*loadO*o/(.2+o)));
+          glucose.values[i]=clamp(g+sub*(.010*s*(1-g)-.023*k*loadG*g/(.15+g)));
+          acid.values[i]=clamp(a+sub*(.014*k*(.3*rn[i]+1.2*rt[i]+.45*ri[i])*g/(.15+g)*(1+.8*(1-o))-.009*clearance*a));
+        }
+      }
+    }
+    updateEnvironment(dt){this.prepareEnvironment();this.integrateEnvironment(dt);}
+    updateMetabolism(dt){
+      for(const m of this.live()){
+        if(m.dying)continue;let o=0,g=0,a=0,n=0;
+        // Integrate over the actual footprint; an amoeboid centroid can lie outside it.
+        for(const [i,pixels] of m.fieldBins){if(this.fields.oxygen.blocked[i])continue;o+=this.fields.oxygen.values[i]*pixels;g+=this.fields.glucose.values[i]*pixels;a+=this.fields.acid.values[i]*pixels;n+=pixels;}
+        if(!n){o=m.oxygen;g=m.glucose;a=m.acid;n=1;}
+        m.oxygen=o/n;m.glucose=g/n;m.acid=a/n;
+        const tolerance=m.genome?.tolerance||1;
+        m.adversity=.35*clamp((.45-m.oxygen)/.45)+.4*clamp((.5-m.glucose)/.5)+.25*clamp((m.acid-.25)/.75);
+        // Tolerance reduces injury and acid inhibition, but cannot create nutrients.
+        m.fitness=clamp(m.oxygen/.45)*clamp(m.glucose/.5)*clamp(1-.85*m.acid/(m.kind===TUMOR?Math.sqrt(tolerance):1));
+        m.stress=clamp(m.stress+dt*(m.adversity*m.adversity/(220*tolerance)-Math.max(0,.18-m.adversity)/160));
+        if(m.stress>=1)this.beginDeath(m.id,'environment');
+        this.updateMechanics(m);
+      }
+    }
+    updateSignals(dt){
+      for(const m of this.live()){
+        if(m.dying)continue;
+        // Sources live on occupied bins, never at a concave body's empty centroid.
+        const deposit=(channel,amount)=>{const volume=this.C.getVolume(m.id);for(const [i,pixels] of m.fieldBins){const f=this.fields[channel];if(!f.blocked[i])f.values[i]=Math.min(30,f.values[i]+amount*pixels/volume);}};
+        if(m.kind===NORMAL)deposit('cohesion',.045*dt);
+        if(m.state==='abnormal')deposit('danger',.035*dt);
+        if(m.kind===TUMOR)deposit('danger',.10*dt);
+        if(m.kind===IMMUNE&&m.recruitment>0)deposit('trail',.38*dt*this.settings.recruitment*m.fitness);
+      }
+      const decay=Math.LN2/this.settings.halfLife;
+      // Fixed substeps keep the explicit solver positive for any requested dt.
+      for(let remaining=dt;remaining>0;remaining-=2){const sub=Math.min(2,remaining);for(const key of SIGNALS)this.fields[key].step(.09*sub,decay*sub);}
+    }
+    updatePolarity(dt){
+      const s=this.settings,next=[];
+      for(const m of this.live()){
+        if(m.dying)continue;let gx=0,gy=0,ax=0,ay=0,rx=0,ry=0,ix=0,iy=0,total=0;
+        const gradient=key=>{const f=this.fields[key];let x=0,y=0,n=0;for(const [i,amount] of m.fieldBins){const g=f.gradient(i%f.width,Math.floor(i/f.width));x+=g[0]*amount;y+=g[1]*amount;n+=amount;}return [x/(n||1),y/(n||1)];};
+        if(m.kind===IMMUNE){const a=gradient('danger'),b=gradient('trail');gx=a[0]+b[0]*1.8;gy=a[1]+b[1]*1.8;}
+        else if(m.kind===NORMAL){[gx,gy]=gradient('cohesion');}
+        else {const g=gradient('cohesion');gx=g[0]*.25;gy=g[1]*.25;}
+        const magnitude=Math.hypot(gx,gy);if(magnitude>0){const gain=Math.min(1,magnitude/.035);gx=gx/magnitude*gain;gy=gy/magnitude*gain;}
+        // This cue reads only local damage/recruitment gradients. Concentration
+        // or contact with another immune cell does not confer recognition.
+        if(m.kind===IMMUNE)m.immuneCue=clamp(s.chemotaxis/1.6)*Math.min(1,magnitude/.035);
+        for(const edge of this.contacts.get(m.id)?.values()||[]){
+          const other=this.cells[edge.id];if(!other||other.dying)continue;
+          if(m.kind===IMMUNE&&other.kind===IMMUNE){ix-=edge.nx;iy-=edge.ny;continue;}
+          if(other.kind===m.kind){ax+=other.px*edge.length;ay+=other.py*edge.length;total+=edge.length;}
+          if(m.targetID!==other.id){rx-=edge.nx;ry-=edge.ny;}
+        }
+        if(total){ax/=total;ay/=total;}
+        const r=Math.hypot(rx,ry);if(r>0){rx/=r;ry/=r;}
+        const chemo=m.kind===NORMAL?s.cohesion:s.chemotaxis;
+        const repel=s.repulsion*(m.kind===TUMOR?.18:m.kind===IMMUNE?.16:1);
+        const separation=Math.hypot(ix,iy);if(separation){ix/=separation;iy/=separation;}
+        // Protect an actual antigen scan/synapse. Other-cell repulsion above is
+        // unchanged; this extra term acts exclusively on immune/immune contact.
+        const peerSeparation=m.kind===IMMUNE&&m.phase==='search'&&!m.targetID?s.immuneSeparation*(1-.65*m.immuneCue):0;
+        const o=gradient('oxygen'),g=gradient('glucose'),a=gradient('acid');
+        let ex=o[0]+g[0]-a[0],ey=o[1]+g[1]-a[1],en=Math.hypot(ex,ey);
+        if(en){const gain=Math.min(1,en/.025)*m.adversity*s.escape;ex=ex/en*gain;ey=ey/en*gain;}
+        const angle=(this.C.random()-.5)*s.noise*.36*Math.sqrt(Math.max(0,dt));
+        const px=m.px*Math.cos(angle)-m.py*Math.sin(angle),py=m.px*Math.sin(angle)+m.py*Math.cos(angle);
+        const blend=1-Math.exp(-dt/12);
+        let nx=px+blend*(chemo*gx+s.alignment*ax+repel*rx+peerSeparation*ix+ex),ny=py+blend*(chemo*gy+s.alignment*ay+repel*ry+peerSeparation*iy+ey);
+        const norm=Math.hypot(nx,ny)||1;next.push([m,nx/norm,ny/norm]);
+      }
+      for(const [m,x,y] of next){m.px=x;m.py=y;this.updateMechanics(m);}
+    }
+    immuneInteractions(dt){
+      for(const m of this.live())if((m.kind===TUMOR||m.state==='abnormal')&&!m.dying)m.damage*=Math.exp(-dt/400);
+      const seen=new Set();
+      for(const ctl of this.live()){
+        if(ctl.kind!==IMMUNE||ctl.dying)continue;
+        let chosen=null;ctl.targetID=0;ctl.phase='search';
+        for(const edge of this.contacts.get(ctl.id)?.values()||[]){
+          const target=this.cells[edge.id];if(!this.immuneTarget(target)||edge.length<1)continue;
+          const key=ctl.id+':'+target.id;seen.add(key);
+          let h=this.histories.get(key);if(!h){h={ctl:ctl.id,target:target.id,dwell:0,recognized:false};this.histories.set(key,h);}
+          h.dwell+=dt*Math.min(1,edge.length/(3*this.scale))*target.antigenLevel*ctl.fitness;
+          if(!h.recognized&&h.dwell>=12){h.recognized=true;this.counters.recognitions++;this.log('recognize',ctl.id,target.id);}
+          if(!chosen||h.dwell>chosen.h.dwell)chosen={target,edge,h};
+        }
+        if(chosen){
+          ctl.phase=chosen.h.recognized?'kill':'scan';
+          // Only the currently contacting, antigen-positive target gets damage.
+          if(chosen.h.recognized){
+            ctl.targetID=chosen.target.id;ctl.activation=700;ctl.recruitment=200;
+            chosen.target.damage+=dt*.012*this.settings.kill*chosen.target.antigenLevel*Math.min(1,chosen.edge.length/(3*this.scale))*ctl.fitness;
+            if(chosen.target.damage>=1)this.beginDeath(chosen.target.id,'kill');
+          }
+        }
+        this.updateMechanics(ctl);
+      }
+      for(const [key,h] of this.histories){
+        if(!this.cells[h.ctl]||!this.immuneTarget(this.cells[h.target]))this.histories.delete(key);
+        else if(!seen.has(key)){h.dwell=Math.max(0,h.dwell-dt*.5);if(!h.dwell)this.histories.delete(key);}
+      }
+    }
+    updateLocal(dt){this.refreshPositions();this.scanContacts();this.immuneInteractions(dt);this.updatePolarity(dt);}
+    log(type,id,target=0,detail={}){this.events.push({time:this.C.time,type,id,target,...detail});if(this.events.length>1000)this.events.shift();}
+    beginDeath(id,cause){const m=this.cells[id];if(!m||m.dying)return false;m.dying=true;m.deathCause=cause;m.targetID=0;m.phase='dying';m.recruitment=0;this.updateMechanics(m);this.log('death-start',id,0,{cause});for(const ctl of this.live())if(ctl.targetID===id){ctl.targetID=0;ctl.phase='search';this.updateMechanics(ctl);}return true;}
+    eraseCell(id){
+      const points=[...this.C.pixels()].filter(([,cid])=>cid===id).map(([p])=>p);for(const p of points)this.C.setpix(p,0);
+      delete this.cells[id];this.contacts.delete(id);for(const [key,h] of this.histories)if(h.ctl===id||h.target===id)this.histories.delete(key);
+      for(const m of this.live())if(m.targetID===id){m.targetID=0;m.phase='search';this.updateMechanics(m);}this.C.stat_values={};
+    }
+    cleanup(){for(const m of this.live())if(!this.C.getVolume(m.id)){
+      this.countDeath(m.deathCause,m);
+      this.log('removed',m.id);this.eraseCell(m.id);
+    }}
+    countDeath(cause,m){if(cause==='kill'){this.counters.kills++;if(m?.state==='abnormal')this.counters.abnormalKills++;}else if(cause==='spontaneous')this.counters.apoptosis++;else if(cause==='environment'){this.counters.environment++;if(m?.state==='normal')this.counters.normalEnvironmentDeaths++;if(m?.state==='abnormal')this.counters.abnormalEnvironmentDeaths++;}}
+    growTarget(m,desired,amount){
+      if(amount<=0||m.target>=desired)return;
+      let available=1,ceiling=desired;
+      if(this.section){
+        // A compressed body must first obtain real space. Otherwise its target
+        // mass raises MIN_AREA above its footprint and pins every neighbour in
+        // a confluent sheet. Keep a compression margin for sequential copies;
+        // do not remove existing mass or relax nuclei/topology to unjam cells.
+        const area=this.C.getVolume(m.id),fraction=m.sectionFraction,ratio=area/Math.max(1,m.target*fraction);
+        available=clamp((ratio-.9)/.1);
+        ceiling=Math.min(desired,area/(.9*fraction));
+      }
+      m.target+=Math.min(Math.max(0,ceiling-m.target),amount*available);
+    }
+    biology(dt){
+      const live=this.live();
+      for(const m of live){
+        m.age+=dt;
+        m.activation=Math.max(0,m.activation-dt);m.recruitment=Math.max(0,m.recruitment-dt);
+        if(m.dying){m.target=Math.max(0,m.target-dt*Math.max(1.8*this.scale*this.scale,m.base*.025));this.updateMechanics(m);if(this.C.getVolume(m.id)<=3*this.scale*this.scale){const cause=m.deathCause;this.eraseCell(m.id);this.countDeath(cause,m);}continue;}
+        this.transformation(m,dt);
+        if(m.kind===TUMOR){
+          const hazard=this.settings.apoptosis/100/1000;
+          if(this.C.random()<1-Math.exp(-hazard*dt)){this.beginDeath(m.id,'spontaneous');continue;}
+          this.growTarget(m,m.base,this.settings.growth*m.genome.proliferation*m.fitness*(1-m.stress)*dt*this.scale*this.scale);
+          if(this.settings.growth>0&&m.target>=m.base&&this.C.getVolume(m.id)>=m.base*.9*(this.section?m.sectionFraction:1)&&m.age>100)this.divide(m.id);
+        }else if(m.kind===IMMUNE){
+          const expanding=m.activation>0&&m.divisionsLeft>0&&this.settings.immuneGrowth>0;
+          const desired=expanding?m.base*1.7:m.base;
+          if(m.target<desired)this.growTarget(m,desired,dt*this.scale*this.scale*(expanding?this.settings.immuneGrowth:.8)*m.fitness*(1-m.stress));
+          else if(!expanding&&m.target>m.base)m.target=Math.max(m.base,m.target-dt*.3*this.scale*this.scale);
+          if(expanding&&m.fitness>.25&&m.target>=desired&&this.C.getVolume(m.id)>=desired*.88*(this.section?m.sectionFraction:1)&&m.age>120)this.divide(m.id);
+        }else if(m.target<m.base)this.growTarget(m,m.base,dt*.8*this.scale*this.scale*m.fitness);
+        this.updateMechanics(m);
+      }
+    }
+    components(id){
+      const remaining=new Set();for(const [p,cid] of this.C.pixels())if(cid===id)remaining.add(this.C.grid.p2i(p));
+      const parts=[];while(remaining.size){const seed=remaining.values().next().value,queue=[seed],part=[];remaining.delete(seed);while(queue.length){const i=queue.pop();part.push(i);for(const n of (this.section?this.faces[i]:this.neighbors[i]))if(remaining.delete(n))queue.push(n);}parts.push(part);}return parts;
+    }
+    divide(id){
+      const m=this.cells[id];if(!m||m.dying||m.state==='abnormal'||this.C.getVolume(id)<80*this.scale*this.scale||(m.kind===IMMUNE&&m.divisionsLeft<=0))return 0;
+      // Relabelling existing cytoplasm is not a new protrusion. Preserve its Act
+      // age instead of letting GridManipulator turn the whole daughter red.
+      const activity=[];for(const [p,cid] of this.C.pixels())if(cid===id){const i=this.C.grid.p2i(p);activity.push([i,this.act.pxact(i)]);}
+      const restoreActivity=()=>{for(const [i,a] of activity)this.act.setActivity(i,a);};
+      const parentTarget=m.target,parentFraction=m.sectionFraction,parentArea=this.C.getVolume(id),divisionX=m.x,divisionY=m.y;
+      this.C.stat_values={};const child=this.wrap?this.gm.divideCellTorus(id):this.gm.divideCell(id);
+      this.refreshPositions();const daughter=this.cells[child],nuclei=this.section&&daughter?[this.section.findNucleus(m,activity.map(x=>x[0])),this.section.findNucleus(daughter,activity.map(x=>x[0]))]:null;
+      if(!this.C.getVolume(child)||this.components(id).length!==1||this.components(child).length!==1||(nuclei&&nuclei.some(p=>!p))){
+        const points=[...this.C.pixels()].filter(([,cid])=>cid===child).map(([p])=>p);for(const p of points)this.C.setpix(p,id);delete this.cells[child];this.contacts.delete(child);restoreActivity();this.C.stat_values={};this.refreshPositions();return 0;
+      }
+      restoreActivity();
+      const parentBirth=m.birth,generation=m.generation+1,left=m.divisionsLeft===null?null:m.divisionsLeft-1,genome=m.genome?{...m.genome}:null,damage=m.damage*.5;
+      for(const c of [m,daughter]){
+        c.target=this.section?parentTarget*this.C.getVolume(c.id)/parentArea:this.C.getVolume(c.id);c.sectionFraction=parentFraction;c.age=0;c.damage=damage;c.targetID=0;c.phase='search';c.generation=generation;c.clone=m.clone;c.parentBirth=parentBirth;c.birth=++this.birthSerial;c.divisionsLeft=left;
+        c.stress=m.stress;c.fitness=m.fitness;c.oxygen=m.oxygen;c.glucose=m.glucose;c.acid=m.acid;c.adversity=m.adversity;c.activation=m.activation;c.recruitment=c===m?m.recruitment:0;
+        c.state=m.state;c.origin=m.origin;c.abnormalSince=m.abnormalSince;c.abnormalAge=m.abnormalAge;c.transformedAt=m.transformedAt;
+        if(genome){c.genome=this.mutate(genome);this.applyGenome(c);}
+        if(nuclei){const p=nuclei[c===m?0:1];c.nucleusX=p[0];c.nucleusY=p[1];c.hasNucleus=true;}
+        this.updateMechanics(c);
+      }
+      daughter.px=m.px;daughter.py=m.py;
+      for(const [key,h] of this.histories)if(h.ctl===id||h.target===id)this.histories.delete(key);
+      this.lineage.push({time:this.C.time,parent:parentBirth,children:[m.birth,daughter.birth],ids:[id,child],clone:m.clone,generation,genomes:genome?[{...m.genome},{...daughter.genome}]:null});
+      if(this.lineage.length>4000)this.lineage.shift();
+      if(m.kind===IMMUNE)this.counters.immuneDivisions++;
+      if(m.kind===TUMOR&&this.scenarioState){this.scenarioState.tumorDivisions++;if(this.scenarioState.initial.clones.includes(m.clone)&&this.scenarioDistance(divisionX,divisionY)>55)this.scenarioState.distalDivisions++;}
+      this.counters.divisions++;this.log('divide',id,child,{generation,clone:m.clone});this.refreshPositions();this.scanContacts();this.immuneInteractions(0);return child;
+    }
+    mutate(parent){
+      const child={...parent};
+      for(const key of ['tolerance','proliferation','invasion','antigen'])if(this.C.random()<this.settings.mutation/100){
+        const z=Math.sqrt(-2*Math.log(Math.max(1e-12,this.C.random())))*Math.cos(2*Math.PI*this.C.random()),step=this.settings.mutationSize*z;
+        const value=key==='antigen'?clamp(child[key]+step):clamp(child[key]*Math.exp(step),.25,3);
+        if(value!==child[key])this.counters.mutations++;child[key]=value;
+      }
+      return child;
+    }
+    set(name,value){
+      if(!(name in DEFAULTS)||!Number.isFinite(value))return;
+      if(name==='sectionYield')value=clamp(value,0,.5);
+      if(name==='stressMutation'||name==='progression')value=clamp(value,0,20);
+      if(name==='immuneSeparation')value=clamp(value,0,3);
+      this.settings[name]=value;if(name==='temperature')this.C.conf.T=value;
+      for(const m of this.live())this.updateMechanics(m);
+      // Adhesive cohesion is local contact energy, complementary to the secreted field.
+      if(name==='cohesion')this.C.conf.J[1][1]=Math.max(2,12-value*5);
+    }
+    moveCell(id,x,y){
+      const cell=this.cells[id];if(!cell||cell.dying)return {steps:0,blocked:true};
+      this.refreshPositions();let dx=Math.round(x-cell.x),dy=Math.round(y-cell.y);
+      if(this.wrap){if(dx>this.width/2)dx-=this.width;if(dx< -this.width/2)dx+=this.width;if(dy>this.height/2)dy-=this.height;if(dy< -this.height/2)dy+=this.height;}
+      let occupied=[...this.C.pixels()].filter(([,cid])=>cid===id).map(([p])=>this.C.grid.p2i(p));
+      let steps=0,blocked=false;
+      const shift=(sx,sy)=>{
+        if(!sx&&!sy)return true;
+        const moved=[];for(const i of occupied){let xx=this.xs[i]+sx,yy=this.ys[i]+sy;if(this.wrap){xx=(xx+this.width)%this.width;yy=(yy+this.height)%this.height;}if(xx<0||yy<0||xx>=this.width||yy>=this.height)return false;
+          const j=this.C.grid.p2i([xx,yy]),other=this.C.pixti(j);if(other&&other!==id)return false;moved.push(j);
+        }
+        const next=new Set(moved),activity=occupied.map(i=>this.act.pxact(i));
+        // Add before removing so the cell ID and volume bookkeeping survive.
+        for(const j of moved)this.C.setpixi(j,id);
+        for(const i of occupied)if(!next.has(i)){this.C.setpixi(i,0);this.act.setActivity(i,0);}
+        for(let k=0;k<moved.length;k++)this.act.setActivity(moved[k],activity[k]);
+        occupied=moved;steps++;return true;
+      };
+      const distance=Math.max(Math.abs(dx),Math.abs(dy));let doneX=0,doneY=0;
+      for(let k=1;k<=distance;k++){
+        const xx=Math.round(dx*k/distance),yy=Math.round(dy*k/distance);
+        const sx=xx-doneX,sy=yy-doneY;
+        if(!shift(sx,0)){blocked=true;break;}if(cell.hasNucleus)cell.nucleusX=(cell.nucleusX+sx+this.width)%this.width;
+        if(!shift(0,sy)){blocked=true;break;}if(cell.hasNucleus)cell.nucleusY=(cell.nucleusY+sy+this.height)%this.height;doneX=xx;doneY=yy;
+      }
+      for(const [key,h] of this.histories)if(h.ctl===id||h.target===id)this.histories.delete(key);
+      this.C.stat_values={};this.updateLocal(0);this.version++;
+      return {steps,blocked,x:cell.x,y:cell.y};
+    }
+    pulse(x,y,channel='danger'){if(SIGNALS.includes(channel))this.fields[channel].deposit(x/this.fieldScale,y/this.fieldScale,8);}
+    mechanicalStep(){
+      if(this.C.borderpixels.length)this.C.timeStep();else this.C.time++;
+      this.cleanup();this.refreshPositions();this.scanContacts();
+      if(this.section)this.section.update(1);
+    }
+    biologicalStep(){
+      if(this.C.time%4===0)this.updateMetabolism(4);
+      this.immuneInteractions(1);this.biology(1);
+      if(this.C.time%4===0){this.updateSignals(4);this.updatePolarity(4);}
+      this.updateScenarioState();
+      if(this.C.time%30===0)this.record();
+    }
+    advance(steps){for(let n=0;n<steps;n++){this.mechanicalStep();if(this.C.time%4===0)this.updateEnvironment(4);this.biologicalStep();}}
+    async advanceAsync(steps,backend){for(let n=0;n<steps;n++){this.mechanicalStep();if(this.C.time%4===0){this.prepareEnvironment();await backend.step(this,4);}this.biologicalStep();}}
+    initializeScenario(){
+      if(!['oncogenesis','cold','hot'].includes(this.scene))return;
+      const live=this.live(),tumors=live.filter(m=>m.kind===TUMOR);
+      this.scenarioState={initial:{normal:live.filter(m=>m.kind===NORMAL).length,tumor:tumors.length,immune:live.filter(m=>m.kind===IMMUNE).length,antigenPositive:tumors.filter(m=>m.antigen).length,clones:tumors.map(m=>m.clone)},tumorDivisions:0,distalDivisions:0,peakTumor:tumors.length,everTumor:tumors.length>0,clearanceAt:null};
+    }
+    scenarioDistance(x,y){return Math.hypot(x/this.scale-this.worldWidth/2,y/this.scale-this.worldHeight/2);}
+    updateScenarioState(){
+      const state=this.scenarioState;if(!state)return;const tumors=this.live().filter(m=>m.kind===TUMOR).length;
+      state.peakTumor=Math.max(state.peakTumor,tumors);
+      if(tumors){state.everTumor=true;state.clearanceAt=null;}
+      else if(state.everTumor&&state.clearanceAt===null)state.clearanceAt=this.C.time;
+    }
+    scenarioReport(){
+      const state=this.scenarioState;if(!state)return null;const live=this.live(),tumors=live.filter(m=>m.kind===TUMOR),active=tumors.filter(m=>!m.dying);
+      const far=active.filter(m=>state.initial.clones.includes(m.clone)&&this.scenarioDistance(m.x,m.y)>55).length;
+      const elapsed=state.clearanceAt===null?0:this.C.time-state.clearanceAt,c=this.counters,abnormal=live.filter(m=>m.state==='abnormal'&&!m.dying).length;
+      const maxAdversity=Math.max(0,...live.filter(m=>!m.dying).map(m=>m.adversity));
+      let phase='',achieved=false;
+      if(this.scene==='oncogenesis'){
+        achieved=active.length>0&&state.tumorDivisions>0;
+        phase=achieved?'新生肿瘤克隆扩增':active.length?'肿瘤已发生':c.malignantTransitions?'肿瘤已出现，当前无存活肿瘤':c.abnormalInitiations?'已发生异常中间态':maxAdversity>.08?'环境压力累积':'局部资源消耗';
+      }else if(this.scene==='cold'){
+        achieved=far>0&&state.distalDivisions>0&&active.length>state.initial.tumor;
+        phase=achieved?'原灶外播散并增殖':far?'肿瘤向原灶外扩散':state.tumorDivisions?'原发灶扩增':'低免疫浸润的原发灶';
+        if(!tumors.length)phase='当前区域肿瘤已消失';
+      }else{
+        achieved=state.everTumor&&!tumors.length&&elapsed>=150&&c.kills>0;
+        phase=achieved?'当前区域持续清除':!tumors.length&&state.everTumor?'清除后继续观察':!active.length&&tumors.length?'靶细胞凋亡清除中':c.kills?'免疫清除进行中':c.recognitions?'接触识别与招募':'浸润与接触扫描';
+      }
+      const preset=PRESETS[this.scene],baseline={...DEFAULTS,...preset.settings};
+      return {label:preset.label,description:preset.description,profile:{environment:preset.environmentProfile||'uniform',founderTolerance:preset.founderTolerance||1},phase,achieved,initial:{...state.initial,clones:[...state.initial.clones]},tumor:active.length,tumorBodies:tumors.length,abnormal,farTumor:far,distalRadius:55,tumorDivisions:state.tumorDivisions,distalDivisions:state.distalDivisions,peakTumor:state.peakTumor,clearanceAt:state.clearanceAt,clearanceElapsed:elapsed,maxAdversity,customized:Object.keys(DEFAULTS).some(k=>this.settings[k]!==baseline[k])};
+    }
+    populationRow(){const counts=[0,0,0,0];let px=0,py=0,n=0,abnormal=0;for(const m of this.live()){counts[m.kind]++;if(m.state==='abnormal')abnormal++;if(!m.dying){px+=m.px;py+=m.py;n++;}}
+      return {time:this.C.time,normal:counts[1]-abnormal,abnormal,tumor:counts[2],immune:counts[3],order:n?Math.hypot(px,py)/n:0,...this.counters};
+    }
+    record(){const row=this.populationRow();if(!sameHistoryRow(this.history.at(-1),row))this.history.push(row);}
+    populationHistory(reduced=false){
+      let rows=this.history;
+      if(reduced){
+        // Rebuild once per archived sample, not for every render/snapshot.
+        if(this.historyCache?.length!==rows.length||this.historyCache?.last!==rows.at(-1))this.historyCache={length:rows.length,last:rows.at(-1),rows:sampleHistory(rows)};
+        rows=this.historyCache.rows;
+      }
+      const result=rows.slice(),current=this.populationRow();
+      if(!sameHistoryRow(result.at(-1),current))result.push(current);
+      return result;
+    }
+    snapshot(){
+      this.refreshPositions();const grid=new Uint16Array(this.width*this.height),activity=new Uint8Array(grid.length),walls=new Uint8Array(grid.length);let orphans=0;
+      for(let q=0;q<grid.length;q++){const i=this.positions[q],id=this.C.grid.pixti(i);grid[q]=id;const m=this.cells[id];if(m)activity[q]=Math.min(255,Math.round(this.act.pxact(i)/this.C.conf.MAX_ACT[m.kind]*255));else if(id){if(this.C.cellKind(id)===WALL)walls[q]=1;else orphans++;}}
+      const cells=this.live().map(m=>({id:m.id,kind:m.kind,x:m.x,y:m.y,px:m.px,py:m.py,area:this.C.getVolume(m.id),target:m.target,antigen:m.antigen,antigenLevel:m.antigenLevel,damage:m.damage,dying:m.dying,deathCause:m.deathCause,phase:m.phase,targetID:m.targetID,age:m.age,genome:m.genome?{...m.genome}:null,clone:m.clone,generation:m.generation,divisionsLeft:m.divisionsLeft,activation:m.activation,recruitment:m.recruitment,oxygen:m.oxygen,glucose:m.glucose,acid:m.acid,stress:m.stress,fitness:m.fitness,confinement:m.confinement}));
+      for(const c of cells){const m=this.cells[c.id];for(const key of ['sectionFraction','sectionPressure','planarTarget','offPlaneTarget','hasNucleus','nucleusX','nucleusY','nucleusRadius','state','origin','abnormalSince','abnormalAge','transformedAt','adversity','immuneCue'])c[key]=m[key];}
+      const fields={};for(const [key,f] of Object.entries(this.fields))fields[key]={width:f.width,height:f.height,values:f.values.slice()};
+      const history=this.populationHistory(true),historySamples=this.history.length+(history.at(-1)===this.history.at(-1)?0:1);
+      return {kernel:this.kernel,width:this.width,height:this.height,worldWidth:this.worldWidth,worldHeight:this.worldHeight,refinement:this.scale,fieldScale:this.fieldScale,fieldMask:this.fields.oxygen.blocked.slice(),scene:this.scene,scenario:this.scenarioReport(),boundary:this.boundary,time:this.C.time,seed:this.seedValue,settings:{...this.settings},counters:{...this.counters},grid,activity,walls,orphans,cells,fields,history,historySamples,events:this.events.slice(-12)};
+    }
+  }
+  globalThis.CellLab={Simulation,SignalField,StepClock,DEFAULTS,PRESETS,BODY_COLORS,TYPE_NAMES,NORMAL,TUMOR,IMMUNE,WALL,sampleHistory};
+})();

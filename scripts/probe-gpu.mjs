@@ -1,0 +1,5 @@
+import {openBrowser,delay} from './browser-session.mjs';import {writeFile} from 'node:fs/promises';
+const b=await openBrowser('dist/artistoo-playground.html',9369,{gpu:true});
+try{for(let i=0;i<100;i++){if(await b.evaluate('!!window.artistooLab?.snapshot'))break;await delay(100);}await b.evaluate('artistooLab.rpc("playing",{value:false})');
+const result=await b.evaluate(`(async()=>{const gl=document.createElement('canvas').getContext('webgl2'),debug=gl?.getExtension('WEBGL_debug_renderer_info');const result={secure:isSecureContext,webgpu:!!navigator.gpu,webgl2:!!gl,renderer:debug?gl.getParameter(debug.UNMASKED_RENDERER_WEBGL):null};if(navigator.gpu){const a=await navigator.gpu.requestAdapter({powerPreference:'high-performance'});result.adapter=a?{vendor:a.info.vendor,architecture:a.info.architecture,description:a.info.description,fallback:a.info.isFallbackAdapter}:null;if(a){const d=await a.requestDevice();result.compute=true;d.destroy();}}return result;})()`);
+await writeFile('output/v4/gpu-capability.json',JSON.stringify(result,null,2));console.log(JSON.stringify(result,null,2));}finally{await b.close();}
