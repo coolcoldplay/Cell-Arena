@@ -12,7 +12,7 @@
   canvas.parentElement.append($('field-probe'));
   let gpuRenderer=null,rendererFailure='';try{gpuRenderer=new CellLabRenderer();}catch(e){rendererFailure=String(e);}
   const labels=['培养液','正常细胞','肿瘤细胞','免疫细胞','实体障碍'];
-  const titles={empty:'空白自建',ecosystem:'免疫共培养',collective:'群体迁移',invasion:'肿瘤扩张',maze:'通道搜索',stress:'密度与逃逸',surveillance:'异常监视',network:'胶质瘤样分枝成网'};
+  const titles={random:'随机生成',empty:'空白自建',ecosystem:'免疫共培养',collective:'群体迁移',invasion:'肿瘤扩张',maze:'通道搜索',stress:'密度与逃逸',surveillance:'异常监视',network:'胶质瘤样分枝成网'};
   const controls=[
     ['chemotaxis','趋化响应',0,3,.1,'局部信号梯度对肿瘤与免疫细胞方向的影响',''],
     ['alignment','正常／肿瘤方向协同',0,3,.1,'接触的同类细胞调整极性；免疫细胞不无条件跟随同类',''],
@@ -105,7 +105,7 @@
     if(m.type==='snapshot'){
       snapshot=m.data;if(snapshot.revision!==lastRevision){lastRevision=snapshot.revision;selected=0;}
       if(raster.width!==snapshot.width||raster.height!==snapshot.height){raster.width=snapshot.width;raster.height=snapshot.height;image=rctx.createImageData(snapshot.width,snapshot.height);}
-      dirty=true;sync();resolveReady();
+      dirty=true;sync();
     }else if(m.type==='response'){
       const p=pending.get(m.id);if(p){clearTimeout(p.timeout);pending.delete(m.id);p.resolve(m.value);}
     }else if(m.type==='error'){
@@ -282,7 +282,7 @@
   const hints={move:'拖动时暂停 · 邻居让位 · 松手恢复',seed:'单击加入一颗 · 可尝试挤入已有细胞区域',signal:'单击释放因子 · 拖动画出信号带',wall:'在空白处拖动画墙',erase:'拖动擦除实体障碍',remove:'擦除触及的整颗细胞 · 单独记账',pan:'按住拖动平移视野 · 不改变细胞位置',inspect:'点击细胞查看状态与局部环境'};
   function setTool(value){
     if(stroke&&!stroke.ending)void endStroke();
-    tool=value;for(const b of document.querySelectorAll('[data-tool]')){const on=b.dataset.tool===tool;b.classList.toggle('selected',on);b.setAttribute('aria-pressed',on);}
+    tool=value;canvas.title=tool==='signal'?'':'中键或 Alt + 左键拖动平移视野';for(const b of document.querySelectorAll('[data-tool]')){const on=b.dataset.tool===tool;b.classList.toggle('selected',on);b.setAttribute('aria-pressed',on);}
     $('tool-hint').textContent=hints[tool];
     $('seed-options').hidden=tool!=='seed';$('signal-options').hidden=tool!=='signal';$('wall-options').hidden=!['wall','erase'].includes(tool);$('eraser-options').hidden=tool!=='remove';probeDirty=true;
     canvas.style.cursor=['move','pan'].includes(tool)?'grab':tool==='inspect'?'pointer':'crosshair';
@@ -293,7 +293,7 @@
     const r=canvas.getBoundingClientRect(),v=document.querySelector('.viewport').getBoundingClientRect(),{clientX,clientY}=hover;
     if(clientX<Math.max(r.left,v.left)||clientX>=Math.min(r.right,v.right)||clientY<Math.max(r.top,v.top)||clientY>=Math.min(r.bottom,v.bottom)){box.hidden=true;return;}
     if(tool==='remove'){const diameter=2*Number($('eraser-radius').value)*snapshot.refinement*r.width/snapshot.width;brush.style.width=diameter+'px';brush.style.height=diameter+'px';brush.style.left=(clientX-v.left)+'px';brush.style.top=(clientY-v.top)+'px';brush.hidden=false;box.hidden=true;return;}
-    if(stroke){box.hidden=true;return;}
+    if(stroke||tool==='signal'){box.hidden=true;return;}
     const [x,y]=point(hover),sample=CellLabDisplay.sample(snapshot,x,y);if(!sample){box.hidden=true;return;}
     $('probe-position').textContent=`位置 ${x}, ${y} · ${sample.time} MCS`;
     $('probe-cell').textContent=sample.wall?'实体障碍':sample.cell?`#${sample.cell.id} ${CellLabDisplay.cellName(sample.cell)}${sample.cell.dying?' · '+CellLabDisplay.deathPhaseLabel(sample.cell):''}`:'培养液';
@@ -347,17 +347,17 @@
   $('eraser-radius').addEventListener('input',()=>{$('eraser-radius-out').textContent=$('eraser-radius').value;probeDirty=true;});
   document.querySelectorAll('[data-tool]').forEach(b=>b.addEventListener('click',()=>setTool(b.dataset.tool)));
   function gridPreview(){
-    const width=Number($('world-size').value),refine=$('refinement');
-    for(const option of refine.options)option.disabled=width*Number(option.value)>1024;
+    const width=Number($('world-size').value),height=Number($('world-size').selectedOptions[0]?.dataset.height)||width*.75,refine=$('refinement');
+    for(const option of refine.options)option.disabled=width*Number(option.value)>1024||height*Number(option.value)>768;
     if(refine.selectedOptions[0].disabled)refine.value=[...refine.options].filter(o=>!o.disabled).at(-1).value;
-    const r=Number(refine.value);$('grid-preview').textContent=`应用后：${width*r} × ${width*.75*r} 真实格点（${width} × ${width*.75} 区域，${r}× 精细度）`;
+    const r=Number(refine.value);$('grid-preview').textContent=`应用后：${Math.round(width*r)} × ${Math.round(height*r)} 真实格点（${width} × ${height} 区域，${r}× 精细度）`;
   }
   for(const id of ['world-size','refinement'])$(id).addEventListener('change',gridPreview);gridPreview();
   async function start(scene=snapshot?.scene||'oncogenesis',{preserve=false,shuffle=false,preset=false}={}){
     selected=0;const seed=preset?17:shuffle?crypto.getRandomValues(new Uint32Array(1))[0]%1000000:snapshot?.seed??17;
     const worldWidth=Number($('world-size').value),refinement=Number($('refinement').value);
     if((preset&&snapshot)||scene==='empty')await rpc('playing',{value:false});
-    await rpc('start',{scene,seed,worldWidth,worldHeight:worldWidth*.75,refinement,boundary:$('boundary').value,settings:preserve?snapshot?.settings||{}:{},...(scene==='empty'?{warmup:0}:{})});
+    await rpc('start',{scene,seed,worldWidth,worldHeight:Number($('world-size').selectedOptions[0]?.dataset.height)||worldWidth*.75,refinement,boundary:$('boundary').value,settings:preserve?snapshot?.settings||{}:{},...(scene==='empty'?{warmup:0}:{})});
     if(preset||scene==='empty'){signalLayers.clear();$('field-view').value=scene==='oncogenesis'?'adversity':'none';if(scene==='hot')signalLayers.add('trail');updateOverlayButtons();dirty=true;await rpc('speed',{value:scene==='oncogenesis'?4:scene==='network'?3:1});await rpc('playing',{value:scene!=='empty'});}
     else if(scene==='stress'||scene==='surveillance'){$('field-view').value='adversity';dirty=true;}
     if(scene==='empty'){view.x=0;view.y=0;$('zoom').value='100';$('seed-kind').value='1';setTool('seed');dirty=true;}
@@ -365,14 +365,14 @@
   document.querySelectorAll('[data-scene]').forEach(b=>b.addEventListener('click',()=>start(b.dataset.scene,{preset:true}).catch(fail)));
   $('restore-scenario').addEventListener('click',()=>start(undefined,{preset:true}).then(()=>toast('已恢复当前情境的参数、种子与初始细胞')).catch(fail));
   $('boundary').addEventListener('change',()=>start(undefined,{preserve:true}).then(()=>toast('已按新的边界条件重新开始')).catch(fail));
-  $('apply-grid').addEventListener('click',async()=>{const b=$('apply-grid'),label=b.textContent;b.disabled=true;b.textContent='正在创建格点与细胞…';try{await start(undefined,{preserve:true});toast('计算区域与真实格点精细度已更新');}catch(e){fail(e);}finally{b.disabled=false;b.textContent=label;}});
+  $('apply-grid').addEventListener('click',async()=>{const b=$('apply-grid');b.disabled=true;b.textContent='正在创建格点与细胞…';try{await start(undefined,{preserve:true});toast('计算区域与真实格点精细度已更新');}catch(e){fail(e);}finally{b.disabled=false;b.textContent='应用区域与精细度 · 重新开始';}});
   $('zoom').addEventListener('change',()=>{view.x=0;view.y=0;dirty=true;});
   $('view-fit').addEventListener('change',()=>{view.x=0;view.y=0;dirty=true;});
   $('render-resolution').addEventListener('change',()=>dirty=true);
   $('tumor-morphology').addEventListener('change',e=>rpc('set',{name:'tumorMorphology',value:Number(e.target.value)}).then(()=>toast('肿瘤形态偏好已更新，胞体将逐步重塑')).catch(fail));
   $('network-demo').addEventListener('click',()=>start('network',{preset:true}).catch(fail));
   $('fullscreen').addEventListener('click',()=>{const viewport=document.querySelector('.viewport');(document.fullscreenElement?document.exitFullscreen():viewport.requestFullscreen()).catch(fail);});
-  $('reset').addEventListener('click',()=>start(undefined,{preserve:true}).catch(fail));$('shuffle').addEventListener('click',()=>start(undefined,{preserve:true,shuffle:true}).catch(fail));
+  $('reset').addEventListener('click',()=>start(undefined,{preserve:true}).catch(fail));$('shuffle').addEventListener('click',()=>start('random',{shuffle:true}).catch(fail));
   $('play').addEventListener('click',()=>rpc('playing',{value:!snapshot?.playing}).catch(fail));$('step').addEventListener('click',()=>rpc('advance',{steps:1}).catch(fail));
   $('speed').addEventListener('input',e=>{$('speed-out').textContent=e.target.value+'×';rpc('speed',{value:Number(e.target.value)}).catch(fail);});
   $('sprinkle').addEventListener('click',()=>rpc('sprinkle',{kind:Number($('seed-kind').value),manual:true}).then(seedFeedback).catch(fail));
@@ -393,13 +393,40 @@
   const modes={wander:{alignment:0,cohesion:0,repulsion:1.2,noise:1.2,normalMotility:.9},cluster:{alignment:.4,cohesion:2.6,repulsion:.3,noise:.4,normalMotility:.45},flock:{alignment:2.7,cohesion:1.1,repulsion:.5,noise:.25,normalMotility:1}};
   document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',async()=>{for(const [name,value] of Object.entries(modes[b.dataset.mode]))await rpc('set',{name,value});toast('局部规则已更新；变化会逐步形成');}));
   function download(url,name){const a=document.createElement('a');a.href=url;a.download=name;a.click();}
+  const video=new CellLabVideo.ArenaRecorder(canvas,viewport,{
+    onChange:state=>{const time=Math.floor(state.elapsed||0),stamp=String(Math.floor(time/60)).padStart(2,'0')+':'+String(time%60).padStart(2,'0');$('record-video').textContent=state.active?'■ 停止并下载':'● 录制视频';$('record-video').disabled=!!state.stopping;$('record-indicator').hidden=!state.active;$('record-indicator').textContent='■ '+stamp;$('record-indicator').disabled=!!state.stopping;if(state.active)$('record-status').textContent=`录制中 ${stamp} · ${state.width} × ${state.height} · 30 FPS`;},
+    onReady:(blob,state)=>{const url=URL.createObjectURL(blob),extension=blob.type.includes('mp4')?'mp4':'webm';download(url,`cell-arena-${snapshot.scene}-${Date.now()}.${extension}`);setTimeout(()=>URL.revokeObjectURL(url),60000);$('record-status').textContent=`视频已导出 · ${Math.round(state.elapsed)} 秒 · ${(blob.size/1024/1024).toFixed(1)} MB`;},
+    onError:error=>{$('record-status').textContent=String(error.message||error);}
+  });
+  $('record-video').addEventListener('click',()=>{try{if(video.status.active)void video.stop();else{render();video.start();}}catch(error){$('record-status').textContent=String(error.message||error);}});$('record-indicator').addEventListener('click',()=>void video.stop());
+  if(!CellLabVideo.ArenaRecorder.supported()){$('record-video').disabled=true;$('record-status').textContent='浏览器不支持视频录制，请使用新版 Chrome、Edge 或 Safari';}
   $('snapshot').addEventListener('click',()=>{render();download(canvas.toDataURL('image/png'),`cell-arena-${snapshot.scene}-${snapshot.time}.png`);});
-  async function exportData(){return {...await rpc('export'),display:{cellColors:CellLabDisplay.normalizeColors(cellColors)}};}
+  function displaySettings(){return {cellColors:CellLabDisplay.normalizeColors(cellColors),fieldView:$('field-view').value,signalLayers:[...signalLayers],opacity:{...opacity},flags:Object.fromEntries(CellLabExperiment.flags.map(id=>[id,$(id).checked])),zoom:$('zoom').value,fit:$('view-fit').value,renderResolution:$('render-resolution').value};}
+  async function exportData(){return {...await rpc('export'),display:displaySettings()};}
   $('export-data').addEventListener('click',async()=>{try{const data=await exportData(),url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));download(url,`cell-arena-experiment-${data.time}.json`);setTimeout(()=>URL.revokeObjectURL(url),5000);}catch(e){fail(e);}});
+  let pendingImport=null,importSerial=0;
+  async function importData(data){
+    const profile=CellLabExperiment.parse(data);await endStroke();await rpc('import',{data});
+    const config=profile.config,select=$('world-size');let option=[...select.options].find(o=>o.value===String(config.worldWidth));if(!option){option=new Option('',String(config.worldWidth));select.append(option);}option.textContent=`${config.worldWidth} × ${config.worldHeight}`;option.dataset.height=config.worldHeight;select.value=String(config.worldWidth);$('refinement').value=String(config.refinement);gridPreview();
+    const d=profile.display;if(d.cellColors)applyColors(d.cellColors);if(d.fieldView!==undefined)$('field-view').value=d.fieldView;if(d.signalLayers){signalLayers.clear();for(const key of d.signalLayers)signalLayers.add(key);}Object.assign(opacity,d.opacity||{});for(const [id,value]of Object.entries(d.flags||{}))$(id).checked=value;
+    if(d.zoom)$('zoom').value=d.zoom;if(d.fit)$('view-fit').value=d.fit;if(d.renderResolution)$('render-resolution').value=d.renderResolution;
+    view.x=0;view.y=0;selected=0;hover=null;probeDirty=true;syncOpacity();updateOverlayButtons();setTool(config.scene==='empty'?'seed':'move');dirty=true;return profile;
+  }
+  $('import-data').addEventListener('click',()=>$('import-file').click());
+  $('import-file').addEventListener('change',async()=>{
+    const file=$('import-file').files?.[0];if(!file)return;const ticket=++importSerial,filename=document.createElement('b');filename.dataset.noI18n='';filename.textContent=file.name;pendingImport=null;$('confirm-import').disabled=true;$('import-summary').replaceChildren(filename);$('import-status').textContent='正在读取文件…';$('import-dialog').showModal();
+    try{if(file.size>32*1024*1024)throw Error('文件超过 32 MB，请使用较小的实验参数文件');const data=JSON.parse(await file.text()),profile=CellLabExperiment.parse(data);if(ticket!==importSerial||!$('import-dialog').open)return;pendingImport=data;
+      $('import-summary').replaceChildren(filename,document.createTextNode('\n'+[`情境：${titles[profile.config.scene]||{oncogenesis:'肿瘤发生发展',cold:'免疫冷肿瘤扩散转移',hot:'免疫热肿瘤治愈'}[profile.config.scene]}`,`种子 ${profile.config.seed} · 区域 ${profile.config.worldWidth} × ${profile.config.worldHeight} · 精细度 ${profile.config.refinement}×`,`参数 ${Object.keys(profile.config.settings).length} 项 · 导出时刻 ${profile.sourceTime} MCS`].join('\n')));
+      $('import-status').textContent=profile.ignored.length?'将忽略旧版或未知参数：'+profile.ignored.join(', '):'文件校验通过';$('confirm-import').disabled=false;
+    }catch(error){if(ticket===importSerial)$('import-status').textContent=error instanceof SyntaxError?'不是有效的 JSON 实验文件':String(error.message||error);}finally{if(ticket===importSerial)$('import-file').value='';}
+  });
+  $('cancel-import').addEventListener('click',()=>$('import-dialog').close());$('import-dialog').addEventListener('close',()=>{pendingImport=null;importSerial++;$('import-file').value='';});
+  $('confirm-import').addEventListener('click',async()=>{if(!pendingImport)return;$('confirm-import').disabled=true;try{await importData(pendingImport);$('import-dialog').close();toast('参数已加载，已暂停重新开局');}catch(error){$('import-status').textContent=String(error.message||error);$('confirm-import').disabled=false;}});
   $('about').addEventListener('click',()=>$('about-dialog').showModal());$('close-about').addEventListener('click',()=>$('about-dialog').close());
   document.addEventListener('visibilitychange',()=>rpc('visible',{value:!document.hidden}).catch(fail));
-  document.addEventListener('keydown',e=>{if(e.code==='Space'&&!['INPUT','SELECT','BUTTON','SUMMARY'].includes(document.activeElement.tagName)&&!$('about-dialog').open){e.preventDefault();rpc('playing',{value:!snapshot?.playing}).catch(fail);}});
+  document.addEventListener('keydown',e=>{if(e.code==='Space'&&!['INPUT','SELECT','BUTTON','SUMMARY'].includes(document.activeElement.tagName)&&!document.querySelector('dialog[open]')){e.preventDefault();rpc('playing',{value:!snapshot?.playing}).catch(fail);}});
   function frame(){if(dirty)render();if(probeDirty)updateProbe();requestAnimationFrame(frame);}requestAnimationFrame(frame);
-  window.artistooLab={rpc,ready,get snapshot(){return snapshot;},get errors(){return errors;},get selected(){return selected;},get colors(){return CellLabDisplay.normalizeColors(cellColors);},get renderer(){return {gpu:!!gpuRenderer&&!gpuRenderer.lost,device:gpuRenderer?.device,error:rendererFailure,ms:gpuRenderer?.lastMs};},setTool,render,exportData};
-  start('oncogenesis',{preset:true}).then(()=>rpc('visible',{value:!document.hidden})).catch(fail);
+  window.artistooLab={rpc,ready,get snapshot(){return snapshot;},get errors(){return errors;},get selected(){return selected;},get recording(){return video.status;},get colors(){return CellLabDisplay.normalizeColors(cellColors);},get renderer(){return {gpu:!!gpuRenderer&&!gpuRenderer.lost,device:gpuRenderer?.device,error:rendererFailure,ms:gpuRenderer?.lastMs};},setTool,render,exportData,importData};
+  const language=CellLabI18n.mount($('language'));
+  start('oncogenesis',{preset:true}).then(()=>rpc('visible',{value:!document.hidden})).then(resolveReady).catch(fail);
 })();

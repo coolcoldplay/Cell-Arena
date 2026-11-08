@@ -39,3 +39,5 @@ Cell-Arena 基于 Artistoo 构建。下表说明直接包含、改写／移植�
 - U87 形态和胶质瘤连接网络的原始研究在 [MORPHOLOGY.md](MORPHOLOGY.md#原始研究与证据边界) 列出。动态突起与接触稳定规则是本项目的定性扩展，没有复制这些论文的仿真代码、图像或视频。
 
 WebGL2、WebGPU 和 WebAssembly 是浏览器接口。WASI SDK/Clang 是开发时编译工具，GitHub Actions 是构建部署服务；本仓库不包含这些工具的可执行文件。项目新增的通讯、微环境、谱系、切面约束与交互仍是定性、未标定的模型扩展，边界见 [MODEL.md](MODEL.md)。
+
+`src/experiment.js` 的参数验证、`src/i18n.js` 与 `src/about.en.html` 的双语界面、`src/recorder.js` 的画布录制与裁切均为本项目扩展，没有新增翻译、录屏或视频编解码依赖。录制使用浏览器自带 MediaRecorder；WebM 时长元数据按 [Matroska 元素规范](https://www.matroska.org/technical/elements.html) 写入，未引入外部视频处理库。

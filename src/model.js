@@ -5,6 +5,15 @@
   const DEATH_COUNTERS={spontaneous:['apoptosisStarted','apoptosis'],kill:['killStarted','kills'],environment:['environmentStarted','environment']};
   const DEFAULTS={normalMotility:.08,tumorMotility:.7,immuneMotility:1,chemotaxis:1.6,alignment:.8,cohesion:1,repulsion:.7,immuneSeparation:1,noise:.6,halfLife:140,growth:.8,apoptosis:8,antigen:65,kill:1,temperature:12,supply:1.8,metabolism:1,escape:2,recruitment:1,immuneGrowth:.35,immuneDivisions:3,mutation:6,mutationSize:.16,sectionYield:.35,stressMutation:1,inflammation:0,progression:1,tumorMorphology:0,branchLength:2.8,branchStrength:5,networkAdhesion:1,branching:1};
   const clamp=(v,lo=0,hi=1)=>Math.max(lo,Math.min(hi,v));
+  // Exploratory defaults, deliberately narrower than the manual slider limits.
+  // A separate seeded generator makes configuration reproducible without
+  // consuming the CPM stream. These are model ranges, not biological calibration.
+  const RANDOM_RANGES={normalMotility:[.05,.25,.05],tumorMotility:[.35,1.2,.05],immuneMotility:[.75,1.4,.05],chemotaxis:[.7,2.2,.1],alignment:[.1,1,.1],cohesion:[.6,1.6,.1],repulsion:[.4,1.2,.1],immuneSeparation:[.7,1.7,.1],noise:[.35,1,.05],halfLife:[80,220,10],growth:[.5,1.4,.05],apoptosis:[0,8,1],antigen:[30,95,5],kill:[.6,1.8,.1],temperature:[8,18,1],supply:[1.6,2.8,.05],metabolism:[.6,1.1,.05],escape:[1.5,3.5,.1],recruitment:[.6,2,.1],immuneGrowth:[.15,.65,.05],immuneDivisions:[2,4,1],mutation:[2,15,1],mutationSize:[.05,.2,.01],sectionYield:[.25,.4,.01],stressMutation:[.2,2,.1],inflammation:[0,1.5,.1],progression:[.5,3,.1],tumorMorphology:[0,2,1],branchLength:[2,3.2,.1],branchStrength:[3,7,.5],networkAdhesion:[.4,1.4,.1],branching:[.5,1.5,.1]};
+  function randomSettings(seed){
+    let state=seed>>>0;
+    const random=()=>{state=(state+0x6d2b79f5)>>>0;let n=Math.imul(state^(state>>>15),1|state);n^=n+Math.imul(n^(n>>>7),61|n);return ((n^(n>>>14))>>>0)/4294967296;};
+    return Object.fromEntries(Object.entries(RANDOM_RANGES).map(([key,[lo,hi,step]])=>[key,Number((lo+Math.floor(random()*(Math.round((hi-lo)/step)+1))*step).toFixed(2))]));
+  }
   const POPULATIONS=['normal','abnormal','tumor','immune'];
   const sameHistoryRow=(a,b)=>!!a&&Object.keys(b).every(key=>a[key]===b[key]);
   // Only the display is reduced. Keep each population's minimum and maximum
@@ -125,7 +134,7 @@
       if(!Number.isInteger(width)||!Number.isInteger(height)||width<32||height<24||width>1024||height>768)throw Error('计算格点需在 32×24 至 1024×768 内，请降低区域或精细度');
       this.worldWidth=width/this.scale;this.worldHeight=height/this.scale;this.fieldScale=FIELD_SCALE*this.scale;
       this.width=width;this.height=height;this.scene=scene;this.seedValue=seed;this.wrap=boundary==='wrap';this.boundary=boundary;
-      this.settings={...DEFAULTS,...(PRESETS[scene]?.settings||{}),...settings};
+      this.settings={...DEFAULTS,...(scene==='random'?randomSettings(seed):PRESETS[scene]?.settings||{}),...settings};
       // Legacy saved configurations may contain a population budget. It has
       // no biological meaning and must not influence this run or its report.
       delete this.settings.capacity;
@@ -306,6 +315,18 @@
       const W=this.worldWidth,H=this.worldHeight,C=this.C,r=this.scale;
       const seed=(kind,x,y,radius)=>this.seed(kind,x*r,y*r,radius*r);
       const background=points=>{for(const [x,y] of points)seed(NORMAL,x,y,8);};
+      if(this.scene==='random'){
+        const centers=Array.from({length:C.ran(1,3)},()=>[W*(.25+.5*C.random()),H*(.25+.5*C.random())]),density=.55+.3*C.random();
+        // Jittered, non-overlapping founders; local patches bias the mixture.
+        // Only initialization has access to these centers; sensing stays local.
+        for(let y=13;y<H-9;y+=22)for(let x=13;x<W-9;x+=22){
+          if(C.random()>density)continue;
+          const near=centers.some(([cx,cy])=>Math.hypot(x-cx,y-cy)<Math.min(W,H)*.22);
+          const roll=C.random(),kind=roll<(near?.6:.08)?TUMOR:roll>.88?IMMUNE:NORMAL;
+          seed(kind,x+C.ran(-3,3),y+C.ran(-3,3),kind===IMMUNE?3:kind===TUMOR?7:8);
+        }
+        return;
+      }
       if(this.scene==='network'){
         let row=0;for(let y=H*.2;y<H*.85;y+=25,row++)for(let x=W*.18+(row%2)*12.5;x<W*.86;x+=25)seed(TUMOR,x+C.ran(-2,2),y+C.ran(-2,2),7);
         return;
@@ -809,5 +830,5 @@
       return {kernel:this.kernel,width:this.width,height:this.height,worldWidth:this.worldWidth,worldHeight:this.worldHeight,refinement:this.scale,fieldScale:this.fieldScale,fieldMask:this.fields.oxygen.blocked.slice(),scene:this.scene,scenario:this.scenarioReport(),boundary:this.boundary,time:this.C.time,seed:this.seedValue,settings:{...this.settings},counters:{...this.counters},manualDeathRemovals:{...this.manualDeathRemovals},deaths:this.deathSummary(),recentDeaths:this.deathHistory.slice(-8).map(d=>({...d})),recentClearances:this.recentClearances.map(d=>({...d})),deathEffects:this.deathEffects.map(e=>({...e})),grid,activity,walls,orphans,cells,fields,history,historySamples,events:this.events.slice(-12)};
     }
   }
-  globalThis.CellLab={Simulation,SignalField,StepClock,DEFAULTS,PRESETS,BODY_COLORS,TYPE_NAMES,NORMAL,TUMOR,IMMUNE,WALL,sampleHistory};
+  globalThis.CellLab={Simulation,SignalField,StepClock,DEFAULTS,PRESETS,BODY_COLORS,TYPE_NAMES,NORMAL,TUMOR,IMMUNE,WALL,sampleHistory,randomSettings,RANDOM_RANGES};
 })();

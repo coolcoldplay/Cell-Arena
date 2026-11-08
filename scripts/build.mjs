@@ -8,10 +8,11 @@ let html = await read('src/index.html');
 const [css, engine, model, worker, app, license,fast,section,wasm,gpu,renderer] = await Promise.all(['src/style.css','vendor/artistoo.js','src/model.js','src/worker.js','src/app.js','vendor/LICENSE','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/gpu-fields.js','src/gpu-renderer.js'].map(read));
 const binary=await readFile(path.join(root,'build/cpm-kernel.wasm'));
 const display=await read('src/display-fields.js'),insertion=await read('src/insertion.js');
+const experiment=await read('src/experiment.js'),recorder=await read('src/recorder.js'),i18n=await read('src/i18n.js'),aboutEnglish=await read('src/about.en.html');
 const mtLicense=await read('vendor/MT19937-LICENSE.txt');
 const wasmMeta=JSON.parse(await read('build/cpm-kernel.meta.json'));
 if(wasmMeta.sourceSHA256!==createHash('sha256').update(await read('src/cpm-kernel.c')).digest('hex')||wasmMeta.wasmSHA256!==createHash('sha256').update(binary).digest('hex'))throw Error('WASM source/binary mismatch. Run npm run build:wasm.');
-for (const [slot, text] of Object.entries({ STYLE: css, WORKER: `globalThis.CELL_LAB_WASM='${binary.toString('base64')}';\n`+[engine,fast,section,wasm,gpu,insertion,model,worker].join('\n'), APP: display+'\n'+renderer+'\n'+app, LICENSE: license, MT_LICENSE: mtLicense })) {
+for (const [slot, text] of Object.entries({ STYLE: css, WORKER: `globalThis.CELL_LAB_WASM='${binary.toString('base64')}';\n`+[engine,fast,section,wasm,gpu,insertion,model,experiment,worker].join('\n'), ABOUT_EN:aboutEnglish, APP: [i18n,display,renderer,experiment,recorder,app].join('\n'), LICENSE: license, MT_LICENSE: mtLicense })) {
   const safe = slot.endsWith('LICENSE') ? text.replaceAll('&','&amp;').replaceAll('<','&lt;') : text.replace(/<\/script/gi, '<\\/script');
   html = html.replace(`/* INLINE_${slot} */`, () => safe);
 }

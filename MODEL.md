@@ -233,3 +233,13 @@ Worker 在整个拖动手势期间锁定暂停，包括没有移动鼠标的时�
 - Kang et al., 2011. [Senescence surveillance of pre-malignant hepatocytes limits liver cancer development](https://www.nature.com/articles/nature10599)。癌前衰老肝细胞的免疫监视，为提前清除的定性规则提供启发，不等同于所有异常细胞均有相同抗原和 CTL 杀伤途径。
 
 尚未建模的机制包括完整代谢网络、免疫耗竭和记忆分化、真实抗原受体谱、血管灌注、基底膜／ECM 降解、核膜连续力学和三维空间占据。任何演化结果都应首先视为这组规则产生的现象，而非真实肿瘤的预测。
+
+## 参数交换、随机建场与录制
+
+实验 JSON 使用 `format: cell-arena-experiment`、`schemaVersion: 1`，保留旧版 v3/v4 根字段以兼容既有分析。UI 与 Worker 共用白名单、有限数值与上下限验证；未知或废弃字段忽略并提示。Worker 在新模型构造和后端配置成功后才替换旧实验，随后暂停并重置统计。导出的细胞摘要不是完整状态，缺少实际格点、场及随机数状态，因此导入不声称恢复中途状态；空白情境仍从 0 MCS 开始，其他情境重新执行 35 MCS 预热。
+
+随机建场以种子决定适中的参数和抖动网格布局。初始局部斑块仅提高肿瘤播种概率，播种结束后不提供追踪目标或额外场。参数抽样使用独立的 32 位种子混合序列，不消耗 CPM 随机序列；生物学仍使用原有 MT19937。完整范围见 `RANDOM_RANGES`：例如正常运动性 0.05–0.25、肿瘤生长 0.5–1.4、补给 1.6–2.8、抗原阳性 30–95%、自发凋亡风险强度 0–8%。这些只是演示探索范围，不能当作生物学正常值。
+
+语言层只翻译 DOM 文本和可访问名称，不读写细胞、物理参数或随机数状态；动态详情保留原数值，切回中文使用原文。配色、语言与摄像范围都是显示偏好。
+
+视频通过浏览器 `canvas.captureStream` 与 `MediaRecorder` 本地编码。独立画布按当前可见范围等比例裁切；窗口改变时保持输出尺寸并留白，不拉伸细胞。目标 30 FPS，输出上限 1920×1080，实际帧率取决于设备。原始模型计时仍由 Worker 决定。对 Chromium 无时长的流式 WebM，仅补写 Segment Info 的 Duration，不修改视频帧；其他封装保持原样。接口与格式依据：[Canvas captureStream](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/captureStream)、[MediaRecorder](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder)、[Matroska 元素规范](https://www.matroska.org/technical/elements.html)。
