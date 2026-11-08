@@ -16,7 +16,7 @@
       const fragment=`#version 300 es
       precision highp float;precision highp int;precision highp usampler2D;
       uniform usampler2D ids,activity,walls,metadata;uniform sampler2D environment,palette,signalLayer,bodySignalLayer;
-      uniform vec3 bodyColors[7];uniform int showSignals;uniform float environmentOpacity,bodyEnvironmentOpacity,pixelRatio;
+      uniform vec3 bodyColors[7];uniform int showSignals,proliferationShading;uniform float environmentOpacity,bodyEnvironmentOpacity,pixelRatio;
       uniform ivec2 lattice;uniform vec2 viewport;uniform int fieldScale,fieldMode,seams,selected,wrap;
       uniform ivec4 actFlags;out vec4 color;
       uint idAt(ivec2 p){if(wrap==1)p=(p+lattice)%lattice;else if(any(lessThan(p,ivec2(0)))||any(greaterThanEqual(p,lattice)))return 0u;return texelFetch(ids,p,0).r;}
@@ -24,7 +24,7 @@
       void main(){
         vec2 xy=vec2(gl_FragCoord.x,viewport.y-gl_FragCoord.y)*vec2(lattice)/viewport;
         ivec2 p=clamp(ivec2(xy),ivec2(0),lattice-1);uint id=idAt(p);
-        uvec3 m=texelFetch(metadata,ivec2(int(id)&255,int(id)>>8),0).rgb;int kind=int(m.r),physicalKind=kind==5?1:kind==6?3:kind;vec3 base=kind==2?vec3(float(m.b)/255.):body(kind),rgb=base;
+        uvec3 m=texelFetch(metadata,ivec2(int(id)&255,int(id)>>8),0).rgb;int kind=int(m.r),physicalKind=kind==5?1:kind==6?3:kind;vec3 base=body(kind);if(kind==2&&proliferationShading==1)base=mix(base,vec3(1),float(m.b)/255.);vec3 rgb=base;
         if(fieldMode>0){float value=texelFetch(environment,p/fieldScale,0).r;int q=int(clamp(floor(value*255.+.5),0.,255.));rgb=mix(rgb,texelFetch(palette,ivec2(q,kind),0).rgb,kind>0?bodyEnvironmentOpacity:environmentOpacity);}
         if(showSignals==1){vec4 signal=kind>0?texelFetch(bodySignalLayer,p/fieldScale,0):texelFetch(signalLayer,p/fieldScale,0);rgb=mix(rgb,signal.rgb,signal.a);}
         if(texelFetch(walls,p,0).r>0u)rgb=(p.x+p.y)%7<2?vec3(66,83,87)/255.:body(4);
@@ -35,18 +35,21 @@
       const compile=(type,source)=>{const sh=gl.createShader(type);gl.shaderSource(sh,source);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(sh));return sh;};
       const program=this.program=gl.createProgram();gl.attachShader(program,compile(gl.VERTEX_SHADER,vertex));gl.attachShader(program,compile(gl.FRAGMENT_SHADER,fragment));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));
       gl.useProgram(program);gl.uniform3fv(gl.getUniformLocation(program,'bodyColors[0]'),Float32Array.from(CellLabDisplay.BODY_COLORS.flat(),v=>v/255));
-      this.uniforms={};for(const key of ['lattice','viewport','fieldScale','fieldMode','seams','selected','wrap','actFlags','showSignals','environmentOpacity','bodyEnvironmentOpacity','pixelRatio'])this.uniforms[key]=gl.getUniformLocation(program,key);
+      this.uniforms={};for(const key of ['lattice','viewport','fieldScale','fieldMode','seams','selected','wrap','actFlags','showSignals','environmentOpacity','bodyEnvironmentOpacity','pixelRatio','bodyColors[0]','proliferationShading'])this.uniforms[key]=gl.getUniformLocation(program,key);
       this.textures=[];for(const [i,key] of ['ids','activity','walls','metadata','environment','palette','signalLayer','bodySignalLayer'].entries()){const t=gl.createTexture();this.textures.push(t);gl.activeTexture(gl.TEXTURE0+i);gl.bindTexture(gl.TEXTURE_2D,t);for(const p of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,p,gl.NEAREST);for(const p of [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T])gl.texParameteri(gl.TEXTURE_2D,p,gl.CLAMP_TO_EDGE);gl.uniform1i(gl.getUniformLocation(program,key),i);}
       this.meta=new Uint8Array(256*256*4);this.palettes=new WeakMap();
       const ext=gl.getExtension('WEBGL_debug_renderer_info');this.device=ext?gl.getParameter(ext.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER);
       this.hardware=ext?!/swiftshader|llvmpipe|software/i.test(this.device):null;
     }
     upload(unit,w,h,internal,format,type,data){const g=this.gl;g.activeTexture(g.TEXTURE0+unit);g.bindTexture(g.TEXTURE_2D,this.textures[unit]);g.pixelStorei(g.UNPACK_ALIGNMENT,1);g.texImage2D(g.TEXTURE_2D,0,internal,w,h,0,format,type,data);}
-    draw(ctx,s,{actFlags,seams,selected,field,info,signal,bodySignal=signal,environmentOpacity=1,bodyEnvironmentOpacity=environmentOpacity,pixelRatio=1}){
+    draw(ctx,s,{actFlags,seams,selected,field,info,signal,bodySignal=signal,environmentOpacity=1,bodyEnvironmentOpacity=environmentOpacity,pixelRatio=1,cellColors=null}){
       if(this.lost||this.gl.isContextLost())return false;
       const g=this.gl,u=this.uniforms,c=this.canvas;const start=performance.now();
       if(c.width!==ctx.canvas.width||c.height!==ctx.canvas.height){c.width=ctx.canvas.width;c.height=ctx.canvas.height;}
       g.useProgram(this.program);g.viewport(0,0,c.width,c.height);
+      // Palette changes redraw even when model time and snapshot are unchanged.
+      if(this.cellColors!==cellColors){g.uniform3fv(u['bodyColors[0]'],Float32Array.from((cellColors?CellLabDisplay.paletteBodies(cellColors):CellLabDisplay.BODY_COLORS).flat(),v=>v/255));this.cellColors=cellColors;}
+      g.uniform1i(u.proliferationShading,cellColors?.proliferationShading===false?0:1);
       if(this.snapshot!==s){this.upload(0,s.width,s.height,g.R16UI,g.RED_INTEGER,g.UNSIGNED_SHORT,s.grid);this.upload(1,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.activity);this.upload(2,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.walls);
         this.meta.fill(0);for(const m of s.cells){this.meta[m.id*4]=CellLabDisplay.displayKind(m);this.meta[m.id*4+1]=m.dying?1:0;this.meta[m.id*4+2]=m.kind===2?CellLabDisplay.tumorShade(m):0;}this.upload(3,256,256,g.RGBA8UI,g.RGBA_INTEGER,g.UNSIGNED_BYTE,this.meta);this.snapshot=s;this.field=null;}
       if(this.field!==field){if(field)this.upload(4,field.width,field.height,g.R32F,g.RED,g.FLOAT,field.values);else this.upload(4,1,1,g.R32F,g.RED,g.FLOAT,new Float32Array(1));this.field=field;}

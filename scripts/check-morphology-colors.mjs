@@ -1,0 +1,40 @@
+import {openBrowser,delay} from './browser-session.mjs';
+import {mkdir,writeFile,readFile} from 'node:fs/promises';
+const target=process.argv[2]||'dist/index.html',out='output/morphology/'+(target.startsWith('https:')?'live':'local');await mkdir(out,{recursive:true});
+const b=await openBrowser(target,9392,{gpu:true,initScript:`const original=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(type,...args){const value=original.call(this,type,...args);if(type==='webgl2')window.testGL=value;return value;};`}),{evaluate,call}=b,checks=[];
+const check=(ok,name,data={})=>{checks.push({name,passed:!!ok,...data});if(!ok)throw Error(name+' '+JSON.stringify(data));};
+const wait=async expression=>{for(let i=0;i<200;i++){if(await evaluate(expression))return;await delay(100);}throw Error('Timed out: '+expression);};
+const click=async selector=>{const point=await evaluate(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});e.scrollIntoView({block:'center'});const r=e.getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2};})()`);for(const type of ['mousePressed','mouseReleased'])await call('Input.dispatchMouseEvent',{type,...point,button:'left',buttons:type==='mousePressed'?1:0,clickCount:1});await delay(80);};
+const shot=async name=>{const image=await call('Page.captureScreenshot',{format:'png'});await writeFile(out+'/'+name+'.png',Buffer.from(image.data,'base64'));};
+try{
+  await wait('!!window.artistooLab?.snapshot&&artistooLab.snapshot.speed===4');await evaluate(`artistooLab.rpc('playing',{value:false})`);
+  await click('#module-colors > summary');await click('#reset-colors');
+  check(await evaluate(`document.querySelectorAll('#color-controls input[type=color]').length===10&&document.getElementById('color-tumor-nucleus').checkVisibility()`),'All five states have visible body and nucleus color controls');
+  await click('#clear-overlays');
+  await evaluate(`document.getElementById('nuclei').checked=false;document.getElementById('cell-seams').checked=false;window.frozen=JSON.stringify({time:artistooLab.snapshot.time,grid:[...artistooLab.snapshot.grid]});window.setColor=(key,value)=>{const e=document.getElementById(key);e.value=value;e.dispatchEvent(new Event('input',{bubbles:true}));};setColor('color-normal-body','#3694b5');setColor('color-normal-nucleus','#240d58');artistooLab.render();window.pixel=(x,y)=>{const c=document.getElementById('world'),s=artistooLab.snapshot;return [...c.getContext('2d').getImageData(Math.floor((x+.5)*c.width/s.width),Math.floor((y+.5)*c.height/s.height),1,1).data].slice(0,3);};window.normalSite=(()=>{const s=artistooLab.snapshot,id=s.cells.find(m=>m.kind===1).id;for(let y=3;y<s.height-3;y++)for(let x=3;x<s.width-3;x++){const q=y*s.width+x;if([q,q-1,q+1,q-s.width,q+s.width].every(i=>s.grid[i]===id))return[x,y];}})();`);
+  const color=await evaluate(`({pixel:pixel(...normalSite),unchanged:JSON.stringify({time:artistooLab.snapshot.time,grid:[...artistooLab.snapshot.grid]})===frozen,renderer:artistooLab.renderer})`);
+  check(color.unchanged&&color.pixel.every((v,k)=>Math.abs(v-[54,148,181][k])<=1)&&color.renderer.gpu,'Changing color while paused immediately updates GPU pixels without restarting or moving cells',color);
+  const exported=await evaluate('artistooLab.exportData()');check(exported.display.cellColors.normal.nucleus==='#240d58'&&exported.history[0].time===0,'Export includes custom display colors and the complete population history');
+  await call('Page.reload');await wait('!!window.artistooLab?.snapshot&&artistooLab.snapshot.speed===4');await evaluate(`artistooLab.rpc('playing',{value:false})`);
+  check(await evaluate(`artistooLab.colors.normal.body==='#3694b5'&&document.getElementById('color-normal-nucleus').value==='#240d58'`),'Color choices survive a page reload');
+  await click('#module-colors > summary');await click('#reset-colors');
+  check(await evaluate(`artistooLab.colors.normal.body==='#cccccc'&&artistooLab.colors.immune.body==='#e99a9a'`),'Restore-default button restores the original state palette');
+  await click('#module-mechanics > summary');await click('#network-demo');await wait('artistooLab.snapshot.scene==="network"&&artistooLab.snapshot.speed===3');await evaluate(`artistooLab.rpc('playing',{value:false})`);
+  check(await evaluate(`artistooLab.snapshot.settings.tumorMorphology===2&&artistooLab.snapshot.cells.every(m=>m.kind===2&&m.morphologyMode===2)`),'The real demo button starts a branched tumor culture');
+  await evaluate(`artistooLab.rpc('advance',{steps:650})`);
+  const network=await evaluate(`(()=>{const s=artistooLab.snapshot;return{time:s.time,population:s.cells.length,links:s.cells.reduce((n,m)=>n+m.networkDegree,0)/2,linked:s.cells.filter(m=>m.networkDegree>0).length,branchCounts:[...new Set(s.cells.map(m=>m.branchCount))],kernel:s.kernel,orphans:s.orphans};})()`);
+  check(network.links>4&&network.linked>6&&network.kernel==='wasm'&&network.orphans===0,'Occupied protrusions form a real multi-cell contact network on the accelerated backend',network);
+  check(network.branchCounts.length>=3,'The culture contains varied, evolving protrusion counts, not repeated three-armed cells',network);
+  await evaluate(`artistooLab.render();window.scrollTo(0,0);document.querySelector('.viewport').scrollTop=0;document.querySelector('aside').scrollTop=0`);await shot('branched-culture');
+  // Verify optional shading against a chosen tumor base; nucleus is independently styled.
+  await click('#module-colors > summary');await evaluate(`window.setColor=(key,value)=>{const e=document.getElementById(key);e.value=value;e.dispatchEvent(new Event('input',{bubbles:true}));};setColor('color-tumor-body','#3b7788');setColor('color-tumor-nucleus','#ffd188');const e=document.getElementById('proliferation-shading');e.checked=false;e.dispatchEvent(new Event('change',{bubbles:true}));document.getElementById('nuclei').checked=true;artistooLab.render();`);
+  check(await evaluate(`artistooLab.colors.proliferationShading===false&&CellLabDisplay.bodyColor(artistooLab.snapshot.cells[0],artistooLab.colors).join(',')==='59,119,136'&&CellLabDisplay.nucleusStyle(artistooLab.snapshot.cells[0],artistooLab.colors).stroke==='#ffd188'`),'Custom tumor and nucleus colors are independent and proliferation shading can be disabled');
+  await shot('custom-colors');
+  await evaluate(`document.getElementById('cell-seams').checked=false;artistooLab.render();window.samples=[];const c=document.getElementById('world'),ctx=c.getContext('2d'),s=artistooLab.snapshot;for(let y=5;y<s.height-5;y+=4)for(let x=5;x<s.width-5;x+=4){const px=Math.floor((x+.5)*c.width/s.width),py=Math.floor((y+.5)*c.height/s.height);samples.push([px,py,[...ctx.getImageData(px,py,1,1).data]]);}testGL.getExtension('WEBGL_lose_context').loseContext();`);await delay(100);await evaluate('artistooLab.render()');
+  const parity=await evaluate(`({gpu:artistooLab.renderer.gpu,maxError:Math.max(...samples.flatMap(([x,y,old])=>[...document.getElementById('world').getContext('2d').getImageData(x,y,1,1).data].map((v,k)=>Math.abs(v-old[k]))))})`);
+  check(!parity.gpu&&parity.maxError<=2,'Custom colors agree between GPU rendering and Canvas fallback',parity);
+  await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await delay(100);
+  check(await evaluate(`document.documentElement.scrollWidth<=392&&document.querySelectorAll('#color-controls input').length===10`),'The color panel fits the mobile layout');await shot('colors-mobile');
+  check(b.errors.length===0&&await evaluate('artistooLab.errors.length===0'),'No browser or Worker errors');
+}catch(error){console.error(error);checks.push({passed:false,error:String(error)});process.exitCode=1;await shot('failure');}
+finally{await writeFile(out+'/checks.json',JSON.stringify(checks,null,2));await writeFile(out+'/tested-manifest.json',await readFile('dist/manifest.json'));console.log(JSON.stringify(checks,null,2));await b.close();}

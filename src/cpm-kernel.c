@@ -7,17 +7,21 @@ typedef unsigned short u16;
 typedef unsigned char u8;
 void *memset(void *p,int value,unsigned long n){volatile u8 *q=p;for(unsigned long i=0;i<n;i++)q[i]=(u8)value;return p;}
 #define MAX 1048576
-#define STRIDE 24
-enum {PRESENT,KIND,DYING,VOLUME,PERIMETER,TARGET,LV,PT,LP,ACT,DRIVE,PX,PY,TARGET_ID,INVASION,HAS_NUCLEUS,NX,NY,NR,REACH,SOFT_REACH,MIN_AREA};
+#define STRIDE 32
+#define BONDS 131072
+#define SEGMENTS 262144
+enum {PRESENT,KIND,DYING,VOLUME,PERIMETER,TARGET,LV,PT,LP,ACT,DRIVE,PX,PY,TARGET_ID,INVASION,HAS_NUCLEUS,NX,NY,NR,REACH,SOFT_REACH,MIN_AREA,MORPHOLOGY,CORE,BRANCH_PENALTY,SEGMENT_START,SEGMENT_COUNT,PROTRUSION_FORCE,SCALE};
 static u16 grid[MAX];static u8 activity[MAX],degree[MAX],nc[MAX],connected[256];
 static int neighbors[MAX*8],rings[MAX*8],pool[MAX],where[MAX];
 static u32 visited[MAX],goals[MAX],queue[MAX],logdata[MAX*2+2],mt[625];
 static double cells[65536*STRIDE],params[64];
+static u32 bond_keys[BONDS];static double bond_strength[BONDS];
+static float segments[SEGMENTS*6];
 static u8 contact_present[65536];static int contact_table[32768],contact_data[16384*5],contact_count;
 static u32 stamp=0;static int width,height,wrap,ybits,nraw,count,logcount,section;
 __attribute__((import_module("math"),import_name("exp"))) extern double js_exp(double);
 __attribute__((import_module("math"),import_name("pow"))) extern double js_pow(double,double);
-__attribute__((export_name("pointer"))) u32 pointer(int k){switch(k){case 0:return(u32)grid;case 1:return(u32)activity;case 2:return(u32)degree;case 3:return(u32)nc;case 4:return(u32)neighbors;case 5:return(u32)rings;case 6:return(u32)pool;case 7:return(u32)mt;case 8:return(u32)cells;case 9:return(u32)params;case 10:return(u32)connected;case 12:return(u32)contact_data;case 13:return(u32)contact_present;default:return(u32)logdata;}}
+__attribute__((export_name("pointer"))) u32 pointer(int k){switch(k){case 0:return(u32)grid;case 1:return(u32)activity;case 2:return(u32)degree;case 3:return(u32)nc;case 4:return(u32)neighbors;case 5:return(u32)rings;case 6:return(u32)pool;case 7:return(u32)mt;case 8:return(u32)cells;case 9:return(u32)params;case 10:return(u32)connected;case 12:return(u32)contact_data;case 13:return(u32)contact_present;case 14:return(u32)bond_keys;case 15:return(u32)bond_strength;case 16:return(u32)segments;default:return(u32)logdata;}}
 __attribute__((export_name("init"))) void init(int w,int h,int wr,int bits,int n,int sec){width=w;height=h;wrap=wr;ybits=bits;nraw=n;section=sec;stamp=0;for(int i=0;i<n;i++){visited[i]=0;goals[i]=0;}}
 static inline double random_value(){
   u32 y;int at=mt[624];if(at>=624){int k=0;for(;k<227;k++){y=(mt[k]&0x80000000u)|(mt[k+1]&0x7fffffffu);mt[k]=mt[k+397]^(y>>1)^((y&1u)?0x9908b0dfu:0);}
@@ -55,10 +59,23 @@ static int topology(int tgt,int b){
 }
 static inline double adhesion(int a,int b){double *ca=cell(a),*cb=cell(b);if(a&&b&&(ca[TARGET_ID]==b||cb[TARGET_ID]==a))return 2;
   if(ca[PRESENT]&&cb[PRESENT]&&ca[KIND]!=cb[KIND]){if(ca[KIND]==3||cb[KIND]==3)return 9;double *t=ca[KIND]==2?ca:cb[KIND]==2?cb:0;if(t){double j=19-3*t[INVASION];return j<9?9:j;}}
-  return params[5+(int)ca[KIND]*5+(int)cb[KIND]];
+  double j=params[5+(int)ca[KIND]*5+(int)cb[KIND]];
+  if(params[32]&&ca[KIND]==2&&cb[KIND]==2&&j<30)j=30;
+  if(params[31]&&ca[KIND]==2&&cb[KIND]==2){u32 key=a<b?((u32)a<<16)|(u32)b:((u32)b<<16)|(u32)a,slot=(key*2654435761u)&(BONDS-1);while(bond_keys[slot]){if(bond_keys[slot]==key)return j-bond_strength[slot];slot=(slot+1)&(BONDS-1);}}
+  return j;
 }
 static inline double activity_at(int i){int id=grid[i];double product=activity[i];if(!id||!product)return 0;int n=1,*ns=neighbors+i*8;for(int k=0;k<nc[i];k++){int j=ns[k];if(grid[j]==id){int v=activity[j];if(!v)return 0;product*=v;n++;}}return js_pow(product,1./n);}
-static inline double shape_energy(int tgt,double *m){if(!m[HAS_NUCLEUS]||m[DYING])return 0;double d=__builtin_sqrt(distance2(tgt,m))/m[SOFT_REACH]-1;if(d<0)d=0;return(m[KIND]==1?5:m[KIND]==2?10:18)*(d*d);}
+static inline double shape_energy(int tgt,double *m){
+  if(!m[HAS_NUCLEUS]||m[DYING])return 0;
+  if(m[MORPHOLOGY]){double dx=(tgt>>ybits)-m[NX],dy=(tgt&((1<<ybits)-1))-m[NY];if(wrap){if(dx>width/2.)dx-=width;else if(dx< -width/2.)dx+=width;if(dy>height/2.)dy-=height;else if(dy< -height/2.)dy+=height;}
+    double distance=__builtin_sqrt(dx*dx+dy*dy),outside=distance-m[CORE],process_gap=1e300;if(outside<0)outside=0;
+    int end=(int)m[SEGMENT_START]+(int)m[SEGMENT_COUNT]*6;
+    for(int k=(int)m[SEGMENT_START];k<end;k+=6){double ax=segments[k],ay=segments[k+1],bx=segments[k+2],by=segments[k+3],r0=segments[k+4],r1=segments[k+5],vx=bx-ax,vy=by-ay,px=dx-ax,py=dy-ay,length2=vx*vx+vy*vy,t=length2?(px*vx+py*vy)/length2:0;if(t<0)t=0;if(t>1)t=1;double ex=px-t*vx,ey=py-t*vy,radius=r0+(r1-r0)*t,gap=__builtin_sqrt(ex*ex+ey*ey)-radius;if(gap<0)gap=0;if(gap<outside)outside=gap;if(gap<process_gap)process_gap=gap;}
+    double forward=(distance-m[CORE])/(5*m[SCALE]),weight=process_gap/(1.5*m[SCALE]);if(forward<0)forward=0;if(forward>1)forward=1;if(weight<0)weight=0;if(weight>1)weight=1;
+    return m[BRANCH_PENALTY]*outside*outside-m[PROTRUSION_FORCE]*(forward*(1-weight));
+  }
+  double d=__builtin_sqrt(distance2(tgt,m))/m[SOFT_REACH]-1;if(d<0)d=0;return(m[KIND]==1?5:m[KIND]==2?10:18)*(d*d);
+}
 __attribute__((export_name("energy"))) double energy(int src,int tgt,int a,int b){
   double *ca=cell(a),*cb=cell(b),hs=0,ht=0;int da=0,db=0,*ns=neighbors+tgt*8;
   for(int k=0;k<nc[tgt];k++){int n=grid[ns[k]];if(n!=a)hs+=adhesion(n,a);if(n!=b)ht+=adhesion(n,b);da+=n==a?-1:1;db+=n==b?1:-1;}

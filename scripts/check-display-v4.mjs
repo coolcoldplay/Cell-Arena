@@ -8,7 +8,7 @@ try{
   for(let i=0;i<150;i++){if(await evaluate('!!window.artistooLab?.snapshot'))break;await delay(100);}await evaluate('artistooLab.rpc("playing",{value:false})');
   await click('#clear-overlays');
   const initial=await evaluate(`({renderer:artistooLab.renderer,modules:document.querySelectorAll('aside details.section').length,open:document.querySelectorAll('aside details.section[open]').length,visibleSliders:[...document.querySelectorAll('aside input[type=range]')].filter(e=>e.checkVisibility()).length})`);
-  check(initial.renderer.gpu&&!initial.renderer.error,'Updated WebGL shader runs on the GPU',initial);check(initial.modules===9&&initial.open===0&&initial.visibleSliders===0,'Parameter modules start collapsed with no slider wall',initial);
+  check(initial.renderer.gpu&&!initial.renderer.error,'Updated WebGL shader runs on the GPU',initial);check(initial.modules===10&&initial.open===0&&initial.visibleSliders===0,'Parameter modules start collapsed with no slider wall',initial);
   await evaluate(`window.pixel=(x,y)=>{const c=document.getElementById('world'),s=artistooLab.snapshot;return Array.from(c.getContext('2d').getImageData(Math.floor((x+.5)*c.width/s.width),Math.floor((y+.5)*c.height/s.height),1,1).data).slice(0,3);};
     window.findSite=(kind)=>{const s=artistooLab.snapshot,m=new Map(s.cells.map(c=>[c.id,c]));for(let y=5;y<s.height-5;y++)for(let x=5;x<s.width-5;x++){const q=y*s.width+x,id=s.grid[q];if((m.get(id)?.kind||0)===kind&&!s.walls[q]&&[q-1,q+1,q-s.width,q+s.width].every(j=>s.grid[j]===id&&!s.walls[j]))return {x,y};}};
     window.mediumSite=findSite(0);window.normalSite=findSite(1);artistooLab.render();`);

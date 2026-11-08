@@ -5,14 +5,28 @@
   const BODY_COLORS=[[243,245,241],[204,204,204],[0,0,0],[233,154,154],[93,108,111],[160,139,102],[153,0,0]];
   const immuneActive=m=>m?.kind===3&&m.activation>0;
   const displayKind=m=>m?.state==='abnormal'?5:immuneActive(m)?6:m?.kind||0;
+  const COLOR_DEFAULTS={normal:{body:'#cccccc',nucleus:'#243b53'},abnormal:{body:'#a08b66',nucleus:'#243b53'},tumor:{body:'#000000',nucleus:'#f2d38a'},immune:{body:'#e99a9a',nucleus:'#8f3548'},activated:{body:'#990000',nucleus:'#f2d38a'},proliferationShading:true};
+  const colorKey=m=>m?.state==='abnormal'?'abnormal':m?.kind===3?(immuneActive(m)?'activated':'immune'):m?.kind===2?'tumor':'normal';
+  const hexRGB=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
+  function normalizeColors(value){
+    const result={proliferationShading:value?.proliferationShading!==false};
+    for(const key of ['normal','abnormal','tumor','immune','activated']){result[key]={};for(const part of ['body','nucleus']){const c=value?.[key]?.[part];result[key][part]=typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c)?c.toLowerCase():COLOR_DEFAULTS[key][part];}}
+    return result;
+  }
+  const paletteBodies=palette=>{const colors=BODY_COLORS.map(c=>c.slice());for(const [i,key] of [[1,'normal'],[2,'tumor'],[3,'immune'],[5,'abnormal'],[6,'activated']])colors[i]=hexRGB(palette[key].body);return colors;};
   // Fixed scale across scenes and generations, using the heritable trait,
   // not transient nutrient suppression or a population-relative ranking.
   const gray=Array.from({length:89},(_,v)=>[v,v,v]);
   const tumorShade=m=>Math.round(88*(1-clamp(((m?.genome?.proliferation??1)-.25)/2.75)));
-  const bodyColor=m=>m?.kind===2?gray[tumorShade(m)]:BODY_COLORS[displayKind(m)];
+  const bodyColor=(m,palette)=>{
+    if(!palette)return m?.kind===2?gray[tumorShade(m)]:BODY_COLORS[displayKind(m)];
+    if(!m||m.kind===0||m.kind===4)return BODY_COLORS[m?.kind||0];
+    const base=hexRGB(palette[colorKey(m)].body),t=m.kind===2&&palette.proliferationShading?tumorShade(m)/255:0;
+    return base.map(v=>Math.round(v+(255-v)*t));
+  };
   const cellName=m=>m?.state==='abnormal'?'异常中间态':m?.kind===3?(immuneActive(m)?'已激活免疫细胞':'未激活免疫细胞'):['培养液','正常细胞','肿瘤细胞','免疫细胞','实体障碍'][m?.kind||0];
   const nucleusStyles={normal:{stroke:'#243b53',fill:'#243b531a'},patrol:{stroke:'#8f3548',fill:'#8f35481a'},dark:{stroke:'#f2d38a',fill:'#f2d38a1a'}};
-  const nucleusStyle=m=>m.kind===1?nucleusStyles.normal:m.kind===3&&!immuneActive(m)?nucleusStyles.patrol:nucleusStyles.dark;
+  const nucleusStyle=(m,palette)=>{if(palette){const stroke=palette[colorKey(m)].nucleus;return {stroke,fill:stroke+'1a'};}return m.kind===1?nucleusStyles.normal:m.kind===3&&!immuneActive(m)?nucleusStyles.patrol:nucleusStyles.dark;};
   // At ordinary opacity keep bodies legible; the upper half of each slider
   // deliberately releases that protection. 100% means a full-strength layer.
   const bodyOpacity=(u,protect=true)=>clamp(u)*(protect?.28+.72*clamp((u-.5)*2):1);
@@ -58,5 +72,5 @@
     const wall=!!s.walls[q],blocked=wall||!!s.fieldMask?.[bin];
     return {x,y,bin,time:s.time,cell:s.cells.find(m=>m.id===s.grid[q])||null,wall,blocked,values:blocked?null:Object.fromEntries(['oxygen','glucose','acid',...Object.keys(SIGNALS)].map(key=>[key,s.fields[key].values[bin]]))};
   }
-  globalThis.CellLabDisplay={BODY_COLORS,SIGNALS,FIELD_INFO,immuneActive,displayKind,tumorShade,bodyColor,cellName,nucleusStyle,bodyOpacity,adversity,signals,sample,Cache};
+  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,normalizeColors,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,displayKind,tumorShade,bodyColor,cellName,nucleusStyle,bodyOpacity,adversity,signals,sample,Cache};
 })();

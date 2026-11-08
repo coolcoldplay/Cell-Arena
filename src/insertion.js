@@ -87,12 +87,12 @@
     // Add before removing, preserving each existing cell's ID and metadata.
     for(const [i,id] of changes)if(id){s.C.setpixi(i,id);s.act.setActivity(i,0);}
     for(const [i,id] of changes)if(!id){s.C.setpixi(i,0);s.act.setActivity(i,0);}
-    let yielded=0;for(const id of changed){const c=cells.get(id),m=c.m;m.nucleusX=c.nx;m.nucleusY=c.ny;m.sectionFraction=c.fraction*Math.min(1,c.points.size/c.initial);if(m.sectionFraction<c.fraction)yielded++;s.updateMechanics(m);}
+    let yielded=0;for(const id of changed){const c=cells.get(id),m=c.m;s.section.rebaseNucleus(m,c.nx,c.ny);m.sectionFraction=c.fraction*Math.min(1,c.points.size/c.initial);if(m.sectionFraction<c.fraction)yielded++;s.updateMechanics(m);}
     s.C.stat_values={};s.refreshPositions();
     const id=s.seed(kind,x,y,radius,{manual:true});
     if(!id)throw Error('Insertion draft failed its final geometry invariant');
     for(const [key,h] of s.histories)if(changed.has(h.ctl)||changed.has(h.target))s.histories.delete(key);
-    s.scanContacts();s.immuneInteractions(0);s.prepareEnvironment();
+    s.scanContacts();s.section.updateJunctions(0);s.immuneInteractions(0);s.prepareEnvironment();
     s.lastSeedResult={...s.lastSeedResult,inserted:true,displaced:changed.size,yielded};s.log('manual-insert',id,0,{displaced:changed.size,yielded});return id;
   }
   globalThis.CellLabInsertion={insert};

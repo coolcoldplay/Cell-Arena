@@ -180,6 +180,8 @@ dS = B²/(220 × 耐受性) - max(0, 0.18-B)/160
 
 ## 机制参考
 
+可选的间质样胞体、动态伪足与肿瘤接触网络，以及独立显示配色，详见 [MORPHOLOGY.md](MORPHOLOGY.md)。原有三个情境默认仍使用紧凑形态；动态分枝不修改免疫的薄颈和核区保护，也不替代实际接触判定。
+
 下面的原始研究支持借鉴方向，不验证本演示中的参数、有限免疫预算或定量预测。
 
 - Wortel & Textor, 2021. [Artistoo, a library to build, share, and explore simulations of cells and tissues in the web browser](https://doi.org/10.7554/eLife.61288)。官方 CPM，固定提交见 README。
