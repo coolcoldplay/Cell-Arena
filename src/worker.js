@@ -39,7 +39,7 @@ async function handle(event){
     else if(command==='clearWalls')sim.clearWalls();
     else if(command==='divide'){
       const target=payload.id||sim.live().filter(c=>!c.dying).sort((a,b)=>sim.C.getVolume(b.id)-sim.C.getVolume(a.id))[0]?.id;value=sim.divide(target);
-    }else if(command==='export')value={version:'4.0.0',kernel:sim.kernel,compute:backend.info(),scene:sim.scene,scenario:sim.scenarioReport(),supplyMap:Array.from(sim.supplyMap),boundary:sim.boundary,seed:sim.seedValue,worldWidth:sim.worldWidth,worldHeight:sim.worldHeight,refinement:sim.scale,settings:sim.settings,time:sim.C.time,history:sim.populationHistory(),events:sim.events,counters:sim.counters,lineage:sim.lineage,cells:sim.snapshot().cells};
+    }else if(command==='export')value={version:'4.0.0',kernel:sim.kernel,compute:backend.info(),scene:sim.scene,scenario:sim.scenarioReport(),supplyMap:Array.from(sim.supplyMap),boundary:sim.boundary,seed:sim.seedValue,worldWidth:sim.worldWidth,worldHeight:sim.worldHeight,refinement:sim.scale,settings:sim.settings,time:sim.C.time,history:sim.populationHistory(),events:sim.events,counters:sim.counters,deaths:sim.deathSummary(),deathHistory:sim.deathHistory,lineage:sim.lineage,cells:sim.snapshot().cells};
     else if(command==='snapshot')value={time:sim.C.time,cells:sim.live().length};
     else throw Error('Unknown command: '+command);
     if(['seed','sprinkle','divide'].includes(command))sim.record();

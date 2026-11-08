@@ -1,0 +1,47 @@
+import {openBrowser,delay} from './browser-session.mjs';
+import {mkdir,writeFile} from 'node:fs/promises';
+const target=process.argv[2]||'dist/index.html',out='output/death-palettes/'+(target.startsWith('https:')?'live':'local');await mkdir(out,{recursive:true});
+const b=await openBrowser(target,9393,{gpu:true}),{evaluate,call}=b,checks=[];
+const check=(ok,name,data={})=>{checks.push({name,passed:!!ok,...data});if(!ok)throw Error(name+' '+JSON.stringify(data));};
+const wait=async expression=>{for(let i=0;i<200;i++){if(await evaluate(expression))return;await delay(100);}throw Error('Timed out: '+expression);};
+const click=async selector=>{const point=await evaluate(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});e.scrollIntoView({block:'center'});const r=e.getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2};})()`);for(const type of ['mousePressed','mouseReleased'])await call('Input.dispatchMouseEvent',{type,...point,button:'left',buttons:type==='mousePressed'?1:0,clickCount:1});await delay(60);};
+const shot=async name=>{const image=await call('Page.captureScreenshot',{format:'png'});await writeFile(out+'/'+name+'.png',Buffer.from(image.data,'base64'));};
+try{
+  await wait('!!window.artistooLab?.snapshot&&artistooLab.snapshot.speed===4');await evaluate(`artistooLab.rpc('playing',{value:false})`);
+  await evaluate(`(async()=>{await artistooLab.rpc('start',{scene:'hot',warmup:0,seed:17});await artistooLab.rpc('advance',{steps:150});})()`);
+  await click('#module-colors > summary');await click('#clear-overlays');
+  await evaluate(`document.getElementById('nuclei').checked=true;document.getElementById('cell-seams').checked=true;window.paletteShots=[];window.frozen=JSON.stringify({time:artistooLab.snapshot.time,grid:[...artistooLab.snapshot.grid],counters:artistooLab.snapshot.counters,settings:artistooLab.snapshot.settings});`);
+  check(await evaluate(`document.querySelectorAll('[data-palette]').length===4`),'Four accessible preset buttons are available');
+  for(const id of ['slate','porcelain','lagoon','violet']){
+    await click(`[data-palette="${id}"]`);await evaluate('artistooLab.render()');
+    const match=await evaluate(`(()=>{const p=CellLabDisplay.COLOR_PRESETS[${JSON.stringify(id)}],s=artistooLab.snapshot;paletteShots.push({name:p.name,description:p.description,colors:p.colors,image:document.getElementById('world').toDataURL('image/png')});return {name:document.getElementById('palette-status').textContent,preset:CellLabDisplay.colorPresetID(artistooLab.colors),pressed:document.querySelector('[data-palette="${id}"]').getAttribute('aria-pressed'),unchanged:JSON.stringify({time:s.time,grid:[...s.grid],counters:s.counters,settings:s.settings})===frozen,fields:[...document.querySelectorAll('#color-controls input')].every(e=>{const parts=e.id.split('-');return e.value===p.colors[parts[1]][parts[2]];})};})()`);
+    check(match.preset===id&&match.pressed==='true'&&match.unchanged&&match.fields,'Preset applies both body and nuclear colors without changing physics: '+id,match);
+  }
+  await shot('palette-controls');
+  const exported=await evaluate('artistooLab.exportData()');check(exported.display.cellColors.tumor.body==='#30253d','Export retains the selected palette');
+  // Side-by-side evidence uses the same frozen culture, captured from the real
+  // renderer. This gallery is only a test artifact, not extra simulation state.
+  await evaluate(`(()=>{const gallery=document.createElement('section');gallery.id='palette-gallery';gallery.style.cssText='position:absolute;inset:0 auto auto 0;width:1440px;min-height:1000px;background:#111a20;z-index:10000;padding:24px 38px;color:#e5ece7;';const heading=document.createElement('h1');heading.textContent='Cell-Arena · 四套细胞配色';heading.style.cssText='margin:0 0 6px;font-size:25px';gallery.append(heading);const note=document.createElement('p');note.textContent='同一暂停时刻 · 同一细胞状态 · 从左到右：正常、异常、肿瘤、免疫、激活';note.style.cssText='margin:0 0 15px;font-size:12px;color:#9aaca7';gallery.append(note);const grid=document.createElement('div');grid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:16px 22px';for(const p of paletteShots){const card=document.createElement('div');card.style.cssText='border:1px solid #384750;border-radius:10px;padding:12px;background:#1a272e';const line=document.createElement('div');line.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:10px';const title=document.createElement('b');title.textContent=p.name;title.style.fontSize='16px';line.append(title);const swatches=document.createElement('div');swatches.style.cssText='display:flex;gap:7px';for(const key of ['normal','abnormal','tumor','immune','activated']){const swatch=document.createElement('i');swatch.style.cssText='display:block;width:20px;height:20px;border-radius:50%;border:1px solid #ffffff50;background:'+p.colors[key].body;swatches.append(swatch);}line.append(swatches);card.append(line);const img=document.createElement('img');img.src=p.image;img.style.cssText='display:block;width:100%;height:350px;object-fit:cover;border-radius:5px;image-rendering:auto';card.append(img);grid.append(card);}gallery.append(grid);document.body.append(gallery);window.scrollTo(0,0);})()`);
+  await delay(100);await shot('palette-comparison');await evaluate(`document.getElementById('palette-gallery').remove()`);
+  await call('Page.reload');await wait('!!window.artistooLab?.snapshot&&artistooLab.snapshot.speed===4');await evaluate(`artistooLab.rpc('playing',{value:false})`);
+  check(await evaluate(`CellLabDisplay.colorPresetID(artistooLab.colors)==='violet'&&document.getElementById('palette-status').textContent.includes('雾紫')`),'Preset survives reload and is correctly identified');
+  await click('#module-colors > summary');await evaluate(`const input=document.getElementById('color-normal-body');input.value='#123456';input.dispatchEvent(new Event('input',{bubbles:true}));`);
+  check(await evaluate(`document.getElementById('palette-status').textContent.includes('自定义')&&[...document.querySelectorAll('[data-palette]')].every(e=>e.getAttribute('aria-pressed')==='false')`),'Manual edits remain available and mark the palette as custom');
+  await click('[data-palette="slate"]');
+  await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await delay(80);
+  check(await evaluate(`document.documentElement.scrollWidth<=392&&[...document.querySelectorAll('[data-palette]')].every(e=>e.getBoundingClientRect().right<=390)`),'All preset controls fit the mobile viewport');await shot('palette-mobile');
+  await call('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});
+  await evaluate(`(async()=>{await artistooLab.rpc('start',{scene:'empty',width:96,height:72,warmup:0,seed:17,settings:{growth:0,immuneGrowth:0,metabolism:0,apoptosis:30,tumorMotility:0}});for(let y=10;y<70;y+=17)for(let x=10;x<94;x+=17)await artistooLab.rpc('seed',{kind:2,x,y});})()`);
+  const initial=await evaluate('artistooLab.snapshot.cells.length');let pending;
+  for(let n=0;n<120;n++){await evaluate(`artistooLab.rpc('advance',{steps:10})`);pending=await evaluate(`({d:artistooLab.snapshot.deaths.spontaneous,time:artistooLab.snapshot.time,count:Number(document.getElementById('death-count').textContent),progress:document.getElementById('death-progress').textContent})`);if(pending.d.clearing)break;}
+  check(pending.d.clearing>0&&pending.count===pending.d.started&&pending.d.started===pending.d.clearing+pending.d.cleared&&pending.progress.includes('清除中 '+pending.d.clearing),'Apoptosis appears at onset while the real body is still clearing',pending);
+  await click('#death-ledger > summary');await shot('death-pending');
+  await evaluate(`artistooLab.rpc('advance',{steps:3000})`);
+  const deathExport=await evaluate('artistooLab.exportData()'),d=deathExport.deaths.spontaneous;
+  check(initial-deathExport.cells.length===d.cleared&&deathExport.deathHistory.length===d.started&&deathExport.deathHistory.filter(r=>r.clearedAt!==null).length===d.cleared,'Export accounts for every initiated and completed death',{initial,remaining:deathExport.cells.length,summary:d,records:deathExport.deathHistory.length});
+  check(deathExport.events.filter(e=>e.type==='removed'&&e.cause==='spontaneous').length===d.cleared,'Both removal paths retain the cause in completion events');
+  check(await evaluate(`document.getElementById('recent-deaths').children.length===Math.min(8,artistooLab.snapshot.deaths.spontaneous.started)&&document.getElementById('death-summary').textContent.includes('自发凋亡：触发')`),'Recent records and separate cause totals are visible');
+  await writeFile(out+'/death-history.json',JSON.stringify({deaths:deathExport.deaths,deathHistory:deathExport.deathHistory},null,2));await shot('death-completed');
+  check(b.errors.length===0&&await evaluate('artistooLab.errors.length===0'),'No browser or Worker errors');
+}catch(error){console.error(error);checks.push({passed:false,error:String(error)});process.exitCode=1;await shot('failure');}
+finally{await writeFile(out+'/checks.json',JSON.stringify(checks,null,2));console.log(JSON.stringify(checks,null,2));await b.close();}

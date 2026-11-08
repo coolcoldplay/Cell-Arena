@@ -86,7 +86,11 @@ npm run verify:build
 
 POPULATION HISTORY 显示本次模拟从 0 MCS 到当前查看时刻的完整时间范围，不再删除早期数量记录。每 30 MCS 采样，手动新增／分裂即时记入，当前数量补齐到曲线右端；暂停时横轴停止，重新开始时清空旧历史。长记录只在绘图时按时间区间保留各类细胞的峰谷，原始采样仍完整保存。
 
-导出 PNG 或 JSON。JSON 包含配置、情境初态与实际进度、空间补给／清除系数图、细胞表型、从开局到当前的完整数量采样历史、最近事件和有限长度谱系记录，**不是完整可恢复的状态检查点**。
+「细胞配色」提供岩灰·珊瑚（推荐）、瓷白·朱砂、雾青·胭脂、雾紫·玫瑰四套方案。点击即刻切换五种状态的胞体／胞核，仍可逐项自定义并保存在本浏览器；不会重置模型或改变生物学。原始配色可一键恢复。
+
+“自发凋亡已触发”在开始缩小时立即计数，旁边分别显示清除中和已清除数量。“死亡记录”展开后可查看各原因统计及最近 8 次死亡；完整死亡档案保留本局所有记录，包含稳定出生编号、死亡原因、触发与清除时刻，避免被滚动交互事件挤出。
+
+导出 PNG 或 JSON。JSON 包含配置、情境初态与实际进度、空间补给／清除系数图、细胞表型、从开局到当前的完整数量采样历史及 `deathHistory` 死亡记录、最近交互事件和有限长度谱系记录，**不是完整可恢复的状态检查点**。
 
 ## 验证
 
@@ -95,12 +99,15 @@ npm test
 npm run test:browser
 npm run test:gpu
 npm run test:display
+npm run test:deaths
 npm run test:surveillance
 node scripts/check-hires-interaction.mjs
 npm run benchmark
 ```
 
 - `tests/model.test.mjs`：原有接触／杀伤／边界／扩散／拖动等回归。
+- `tests/death-accounting.test.mjs`：触发与清除分别计数、两条移除路径、各死亡原因、重复清理、滚动交互日志之外的完整死亡档案及 JS/WASM 一致性。
+- `tests/custom-colors.test.mjs`、`scripts/check-death-palettes.mjs`：四套配色的核区对比、真实按钮切换与保存、只读显示、死亡过程与导出、移动端布局。
 - `tests/unrestricted-growth.test.mjs`：旧数量参数不影响生长／分裂／随机轨迹，超过 2048 颗仍可播种，保留营养与空间约束、有限免疫分裂和大病灶几何开局。
 - `tests/immune-mobility.test.mjs`：受压时停止虚增生物量；在真实贴满的肿瘤层中，代谢正常且分裂次数耗尽的免疫细胞仍可局部趋化穿行，核区和连通性保持。`scripts/probe-immune-stalling.mjs` 保存高密度停滞的前后对照，见 `output/immune-stalling/`。
 - `tests/hires-interaction.test.mjs`：忽略旧预算、播种失败原因、大区域开局、3×／4× 尺度、1024×768 的 WASM 储存边界与逐步 JS 一致性、真实识别配色和增殖灰度。

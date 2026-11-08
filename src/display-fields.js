@@ -6,12 +6,23 @@
   const immuneActive=m=>m?.kind===3&&m.activation>0;
   const displayKind=m=>m?.state==='abnormal'?5:immuneActive(m)?6:m?.kind||0;
   const COLOR_DEFAULTS={normal:{body:'#cccccc',nucleus:'#243b53'},abnormal:{body:'#a08b66',nucleus:'#243b53'},tumor:{body:'#000000',nucleus:'#f2d38a'},immune:{body:'#e99a9a',nucleus:'#8f3548'},activated:{body:'#990000',nucleus:'#f2d38a'},proliferationShading:true};
+  const COLOR_PRESETS={
+    slate:{name:'岩灰 · 珊瑚',description:'冷灰胞体，珊瑚免疫',colors:{normal:{body:'#aebfc6',nucleus:'#36515f'},abnormal:{body:'#d5ac78',nucleus:'#76512d'},tumor:{body:'#202b33',nucleus:'#d9e4e9'},immune:{body:'#efb1ad',nucleus:'#9b4e53'},activated:{body:'#aa3449',nucleus:'#ffe0d9'},proliferationShading:true}},
+    porcelain:{name:'瓷白 · 朱砂',description:'暖灰组织，朱砂激活',colors:{normal:{body:'#c9c2b8',nucleus:'#655c55'},abnormal:{body:'#cbb070',nucleus:'#6d5228'},tumor:{body:'#302a2a',nucleus:'#f1dfbd'},immune:{body:'#efb8ab',nucleus:'#944d47'},activated:{body:'#b13b36',nucleus:'#ffe2d4'},proliferationShading:true}},
+    lagoon:{name:'雾青 · 胭脂',description:'青灰基调，胭脂点缀',colors:{normal:{body:'#a8c2bb',nucleus:'#3d6058'},abnormal:{body:'#c4aa79',nucleus:'#695330'},tumor:{body:'#173b3b',nucleus:'#d7ede5'},immune:{body:'#edb5c3',nucleus:'#9a5268'},activated:{body:'#a33153',nucleus:'#ffe0e7'},proliferationShading:true}},
+    violet:{name:'雾紫 · 玫瑰',description:'灰紫组织，玫瑰免疫',colors:{normal:{body:'#c1bacf',nucleus:'#625574'},abnormal:{body:'#cbb18c',nucleus:'#725836'},tumor:{body:'#30253d',nucleus:'#e5d9f2'},immune:{body:'#efb6c4',nucleus:'#9b5067'},activated:{body:'#a03260',nucleus:'#ffe2eb'},proliferationShading:true}}
+  };
   const colorKey=m=>m?.state==='abnormal'?'abnormal':m?.kind===3?(immuneActive(m)?'activated':'immune'):m?.kind===2?'tumor':'normal';
   const hexRGB=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
   function normalizeColors(value){
     const result={proliferationShading:value?.proliferationShading!==false};
     for(const key of ['normal','abnormal','tumor','immune','activated']){result[key]={};for(const part of ['body','nucleus']){const c=value?.[key]?.[part];result[key][part]=typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c)?c.toLowerCase():COLOR_DEFAULTS[key][part];}}
     return result;
+  }
+  function colorPresetID(value){
+    const normalized=normalizeColors(value),same=colors=>JSON.stringify(normalizeColors(colors))===JSON.stringify(normalized);
+    for(const [id,preset] of Object.entries(COLOR_PRESETS))if(same(preset.colors))return id;
+    return same(COLOR_DEFAULTS)?'original':'custom';
   }
   const paletteBodies=palette=>{const colors=BODY_COLORS.map(c=>c.slice());for(const [i,key] of [[1,'normal'],[2,'tumor'],[3,'immune'],[5,'abnormal'],[6,'activated']])colors[i]=hexRGB(palette[key].body);return colors;};
   // Fixed scale across scenes and generations, using the heritable trait,
@@ -72,5 +83,5 @@
     const wall=!!s.walls[q],blocked=wall||!!s.fieldMask?.[bin];
     return {x,y,bin,time:s.time,cell:s.cells.find(m=>m.id===s.grid[q])||null,wall,blocked,values:blocked?null:Object.fromEntries(['oxygen','glucose','acid',...Object.keys(SIGNALS)].map(key=>[key,s.fields[key].values[bin]]))};
   }
-  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,normalizeColors,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,displayKind,tumorShade,bodyColor,cellName,nucleusStyle,bodyOpacity,adversity,signals,sample,Cache};
+  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,displayKind,tumorShade,bodyColor,cellName,nucleusStyle,bodyOpacity,adversity,signals,sample,Cache};
 })();

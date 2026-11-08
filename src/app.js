@@ -24,7 +24,7 @@
     ['tumorMotility','肿瘤细胞运动性',0,1.5,.05,'增强前缘活动和侵袭式游走',''],
     ['immuneMotility','免疫细胞运动性',0,1.5,.05,'小体积细胞通过形变和邻居重排穿行',''],
     ['growth','肿瘤生长速度',0,2,.05,'由实际空间、遗传增殖性状、营养和累积压力共同调制',''],
-    ['apoptosis','肿瘤自发凋亡率',0,30,1,'每 1000 MCS 的风险率，独立于免疫杀伤','%'],
+    ['apoptosis','肿瘤自发凋亡强度',0,30,1,'每颗存活肿瘤按模型时间抽样；每 1000 MCS 的风险强度，30% 约对应 26% 发生概率','%'],
     ['antigen','初始抗原阳性比例',0,100,5,'只影响新播种的肿瘤；已有克隆的表达通过遗传与突变改变','%'],
     ['kill','接触杀伤强度',0,2,.1,'只对已识别且仍接触的靶细胞递送损伤',''],
     ['temperature','膜形变波动',2,30,1,'CPM 温度，影响随机复制尝试的接受率',''],
@@ -68,8 +68,19 @@
   const blob=new Blob([$('worker-source').textContent],{type:'text/javascript'}),workerURL=URL.createObjectURL(blob),worker=new Worker(workerURL);
   let sequence=0,snapshot=null,selected=0,tool='move',image=null,dirty=false,toastTimer,lastRevision=-1;
   const colorTypes=[['normal','正常细胞'],['abnormal','异常中间态'],['tumor','肿瘤细胞'],['immune','未激活免疫'],['activated','已激活免疫']];
+  for(const [id,preset] of Object.entries(CellLabDisplay.COLOR_PRESETS)){
+    const button=document.createElement('button');button.type='button';button.className='color-preset';button.dataset.palette=id;button.setAttribute('aria-label','应用'+preset.name+'配色');
+    const name=document.createElement('b');name.textContent=preset.name;button.append(name);
+    const preview=document.createElement('span');preview.className='palette-preview';preview.setAttribute('aria-hidden','true');
+    for(const [key] of colorTypes){const cell=document.createElement('i');cell.style.setProperty('--body',preset.colors[key].body);cell.style.setProperty('--nucleus',preset.colors[key].nucleus);preview.append(cell);}button.append(preview);
+    const description=document.createElement('small');description.textContent=preset.description+(id==='slate'?' · 推荐':'');button.append(description);
+    button.addEventListener('click',()=>applyColors(preset.colors));$('color-presets').append(button);
+  }
   for(const [key,label] of colorTypes){const text=document.createElement('span');text.textContent=label;$('color-controls').append(text);for(const [part,name] of [['body','胞体'],['nucleus','胞核']]){const input=document.createElement('input');input.type='color';input.id='color-'+key+'-'+part;input.setAttribute('aria-label',label+name+'颜色');input.addEventListener('input',()=>applyColors({...cellColors,[key]:{...cellColors[key],[part]:input.value}}));$('color-controls').append(input);}}
   function syncColors(){
+    const preset=CellLabDisplay.colorPresetID(cellColors);
+    $('palette-status').textContent='当前：'+(CellLabDisplay.COLOR_PRESETS[preset]?.name||(preset==='original'?'原始配色':'自定义配色'));
+    for(const button of $('color-presets').children){const active=button.dataset.palette===preset;button.classList.toggle('selected',active);button.setAttribute('aria-pressed',active);}
     for(const [key] of colorTypes)for(const part of ['body','nucleus'])$('color-'+key+'-'+part).value=cellColors[key][part];
     $('proliferation-shading').checked=cellColors.proliferationShading;
     for(const [key,css] of [['normal','normal'],['abnormal','abnormal'],['tumor','tumor'],['immune','immune'],['activated','immune-active']])document.querySelector('.legend .'+css).style.background=cellColors[key].body;
@@ -131,7 +142,17 @@
     $('normal-count').textContent=counts[1]-abnormal;$('abnormal-count').textContent=abnormal;$('tumor-count').textContent=counts[2];$('immune-count').textContent=counts[3];
     $('activated-immune-count').textContent=activated;
     $('seed-status').textContent=`当前 ${s.cells.length} 颗 · 按局部空间尝试加入`;
-    $('division-count').textContent=s.counters.divisions;$('recognition-count').textContent=s.counters.recognitions;$('kill-count').textContent=s.counters.kills;$('death-count').textContent=s.counters.apoptosis;
+    $('division-count').textContent=s.counters.divisions;$('recognition-count').textContent=s.counters.recognitions;$('kill-count').textContent=s.counters.kills;$('death-count').textContent=s.counters.apoptosisStarted;
+    $('death-progress').textContent=`清除中 ${s.deaths.spontaneous.clearing} · 已清除 ${s.deaths.spontaneous.cleared}`;
+    const deathNames={spontaneous:'自发凋亡',kill:'免疫杀伤',environment:'环境死亡'},totals=Object.values(s.deaths);
+    $('death-ledger-count').textContent=`已触发 ${totals.reduce((n,d)=>n+d.started,0)} · 清除中 ${totals.reduce((n,d)=>n+d.clearing,0)}`;
+    $('death-summary').textContent=Object.entries(s.deaths).map(([cause,d])=>`${deathNames[cause]}：触发 ${d.started} · 清除中 ${d.clearing} · 已清除 ${d.cleared}`).join('\n');
+    const deathText=JSON.stringify(s.recentDeaths);
+    if($('recent-deaths').dataset.records!==deathText){
+      $('recent-deaths').dataset.records=deathText;$('recent-deaths').replaceChildren();
+      for(const death of s.recentDeaths.slice().reverse()){const li=document.createElement('li');li.textContent=`${death.startedAt} MCS · #${death.id} · ${deathNames[death.cause]||death.cause} · ${death.clearedAt===null?'清除中':death.clearedAt+' MCS 已清除'}`;$('recent-deaths').append(li);}
+      if(!s.recentDeaths.length){const li=document.createElement('li');li.textContent='本局尚无死亡事件。';$('recent-deaths').append(li);}
+    }
     $('environment-count').textContent=`环境死亡 ${s.counters.environment}（正常 ${s.counters.normalEnvironmentDeaths} · 异常 ${s.counters.abnormalEnvironmentDeaths}）`;$('immune-division-count').textContent='免疫分裂 '+s.counters.immuneDivisions;$('mutation-count').textContent='性状突变 '+s.counters.mutations;
     $('abnormal-events').textContent=`异常发生 ${s.counters.abnormalInitiations} · 恶性转变 ${s.counters.malignantTransitions} · 异常免疫清除 ${s.counters.abnormalKills}`;
     $('grid-info').textContent=`${s.width} × ${s.height} 格点 · ${s.refinement}× 精细度`;
@@ -152,7 +173,7 @@
       if(cell.kind===3)lines.push(`第 ${cell.generation} 代 · 剩余分裂 ${cell.divisionsLeft} 次`,`激活 ${Math.ceil(cell.activation)} MCS · 招募 ${Math.ceil(cell.recruitment)} MCS`);
       if(cell.kind===2&&cell.origin==='normal')lines.push(`源自正常细胞 · ${cell.transformedAt} MCS 恶性转变`);
       if(cell.kind===2&&cell.morphologyMode)lines.push(`${cell.morphologyMode===2?'动态分枝':'梭形双极'} · 伸展／回缩中的突起 ${cell.branchCount} 处 · 稳定接触 ${cell.networkDegree||0} 个邻居`);
-      if(cell.dying)lines.push('死亡原因：'+({environment:'持续代谢压力',kill:'免疫递送损伤',spontaneous:'自发凋亡'}[cell.deathCause]||cell.deathCause));
+      if(cell.dying)lines.push('死亡原因：'+({environment:'持续代谢压力',kill:'免疫递送损伤',spontaneous:'自发凋亡'}[cell.deathCause]||cell.deathCause),`开始凋亡：${cell.deathStartedAt} MCS · 清除中 ${s.time-cell.deathStartedAt} MCS`);
       $('inspection').textContent=lines.join('\n');
     }else{selected=0;$('inspection').textContent='点击细胞，查看局部代谢、活性、抗原、遗传性状与剩余分裂次数。';}
   }
