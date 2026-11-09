@@ -540,6 +540,8 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
 。通讯、代谢、遗传、切面约束和交互为本网页的模型扩展；详细机制参考见模型文档。|. Communication, metabolism, inheritance, section constraints and interaction are extensions in this page; detailed mechanism references are in the model documentation.
 `);
   const templates=[
+    [/^当前存活已检查 (\d+) \/ (\d+)$/,(_,n,total)=>`Living cells inspected: ${n} / ${total}`],
+    [/^本细胞已检查 (\d+) 颗不同组织细胞$/,(_,n)=>`This cell inspected ${n} distinct tissue cells`],
     [/^子代 P(\d+) · 沿谱系分裂 (\d+) 次$/,(_,p,n)=>`Generation P${p} · ${n} divisions along lineage`],
     [/^首达 #([\d/]+) · (\d+) MCS$/,(_,n,t)=>`First #${n} · ${t} MCS`],
     [/^(减小|增大)(.+)$/,(_,action,name)=>`${action==='减小'?'Decrease':'Increase'} ${translate(name)}`],
@@ -560,6 +562,15 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
     [/^正常、异常、肿瘤和免疫细胞数量：从 0 到 (\d+) MCS 的完整过程$/,(_,t)=>`Normal, abnormal, tumor and immune populations from 0 to ${t} MCS`]
   ];
   add(`
+免疫巡逻统计|Immune patrol statistics
+巡逻覆盖率|Patrol coverage
+累计检查的不同细胞|Distinct cells inspected
+巡逻统计口径|How patrol is measured
+覆盖率＝免疫胞体实际经过的面积／当前非障碍面积，封闭区域仍计入分母。拖动路径不计入自主巡逻。|Coverage = area occupied by patrolling immune bodies / current non-wall area, including enclosed regions. Manual drag paths do not count.
+检查需连续膜接触累积达到 6 个有效 MCS，按接触长度和代谢效能加权。正常、异常、肿瘤均可计入；按出生身份去重，分裂子代重新统计。已检查不等于已识别抗原。|Inspection requires 6 effective MCS of uninterrupted membrane contact, weighted by contact length and metabolic fitness. Normal, abnormal and tumor cells count once per birth identity; daughters count separately. Inspection does not imply antigen recognition.
+巡逻转向|Patrol reorientation
+巡逻接触扫描|Patrol contact scanning
+持续巡逻|Persistent patrol
 招募扩散：沿通道|Recruitment: along corridors
 招募扩散：穿墙|Recruitment: through walls
 仅切换招募因子扩散；细胞仍不能穿墙|Switch recruitment diffusion only; cells cannot cross walls
@@ -584,6 +595,62 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
 免疫迷宫需要至少 144 的区域短边|The maze needs a world with its shorter side at least 144 units
 正常细胞铺满培养皿，4 颗免疫细胞分散在单层内部。中心酸清除弱、氧糖补给略低；局部代谢压力经异常中间态推动随机癌变，免疫细胞进行接触监视。|Normal cells fill the dish with 4 immune cells dispersed inside the monolayer. Reduced central acid clearance and nutrient supply allow local stress to drive stochastic transformation through an abnormal state, under contact-based immune surveillance.
 圆心持续释放最强招募信号，入口清除信号；开局已建立沿通道扩散的浓度场。6 颗免疫细胞从等距入口出发，仅凭局部梯度与随机探索前进，胞核进入中心终点区计时。|The center maintains a maximal recruitment source and entrances drain the signal. Diffusion through the passages is equilibrated before the race. Six immune cells start at evenly spaced entrances, using local gradients and random exploration. Arrival is recorded when the nucleus enters the central finish zone.
+`);
+  add(`
+细胞周期与静息|Cell cycle & quiescence
+细胞内标记|Cell markers
+细胞标记|Cell markings
+抗原轮廓|Antigen outline
+周期文字|Cycle labels
+红色轮廓：抗原可识别|Red outline: recognizable antigen
+红色细线标出可识别抗原的肿瘤和异常细胞|Thin red outlines mark tumor and abnormal cells with recognizable antigen
+不显示|None
+细胞核|Nuclei
+细胞周期阶段|Cell cycle phase
+G0 静息 · G1 生长 · S 复制 · G2 准备 · M 分裂|G0 resting · G1 growth · S replication · G2 preparation · M division
+细胞周期与扩增|Cell cycle & expansion
+细胞周期统计|Cell cycle statistics
+细胞周期|Cell cycle
+阶段进度|Phase progress
+周期阻滞|Arrested
+周期推进|Cycle progressing
+整合增殖信号|Integrating proliferation signals
+生长参数关闭|Growth control is off
+氧糖或代谢不足|Insufficient nutrients or metabolic fitness
+酸负荷过高|Excessive acidity
+累积损伤待恢复|Recovering from accumulated injury
+谱系分裂上限|Lineage division limit reached
+慢性刺激耗竭|Chronic stimulation exhaustion
+抗原记忆不足|Insufficient antigen memory
+IL-2 支持不足|Insufficient IL-2 support
+实际空间不足|Insufficient physical space
+等待胞体生长|Waiting for biomass growth
+分裂几何受限|Cytokinesis blocked by geometry
+IL-2 扩增信号|IL-2 expansion signal
+抗原刺激记忆|Antigen stimulation memory
+慢性耗竭|Chronic exhaustion
+局部 IL-2|Local IL-2
+扩增响应|Expansion response
+免疫扩增速度|Immune expansion rate
+新免疫细胞谱系分裂上限|New immune lineage division limit
+肿瘤基础周期|Baseline tumor cycle
+肿瘤压缩静息敏感性|Tumor compression sensitivity
+免疫基础周期|Baseline immune cycle
+抗原刺激记忆半衰期|Antigen memory half-life
+识别后 IL-2 分泌|IL-2 secretion after recognition
+IL-2 半衰期|IL-2 half-life
+慢性刺激耗竭速率|Chronic exhaustion rate
+抗原刺激记忆与 IL-2 共同支持；受营养、耗竭和实际空间限制|Supported jointly by antigen memory and IL-2; limited by nutrients, exhaustion and physical space
+实验性谱系上限；每次分裂，两颗子细胞均扣一次；只影响新播种|Experimental lineage limit; both daughters spend one division; applies to new cells only
+G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环境调节|Baseline G1/S/G2/M duration, modulated by the proliferation trait, growth control and environment
+由实际面积相对切面目标的压缩触发；0 只关闭此生物学闸门，几何限制保留|Triggered by compression relative to the section target; 0 disables this biological gate while retaining geometry constraints
+许可后的基础总时长；停止直接接触不会立即清空扩增记忆|Baseline duration after licensing; leaving a target does not immediately erase expansion memory
+内部扩增许可逐渐衰减，子代继承并稀释；不是即时杀伤激活|Internal expansion license decays and is inherited and diluted by daughters; separate from immediate killing activation
+真实抗原刺激后短时分泌；IL-2 支持扩增，不作为趋化或抗原替代|Short-lived secretion after real antigen stimulation; IL-2 supports expansion without replacing antigen or acting as a chemotactic cue
+独立扩散、衰减和摄取；可用持续场源外源补充|Independent diffusion, decay and uptake; persistent sources provide external supplementation
+持续抗原刺激逐渐降低扩增和杀伤；补足营养不会立即清空耗竭|Chronic antigen stimulation gradually reduces expansion and killing; refeeding does not instantly erase exhaustion
+手动分裂（实验干预）|Manual division (intervention)
+实验干预：绕过周期许可，仍受胞体、胞核和分裂几何限制|Experimental intervention: bypass cycle licensing while retaining body, nucleus and division geometry constraints
 `);
   let terms;
   function translate(value,language='en'){

@@ -56,7 +56,7 @@ try{
   // Inspect real pixels: activity is rendered inside protrusions, not just at boundaries.
   // Factor layers persist independently of the environmental heatmap selector.
   await evaluate('document.getElementById("clear-overlays").click()');
-  await evaluate('document.getElementById("field-view").value="none";document.getElementById("antigen-marks").checked=false;document.getElementById("edge-activity").checked=true;for(const id of ["normal-activity","tumor-activity","immune-activity"])document.getElementById(id).checked=true;document.getElementById("cell-seams").checked=false;artistooLab.render()');
+  await evaluate('document.getElementById("field-view").value="none";for(const id of ["nuclei","antigen-marks","cycle-marks"])document.getElementById(id).checked=false;document.getElementById("edge-activity").checked=true;for(const id of ["normal-activity","tumor-activity","immune-activity"])document.getElementById(id).checked=true;document.getElementById("cell-seams").checked=false;artistooLab.render()');
   const pixels=await evaluate(`(()=>{const s=artistooLab.snapshot,c=document.getElementById('world'),ctx=c.getContext('2d'),scale=c.width/s.width,meta=new Map(s.cells.map(m=>[m.id,m]));let interior=0,plainEdges=0;const colors=[null,[204,204,204],[0,0,0],[153,0,0]];
     for(let y=2;y<s.height-2;y++)for(let x=2;x<s.width-2;x++){const q=y*s.width+x,m=meta.get(s.grid[q]);if(!m||m.dying)continue;const inside=[q-1,q+1,q-s.width,q+s.width].every(j=>s.grid[j]===m.id),a=s.activity[q],rgb=ctx.getImageData(Math.floor((x+.5)*scale),Math.floor((y+.5)*scale),1,1).data;
       if(inside&&a>0&&rgb[0]===Math.min(255,a*2)&&rgb[1]===Math.min(255,(255-a)*2)&&rgb[2]===0)interior++;

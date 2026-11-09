@@ -16,8 +16,8 @@ test('old population budgets do not alter tumor growth, division, random traject
   assert.equal('capacity' in a.s.settings,false);assert.equal('limit' in a.s.snapshot(),false);assert.equal('hardLimit' in a.s.snapshot(),false);
 });
 
-test('activation-driven immune division works beyond old population budgets but still consumes a finite lineage allowance',()=>{
-  const {s,id}=forty(40,3),m=s.cells[id];s.set('immuneGrowth',1);m.activation=700;m.target=m.base*1.7;m.age=200;const remaining=m.divisionsLeft;
+test('licensed immune cytokinesis works beyond old population budgets but still consumes a finite lineage allowance',()=>{
+  const {s,id}=forty(40,3),m=s.cells[id];s.set('immuneGrowth',1);m.antigenMemory=1;s.fields.il2.values.fill(2);m.cycle.phase='M';m.cycle.progress=1;m.target=m.base*1.7;m.age=200;const remaining=m.divisionsLeft;
   s.biology(1);assert.equal(s.live().length,41);assert.equal(s.counters.immuneDivisions,1);assert.equal(m.divisionsLeft,remaining-1);
   for(const c of s.live().filter(c=>c.kind===3))c.divisionsLeft=0;
   const n=s.live().length;assert.equal(s.divide(id),0);assert.equal(s.live().length,n);

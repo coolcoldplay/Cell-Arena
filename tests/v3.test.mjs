@@ -129,6 +129,8 @@ test('metabolic fields use the same no-flux barriers as chemokines',()=>{
 test('immune metabolic inhibition reduces delivered damage and activated growth at identical contact',()=>{
   const healthy=make({antigen:100,kill:1,immuneGrowth:1}),poor=make({antigen:100,kill:1,immuneGrowth:1});
   for(const s of [healthy,poor]){s.seed(2,30,24,5);s.seed(3,40,24,4);for(let n=0;n<30;n++)s.updateLocal(4);s.cells[1].damage=0;}
+  // Hold cycle licensing and supported biomass equal to isolate metabolism.
+  for(const s of [healthy,poor]){const m=s.cells[2];m.antigenMemory=.8;m.cycle.phase='G1';m.target=s.C.getVolume(m.id);s.fields.il2.values.fill(2);}
   poor.fields.oxygen.values.fill(.1);poor.fields.glucose.values.fill(.1);poor.fields.acid.values.fill(.9);poor.updateMetabolism(4);
   for(const s of [healthy,poor]){s.updateLocal(8);s.biology(8);}
   assert.ok(poor.cells[1].damage<healthy.cells[1].damage*.1);assert.ok(poor.cells[2].target<healthy.cells[2].target);
@@ -136,7 +138,7 @@ test('immune metabolic inhibition reduces delivered damage and activated growth 
 
 test('heritable tumor traits change growth, migration mechanics and stress tolerance',()=>{
   const a=make({growth:1,tumorMotility:1}),b=make({growth:1,tumorMotility:1});
-  for(const s of [a,b])s.seed(2,30,24,6);
+  for(const s of [a,b]){s.seed(2,30,24,6);s.cells[1].cycle.phase='G1';s.cells[1].target=s.C.getVolume(1);}
   Object.assign(a.cells[1].genome,{proliferation:.5,invasion:.5,tolerance:.5});Object.assign(b.cells[1].genome,{proliferation:2,invasion:2,tolerance:2});
   const t=a.cells[1].target;a.biology(10);b.biology(10);assert.ok(b.cells[1].target-t>(a.cells[1].target-t)*3);assert.ok(b.cells[1].drive>a.cells[1].drive*3);
   for(const s of [a,b]){s.fields.oxygen.values.fill(.1);s.fields.glucose.values.fill(.1);s.fields.acid.values.fill(.8);s.updateMetabolism(100);}

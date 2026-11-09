@@ -32,7 +32,7 @@ test('basal patrol explores new neighbours in a fully occupied healthy monolayer
 test('compressed cells do not manufacture additional target mass and ratchet their hard area floor above occupied space',()=>{
   for(const kind of [1,2,3]){
     const s=new CellLab.Simulation({width:64,height:48,scene:'empty',warmup:0,settings}),id=s.seed(kind,25,25,5),m=s.cells[id];
-    m.target=kind===1?m.base*.7:kind===2?m.base*.55:m.base*1.6;m.activation=300;m.sectionFraction=.85;s.updateMechanics(m);
+    m.target=kind===1?m.base*.7:kind===2?m.base*.55:m.base*1.6;m.activation=300;m.antigenMemory=1;s.fields.il2.values.fill(2);m.sectionFraction=.85;s.updateMechanics(m);
     const before=m.target,minArea=m.minVisibleArea;assert.ok(s.C.getVolume(id)<m.planarTarget*.9);
     s.biology(20);assert.equal(m.target,before,`kind ${kind} cannot grow without mechanical space`);assert.equal(m.minVisibleArea,minArea);assert.equal(m.target,m.planarTarget+m.offPlaneTarget);
   }

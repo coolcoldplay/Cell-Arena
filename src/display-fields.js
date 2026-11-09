@@ -56,10 +56,36 @@
     // Even the largest contour stays inside the protected circular envelope.
     return nuclearAngles.map(([ux,uy,c3,s3,c4,s4])=>{const r=1+recovery*(.015*(c3*cp-s3*sp)+.009*(s4*cp-c4*sp)),x=a*ux*r,y=b*uy*r;return [x*c-y*s,x*s+y*c];});
   }
+  function cycleText(m){
+    if(m.dying)return '';
+    return ['G0','G1','S','G2','M'].includes(m.cycle?.phase)?m.cycle.phase:'';
+  }
+  const antigenMarked=m=>!!m&&!m.dying&&(m.kind===2||m.state==='abnormal')&&m.antigen;
+  // Smallest occupied interval on each periodic axis. A cell crossing a seam
+  // gets a local box repeated at the edges, never a box spanning the dish.
+  function occupiedInterval(axis,wrap){
+    let first=-1,last=-1,start=0,gap=-1;
+    for(let i=0;i<axis.length;i++)if(axis[i]){
+      if(first<0)first=i;
+      else if(i-last-1>gap){gap=i-last-1;start=i;}
+      last=i;
+    }
+    if(first<0)return null;
+    if(!wrap)return [first,last+1];
+    if(first+axis.length-last-1>=gap){gap=first+axis.length-last-1;start=first;}
+    return [start,start+axis.length-gap];
+  }
+  function selectionBounds(s,id){
+    if(!id)return null;
+    const xs=new Uint8Array(s.width),ys=new Uint8Array(s.height);
+    for(let q=0;q<s.grid.length;q++)if(s.grid[q]===id){xs[q%s.width]=1;ys[Math.floor(q/s.width)]=1;}
+    const wrap=s.boundary==='wrap',x=occupiedInterval(xs,wrap),y=occupiedInterval(ys,wrap);
+    return x&&y?{left:x[0],right:x[1],top:y[0],bottom:y[1]}:null;
+  }
   // At ordinary opacity keep bodies legible; the upper half of each slider
   // deliberately releases that protection. 100% means a full-strength layer.
   const bodyOpacity=(u,protect=true)=>clamp(u)*(protect?.28+.72*clamp((u-.5)*2):1);
-  const SIGNALS={cohesion:{label:'细胞凝聚因子',color:[36,171,132]},danger:{label:'损伤趋化因子',color:[239,140,42]},trail:{label:'免疫招募因子',color:[157,100,219]}};
+  const SIGNALS={cohesion:{label:'细胞凝聚因子',color:[36,171,132]},danger:{label:'损伤趋化因子',color:[239,140,42]},trail:{label:'免疫招募因子',color:[157,100,219]},il2:{label:'IL-2 扩增信号',color:[31,146,205]}};
   const FIELD_INFO={
     adversity:{label:'环境恶劣度',low:[213,237,222],middle:[238,185,73],high:[147,40,71],description:'0 友好 → 1 恶劣；综合低氧、低糖与高酸，不是细胞累计损伤'},
     oxygen:{label:'氧可用量',low:[142,67,96],high:[95,186,184],description:'0 低氧 → 1 补给浓度'},
@@ -77,7 +103,7 @@
     return {width:oxygen.width,height:oxygen.height,values};
   }
   function signals(fields,enabled,opacity={},scales={}){
-    const keys=Object.keys(SIGNALS).filter(k=>enabled.has(k));if(!keys.length)return null;
+    const keys=Object.keys(SIGNALS).filter(k=>enabled.has(k)&&fields[k]);if(!keys.length)return null;
     const f=fields[keys[0]],rgba=new Uint8Array(f.values.length*4);
     for(let i=0;i<f.values.length;i++){
       let total=0,r=0,g=0,b=0,transparent=1;
@@ -87,6 +113,10 @@
     return {width:f.width,height:f.height,rgba};
   }
   class Cache {
+    selection(s,id){
+      if(this.selectionSnapshot!==s||this.selectionID!==id){this.selectionSnapshot=s;this.selectionID=id;this.selectionBox=selectionBounds(s,id);}
+      return this.selectionBox;
+    }
     get(s,view,enabled,opacity={},protect=true){
       if(this.snapshot!==s){this.snapshot=s;this.adverse=null;this.signalMask=null;this.signal=null;}
       if(view==='adversity'&&!this.adverse)this.adverse=adversity(s.fields);
@@ -99,7 +129,7 @@
     if(x<0||y<0||x>=s.width||y>=s.height)return null;
     x=Math.floor(x);y=Math.floor(y);const q=y*s.width+x,bin=Math.floor(y/s.fieldScale)*s.fields.oxygen.width+Math.floor(x/s.fieldScale);
     const wall=!!s.walls[q],blocked=wall||!!s.fieldMask?.[bin];
-    return {x,y,bin,time:s.time,cell:s.cells.find(m=>m.id===s.grid[q])||null,wall,blocked,values:blocked?null:Object.fromEntries(['oxygen','glucose','acid',...Object.keys(SIGNALS)].map(key=>[key,s.fields[key].values[bin]]))};
+    return {x,y,bin,time:s.time,cell:s.cells.find(m=>m.id===s.grid[q])||null,wall,blocked,values:blocked?null:Object.fromEntries(['oxygen','glucose','acid',...Object.keys(SIGNALS)].map(key=>[key,s.fields[key]?.values[bin]??0]))};
   }
-  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,bodyOpacity,adversity,signals,sample,Cache};
+  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,antigenMarked,selectionBounds,bodyOpacity,adversity,signals,sample,Cache};
 })();
