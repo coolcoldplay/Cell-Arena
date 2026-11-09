@@ -102,6 +102,41 @@ dialog{max-width:700px;width:calc(100% - 32px);max-height:86dvh;overflow:auto;ov
 .patrol-metrics{padding:7px 0;border-top:0}.patrol-current{font:12px Consolas,monospace;margin:6px 0}.patrol-definition{font-size:12px;color:var(--muted);line-height:1.6}.patrol-definition summary{cursor:pointer}.patrol-definition p{margin:6px 0}
 .cycle-summary{margin:8px 0;padding:8px 0;border-block:1px solid var(--line);font-size:12px;line-height:1.5}.cycle-summary p{margin:3px 0;overflow-wrap:anywhere}
 .antigen-key i{width:12px;height:9px;background:transparent;border:1px solid #d12f39}
+
+/* A dashboard in the existing sidebar; the arena keeps its full height. */
+.statistics-actions{display:flex;gap:5px;padding:5px 0}.statistics-actions button{flex:1;white-space:nowrap;font-size:12px}
+aside.statistics-focused>:not(.dish-head):not(.sidebar-scroll){display:none!important}
+aside.statistics-focused .sidebar-scroll>:not(#statistics-panel){display:none!important}
+aside.statistics-focused .sidebar-scroll{padding:0 8px 8px;scroll-padding-top:40px}
+aside.statistics-focused #statistics-panel{margin:0;border:0}
+aside.statistics-focused #statistics-panel>summary{display:none}
+aside.statistics-focused .statistics-actions{position:sticky;top:0;z-index:3;background:var(--bg);border-bottom:1px solid var(--line)}
+aside.statistics-focused .legend{gap:4px 9px;padding:5px 0}
+aside.statistics-focused .legend .proliferation-key,aside.statistics-focused .legend .edge-key,aside.statistics-focused .legend .antigen-key,aside.statistics-focused .legend .cycle-key{display:none}
+aside.statistics-focused .metrics{gap:4px;padding:3px 0}
+aside.statistics-focused .metrics>div{padding:3px 5px}
+aside.statistics-focused .metrics b{font-size:18px}
+aside.statistics-focused .metrics span{margin-top:1px}
+aside.statistics-focused .cycle-summary{padding:3px 0;margin:3px 0}
+aside.statistics-focused .patrol-current{margin:3px 0}
+aside.statistics-focused .death-overview{padding:3px 0}
+aside.statistics-focused .death-causes b{margin:1px 0}
+aside.statistics-focused .death-overview>.hint,aside.statistics-focused .death-visual-key,aside.statistics-focused .chart-panel>.hint,aside.statistics-focused .ecology-line>span:last-child:not([id]){display:none}
+aside.statistics-focused .performance-line,aside.statistics-focused .ecology-line{line-height:1.45;padding:4px 0;gap:2px 8px}
+aside.statistics-focused .chart-panel{padding:5px 0}
+aside.statistics-focused #history{height:clamp(85px,11dvh,125px);margin-top:3px}
+aside.statistics-focused #statistics-scenario{margin:0}
+aside.statistics-focused #statistics-scenario>summary{padding:4px 0}
+aside.statistics-focused #scenario-description{display:none}
+aside.statistics-focused .scenario-metrics{margin:3px 0}
+aside.statistics-focused #restore-scenario{display:none}
+aside.statistics-focused .death-ledger{padding:4px 0}
+aside.statistics-focused .death-ledger summary{display:flex;flex-wrap:wrap;gap:4px 8px}
+aside.statistics-focused #record-options{margin-bottom:3px}
+aside.statistics-focused #record-options>summary{padding:4px 0}
+@media(max-width:850px){.statistics-actions button{min-height:40px}.statistics-actions{padding:6px 0}}
+
+@media(max-width:850px){.record-scope-hint{display:none}}
 </style></head>
 <body>
 <main class="workspace">
@@ -153,7 +188,7 @@ dialog{max-width:700px;width:calc(100% - 32px);max-height:86dvh;overflow:auto;ov
 <details class="section" name="parameters" id="module-tumor"><summary><b>肿瘤细胞</b><span>生长 / 侵袭 / 遗传</span></summary><div class="section-body"><div id="tumor-sliders"></div><details class="subsection" id="tumor-evolution-controls"><summary>突变与抗原演化</summary><div id="tumor-evolution-sliders"></div></details><details class="subsection" id="tumor-cycle-controls"><summary>细胞周期与静息</summary><div id="tumor-cycle-sliders"></div></details><details class="subsection" id="module-mechanics"><summary>形态与穿行 <span>分枝 · 成网 · 让位</span></summary><div class="section-body"><label class="select-row">肿瘤形态<select id="tumor-morphology"><option value="0">紧凑 / 阿米巴样</option><option value="1">间质样 · 梭形双极</option><option value="2">胶质瘤样 · 分枝成网</option></select></label><p class="hint">切换后，已有肿瘤逐渐重塑真实胞体。分枝接触持续 20 MCS 后开始稳定连接；分离或死亡即解除。U87 等胶质瘤形态研究启发，未经细胞系标定。</p><div id="branch-sliders"></div><button id="network-demo">重新开始分枝成网示例</button><p id="network-status" class="hint"></p></div></details></div></details>
 <details class="section" name="parameters" id="module-immune"><summary><b>免疫细胞</b><span>巡逻 / 杀伤 / 扩增</span></summary><div class="section-body"><div id="immune-sliders"></div><details class="subsection" id="immune-regulation-controls"><summary>损伤应答与免疫抑制</summary><div id="immune-regulation-sliders"></div></details><details class="subsection" id="immune-cycle-controls"><summary>细胞周期与扩增</summary><div id="immune-cycle-sliders"></div></details></div></details>
 <details class="section" name="parameters" id="module-other"><summary><b>其他</b><span>共用力学 / 计算</span></summary><div class="section-body"><div class="modes" role="group" aria-label="运动规则预设"><button data-mode="wander">分散探索</button><button data-mode="cluster">偏向凝聚</button><button data-mode="flock">偏向群迁</button></div><div id="other-sliders"></div><details class="subsection" id="module-performance"><summary>性能与计算 <span>后端 · 实际速度</span></summary><div class="section-body"><label class="select-row">微环境计算<select id="compute-backend"><option value="auto">自动 · 实测选择</option><option value="cpu">CPU</option><option value="gpu">WebGPU</option></select></label><p id="backend-status" class="hint"></p><p id="compute-note" class="hint"></p><p id="population-load" class="hint" role="status"></p><p class="hint">增殖由空间、营养、累积压力与细胞自身状态决定。算力不足时提示实际速度，继续完整计算形变、接触和微环境；可降低播放倍率或绘图分辨率。</p></div></details></div></details></section>
-      <details id="statistics-panel" class="panel-details"><summary>数量与事件统计</summary><div class="legend"><span><i class="medium"></i>培养液</span><span><i class="normal"></i>正常 <b id="normal-count">0</b></span><span><i class="abnormal"></i>异常 <b id="abnormal-count">0</b></span><span><i class="tumor"></i>肿瘤 <b id="tumor-count">0</b></span><span><i class="immune"></i>免疫 <b id="immune-count">0</b></span><span><i class="immune-active"></i>其中激活 <b id="activated-immune-count">0</b></span><span><i class="immune-suppressive" style="background:#6398d2"></i>其中抑制 <b id="suppressive-immune-count">0</b></span><span class="proliferation-key" title="可遗传的增殖性状，固定范围 0.25–3；实际增殖还受营养、压力与全局生长参数影响"><i></i>肿瘤：灰 → 黑，增殖能力低 → 高</span><span class="edge-key"><i></i>Act：绿＝衰减中 → 红＝新生突起</span><span class="antigen-key"><i></i>红色轮廓：抗原可识别</span><span class="cycle-key" hidden>G0 静息 · G1 生长 · S 复制 · G2 准备 · M 分裂</span></div><div class="metrics"><div><b id="rate">—</b><span>实际 MCS / 秒</span></div><div><b id="division-count">0</b><span>总分裂（含免疫）</span></div><div><b id="recognition-count">0</b><span>接触识别</span></div><div><b id="total-death-count">0</b><span>累计死亡清除</span><span id="total-death-progress">清除中 0 · 已触发 0</span></div></div>
+      <details id="statistics-panel" class="panel-details"><summary>数量与事件统计</summary><div class="statistics-actions"><button id="statistics-expand" aria-pressed="false">占满侧栏</button><button id="statistics-play">Ⅱ 暂停</button><button id="statistics-record">● 录制 MP4</button></div><div id="statistics-record-settings"></div><div class="legend"><span><i class="medium"></i>培养液</span><span><i class="normal"></i>正常 <b id="normal-count">0</b></span><span><i class="abnormal"></i>异常 <b id="abnormal-count">0</b></span><span><i class="tumor"></i>肿瘤 <b id="tumor-count">0</b></span><span><i class="immune"></i>免疫 <b id="immune-count">0</b></span><span><i class="immune-active"></i>其中激活 <b id="activated-immune-count">0</b></span><span><i class="immune-suppressive" style="background:#6398d2"></i>其中抑制 <b id="suppressive-immune-count">0</b></span><span class="proliferation-key" title="可遗传的增殖性状，固定范围 0.25–3；实际增殖还受营养、压力与全局生长参数影响"><i></i>肿瘤：灰 → 黑，增殖能力低 → 高</span><span class="edge-key"><i></i>Act：绿＝衰减中 → 红＝新生突起</span><span class="antigen-key"><i></i>红色轮廓：抗原可识别</span><span class="cycle-key" hidden>G0 静息 · G1 生长 · S 复制 · G2 准备 · M 分裂</span></div><div class="metrics"><div><b id="rate">—</b><span>实际 MCS / 秒</span></div><div><b id="division-count">0</b><span>总分裂（含免疫）</span></div><div><b id="recognition-count">0</b><span>接触识别</span></div><div><b id="total-death-count">0</b><span>累计死亡清除</span><span id="total-death-progress">清除中 0 · 已触发 0</span></div></div>
       <div class="metrics patrol-metrics" role="group" aria-label="免疫巡逻统计"><div><b id="patrol-coverage">0.0%</b><span>巡逻覆盖率</span></div><div><b id="patrol-checked">0</b><span>累计检查的不同细胞</span></div></div>
       <div class="cycle-summary" role="group" aria-label="细胞周期统计"><b>细胞周期</b><p id="cycle-tumor"></p><p id="cycle-immune"></p></div>
       <p id="patrol-current" class="patrol-current">当前存活已检查 0 / 0</p>
@@ -172,13 +207,13 @@ dialog{max-width:700px;width:calc(100% - 32px);max-height:86dvh;overflow:auto;ov
       <div class="ecology-line"><span id="environment-count">环境死亡 0</span><span id="immune-division-count">免疫分裂 0</span><span id="mutation-count">性状突变 0</span><span id="grid-info">正在准备格点</span></div>
       <div class="ecology-line"><span id="evolution-events"></span><span id="immune-regulation-events"></span><span id="abnormal-events">异常发生 0 · 恶性转变 0 · 异常免疫清除 0</span><span>悬停画布查看局部资源与因子浓度</span></div>
       <details class="death-ledger" id="death-ledger"><summary>死亡记录 <span id="death-ledger-count">已清除 0 · 清除中 0</span></summary><p class="hint">触发后进入相应死亡过程，胞体消失时记为清除；三种原因分别统计。下方按清除和触发分别显示最近 8 次，导出实验数据包含本局完整记录。</p><div id="death-summary"></div><h3>最近从画面清除</h3><ol id="recent-clearances"></ol><h3>最近触发死亡</h3><ol id="recent-deaths"></ol></details>
-      <div class="chart-panel"><div><span class="eyebrow">POPULATION HISTORY</span><span id="history-range">全程 0 — 0 MCS</span><span id="order">极性一致度 —</span></div><canvas id="history" width="960" height="125" aria-label="正常、异常、肿瘤和免疫细胞数量随模型时间变化"></canvas><p class="hint">从开局到当前时刻；每 30 MCS 采样，手动新增／分裂即时记入，当前数量实时补齐。长记录绘图保留峰谷，导出包含完整采样。</p></div><details class="subsection"><summary>情境进度与开局</summary><section id="scenario-guide" class="scenario-guide" aria-label="情境设定与实际进度">
-    <div class="scenario-heading"><b id="scenario-phase">正在准备情境</b><span id="scenario-configuration">预设参数</span><button id="restore-scenario" class="quiet" title="恢复当前情境的参数和种子 17，保留区域、精细度与边界选择">恢复情境设定 ↺</button></div>
+      <div class="chart-panel"><div><span class="eyebrow">POPULATION HISTORY</span><span id="history-range">全程 0 — 0 MCS</span><span id="order">极性一致度 —</span></div><canvas id="history" width="960" height="125" aria-label="正常、异常、肿瘤和免疫细胞数量随模型时间变化"></canvas><p class="hint">从开局到当前时刻；每 30 MCS 采样，手动新增／分裂即时记入，当前数量实时补齐。长记录绘图保留峰谷，导出包含完整采样。</p></div><details class="subsection" id="statistics-scenario"><summary>情境进度与开局</summary><section id="scenario-guide" class="scenario-guide" aria-label="情境设定与实际进度">
+    <div class="scenario-heading"><b id="scenario-phase">正在准备情境</b><span id="scenario-configuration">预设参数</span><button id="restore-scenario" class="quiet" title="恢复当前情境的参数和推荐种子，保留区域、精细度与边界选择">恢复情境设定 ↺</button></div>
     <p id="scenario-description"></p><div id="scenario-metrics" class="scenario-metrics"></div><small id="scenario-setup"></small>
   </section>
 </details></details>
       <details id="mobile-tools" class="panel-details mobile-only"><summary>画布工具</summary><div id="mobile-tools-host"></div></details><details id="mobile-session" class="panel-details mobile-only"><summary>场景与开局</summary><div id="mobile-scenes-host"></div><div id="mobile-session-actions"></div></details>
-      <details id="record-options" class="subsection"><summary>录像设置 <span id="record-options-summary">MP4 · 1440p</span></summary><label class="select-row">视频格式<select id="record-format"><option value="mp4" selected>MP4 · 推荐</option><option value="webm">WebM · 兼容</option></select></label><label class="select-row">录像画质<select id="record-quality"><option value="standard">1080p · 标准</option><option value="high" selected>1440p · 高清</option><option value="ultra">4K · 超清</option></select></label><p id="record-options-info" class="hint"></p><p class="hint">保留画布比例，高清录制时提升绘制精度；4K 文件较大。</p></details>
+      <details id="record-options" class="subsection"><summary>录像设置 <span id="record-options-summary">MP4 · 1440p</span></summary><label class="select-row">录制范围<select id="record-scope"><option value="arena" selected>仅 Arena</option><option value="workspace">Arena ＋ 右侧栏</option></select></label><p class="hint record-scope-hint">组合录制包含侧栏当前可见的内容；统计可先占满侧栏。Arena 30 FPS，侧栏最多每秒刷新 5 次。</p><label class="select-row">视频格式<select id="record-format"><option value="mp4" selected>MP4 · 推荐</option><option value="webm">WebM · 兼容</option></select></label><label class="select-row">录像画质<select id="record-quality"><option value="standard">1080p · 标准</option><option value="high" selected>1440p · 高清</option><option value="ultra">4K · 超清</option></select></label><p id="record-options-info" class="hint"></p><p class="hint">保留画布比例，高清录制时提升绘制精度；4K 文件较大。</p></details>
       <div class="exports"><button id="snapshot">保存画面 ↓</button><button id="export-data">导出实验数据 ↓</button><button id="import-data">导入实验参数 ↑</button><button id="record-video">● 录制 MP4</button></div>
       <input id="import-file" type="file" accept=".json,application/json" hidden><p id="record-status" class="hint" role="status"></p><footer><a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/THIRD_PARTY_NOTICES.md" target="_blank" rel="noreferrer">Artistoo · 来源与许可</a><span>二维模型 · MCS 非真实时间</span></footer>
     </div>
@@ -11923,7 +11958,7 @@ var CPM = (function (exports, module$1) {
   // Phenomenological MCS parameters; not hours or molecular concentrations.
   Object.assign(DEFAULTS,{tumorCycle:240,tumorQuiescence:1,immuneCycle:220,antigenMemory:900,il2Secretion:1,il2HalfLife:180,exhaustionRate:1});
   Object.assign(DEFAULTS,{normalMutationGain:2,tumorMutationGain:2,mutationBias:0,antigenStressGain:.5,contactEscape:.1,signalEscape:.05,evolutionMemory:800});
-  Object.assign(DEFAULTS,{damagePolarization:1,damageDeactivation:1,suppressiveSecretion:1,suppressionStrength:1,immuneRegulationMemory:400});
+  Object.assign(DEFAULTS,{damagePolarization:1,damageDeactivation:1,suppressiveSecretion:1,suppressionStrength:1,immuneRegulationMemory:400,suppressionRecovery:1});
   const newCycle=()=>({phase:'G0',progress:0,entry:0,blockedFor:0,arrest:'',drive:0,pressure:0,retry:0});
   const CYCLE_STAGES=['G1','S','G2','M'],CYCLE_FRACTIONS={G1:.4,S:.35,G2:.18,M:.07};
   // Exploratory defaults, deliberately narrower than the manual slider limits.
@@ -11932,11 +11967,24 @@ var CPM = (function (exports, module$1) {
   const RANDOM_RANGES={normalMotility:[.05,.25,.05],tumorMotility:[.35,1.2,.05],immuneMotility:[.75,1.4,.05],chemotaxis:[.7,2.2,.1],alignment:[.1,1,.1],cohesion:[.6,1.6,.1],repulsion:[.4,1.2,.1],immuneSeparation:[.7,1.7,.1],noise:[.35,1,.05],halfLife:[80,220,10],growth:[.5,1.4,.05],apoptosis:[0,8,1],antigen:[30,95,5],kill:[.6,1.8,.1],temperature:[8,18,1],supply:[1.6,2.8,.05],metabolism:[.6,1.1,.05],escape:[1.5,3.5,.1],recruitment:[.6,2,.1],immuneGrowth:[.15,.65,.05],immuneDivisions:[2,4,1],mutation:[2,15,1],mutationSize:[.05,.2,.01],sectionYield:[.25,.4,.01],stressMutation:[.2,2,.1],inflammation:[0,1.5,.1],progression:[.5,3,.1],tumorMorphology:[0,2,1],branchLength:[2,3.2,.1],branchStrength:[3,7,.5],networkAdhesion:[.4,1.4,.1],branching:[.5,1.5,.1]};
   Object.assign(RANDOM_RANGES,{tumorCycle:[180,320,20],tumorQuiescence:[.6,1.4,.1],immuneCycle:[160,280,20],antigenMemory:[600,1400,100],il2Secretion:[.6,1.5,.1],il2HalfLife:[120,260,20],exhaustionRate:[.5,1.5,.1]});
   Object.assign(RANDOM_RANGES,{normalMutationGain:[1,5,1],tumorMutationGain:[1,5,1],mutationBias:[0,0,1],antigenStressGain:[.2,1,.1],contactEscape:[.05,.3,.05],signalEscape:[.02,.12,.02],evolutionMemory:[600,1200,100]});
-  Object.assign(RANDOM_RANGES,{damagePolarization:[.5,1.5,.1],damageDeactivation:[.5,1.5,.1],suppressiveSecretion:[.5,1.5,.1],suppressionStrength:[.5,1.5,.1],immuneRegulationMemory:[200,600,50]});
+  Object.assign(RANDOM_RANGES,{damagePolarization:[.5,1.5,.1],damageDeactivation:[.5,1.5,.1],suppressiveSecretion:[.5,1.5,.1],suppressionStrength:[.5,1.5,.1],immuneRegulationMemory:[200,600,50],suppressionRecovery:[.5,1.5,.1]});
+  // Random development experiments stay near competing, viable regimes rather
+  // than combining unrelated extremes or pre-planting malignant cells.
+  Object.assign(RANDOM_RANGES,{supply:[2.3,2.8,.05],metabolism:[1.05,1.3,.05],stressMutation:[3,6,.5],progression:[1.5,4,.5],inflammation:[.6,1.6,.1],normalMutationGain:[3,6,.5],tumorMutationGain:[3,7,.5],growth:[.8,1.35,.05],tumorMotility:[.6,1.2,.05],normalMotility:[.05,.15,.05],immuneMotility:[1,1.4,.05],kill:[1,1.8,.1],recruitment:[1,2,.1],immuneGrowth:[.3,.65,.05],immuneDivisions:[3,4,1],immuneCycle:[180,240,20],antigenMemory:[900,1500,100],tumorCycle:[180,280,20],chemotaxis:[1.5,2.5,.1],escape:[1.8,3,.1],mutation:[8,16,1],mutationSize:[.12,.24,.02],antigenStressGain:[.5,1.5,.1],contactEscape:[.2,.8,.1],signalEscape:[.1,.4,.05],damagePolarization:[2.5,4.5,.25],damageDeactivation:[.7,1.5,.1],suppressiveSecretion:[1,1.8,.1],suppressionStrength:[.8,1.6,.1],suppressionRecovery:[1,2.5,.25],immuneRegulationMemory:[150,350,50],tumorMorphology:[0,1,1]});
   function randomSettings(seed){
     let state=seed>>>0;
     const random=()=>{state=(state+0x6d2b79f5)>>>0;let n=Math.imul(state^(state>>>15),1|state);n^=n+Math.imul(n^(n>>>7),61|n);return ((n^(n>>>14))>>>0)/4294967296;};
     return Object.fromEntries(Object.entries(RANDOM_RANGES).map(([key,[lo,hi,step]])=>[key,Number((lo+Math.floor(random()*(Math.round((hi-lo)/step)+1))*step).toFixed(2))]));
+  }
+  function ecologyLayout(seed,randomized){
+    let state=(seed^0x58a1c9e7)>>>0;
+    const random=()=>{state=(state+0x6d2b79f5)>>>0;let n=Math.imul(state^(state>>>15),1|state);n^=n+Math.imul(n^(n>>>7),61|n);return ((n^(n>>>14))>>>0)/4294967296;};
+    const niches=randomized?[
+      {x:.4+.2*random(),y:.4+.2*random(),rx:.22+.04*random(),ry:.26+.05*random(),floor:.04+.03*random()},
+      ...Array.from({length:2},()=>({x:.24+.5*random(),y:.25+.5*random(),rx:.11+.05*random(),ry:.14+.06*random(),floor:.10+.08*random()}))
+    ]:[{x:.5,y:.5,rx:.25,ry:.30,floor:.05},{x:.28,y:.38,rx:.13,ry:.18,floor:.16},{x:.70,y:.68,rx:.14,ry:.15,floor:.12}];
+    const patrols=randomized?Array.from({length:16},(_,i)=>({x:.18+(i%4)*.213+(random()-.5)*.03,y:.2+Math.floor(i/4)*.2+(random()-.5)*.03,key:random()})).sort((a,b)=>a.key-b.key).slice(0,12+Math.floor(random()*5)).map(p=>[p.x,p.y]):Array.from({length:12},(_,i)=>[.2+(i%4)*.2,.25+Math.floor(i/4)*.25]);
+    return {niches,patrols};
   }
   const POPULATIONS=['normal','abnormal','tumor','immune'];
   const sameHistoryRow=(a,b)=>!!a&&Object.keys(b).every(key=>a[key]===b[key]);
@@ -11957,7 +12005,8 @@ var CPM = (function (exports, module$1) {
   }
   const SIGNALS=['cohesion','danger','trail','il2','normalDamage','inhibition'];
   const PRESETS={
-    oncogenesis:{label:'肿瘤发生发展',environmentProfile:'poor-core',founderTolerance:2.4,description:'正常细胞铺满培养皿，4 颗免疫细胞分散在单层内部。中心酸清除弱、氧糖补给略低；代谢与炎症压力提高随机变异，经异常中间态产生肿瘤；耐受变异、细胞死亡与免疫监视共同筛选存活克隆。',settings:{supply:2.8,metabolism:1.2,inflammation:1,stressMutation:5,progression:5,normalMutationGain:4,tumorMutationGain:4,growth:1.2,apoptosis:2,tumorMotility:1.5,normalMotility:.05,cohesion:1.3,escape:4,immuneGrowth:.15,immuneDivisions:2,kill:1.2}},
+    oncogenesis:{label:'肿瘤发生发展',environmentProfile:'mosaic',founderTolerance:2.3,description:'密铺正常组织与 12 颗分散免疫细胞，从零肿瘤开始。三处供给较弱的区域与健康边缘形成差异；异常、癌变、免疫清除、抑制与恢复相互竞争，逃逸克隆可能再次扩增。没有定时转变或预设结局。',settings:{supply:2.5,metabolism:1.2,inflammation:1.2,stressMutation:4,progression:2.5,normalMutationGain:5,tumorMutationGain:6,growth:1.05,tumorCycle:220,apoptosis:3,tumorMotility:.9,normalMotility:.1,cohesion:1.1,escape:2.4,immuneMotility:1.3,immuneGrowth:.5,immuneDivisions:3,immuneCycle:200,antigenMemory:1200,kill:1.4,recruitment:1.4,chemotaxis:1.8,mutation:12,mutationSize:.2,antigenStressGain:1.2,contactEscape:.6,signalEscape:.3,damagePolarization:3.5,damageDeactivation:1.2,suppressiveSecretion:1.5,suppressionStrength:1.3,suppressionRecovery:1.5,immuneRegulationMemory:200}},
+    random:{label:'随机肿瘤演化',environmentProfile:'mosaic',founderTolerance:2.3,description:'随机化的密铺正常组织、12–16 颗内部免疫细胞与三处弱供给区域。参数在发生发展附近抽样，肿瘤必须由局部异常产生；相同种子和参数可重现开局，结局由局部相互作用产生。',settings:{}},
     cold:{label:'免疫冷肿瘤扩散转移',description:'正常细胞铺满背景，中央嵌入 19 颗低抗原肿瘤，外围仅 3 颗免疫细胞。梭形肿瘤侵袭扩增，压力提高性状变异，部分克隆可能暴露抗原；免疫招募较弱。这是二维局部播散，不含血管或跨器官转移。',settings:{supply:2.8,metabolism:.65,stressMutation:0,progression:1,growth:1.4,tumorCycle:180,apoptosis:2,tumorMotility:1.5,tumorMorphology:1,normalMotility:.25,cohesion:.4,sectionYield:.4,immuneMotility:.8,antigen:15,kill:1,chemotaxis:.6,recruitment:.35,immuneGrowth:.15,immuneDivisions:2,alignment:.2,noise:.85,mutation:8,normalMutationGain:1,tumorMutationGain:5,antigenStressGain:.3,contactEscape:.15,signalEscape:.1}},
     hot:{label:'免疫热肿瘤治愈',description:'正常细胞铺满背景，中央嵌入 37 颗高抗原肿瘤，18 颗免疫细胞分散在病灶周边的组织内。接触识别、招募及 IL-2 扩增支持早期清除；少数存活克隆可能丢失抗原并再次扩增。结局随种子改变，关闭杀伤可作对照。',settings:{supply:2.8,metabolism:.65,stressMutation:0,progression:1,growth:.75,tumorCycle:280,apoptosis:0,tumorMotility:.35,immuneMotility:1.2,antigen:100,kill:2,chemotaxis:2.5,recruitment:2.4,immuneGrowth:.65,immuneDivisions:3,immuneCycle:200,antigenMemory:1200,il2Secretion:1.2,noise:.45,halfLife:180,mutation:2,mutationSize:.05,antigenStressGain:.15,contactEscape:.35,signalEscape:.12}},
     ecosystem:{label:'免疫共培养',settings:{}},
@@ -12072,7 +12121,7 @@ var CPM = (function (exports, module$1) {
       this.counters={manualRemoved:0,divisions:0,immuneDivisions:0,kills:0,apoptosis:0,environment:0,apoptosisStarted:0,killStarted:0,environmentStarted:0,recognitions:0,mutations:0,abnormalInitiations:0,malignantTransitions:0,abnormalKills:0,normalEnvironmentDeaths:0,abnormalEnvironmentDeaths:0};this.birthSerial=0;this.lineage=[];this.deathHistory=[];this.recentClearances=[];this.manualDeathRemovals={spontaneous:0,kill:0,environment:0};
       this.deathEffects=[];this.sources=[];this.sourceSerial=0;
       Object.assign(this.counters,{normalTraitMutations:0,stressMutations:0,antigenExposures:0,antigenEscapes:0});
-      Object.assign(this.counters,{suppressiveTransitions:0,injuryDeactivations:0,signalDeactivations:0});
+      Object.assign(this.counters,{suppressiveTransitions:0,suppressiveRecoveries:0,injuryDeactivations:0,signalDeactivations:0});
       const s=this.settings;
       this.C=new CPM.CPM([width,height],{
         seed,torus:[this.wrap,this.wrap],T:s.temperature,
@@ -12130,6 +12179,11 @@ var CPM = (function (exports, module$1) {
       // Core acid clearance is limited more strongly than nutrient supply, so
       // chronic injury can coexist with a viable, better supplied frontier.
       this.supplyMap=new Float32Array(bins).fill(1);
+      this.ecology=PRESETS[scene]?.environmentProfile==='mosaic'?ecologyLayout(seed,scene==='random'):null;
+      if(this.ecology)for(let i=0;i<bins;i++){
+        const x=(i%this.fields.oxygen.width+.5)*this.fieldScale/width,y=(Math.floor(i/this.fields.oxygen.width)+.5)*this.fieldScale/height;
+        for(const n of this.ecology.niches){const radius=Math.hypot((x-n.x)/n.rx,(y-n.y)/n.ry);this.supplyMap[i]=Math.min(this.supplyMap[i],n.floor+(1-n.floor)*clamp((radius-.55)/.65));}
+      }
       if(PRESETS[scene]?.environmentProfile==='poor-core')for(let i=0;i<bins;i++){
         const x=(i%this.fields.oxygen.width+.5)*this.fieldScale/this.scale,y=(Math.floor(i/this.fields.oxygen.width)+.5)*this.fieldScale/this.scale;
         const radius=Math.hypot((x-this.worldWidth/2)/(this.worldWidth*.22),(y-this.worldHeight/2)/(this.worldHeight*.25));
@@ -12177,10 +12231,10 @@ var CPM = (function (exports, module$1) {
       m.nucleusStrainX=0;m.nucleusStrainY=0;m.fieldBins=new Map();m.sectionFraction=1;m.sectionPressure=0;m.hasNucleus=false;if(genome)this.applyGenome(m);
       m.cycle=newCycle();m.antigenMemory=0;m.il2=0;m.il2Response=0;m.il2Production=0;m.chronicStimulation=0;m.exhaustion=0;
       m.normalTolerance=1;m.mutationPressure=0;m.immuneEncounters=0;m.immuneContactMemory=0;m.recruitmentExposure=0;m.lastAntigenChange=null;
-      m.immunePhenotype=kind===IMMUNE?'cytotoxic':null;m.normalDamageExposure=0;m.inhibition=0;m.immuneRefractory=0;
+      m.immunePhenotype=kind===IMMUNE?'cytotoxic':null;m.normalDamageExposure=0;m.inhibition=0;m.immuneRefractory=0;m.recruitmentTargetID=0;m.recruitmentTargetBirth=0;
       this.cells[id]=m;this.contacts.set(id,new Map());this.updateMechanics(m);return m;
     }
-    applyGenome(m){m.antigenLevel=m.genome.antigen;m.antigen=m.antigenLevel>=.18;}
+    applyGenome(m){const recognized=m.antigen;m.antigenLevel=m.genome.antigen;m.antigen=m.antigenLevel>=.18;if(recognized&&!m.antigen)this.releaseAntigenTarget(m);}
     immuneTarget(m){return !!m&&!m.dying&&(m.kind===TUMOR||(m.kind===NORMAL&&m.state==='abnormal'))&&m.antigen;}
     beginAbnormal(id){
       const m=this.cells[id];if(!m||m.dying||m.kind!==NORMAL||m.state!=='normal')return false;
@@ -12256,9 +12310,18 @@ var CPM = (function (exports, module$1) {
       const before=m.antigenLevel;m.antigenLevel=level;m.antigen=level>=.18;if(m.genome)m.genome.antigen=level;
       m.lastAntigenChange={time:this.C.time,cause};this.counters[cause==='escape'?'antigenEscapes':'antigenExposures']++;
       this.log('antigen-'+cause,m.id,0,{birth:m.birth,from:before,to:level,encounters:m.immuneEncounters,exposure:m.recruitmentExposure});
-      // Loss ends recognition immediately; it never repairs already delivered damage.
-      for(const [key,h]of this.histories)if(h.target===m.id)this.histories.delete(key);
-      for(const ctl of this.live())if(ctl.targetID===m.id){ctl.targetID=0;ctl.phase='search';this.updateMechanics(ctl);}
+      if(!m.antigen)this.releaseAntigenTarget(m);
+    }
+    releaseAntigenTarget(m){
+      // Invalidate both current synapses and recent recruitment from this exact
+      // birth identity. Already released fields, damage and CTL memory remain.
+      const scanned=new Set();
+      for(const [key,h]of this.histories)if(h.target===m.id){scanned.add(h.ctl);this.histories.delete(key);}
+      for(const ctl of this.live())if(ctl.kind===IMMUNE){
+        const bound=ctl.targetID===m.id,recruiting=ctl.recruitmentTargetID===m.id&&ctl.recruitmentTargetBirth===m.birth;
+        if(bound||recruiting){ctl.recruitment=0;ctl.recruitmentTargetID=0;ctl.recruitmentTargetBirth=0;}
+        if(bound||(!ctl.targetID&&scanned.has(ctl.id))){ctl.targetID=0;ctl.phase='search';this.updateMechanics(ctl);}
+      }
     }
     updateMechanics(m){
       if(this.section)this.section.sync(m);
@@ -12335,7 +12398,7 @@ var CPM = (function (exports, module$1) {
       const nearest=(x,y)=>{let best=null,d=Infinity;const row=Math.floor(y/H*ny),col=Math.floor(x/W*nx);
         for(let yy=Math.max(0,row-2);yy<=Math.min(ny-1,row+2);yy++)for(let xx=Math.max(0,col-2);xx<=Math.min(nx-1,col+2);xx++){const site=rows[yy][xx],q=(site.x-x)**2+(site.y-y)**2;if(q<d){d=q;best=site;}}return [best,d];};
       const patrols=[];
-      const hot=this.scene==='hot',positions=!tumorCount?[[.24,.27],[.73,.25],[.32,.73],[.77,.69]]:hot?Array.from({length:18},(_,i)=>[.5+64*Math.cos(i*Math.PI/9)/W,.5+64*Math.sin(i*Math.PI/9)/H]):[[.08,.28],[.92,.5],[.08,.76]];
+      const hot=this.scene==='hot',positions=!tumorCount?(this.ecology?.patrols||[[.24,.27],[.73,.25],[.32,.73],[.77,.69]]):hot?Array.from({length:18},(_,i)=>[.5+64*Math.cos(i*Math.PI/9)/W,.5+64*Math.sin(i*Math.PI/9)/H]):[[.08,.28],[.92,.5],[.08,.76]];
       for(const [fx,fy]of positions){
         let spot=null,score=-Infinity;for(let y=H*fy-7;y<=H*fy+7;y++)for(let x=W*fx-7;x<=W*fx+7;x++){const d=nearest(x,y)[1];if(d>score){score=d;spot=[x,y];}}
         const [x,y]=spot,site={x,y,id:this.C.makeNewCellID(IMMUNE),points:[],weight:0};let lo=-100,hi=100;
@@ -12454,15 +12517,7 @@ var CPM = (function (exports, module$1) {
       const W=this.worldWidth,H=this.worldHeight,C=this.C,r=this.scale;
       const seed=(kind,x,y,radius)=>this.seed(kind,x*r,y*r,radius*r);
       if(this.scene==='random'){
-        const centers=Array.from({length:C.ran(1,3)},()=>[W*(.25+.5*C.random()),H*(.25+.5*C.random())]),density=.55+.3*C.random();
-        // Jittered, non-overlapping founders; local patches bias the mixture.
-        // Only initialization has access to these centers; sensing stays local.
-        for(let y=13;y<H-9;y+=22)for(let x=13;x<W-9;x+=22){
-          if(C.random()>density)continue;
-          const near=centers.some(([cx,cy])=>Math.hypot(x-cx,y-cy)<Math.min(W,H)*.22);
-          const roll=C.random(),kind=roll<(near?.6:.08)?TUMOR:roll>.88?IMMUNE:NORMAL;
-          seed(kind,x+C.ran(-3,3),y+C.ran(-3,3),kind===IMMUNE?3:kind===TUMOR?7:8);
-        }
+        this.populateMonolayer();
         return;
       }
       if(this.scene==='network'){
@@ -12607,8 +12662,10 @@ var CPM = (function (exports, module$1) {
         }
         if(m.dying)continue;
         if(m.kind===NORMAL)deposit('cohesion',.045*dt);
-        if(m.state==='abnormal')deposit('danger',.035*dt);
-        if(m.kind===TUMOR)deposit('danger',.10*dt);
+        // This constitutive lesion cue is an explicit recognizable-phenotype
+        // proxy; antigen-negative bodies do not carry a moving chemo-beacon.
+        if(m.state==='abnormal'&&m.antigen)deposit('danger',.035*dt);
+        if(m.kind===TUMOR&&m.antigen)deposit('danger',.10*dt);
         const effector=m.immunePhenotype!=='suppressive'&&m.immuneRefractory<=0;
         if(m.kind===IMMUNE&&m.immunePhenotype==='suppressive')deposit('inhibition',.30*dt*this.settings.suppressiveSecretion*m.fitness);
         if(m.kind===IMMUNE&&effector&&m.recruitment>0)deposit('trail',.38*dt*this.settings.recruitment*m.fitness);
@@ -12645,11 +12702,14 @@ var CPM = (function (exports, module$1) {
       for(const m of this.live()){
         if(m.dying)continue;let gx=0,gy=0,ax=0,ay=0,rx=0,ry=0,ix=0,iy=0,total=0;
         const gradient=key=>{const f=this.fields[key];let x=0,y=0,n=0;for(const [i,amount] of m.fieldBins){const g=f.gradient(i%f.width,Math.floor(i/f.width));x+=g[0]*amount;y+=g[1]*amount;n+=amount;}return [x/(n||1),y/(n||1)];};
-        if(m.kind===IMMUNE){const a=gradient('danger'),b=gradient('trail');gx=a[0]+b[0]*1.8;gy=a[1]+b[1]*1.8;}
+        if(m.kind===IMMUNE){
+          if(m.immunePhenotype==='suppressive')[gx,gy]=gradient('normalDamage');
+          else {const a=gradient('danger'),b=gradient('trail');gx=a[0]+b[0]*1.8;gy=a[1]+b[1]*1.8;}
+        }
         else if(m.kind===NORMAL){[gx,gy]=gradient('cohesion');}
         else {const g=gradient('cohesion');gx=g[0]*.25;gy=g[1]*.25;}
         const magnitude=Math.hypot(gx,gy);if(magnitude>0){const gain=Math.min(1,magnitude/.035);gx=gx/magnitude*gain;gy=gy/magnitude*gain;}
-        // This cue reads only local damage/recruitment gradients. Concentration
+        // This cue reads only phenotype-specific local gradients. Concentration
         // or contact with another immune cell does not confer recognition.
         if(m.kind===IMMUNE)m.immuneCue=clamp(s.chemotaxis/1.6)*Math.min(1,magnitude/.035);
         for(const edge of this.contacts.get(m.id)?.values()||[]){
@@ -12702,7 +12762,7 @@ var CPM = (function (exports, module$1) {
           ctl.phase=chosen.h.recognized?'kill':'scan';
           // Only the currently contacting, antigen-positive target gets damage.
           if(chosen.h.recognized){
-            ctl.targetID=chosen.target.id;ctl.activation=700;ctl.recruitment=200;
+            ctl.targetID=chosen.target.id;ctl.activation=700;ctl.recruitment=200;ctl.recruitmentTargetID=chosen.target.id;ctl.recruitmentTargetBirth=chosen.target.birth;
             chosen.target.damage+=dt*.012*this.settings.kill*chosen.target.antigenLevel*Math.min(1,chosen.edge.length/(3*this.scale))*ctl.fitness*(1-.8*ctl.exhaustion);
             if(chosen.target.damage>=1)this.beginDeath(chosen.target.id,'kill');
           }
@@ -12719,10 +12779,22 @@ var CPM = (function (exports, module$1) {
       const s=this.settings;
       for(const m of this.live())if(m.kind===IMMUNE&&!m.dying){
         m.immuneRefractory=Math.max(0,m.immuneRefractory-dt);
-        const injury=this.fieldOnCell(m,'normalDamage'),u=injury/(.35+injury);
+        // Endogenous injury is diluted over a cell's occupied field bins. Its
+        // dimensionless response scale must match that source, not a 30-unit
+        // manually painted pulse; otherwise natural tissue injury is inert.
+        const injury=this.fieldOnCell(m,'normalDamage'),u=injury/(.03+injury);
         m.normalDamageExposure=clamp(u+(m.normalDamageExposure-u)*Math.exp(-dt/s.immuneRegulationMemory));
         m.inhibition=this.fieldOnCell(m,'inhibition');
-        if(m.immunePhenotype==='suppressive')continue;
+        if(m.immunePhenotype==='suppressive'){
+          // Both recent history and present dose must fall. Self-secreted
+          // inhibition does not lock the cell into its suppressive phenotype.
+          const relief=clamp((.5-Math.max(m.normalDamageExposure,u))/.5),hazard=.001*s.suppressionRecovery*relief**2;
+          if(hazard>0&&this.C.random()<-Math.expm1(-hazard*dt)){
+            this.deactivateImmune(m);m.immunePhenotype='cytotoxic';this.counters.suppressiveRecoveries++;
+            this.log('immune-recovery',m.id,0,{birth:m.birth,normalDamageExposure:m.normalDamageExposure});
+          }
+          continue;
+        }
         if(m.activation>0){
           const injuryRate=.0008*s.damageDeactivation*m.normalDamageExposure**2,signalRate=.0012*s.suppressionStrength*m.inhibition/(.35+m.inhibition),hazard=injuryRate+signalRate;
           if(hazard>0&&this.C.random()<-Math.expm1(-hazard*dt)){
@@ -12740,7 +12812,7 @@ var CPM = (function (exports, module$1) {
       }
     }
     deactivateImmune(m){
-      m.activation=0;m.recruitment=0;m.il2Production=0;m.targetID=0;m.phase='search';m.immuneRefractory=240;
+      m.activation=0;m.recruitment=0;m.recruitmentTargetID=0;m.recruitmentTargetBirth=0;m.il2Production=0;m.targetID=0;m.phase='search';m.immuneRefractory=240;
       for(const [key,h]of this.histories)if(h.ctl===m.id)this.histories.delete(key);
       // This changes function, not geometry, stored antigen memory or already
       // delivered target damage. The refractory interval prevents same-step reactivation.
@@ -13056,7 +13128,7 @@ var CPM = (function (exports, module$1) {
       if(['antigenStressGain','contactEscape','signalEscape'].includes(name))value=clamp(value,0,5);
       if(name==='mutationBias')value=clamp(value,-100,100);
       if(name==='evolutionMemory')value=clamp(value,100,4000);
-      if(['damagePolarization','damageDeactivation','suppressiveSecretion','suppressionStrength'].includes(name))value=clamp(value,0,5);
+      if(['damagePolarization','damageDeactivation','suppressiveSecretion','suppressionStrength','suppressionRecovery'].includes(name))value=clamp(value,0,5);
       if(name==='immuneRegulationMemory')value=clamp(value,100,2000);
       this.settings[name]=value;if(name==='temperature')this.C.conf.T=value;
       this.section?.updateJunctions(0);
@@ -13120,7 +13192,7 @@ var CPM = (function (exports, module$1) {
     advance(steps){for(let n=0;n<steps;n++){this.mechanicalStep();if(this.C.time%4===0)this.updateEnvironment(4);this.biologicalStep();}}
     async advanceAsync(steps,backend){for(let n=0;n<steps;n++){this.mechanicalStep();if(this.C.time%4===0){this.prepareEnvironment();await backend.step(this,4);}this.biologicalStep();}}
     initializeScenario(){
-      if(!['oncogenesis','cold','hot'].includes(this.scene))return;
+      if(!['oncogenesis','random','cold','hot'].includes(this.scene))return;
       const live=this.live(),tumors=live.filter(m=>m.kind===TUMOR);
       this.scenarioState={initial:{normal:live.filter(m=>m.kind===NORMAL).length,tumor:tumors.length,immune:live.filter(m=>m.kind===IMMUNE).length,antigenPositive:tumors.filter(m=>m.antigen).length,clones:tumors.map(m=>m.clone)},tumorDivisions:0,distalDivisions:0,peakTumor:tumors.length,everTumor:tumors.length>0,clearanceAt:null};
     }
@@ -13138,7 +13210,7 @@ var CPM = (function (exports, module$1) {
       const elapsed=state.clearanceAt===null?0:this.C.time-state.clearanceAt,c=this.counters,abnormal=live.filter(m=>m.state==='abnormal'&&!m.dying).length;
       const maxAdversity=Math.max(0,...live.filter(m=>!m.dying).map(m=>m.adversity));
       let phase='',achieved=false;
-      if(this.scene==='oncogenesis'){
+      if(this.scene==='oncogenesis'||this.scene==='random'){
         achieved=active.length>0&&state.tumorDivisions>0;
         phase=achieved?'新生肿瘤克隆扩增':active.length?'肿瘤已发生':c.malignantTransitions?'肿瘤已出现，当前无存活肿瘤':c.abnormalInitiations?'已发生异常中间态':maxAdversity>.08?'环境压力累积':'局部资源消耗';
       }else if(this.scene==='cold'){
@@ -13149,8 +13221,8 @@ var CPM = (function (exports, module$1) {
         achieved=state.everTumor&&!tumors.length&&elapsed>=150&&c.kills>0;
         phase=achieved?'当前区域持续清除':!tumors.length&&state.everTumor?'清除后继续观察':!active.length&&tumors.length?'靶细胞凋亡清除中':c.kills?'免疫清除进行中':c.recognitions?'接触识别与招募':'浸润与接触扫描';
       }
-      const preset=PRESETS[this.scene],baseline={...DEFAULTS,...preset.settings};
-      return {label:preset.label,description:preset.description,profile:{environment:preset.environmentProfile||'uniform',founderTolerance:preset.founderTolerance||1},phase,achieved,initial:{...state.initial,clones:[...state.initial.clones]},tumor:active.length,tumorBodies:tumors.length,abnormal,farTumor:far,distalRadius:55,tumorDivisions:state.tumorDivisions,distalDivisions:state.distalDivisions,peakTumor:state.peakTumor,clearanceAt:state.clearanceAt,clearanceElapsed:elapsed,maxAdversity,customized:Object.keys(DEFAULTS).some(k=>this.settings[k]!==baseline[k])};
+      const preset=PRESETS[this.scene],baseline={...DEFAULTS,...(this.scene==='random'?randomSettings(this.seedValue):preset.settings)};
+      return {label:preset.label,description:preset.description,profile:{environment:preset.environmentProfile||'uniform',founderTolerance:preset.founderTolerance||1,...(this.ecology?{niches:this.ecology.niches.map(n=>({...n}))}:{})},phase,achieved,initial:{...state.initial,clones:[...state.initial.clones]},tumor:active.length,tumorBodies:tumors.length,abnormal,farTumor:far,distalRadius:55,tumorDivisions:state.tumorDivisions,distalDivisions:state.distalDivisions,peakTumor:state.peakTumor,clearanceAt:state.clearanceAt,clearanceElapsed:elapsed,maxAdversity,customized:Object.keys(DEFAULTS).some(k=>this.settings[k]!==baseline[k])};
     }
     populationRow(){const counts=[0,0,0,0];let px=0,py=0,n=0,abnormal=0;for(const m of this.live()){counts[m.kind]++;if(m.state==='abnormal')abnormal++;if(!m.dying){px+=m.px;py+=m.py;n++;}}
       return {time:this.C.time,normal:counts[1]-abnormal,abnormal,tumor:counts[2],immune:counts[3],order:n?Math.hypot(px,py)/n:0,...this.counters};
@@ -13189,7 +13261,7 @@ var CPM = (function (exports, module$1) {
   const ranges={normalMotility:[0,1.5],tumorMotility:[0,1.5],immuneMotility:[0,1.5],chemotaxis:[0,3],alignment:[0,3],cohesion:[0,3],repulsion:[0,3],immuneSeparation:[0,3],noise:[0,2],halfLife:[20,400],growth:[0,2],apoptosis:[0,30],antigen:[0,100],kill:[0,2],temperature:[2,30],supply:[0,3],metabolism:[0,2],escape:[0,5],recruitment:[0,3],immuneGrowth:[0,1.5],immuneDivisions:[0,6],mutation:[0,100],mutationSize:[0,.5],sectionYield:[0,.5],stressMutation:[0,20],inflammation:[0,10],progression:[0,20],tumorMorphology:[0,2],branchLength:[1.6,4],branchStrength:[0,12],networkAdhesion:[0,2],branching:[0,3]};
   Object.assign(ranges,{tumorCycle:[80,1200],tumorQuiescence:[0,3],immuneCycle:[80,1200],antigenMemory:[100,6000],il2Secretion:[0,3],il2HalfLife:[20,800],exhaustionRate:[0,3]});
   Object.assign(ranges,{normalMutationGain:[0,12],tumorMutationGain:[0,12],mutationBias:[-100,100],antigenStressGain:[0,5],contactEscape:[0,5],signalEscape:[0,5],evolutionMemory:[100,4000]});
-  Object.assign(ranges,{damagePolarization:[0,5],damageDeactivation:[0,5],suppressiveSecretion:[0,5],suppressionStrength:[0,5],immuneRegulationMemory:[100,2000]});
+  Object.assign(ranges,{damagePolarization:[0,5],damageDeactivation:[0,5],suppressiveSecretion:[0,5],suppressionStrength:[0,5],immuneRegulationMemory:[100,2000],suppressionRecovery:[0,5]});
   const signals=['cohesion','danger','trail','il2','normalDamage','inhibition'];
   const scenes=['oncogenesis','cold','hot','empty','random','ecosystem','network','collective','invasion','maze','stress','surveillance'];
   const flags=['edge-activity','normal-activity','tumor-activity','immune-activity','cell-seams','arrows','antigen-marks','nuclei','cycle-marks','protect-bodies','show-tracks'];
@@ -14041,6 +14113,8 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
 免疫抑制|Immune suppression
 损伤应答与免疫抑制|Injury response & immune suppression
 损伤暴露转抑制态|Injury-driven suppressive conversion
+抑制态恢复速度|Suppressive-state recovery rate
+当前正常损伤信号和累计暴露均降低后，蓝色细胞按概率恢复粉色；越大恢复越快，0 关闭恢复|Blue cells can return to pink once both current normal-injury signals and accumulated exposure fall; higher values speed recovery, 0 disables it
 损伤暴露退激活|Injury-driven deactivation
 抑制态信号分泌|Suppressive signal secretion
 抑制信号退激活|Signal-driven deactivation
@@ -14054,9 +14128,11 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
 正常损伤暴露|Normal-injury exposure
 局部抑制信号|Local suppression signal
 抑制样表型：分泌抑制信号，保留运动，停止抗肿瘤杀伤|Suppressive-like phenotype: secretes suppression, retains movement, stops antitumor killing
+抑制样表型：趋向正常损伤，分泌抑制信号；暴露降低后可恢复粉色|Suppressive-like phenotype: moves toward normal injury and secretes suppression; may return to pink after exposure falls
 再激活等待|Reactivation delay
 其中抑制|Of these, suppressive
 转抑制态|Suppressive transitions
+恢复静息态|Recoveries to resting state
 损伤退激活|Injury deactivations
 信号退激活|Signal deactivations
 `);
@@ -14074,6 +14150,23 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
     const result=lines.join('\n');if(/[\p{Script=Han}]/u.test(result))missing.add(source);
     if(cache.size>1024)cache.clear();cache.set(source,result);return result;
   }
+  add(`
+恢复当前情境的参数和推荐种子，保留区域、精细度与边界选择|Restore scenario parameters and its recommended seed; keep area, refinement and boundary
+手机端仅录制 Arena，组合录像已结束|Mobile records the Arena only; combined recording has ended
+占满侧栏|Fill sidebar
+返回控制|Back to controls
+录制范围|Capture area
+仅 Arena|Arena only
+Arena ＋ 右侧栏|Arena + sidebar
+准备录制…|Preparing recording…
+录像未能开始|Recording could not start
+侧栏录制不可用|Sidebar capture is unavailable
+组合录制包含侧栏当前可见的内容；统计可先占满侧栏。Arena 30 FPS，侧栏最多每秒刷新 5 次。|Combined capture includes the currently visible sidebar. Expand statistics first for a dashboard view. Arena: 30 FPS; sidebar: up to 5 updates/second.
+用于本地绘制录像中的实时侧栏。|Renders the live sidebar locally for video capture.
+随机发生发展|Random tumor development
+密铺正常组织与 12 颗分散免疫细胞，从零肿瘤开始。三处供给较弱的区域与健康边缘形成差异；异常、癌变、免疫清除、抑制与恢复相互竞争，逃逸克隆可能再次扩增。没有定时转变或预设结局。|Confluent normal tissue and 12 dispersed immune cells, starting without tumors. Three low-supply niches contrast with healthy edges. Abnormal change, malignancy, clearance, suppression and recovery compete; escape clones may expand again. No scheduled transitions or predetermined outcome.
+随机化的密铺正常组织、12–16 颗内部免疫细胞与三处弱供给区域。参数在发生发展附近抽样，肿瘤必须由局部异常产生；相同种子和参数可重现开局，结局由局部相互作用产生。|Randomized confluent normal tissue, 12–16 internal immune cells and three low-supply niches. Parameters are sampled near the development preset; tumors must arise from local abnormal cells. Seed and parameters reproduce the start; local interactions determine the course.
+`);
   function mount(control){
     let language='zh';try{if(localStorage.getItem('cell-arena-language')==='en')language='en';}catch{}
     const texts=new WeakMap(),attributes=new WeakMap(),names=['title','aria-label','placeholder'];
@@ -14311,7 +14404,7 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
   const ranges={normalMotility:[0,1.5],tumorMotility:[0,1.5],immuneMotility:[0,1.5],chemotaxis:[0,3],alignment:[0,3],cohesion:[0,3],repulsion:[0,3],immuneSeparation:[0,3],noise:[0,2],halfLife:[20,400],growth:[0,2],apoptosis:[0,30],antigen:[0,100],kill:[0,2],temperature:[2,30],supply:[0,3],metabolism:[0,2],escape:[0,5],recruitment:[0,3],immuneGrowth:[0,1.5],immuneDivisions:[0,6],mutation:[0,100],mutationSize:[0,.5],sectionYield:[0,.5],stressMutation:[0,20],inflammation:[0,10],progression:[0,20],tumorMorphology:[0,2],branchLength:[1.6,4],branchStrength:[0,12],networkAdhesion:[0,2],branching:[0,3]};
   Object.assign(ranges,{tumorCycle:[80,1200],tumorQuiescence:[0,3],immuneCycle:[80,1200],antigenMemory:[100,6000],il2Secretion:[0,3],il2HalfLife:[20,800],exhaustionRate:[0,3]});
   Object.assign(ranges,{normalMutationGain:[0,12],tumorMutationGain:[0,12],mutationBias:[-100,100],antigenStressGain:[0,5],contactEscape:[0,5],signalEscape:[0,5],evolutionMemory:[100,4000]});
-  Object.assign(ranges,{damagePolarization:[0,5],damageDeactivation:[0,5],suppressiveSecretion:[0,5],suppressionStrength:[0,5],immuneRegulationMemory:[100,2000]});
+  Object.assign(ranges,{damagePolarization:[0,5],damageDeactivation:[0,5],suppressiveSecretion:[0,5],suppressionStrength:[0,5],immuneRegulationMemory:[100,2000],suppressionRecovery:[0,5]});
   const signals=['cohesion','danger','trail','il2','normalDamage','inhibition'];
   const scenes=['oncogenesis','cold','hot','empty','random','ecosystem','network','collective','invasion','maze','stress','surveillance'];
   const flags=['edge-activity','normal-activity','tumor-activity','immune-activity','cell-seams','arrows','antigen-marks','nuclei','cycle-marks','protect-bodies','show-tracks'];
@@ -14346,9 +14439,100 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
   globalThis.CellLabExperiment={parse,ranges,scenes,flags};
 })();
 
-/* Local arena-only video capture; never records the desktop or microphone. */
+/* Record this app's visible sidebar using the browser's actual layout. Wrapped
+ * text is measured with DOM ranges; no second layout engine or iframe is used. */
 (() => {
   'use strict';
+  const intersects=(a,b)=>a.right>b.left&&a.left<b.right&&a.bottom>b.top&&a.top<b.bottom;
+  const intersection=(a,b)=>({left:Math.max(a.left,b.left),top:Math.max(a.top,b.top),right:Math.min(a.right,b.right),bottom:Math.min(a.bottom,b.bottom)});
+  const visible=color=>color&&color!=='transparent'&&color!=='rgba(0, 0, 0, 0)';
+  function capture(element,scale){
+    const bounds=element.getBoundingClientRect(),canvas=document.createElement('canvas');
+    canvas.width=Math.max(1,Math.ceil(bounds.width*scale));canvas.height=Math.max(1,Math.ceil(bounds.height*scale));
+    const ctx=canvas.getContext('2d');ctx.scale(scale,scale);ctx.translate(-bounds.left,-bounds.top);
+    const styleCache=new Map(),sticky=[];
+    const css=e=>{if(!styleCache.has(e))styleCache.set(e,getComputedStyle(e));return styleCache.get(e);};
+    function text(value,r,style){
+      if(!value||r.width<=0||r.height<=0)return;
+      ctx.font=`${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;ctx.fillStyle=style.color;ctx.textAlign='left';ctx.textBaseline='alphabetic';
+      if('letterSpacing' in ctx)ctx.letterSpacing=style.letterSpacing==='normal'?'0px':style.letterSpacing;
+      const m=ctx.measureText(value),a=m.fontBoundingBoxAscent??m.actualBoundingBoxAscent,d=m.fontBoundingBoxDescent??m.actualBoundingBoxDescent;
+      ctx.fillText(value,r.left,r.top+(r.height-a-d)/2+a,r.width+.5);
+      if(style.textDecorationLine.includes('underline'))ctx.fillRect(r.left,r.bottom-1,Math.min(r.width,m.width),.7);
+    }
+    function textNode(node,clip){
+      const style=css(node.parentElement),range=document.createRange();let line=null;
+      const flush=()=>{if(line&&intersects(line,clip))text(line.value,{...line,width:line.right-line.left,height:line.bottom-line.top},style);line=null;};
+      // This preserves grid/flex wrapping and skips collapsed whitespace.
+      for(let i=0;i<node.length;){const n=node.data.codePointAt(i)>0xffff?2:1;range.setStart(node,i);range.setEnd(node,i+n);const r=range.getBoundingClientRect(),value=node.data.slice(i,i+n);i+=n;
+        if(!r.width||!r.height)continue;
+        if(!line||Math.abs(line.top-r.top)>1||r.left<line.left-1){flush();line={left:r.left,top:r.top,right:r.right,bottom:r.bottom,value};}
+        else{line.value+=value;line.right=r.right;line.bottom=Math.max(line.bottom,r.bottom);}
+      }
+      flush();range.detach();
+    }
+    function box(r,style){
+      if(visible(style.backgroundColor)){ctx.fillStyle=style.backgroundColor;ctx.fillRect(r.left,r.top,r.width,r.height);}
+      if(style.backgroundImage.startsWith('linear-gradient')){
+        const colors=style.backgroundImage.match(/rgba?\([^)]+\)|#[\da-f]+/gi)||[];
+        if(colors.length>1){const gradient=ctx.createLinearGradient(r.left,0,r.right,0);colors.forEach((c,i)=>gradient.addColorStop(i/(colors.length-1),c));ctx.fillStyle=gradient;ctx.fillRect(r.left,r.top,r.width,r.height);}
+      }
+      for(const [side,x,y,w,h]of [['Top',r.left,r.top,r.width,parseFloat(style.borderTopWidth)],['Bottom',r.left,r.bottom-parseFloat(style.borderBottomWidth),r.width,parseFloat(style.borderBottomWidth)],['Left',r.left,r.top,parseFloat(style.borderLeftWidth),r.height],['Right',r.right-parseFloat(style.borderRightWidth),r.top,parseFloat(style.borderRightWidth),r.height]]){
+        if(w>0&&h>0&&style['border'+side+'Style']!=='none'){ctx.fillStyle=style['border'+side+'Color'];ctx.fillRect(x,y,w,h);}
+      }
+    }
+    function control(el,r,style){
+      if(el.type==='range'){
+        const tw=12,th=15,y=r.top+r.height/2,f=Math.max(0,Math.min(1,(Number(el.value)-(Number(el.min)||0))/((Number(el.max)||100)-(Number(el.min)||0)||1)));
+        ctx.fillStyle='#c7b58e';ctx.fillRect(r.left,y-3,r.width,6);ctx.strokeStyle='#a59475';ctx.strokeRect(r.left+.5,y-2.5,r.width-1,5);
+        for(let x=r.left+13;x<r.right;x+=15){ctx.fillStyle='#dcd0b7';ctx.fillRect(x,y-2,2,4);}
+        ctx.fillStyle='#80653f';ctx.fillRect(r.left+f*(r.width-tw),y-th/2,tw,th);ctx.strokeStyle='#55442c';ctx.strokeRect(r.left+f*(r.width-tw)+.5,y-th/2+.5,tw-1,th-1);return;
+      }
+      if(el.type==='checkbox'){
+        ctx.fillStyle=el.checked?'#74543a':'#f7f0e3';ctx.fillRect(r.left,r.top,r.width,r.height);ctx.strokeStyle='#a59475';ctx.strokeRect(r.left+.5,r.top+.5,r.width-1,r.height-1);
+        if(el.checked){ctx.strokeStyle='#fff8eb';ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(r.left+r.width*.2,r.top+r.height*.5);ctx.lineTo(r.left+r.width*.43,r.top+r.height*.75);ctx.lineTo(r.left+r.width*.8,r.top+r.height*.25);ctx.stroke();}return;
+      }
+      if(el.type==='color'){ctx.fillStyle=el.value;ctx.fillRect(r.left+3,r.top+3,r.width-6,r.height-6);return;}
+      const left=r.left+parseFloat(style.paddingLeft)+parseFloat(style.borderLeftWidth),right=r.right-parseFloat(style.paddingRight)-(el.tagName==='SELECT'?16:2);
+      text(el.tagName==='SELECT'?el.selectedOptions[0]?.textContent:el.value,{left,top:r.top,width:right-left,height:r.height,bottom:r.bottom},style);
+      if(el.tagName==='SELECT'){ctx.strokeStyle=style.color;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(r.right-15,r.top+r.height/2-2);ctx.lineTo(r.right-11,r.top+r.height/2+2);ctx.lineTo(r.right-7,r.top+r.height/2-2);ctx.stroke();}
+    }
+    function paint(el,clip,alpha=1,overlay=false){
+      const r=el.getBoundingClientRect(),style=css(el);
+      if(style.display==='none'||style.visibility==='hidden'||!r.width||!r.height||!intersects(r,clip))return;
+      if(style.position==='sticky'&&!overlay){sticky.push({el,clip,alpha});return;}
+      ctx.save();ctx.beginPath();ctx.rect(clip.left,clip.top,clip.right-clip.left,clip.bottom-clip.top);ctx.clip();ctx.globalAlpha=alpha*Number(style.opacity);box(r,style);
+      let childClip=clip;
+      if(['auto','scroll','hidden','clip'].includes(style.overflowY)||['auto','scroll','hidden','clip'].includes(style.overflowX)){childClip=intersection(clip,r);ctx.beginPath();ctx.rect(childClip.left,childClip.top,childClip.right-childClip.left,childClip.bottom-childClip.top);ctx.clip();}
+      if(el.tagName==='CANVAS'){if(el.width&&el.height)ctx.drawImage(el,r.left,r.top,r.width,r.height);}
+      else if(el.tagName==='INPUT'||el.tagName==='SELECT')control(el,r,style);
+      else{
+        if(el.tagName==='SUMMARY'){
+          const content=getComputedStyle(el,'::before').content,symbol=content&&content!=='none'&&content!=='normal'?content.replace(/^['"]|['"]$/g,''):(style.display==='list-item'?(el.parentElement.open?'▾':'▸'):'');
+          if(symbol)text(symbol,{left:r.left+parseFloat(style.paddingLeft),top:r.top,width:12,height:r.height,bottom:r.bottom},style);
+        }
+        for(const node of el.childNodes){
+          if(el.tagName==='DETAILS'&&!el.open&&node.nodeName!=='SUMMARY')continue;
+          if(node.nodeType===1)paint(node,childClip,ctx.globalAlpha);else if(node.nodeType===3)textNode(node,childClip);
+        }
+      }
+      ctx.restore();
+    }
+    paint(element,bounds);for(const item of sticky)paint(item.el,item.clip,item.alpha,true);
+    return Promise.resolve(canvas);
+  }
+  globalThis.CellLabSidebarCapture={capture};
+})();
+
+/* Local arena / app-sidebar capture; never records the desktop or microphone. */
+(() => {
+  'use strict';
+  function captureBounds(arena,sidebar,scope='arena'){
+    if(scope==='arena')return arena;
+    if(scope!=='workspace'||!sidebar)throw Error('Invalid recording scope');
+    const left=Math.min(arena.left,sidebar.left),top=Math.min(arena.top,sidebar.top),right=Math.max(arena.right,sidebar.right),bottom=Math.max(arena.bottom,sidebar.bottom);
+    return {left,top,right,bottom,width:right-left,height:bottom-top};
+  }
   function framing(source,view,width,height,pixels){
     const left=Math.max(source.left,view.left),top=Math.max(source.top,view.top),right=Math.min(source.right,view.right),bottom=Math.min(source.bottom,view.bottom),scale=Math.min(width/view.width,height/view.height);
     if(right<=left||bottom<=top)return null;
@@ -14395,28 +14579,39 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
     return (FORMATS[format]||[]).filter(supports);
   }
   class ArenaRecorder {
-    constructor(canvas,viewport,{onChange=()=>{},onReady=()=>{},onError=()=>{},onResolution=()=>{}}={}){
-      Object.assign(this,{canvas,viewport,onChange,onReady,onError,onResolution});this.session=null;this.last={active:false,stopping:false,elapsed:0,bytes:0};
+    constructor(canvas,viewport,{sidebar=null,captureSidebar=null,onChange=()=>{},onReady=()=>{},onError=()=>{},onResolution=()=>{}}={}){
+      Object.assign(this,{canvas,viewport,sidebar,captureSidebar,onChange,onReady,onError,onResolution});this.session=null;this.preparing=null;this.last={active:false,stopping:false,elapsed:0,bytes:0};
     }
     static supported(format){return typeof MediaRecorder!=='undefined'&&typeof HTMLCanvasElement!=='undefined'&&typeof HTMLCanvasElement.prototype.captureStream==='function'&&(!format||candidates(format).length>0);}
     get status(){
+      if(this.preparing)return this.preparing;
       const s=this.session;return s?{...s.config,active:s.recorder.state!=='inactive',stopping:s.stopping,elapsed:((s.stoppedAt||performance.now())-s.started)/1000,bytes:s.bytes,frames:s.frames,mimeType:s.recorder.mimeType||s.mime}:this.last;
     }
-    start({quality='high',format='mp4'}={}){
-      if(this.session)return;if(!ArenaRecorder.supported())throw Error('浏览器不支持视频录制，请使用新版 Chrome、Edge 或 Safari');
+    bounds(scope='arena'){return captureBounds(this.viewport.getBoundingClientRect(),this.sidebar?.getBoundingClientRect(),scope);}
+    async start({quality='high',format='mp4',scope='arena'}={}){
+      if(this.session||this.preparing)return;if(!ArenaRecorder.supported())throw Error('浏览器不支持视频录制，请使用新版 Chrome、Edge 或 Safari');
       const types=candidates(format);if(!types.length)throw Error(format==='mp4'?'当前浏览器不支持 MP4，请使用新版 Chrome、Edge 或 Safari，或手动选择 WebM':'当前浏览器不支持所选视频格式');
-      const config={...plan(this.viewport.getBoundingClientRect(),quality),format},output=document.createElement('canvas');output.width=config.width;output.height=config.height;
+      const bounds=this.bounds(scope),config={...plan(bounds,quality),format,scope},output=document.createElement('canvas');output.width=config.width;output.height=config.height;
+      let sidebarImage=null;
+      if(scope==='workspace'){
+        if(!this.captureSidebar)throw Error('侧栏录制不可用');
+        const preparing={...config,active:false,preparing:true,stopping:false,elapsed:0,bytes:0};this.preparing=preparing;this.onChange(this.status);
+        try{sidebarImage=await this.captureSidebar(this.sidebar,Math.min(output.width/bounds.width,output.height/bounds.height));}
+        catch(error){if(this.preparing===preparing){this.preparing=null;this.onChange(this.last);}throw error;}
+        if(this.preparing!==preparing)return;
+        this.preparing=null;
+      }
       const ctx=output.getContext('2d',{alpha:false});ctx.fillStyle='#eee4d2';ctx.fillRect(0,0,output.width,output.height);
       const stream=output.captureStream(config.fps),track=stream.getVideoTracks()[0];if('contentHint' in track)track.contentHint='detail';
       let recorder,mime;
       for(const type of types){try{recorder=new MediaRecorder(stream,{mimeType:type,videoBitsPerSecond:config.bitrate});mime=type;break;}catch{/* Try another codec in the same container, never silently change format. */}}
       if(!recorder){stream.getTracks().forEach(t=>t.stop());throw Error('无法创建视频编码器，请降低画质或更换浏览器');}
-      const s={output,ctx,stream,track,recorder,mime,config,chunks:[],bytes:0,frames:0,started:performance.now(),nextFrame:0,lastNotice:0,raf:0,stopping:false,error:null};this.session=s;
+      const s={output,ctx,stream,track,recorder,mime,config,chunks:[],bytes:0,frames:0,started:performance.now(),nextFrame:0,lastNotice:0,raf:0,stopping:false,error:null,sidebarImage,sidebarPending:false,nextSidebar:0};this.session=s;
       s.done=new Promise(resolve=>s.resolve=resolve);
       recorder.ondataavailable=event=>{if(event.data.size){s.chunks.push(event.data);s.bytes+=event.data.size;}};
       recorder.onerror=()=>{s.error=Error('视频编码失败，请降低画质或更换浏览器');void this.stop();};
       recorder.onstop=async()=>{
-        cancelAnimationFrame(s.raf);stream.getTracks().forEach(t=>t.stop());const elapsed=((s.stoppedAt||performance.now())-s.started)/1000;
+        cancelAnimationFrame(s.raf);s.sidebarImage=null;stream.getTracks().forEach(t=>t.stop());const elapsed=((s.stoppedAt||performance.now())-s.started)/1000;
         let blob=new Blob(s.chunks,{type:recorder.mimeType||mime});s.chunks=[];
         try{if(s.error)throw s.error;if(!blob.size)throw Error('录制没有生成视频，请重试');blob=await finalizeWebM(blob,elapsed);}
         catch(error){s.error=error;}
@@ -14428,11 +14623,24 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
         if(this.session!==s||s.stopping)return;
         try{
           if(now>=s.nextFrame){
-            const view=this.viewport.getBoundingClientRect(),scale=Math.min(output.width/view.width,output.height/view.height);
+            const view=this.bounds(scope),arena=this.viewport.getBoundingClientRect(),scale=Math.min(output.width/view.width,output.height/view.height);
             this.onResolution(scale);
-            const r=framing(this.canvas.getBoundingClientRect(),view,output.width,output.height,this.canvas);
+            // Clip a zoomed arena to its own viewport before placing it beside
+            // the sidebar, so offscreen cells cannot cover the recorded panel.
+            const r=framing(this.canvas.getBoundingClientRect(),arena,arena.width*scale,arena.height*scale,this.canvas);
             ctx.fillStyle='#eee4d2';ctx.fillRect(0,0,output.width,output.height);ctx.imageSmoothingEnabled=false;
-            if(r)ctx.drawImage(this.canvas,r.sx,r.sy,r.sw,r.sh,r.dx,r.dy,r.dw,r.dh);
+            const ox=(output.width-view.width*scale)/2,oy=(output.height-view.height*scale)/2;
+            if(r)ctx.drawImage(this.canvas,r.sx,r.sy,r.sw,r.sh,r.dx+ox+(arena.left-view.left)*scale,r.dy+oy+(arena.top-view.top)*scale,r.dw,r.dh);
+            if(scope==='workspace'){
+              const panel=this.sidebar.getBoundingClientRect();
+              if(s.sidebarImage){ctx.imageSmoothingEnabled=true;ctx.drawImage(s.sidebarImage,ox+(panel.left-view.left)*scale,oy+(panel.top-view.top)*scale,panel.width*scale,panel.height*scale);}
+              // Serialize captures and cap sidebar work at 5 Hz; no accumulating
+              // render queue when a large panel or slow device takes longer.
+              if(!s.sidebarPending&&now>=s.nextSidebar){
+                s.sidebarPending=true;s.nextSidebar=now+200;
+                this.captureSidebar(this.sidebar,scale).then(image=>{if(this.session===s&&!s.stopping)s.sidebarImage=image;}).catch(error=>{if(this.session===s&&!s.stopping){s.error=error;void this.stop();}}).finally(()=>{s.sidebarPending=false;});
+              }
+            }
             track.requestFrame?.();s.frames++;
             // Carry fractional frame time forward; resetting to 'now' drops to
             // ~20 FPS when 60 Hz animation-frame timestamps fluctuate slightly.
@@ -14444,9 +14652,9 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
       try{s.nextFrame=performance.now();recorder.start(1000);draw(s.nextFrame);this.onChange(this.status);}
       catch(error){cancelAnimationFrame(s.raf);recorder.onstop=null;stream.getTracks().forEach(t=>t.stop());if(recorder.state!=='inactive')recorder.stop();this.session=null;this.onResolution(0);s.resolve(null);throw error;}
     }
-    stop(){const s=this.session;if(!s)return Promise.resolve(null);if(!s.stopping){s.stopping=true;s.stoppedAt=performance.now();cancelAnimationFrame(s.raf);if(s.recorder.state!=='inactive')s.recorder.stop();this.onChange(this.status);}return s.done;}
+    stop(){if(this.preparing){this.preparing=null;this.onChange(this.last);return Promise.resolve(null);}const s=this.session;if(!s)return Promise.resolve(null);if(!s.stopping){s.stopping=true;s.stoppedAt=performance.now();cancelAnimationFrame(s.raf);if(s.recorder.state!=='inactive')s.recorder.stop();this.onChange(this.status);}return s.done;}
   }
-  globalThis.CellLabVideo={ArenaRecorder,framing,finalizeWebM,plan,candidates,QUALITIES};
+  globalThis.CellLabVideo={ArenaRecorder,framing,captureBounds,finalizeWebM,plan,candidates,QUALITIES};
 })();
 
 /* Responsive controls only. Moving existing DOM nodes preserves input state,
@@ -14530,6 +14738,33 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
   globalThis.CellLabMobile={mount};
 })();
 
+/* Focus the existing, live statistics. Never clone counters or reset biology. */
+(() => {
+  function mount(mobile,onLayout=()=>{}){
+    const $=id=>document.getElementById(id),aside=document.querySelector('aside'),pane=$('sidebar-scroll');
+    const record=$('record-options'),anchor=document.createComment('record settings position');record.before(anchor);
+    let active=false,priorScroll=0,priorMobile=false,priorScenario=false;
+    function set(value){
+      value=!!value;if(value===active)return;
+      if(value){priorScroll=pane.scrollTop;priorMobile=mobile.expanded;priorScenario=$('statistics-scenario').open;}
+      active=value;aside.classList.toggle('statistics-focused',active);
+      $('statistics-expand').setAttribute('aria-pressed',String(active));$('statistics-expand').textContent=active?'返回控制':'占满侧栏';
+      if(active){
+        $('statistics-panel').open=true;$('statistics-scenario').open=true;
+        $('statistics-record-settings').append(record);mobile.expand(true);pane.scrollTop=0;
+      }else{
+        anchor.after(record);$('statistics-scenario').open=priorScenario;mobile.expand(priorMobile);pane.scrollTop=priorScroll;
+      }
+      onLayout();
+    }
+    $('statistics-expand').addEventListener('click',()=>set(!active));
+    matchMedia('(max-width:850px)').addEventListener('change',()=>{if(active)mobile.expand(true);});
+    document.addEventListener('keydown',event=>{if(event.key==='Escape'&&active&&!document.querySelector('dialog[open]')){set(false);$('statistics-expand').focus();}});
+    return{set,get active(){return active;}};
+  }
+  globalThis.CellLabStatistics={mount};
+})();
+
 (() => {
   'use strict';
   const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d',{alpha:false});
@@ -14576,6 +14811,7 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
     ['il2HalfLife','IL-2 半衰期',20,800,20,'独立扩散、衰减和摄取；可用持续场源外源补充',' MCS'],
     ['exhaustionRate','慢性刺激耗竭速率',0,3,.1,'持续抗原刺激逐渐降低扩增和杀伤；补足营养不会立即清空耗竭',''],
     ['damagePolarization','损伤暴露转抑制态',0,5,.1,'正常细胞损伤信号暴露越强、越久，粉色巡逻细胞转蓝概率越高；0 关闭转变','×'],
+    ['suppressionRecovery','抑制态恢复速度',0,5,.1,'当前正常损伤信号和累计暴露均降低后，蓝色细胞按概率恢复粉色；越大恢复越快，0 关闭恢复','×'],
     ['damageDeactivation','损伤暴露退激活',0,5,.1,'持续正常细胞损伤信号提高红色免疫细胞退回粉色的概率','×'],
     ['suppressiveSecretion','抑制态信号分泌',0,5,.1,'蓝色细胞沿自身胞体分泌独立免疫抑制信号，随局部代谢效能变化','×'],
     ['suppressionStrength','抑制信号退激活',0,5,.1,'局部抑制信号提高红色转粉色的概率；退激活后 240 MCS 内不能立即重新识别','×'],
@@ -14607,7 +14843,7 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
     'tumor-evolution-sliders':['mutation','mutationSize','tumorMutationGain','antigenStressGain','contactEscape','signalEscape'],
     'tumor-cycle-sliders':['tumorCycle','tumorQuiescence'],
     'immune-sliders':['immuneMotility','immuneSeparation','kill','recruitment'],
-    'immune-regulation-sliders':['damagePolarization','damageDeactivation','suppressiveSecretion','suppressionStrength','immuneRegulationMemory'],
+    'immune-regulation-sliders':['damagePolarization','suppressionRecovery','damageDeactivation','suppressiveSecretion','suppressionStrength','immuneRegulationMemory'],
     'immune-cycle-sliders':['immuneGrowth','immuneDivisions','immuneCycle','antigenMemory','il2Secretion','il2HalfLife','exhaustionRate'],
     'other-sliders':['sectionYield','temperature','alignment','repulsion','noise']
   },moduleFor=Object.fromEntries(Object.entries(modules).flatMap(([id,names])=>names.map(name=>[name,id])));
@@ -14703,10 +14939,11 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
       $('scenario-configuration').textContent=scenario.customized?'参数已调整':'预设参数';
       const initial=scenario.initial;
       $('scenario-setup').textContent=`开局：正常 ${initial.normal} · 肿瘤 ${initial.tumor} · 免疫 ${initial.immune}${initial.tumor?' · 抗原阳性 '+initial.antigenPositive+'/'+initial.tumor:''}。种子 ${s.seed}；区域、参数和手动操作会改变演化。`;
-      const values=s.scene==='oncogenesis'?[`异常发生 ${s.counters.abnormalInitiations}`,`恶性转变 ${s.counters.malignantTransitions}`,`肿瘤分裂 ${scenario.tumorDivisions}`]:s.scene==='cold'?[`存活肿瘤 ${scenario.tumor}`,`原灶外肿瘤 ${scenario.farTumor}`,`远端分裂 ${scenario.distalDivisions}`]:[`残留肿瘤胞体 ${scenario.tumorBodies}`,`免疫清除 ${s.counters.kills}`,`清除后观察 ${scenario.clearanceElapsed} MCS`];
+      const values=['oncogenesis','random'].includes(s.scene)?[`异常发生 ${s.counters.abnormalInitiations}`,`恶性转变 ${s.counters.malignantTransitions}`,`肿瘤分裂 ${scenario.tumorDivisions}`]:s.scene==='cold'?[`存活肿瘤 ${scenario.tumor}`,`原灶外肿瘤 ${scenario.farTumor}`,`远端分裂 ${scenario.distalDivisions}`]:[`残留肿瘤胞体 ${scenario.tumorBodies}`,`免疫清除 ${s.counters.kills}`,`清除后观察 ${scenario.clearanceElapsed} MCS`];
       $('scenario-metrics').textContent=values.join('　·　');
     }
     $('seed-label').textContent='种子 '+s.seed;
+    $('statistics-play').textContent=s.playing?'Ⅱ 暂停':'▶ 继续';
     for(const b of document.querySelectorAll('[data-scene]')){const active=b.dataset.scene===s.scene;b.classList.toggle('active',active);b.setAttribute('aria-pressed',active);}
     for(const [name,,,,,,suffix] of controls){if(document.activeElement!==$(name)&&!$(name).dataset.touchEditing)$(name).value=s.settings[name];$(name+'-out').textContent=Number($(name).value)+suffix;syncParameterInput(name);}
     if(document.activeElement!==$('speed')&&!$('speed').dataset.touchEditing)$('speed').value=s.speed;$('speed-out').textContent=s.speed+'×';
@@ -14720,7 +14957,7 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
     $('normal-count').textContent=counts[1]-abnormal;$('abnormal-count').textContent=abnormal;$('tumor-count').textContent=counts[2];$('immune-count').textContent=counts[3];
     $('activated-immune-count').textContent=activated;
     $('suppressive-immune-count').textContent=suppressive;
-    $('immune-regulation-events').textContent=`转抑制态 ${s.counters.suppressiveTransitions} · 损伤退激活 ${s.counters.injuryDeactivations} · 信号退激活 ${s.counters.signalDeactivations}`;
+    $('immune-regulation-events').textContent=`转抑制态 ${s.counters.suppressiveTransitions} · 恢复静息态 ${s.counters.suppressiveRecoveries} · 损伤退激活 ${s.counters.injuryDeactivations} · 信号退激活 ${s.counters.signalDeactivations}`;
     $('seed-status').textContent=`当前 ${s.cells.length} 颗 · 按局部空间尝试加入`;
     $('division-count').textContent=s.counters.divisions;$('recognition-count').textContent=s.counters.recognitions;
     const patrol=s.patrol;$('patrol-coverage').textContent=(100*patrol.coverage).toFixed(1)+'%';$('patrol-checked').textContent=patrol.checkedCells;
@@ -14783,7 +15020,7 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
       if(cell.kind===2){const g=cell.genome;lines.push(`克隆 #${cell.clone} · 第 ${cell.generation} 代 · 杀伤损伤 ${(cell.damage*100).toFixed(0)}%`,`遗传：耐受 ${g.tolerance.toFixed(2)} / 增殖 ${g.proliferation.toFixed(2)} / 侵袭 ${g.invasion.toFixed(2)}`,`抗原表达 ${g.antigen.toFixed(2)} · ${cell.antigen?'可识别':'低于识别阈值'}`);}
       if(cell.kind===3)lines.push(`第 ${cell.generation} 代 · 剩余分裂 ${cell.divisionsLeft} 次`,`激活 ${Math.ceil(cell.activation)} MCS · 招募 ${Math.ceil(cell.recruitment)} MCS`);
       if(cell.kind===3)lines.push(`抗原刺激记忆 ${Math.round(cell.antigenMemory*100)}% · 慢性耗竭 ${Math.round(cell.exhaustion*100)}%`,`局部 IL-2 ${cell.il2.toFixed(3)} · 扩增响应 ${Math.round(cell.il2Response*100)}%`);
-      if(cell.kind===3)lines.push(`正常损伤暴露 ${Math.round(cell.normalDamageExposure*100)}% · 局部抑制信号 ${cell.inhibition.toFixed(3)}`,cell.immunePhenotype==='suppressive'?'抑制样表型：分泌抑制信号，保留运动，停止抗肿瘤杀伤':`再激活等待 ${Math.ceil(cell.immuneRefractory)} MCS`);
+      if(cell.kind===3)lines.push(`正常损伤暴露 ${Math.round(cell.normalDamageExposure*100)}% · 局部抑制信号 ${cell.inhibition.toFixed(3)}`,cell.immunePhenotype==='suppressive'?'抑制样表型：趋向正常损伤，分泌抑制信号；暴露降低后可恢复粉色':`再激活等待 ${Math.ceil(cell.immuneRefractory)} MCS`);
       if(cell.kind===3)lines.push(`本细胞已检查 ${cell.patrolChecked} 颗不同组织细胞`);
       if(cell.kind===2&&cell.origin==='normal')lines.push(`源自正常细胞 · ${cell.transformedAt} MCS 恶性转变`);
       if(cell.kind===2&&cell.morphologyMode)lines.push(`${cell.morphologyMode===2?'动态分枝':'梭形双极'} · 伸展／回缩中的突起 ${cell.branchCount} 处 · 稳定接触 ${cell.networkDegree||0} 个邻居`);
@@ -14934,7 +15171,7 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
     drawHistory();dirty=false;probeDirty=true;
   }
   function drawHistory(){
-    const chart=$('history'),c=chart.getContext('2d'),rows=snapshot.history,w=Math.max(260,chart.clientWidth||320),h=110,dpr=devicePixelRatio||1;
+    const chart=$('history'),c=chart.getContext('2d'),rows=snapshot.history,w=Math.max(260,chart.clientWidth||320),h=110,dpr=Math.max(devicePixelRatio||1,recordingScale);
     if(chart.width!==Math.round(w*dpr)||chart.height!==Math.round(h*dpr)){chart.width=Math.round(w*dpr);chart.height=Math.round(h*dpr);}c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,w,h);if(!rows.length)return;
     let max=10;for(const row of rows)for(const key of ['normal','abnormal','tumor','immune'])max=Math.max(max,row[key]||0);
     const last=rows.at(-1),end=snapshot.time,span=Math.max(1,end);
@@ -15024,13 +15261,13 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
   for(const id of ['world-size','refinement'])$(id).addEventListener('change',gridPreview);gridPreview();
   async function start(scene=snapshot?.scene||'oncogenesis',{preserve=false,shuffle=false,preset=false}={}){
     if(preset&&scene==='maze'&&Number($('world-size').value)<384){$('world-size').value='384';if(Number($('refinement').value)>2)$('refinement').value='2';gridPreview();}
-    selected=0;observedBirth=0;const resetDisplay=preset||scene!==snapshot?.scene;
-    const seed=preset?17:shuffle?crypto.getRandomValues(new Uint32Array(1))[0]%1000000:snapshot?.seed??17;
+    selected=0;observedBirth=0;const resetDisplay=preset||shuffle||scene!==snapshot?.scene;
+    const seed=preset?(scene==='oncogenesis'?29:17):shuffle?crypto.getRandomValues(new Uint32Array(1))[0]%1000000:snapshot?.seed??17;
     const worldWidth=Number($('world-size').value),refinement=Number($('refinement').value);
-    if((preset&&snapshot)||scene==='empty')await rpc('playing',{value:false});
+    if(((preset||shuffle)&&snapshot)||scene==='empty')await rpc('playing',{value:false});
     await rpc('start',{scene,seed,worldWidth,worldHeight:Number($('world-size').selectedOptions[0]?.dataset.height)||worldWidth*.75,refinement,boundary:$('boundary').value,settings:preserve?snapshot?.settings||{}:{},...(scene==='empty'?{warmup:0}:{})});
     if(resetDisplay){$('edge-activity').checked=true;$('normal-activity').checked=false;$('tumor-activity').checked=false;$('immune-activity').checked=scene==='maze';dirty=true;}
-    if(preset||scene==='empty'){signalLayers.clear();$('field-view').value=scene==='oncogenesis'?'adversity':'none';if(scene==='hot'||scene==='maze')signalLayers.add('trail');if(scene==='maze'){$('edge-activity').checked=true;$('immune-activity').checked=true;$('show-tracks').checked=true;$('track-duration').value='1200';syncTracks();view.x=0;view.y=0;$('zoom').value='100';$('view-fit').value='contain';}updateOverlayButtons();dirty=true;await rpc('speed',{value:scene==='oncogenesis'?4:scene==='network'?3:1});await rpc('playing',{value:scene!=='empty'});}
+    if(preset||shuffle||scene==='empty'){signalLayers.clear();$('field-view').value=['oncogenesis','random'].includes(scene)?'adversity':'none';if(scene==='hot'||scene==='maze')signalLayers.add('trail');if(scene==='maze'){$('edge-activity').checked=true;$('immune-activity').checked=true;$('show-tracks').checked=true;$('track-duration').value='1200';syncTracks();view.x=0;view.y=0;$('zoom').value='100';$('view-fit').value='contain';}updateOverlayButtons();dirty=true;await rpc('speed',{value:['oncogenesis','random'].includes(scene)?4:scene==='network'?3:1});await rpc('playing',{value:scene!=='empty'});}
     else if(scene==='stress'||scene==='surveillance'){$('field-view').value='adversity';dirty=true;}
     if(scene==='empty'){view.x=0;view.y=0;$('zoom').value='100';$('seed-kind').value='1';setTool('seed');if(mobileUI.isMobile)mobileUI.focus('mobile-tools');dirty=true;}
   }
@@ -15064,31 +15301,38 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
   $('clear-overlays').addEventListener('click',()=>{signalLayers.clear();$('field-view').value='none';updateOverlayButtons();dirty=true;});
   const sections=[...document.querySelectorAll('aside details.section')];
   const mobileUI=CellLabMobile.mount();
+  const statisticsUI=CellLabStatistics.mount(mobileUI,()=>{dirty=true;});
   for(const section of sections)section.addEventListener('toggle',()=>{if(section.open)for(const other of sections)if(other!==section)other.open=false;});
   $('collapse-modules').addEventListener('click',()=>sections.forEach(section=>section.open=false));
-  document.querySelectorAll('[data-panel]').forEach(button=>button.addEventListener('click',()=>mobileUI.focus(button.dataset.panel)));
+  document.querySelectorAll('[data-panel]').forEach(button=>button.addEventListener('click',()=>{statisticsUI.set(false);mobileUI.focus(button.dataset.panel);}));
   $('compute-backend').addEventListener('change',()=>rpc('backend',{mode:$('compute-backend').value}).catch(fail));
   const modes={wander:{alignment:0,cohesion:0,repulsion:1.2,noise:1.2,normalMotility:.9},cluster:{alignment:.4,cohesion:2.6,repulsion:.3,noise:.4,normalMotility:.45},flock:{alignment:2.7,cohesion:1.1,repulsion:.5,noise:.25,normalMotility:1}};
   document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',async()=>{for(const [name,value] of Object.entries(modes[b.dataset.mode]))await rpc('set',{name,value});toast('局部规则已更新；变化会逐步形成');}));
   function download(url,name){const a=document.createElement('a');a.href=url;a.download=name;a.click();}
   let recordUnavailable=false;
   function refreshRecordingOptions(){
-    const format=$('record-format').value,quality=$('record-quality').value,label=format==='mp4'?'MP4':'WebM',state=video.status,busy=state.active||state.stopping,q=busy?state:CellLabVideo.plan(viewport.getBoundingClientRect(),quality);
-    $('record-options-summary').textContent=label+' · '+({standard:'1080p',high:'1440p',ultra:'4K'}[quality]);
+    const phone=matchMedia('(max-width:850px)').matches;if(phone&&!video.status.active&&!video.status.preparing&&!video.status.stopping)$('record-scope').value='arena';$('record-scope').closest('label').hidden=phone;
+    const format=$('record-format').value,quality=$('record-quality').value,label=format==='mp4'?'MP4':'WebM',state=video.status,busy=state.active||state.preparing||state.stopping,q=busy?state:CellLabVideo.plan(video.bounds($('record-scope').value),quality);
+    $('record-options-summary').textContent=label+' · '+({standard:'1080p',high:'1440p',ultra:'4K'}[quality])+' · '+($('record-scope').value==='workspace'?'Arena ＋ 右侧栏':'仅 Arena');
     const supported=CellLabVideo.ArenaRecorder.supported(format);
     $('record-options-info').textContent=supported?`${q.width} × ${q.height} · 30 FPS`:(format==='mp4'?'当前浏览器不支持 MP4，请使用新版 Chrome、Edge 或 Safari，或手动选择 WebM':'当前浏览器不支持所选视频格式');
-    $('record-format').disabled=busy;$('record-quality').disabled=busy;
+    $('record-format').disabled=busy;$('record-quality').disabled=busy;$('record-scope').disabled=busy;
     if(!busy){$('record-video').textContent='● 录制 '+label;$('record-video').disabled=!supported;if(!supported)$('record-status').textContent=$('record-options-info').textContent;else if(recordUnavailable)$('record-status').textContent='';recordUnavailable=!supported;}
+    $('statistics-record').textContent=$('record-video').textContent;$('statistics-record').disabled=$('record-video').disabled;
   }
   const video=new CellLabVideo.ArenaRecorder(canvas,viewport,{
-    onChange:state=>{const time=Math.floor(state.elapsed||0),stamp=String(Math.floor(time/60)).padStart(2,'0')+':'+String(time%60).padStart(2,'0');$('record-video').textContent=state.stopping?'正在生成视频…':state.active?'■ 停止并下载':'● 录制 '+($('record-format').value==='mp4'?'MP4':'WebM');$('record-video').disabled=!!state.stopping;$('record-indicator').hidden=!state.active;$('record-indicator').textContent='■ '+stamp;$('record-indicator').disabled=!!state.stopping;if(state.active)$('record-status').textContent=`录制中 ${stamp} · ${state.format==='mp4'?'MP4':'WebM'} · ${state.width} × ${state.height} · ${state.fps} FPS`;refreshRecordingOptions();},
+    sidebar:document.querySelector('aside'),captureSidebar:CellLabSidebarCapture.capture,
+    onChange:state=>{const time=Math.floor(state.elapsed||0),stamp=String(Math.floor(time/60)).padStart(2,'0')+':'+String(time%60).padStart(2,'0');$('record-video').textContent=state.preparing?'准备录制…':state.stopping?'正在生成视频…':state.active?'■ 停止并下载':'● 录制 '+($('record-format').value==='mp4'?'MP4':'WebM');$('record-video').disabled=!!(state.stopping||state.preparing);$('record-indicator').hidden=!state.active;$('record-indicator').textContent='■ '+stamp;$('record-indicator').disabled=!!state.stopping;if(state.active)$('record-status').textContent=`录制中 ${stamp} · ${state.format==='mp4'?'MP4':'WebM'} · ${state.width} × ${state.height} · ${state.fps} FPS`;refreshRecordingOptions();},
     onReady:(blob,state)=>{const url=URL.createObjectURL(blob),extension=blob.type.includes('mp4')?'mp4':'webm';download(url,`cell-arena-${snapshot.scene}-${state.width}x${state.height}-${Date.now()}.${extension}`);setTimeout(()=>URL.revokeObjectURL(url),60000);$('record-status').textContent=`视频已导出 · ${extension==='mp4'?'MP4':'WebM'} · ${state.width} × ${state.height} · ${Math.round(state.elapsed)} 秒 · ${(blob.size/1024/1024).toFixed(1)} MB`;},
     onError:error=>{$('record-status').textContent=String(error.message||error);},
     onResolution:scale=>{if(Math.abs(recordingScale-scale)>.001){recordingScale=scale;if(scale>0)render();else dirty=true;}}
   });
   $('maze-diffusion').addEventListener('click',async()=>{if(!snapshot?.maze)return;const button=$('maze-diffusion');button.disabled=true;try{await rpc('mazeSignal',{throughWalls:!snapshot.maze.signalThroughWalls});}catch(e){fail(e);}finally{button.disabled=false;}});
-  $('record-video').addEventListener('click',()=>{try{if(video.status.active)void video.stop();else{render();video.start({quality:$('record-quality').value,format:$('record-format').value});}}catch(error){$('record-status').textContent=String(error.message||error);}});$('record-indicator').addEventListener('click',()=>void video.stop());
-  for(const id of ['record-format','record-quality'])$(id).addEventListener('change',refreshRecordingOptions);refreshRecordingOptions();
+  $('record-video').addEventListener('click',async()=>{try{if(video.status.active||video.status.preparing)await video.stop();else{render();await video.start({quality:$('record-quality').value,format:$('record-format').value,scope:mobileUI.isMobile?'arena':$('record-scope').value});}}catch(error){refreshRecordingOptions();$('record-status').textContent=String(error.message||error);toast('录像未能开始：'+String(error.message||error));}});$('record-indicator').addEventListener('click',()=>void video.stop());
+  matchMedia('(max-width:850px)').addEventListener('change',async event=>{if(event.matches&&video.status.scope==='workspace'&&(video.status.active||video.status.preparing)){await video.stop();toast('手机端仅录制 Arena，组合录像已结束');}refreshRecordingOptions();});
+  $('statistics-record').addEventListener('click',()=>$('record-video').click());
+  $('statistics-play').addEventListener('click',()=>$('play').click());
+  for(const id of ['record-format','record-quality','record-scope'])$(id).addEventListener('change',refreshRecordingOptions);refreshRecordingOptions();
   $('snapshot').addEventListener('click',()=>{render();download(canvas.toDataURL('image/png'),`cell-arena-${snapshot.scene}-${snapshot.time}.png`);});
   function displaySettings(){return {cellColors:CellLabDisplay.normalizeColors(cellColors),trackDuration:Number($('track-duration').value),fieldView:$('field-view').value,signalLayers:[...signalLayers],opacity:{...opacity},flags:Object.fromEntries(CellLabExperiment.flags.map(id=>[id,$(id).checked])),zoom:$('zoom').value,fit:$('view-fit').value,renderResolution:$('render-resolution').value};}
   async function exportData(){return {...await rpc('export'),display:displaySettings()};}

@@ -1,6 +1,12 @@
-/* Local arena-only video capture; never records the desktop or microphone. */
+/* Local arena / app-sidebar capture; never records the desktop or microphone. */
 (() => {
   'use strict';
+  function captureBounds(arena,sidebar,scope='arena'){
+    if(scope==='arena')return arena;
+    if(scope!=='workspace'||!sidebar)throw Error('Invalid recording scope');
+    const left=Math.min(arena.left,sidebar.left),top=Math.min(arena.top,sidebar.top),right=Math.max(arena.right,sidebar.right),bottom=Math.max(arena.bottom,sidebar.bottom);
+    return {left,top,right,bottom,width:right-left,height:bottom-top};
+  }
   function framing(source,view,width,height,pixels){
     const left=Math.max(source.left,view.left),top=Math.max(source.top,view.top),right=Math.min(source.right,view.right),bottom=Math.min(source.bottom,view.bottom),scale=Math.min(width/view.width,height/view.height);
     if(right<=left||bottom<=top)return null;
@@ -47,28 +53,39 @@
     return (FORMATS[format]||[]).filter(supports);
   }
   class ArenaRecorder {
-    constructor(canvas,viewport,{onChange=()=>{},onReady=()=>{},onError=()=>{},onResolution=()=>{}}={}){
-      Object.assign(this,{canvas,viewport,onChange,onReady,onError,onResolution});this.session=null;this.last={active:false,stopping:false,elapsed:0,bytes:0};
+    constructor(canvas,viewport,{sidebar=null,captureSidebar=null,onChange=()=>{},onReady=()=>{},onError=()=>{},onResolution=()=>{}}={}){
+      Object.assign(this,{canvas,viewport,sidebar,captureSidebar,onChange,onReady,onError,onResolution});this.session=null;this.preparing=null;this.last={active:false,stopping:false,elapsed:0,bytes:0};
     }
     static supported(format){return typeof MediaRecorder!=='undefined'&&typeof HTMLCanvasElement!=='undefined'&&typeof HTMLCanvasElement.prototype.captureStream==='function'&&(!format||candidates(format).length>0);}
     get status(){
+      if(this.preparing)return this.preparing;
       const s=this.session;return s?{...s.config,active:s.recorder.state!=='inactive',stopping:s.stopping,elapsed:((s.stoppedAt||performance.now())-s.started)/1000,bytes:s.bytes,frames:s.frames,mimeType:s.recorder.mimeType||s.mime}:this.last;
     }
-    start({quality='high',format='mp4'}={}){
-      if(this.session)return;if(!ArenaRecorder.supported())throw Error('浏览器不支持视频录制，请使用新版 Chrome、Edge 或 Safari');
+    bounds(scope='arena'){return captureBounds(this.viewport.getBoundingClientRect(),this.sidebar?.getBoundingClientRect(),scope);}
+    async start({quality='high',format='mp4',scope='arena'}={}){
+      if(this.session||this.preparing)return;if(!ArenaRecorder.supported())throw Error('浏览器不支持视频录制，请使用新版 Chrome、Edge 或 Safari');
       const types=candidates(format);if(!types.length)throw Error(format==='mp4'?'当前浏览器不支持 MP4，请使用新版 Chrome、Edge 或 Safari，或手动选择 WebM':'当前浏览器不支持所选视频格式');
-      const config={...plan(this.viewport.getBoundingClientRect(),quality),format},output=document.createElement('canvas');output.width=config.width;output.height=config.height;
+      const bounds=this.bounds(scope),config={...plan(bounds,quality),format,scope},output=document.createElement('canvas');output.width=config.width;output.height=config.height;
+      let sidebarImage=null;
+      if(scope==='workspace'){
+        if(!this.captureSidebar)throw Error('侧栏录制不可用');
+        const preparing={...config,active:false,preparing:true,stopping:false,elapsed:0,bytes:0};this.preparing=preparing;this.onChange(this.status);
+        try{sidebarImage=await this.captureSidebar(this.sidebar,Math.min(output.width/bounds.width,output.height/bounds.height));}
+        catch(error){if(this.preparing===preparing){this.preparing=null;this.onChange(this.last);}throw error;}
+        if(this.preparing!==preparing)return;
+        this.preparing=null;
+      }
       const ctx=output.getContext('2d',{alpha:false});ctx.fillStyle='#eee4d2';ctx.fillRect(0,0,output.width,output.height);
       const stream=output.captureStream(config.fps),track=stream.getVideoTracks()[0];if('contentHint' in track)track.contentHint='detail';
       let recorder,mime;
       for(const type of types){try{recorder=new MediaRecorder(stream,{mimeType:type,videoBitsPerSecond:config.bitrate});mime=type;break;}catch{/* Try another codec in the same container, never silently change format. */}}
       if(!recorder){stream.getTracks().forEach(t=>t.stop());throw Error('无法创建视频编码器，请降低画质或更换浏览器');}
-      const s={output,ctx,stream,track,recorder,mime,config,chunks:[],bytes:0,frames:0,started:performance.now(),nextFrame:0,lastNotice:0,raf:0,stopping:false,error:null};this.session=s;
+      const s={output,ctx,stream,track,recorder,mime,config,chunks:[],bytes:0,frames:0,started:performance.now(),nextFrame:0,lastNotice:0,raf:0,stopping:false,error:null,sidebarImage,sidebarPending:false,nextSidebar:0};this.session=s;
       s.done=new Promise(resolve=>s.resolve=resolve);
       recorder.ondataavailable=event=>{if(event.data.size){s.chunks.push(event.data);s.bytes+=event.data.size;}};
       recorder.onerror=()=>{s.error=Error('视频编码失败，请降低画质或更换浏览器');void this.stop();};
       recorder.onstop=async()=>{
-        cancelAnimationFrame(s.raf);stream.getTracks().forEach(t=>t.stop());const elapsed=((s.stoppedAt||performance.now())-s.started)/1000;
+        cancelAnimationFrame(s.raf);s.sidebarImage=null;stream.getTracks().forEach(t=>t.stop());const elapsed=((s.stoppedAt||performance.now())-s.started)/1000;
         let blob=new Blob(s.chunks,{type:recorder.mimeType||mime});s.chunks=[];
         try{if(s.error)throw s.error;if(!blob.size)throw Error('录制没有生成视频，请重试');blob=await finalizeWebM(blob,elapsed);}
         catch(error){s.error=error;}
@@ -80,11 +97,24 @@
         if(this.session!==s||s.stopping)return;
         try{
           if(now>=s.nextFrame){
-            const view=this.viewport.getBoundingClientRect(),scale=Math.min(output.width/view.width,output.height/view.height);
+            const view=this.bounds(scope),arena=this.viewport.getBoundingClientRect(),scale=Math.min(output.width/view.width,output.height/view.height);
             this.onResolution(scale);
-            const r=framing(this.canvas.getBoundingClientRect(),view,output.width,output.height,this.canvas);
+            // Clip a zoomed arena to its own viewport before placing it beside
+            // the sidebar, so offscreen cells cannot cover the recorded panel.
+            const r=framing(this.canvas.getBoundingClientRect(),arena,arena.width*scale,arena.height*scale,this.canvas);
             ctx.fillStyle='#eee4d2';ctx.fillRect(0,0,output.width,output.height);ctx.imageSmoothingEnabled=false;
-            if(r)ctx.drawImage(this.canvas,r.sx,r.sy,r.sw,r.sh,r.dx,r.dy,r.dw,r.dh);
+            const ox=(output.width-view.width*scale)/2,oy=(output.height-view.height*scale)/2;
+            if(r)ctx.drawImage(this.canvas,r.sx,r.sy,r.sw,r.sh,r.dx+ox+(arena.left-view.left)*scale,r.dy+oy+(arena.top-view.top)*scale,r.dw,r.dh);
+            if(scope==='workspace'){
+              const panel=this.sidebar.getBoundingClientRect();
+              if(s.sidebarImage){ctx.imageSmoothingEnabled=true;ctx.drawImage(s.sidebarImage,ox+(panel.left-view.left)*scale,oy+(panel.top-view.top)*scale,panel.width*scale,panel.height*scale);}
+              // Serialize captures and cap sidebar work at 5 Hz; no accumulating
+              // render queue when a large panel or slow device takes longer.
+              if(!s.sidebarPending&&now>=s.nextSidebar){
+                s.sidebarPending=true;s.nextSidebar=now+200;
+                this.captureSidebar(this.sidebar,scale).then(image=>{if(this.session===s&&!s.stopping)s.sidebarImage=image;}).catch(error=>{if(this.session===s&&!s.stopping){s.error=error;void this.stop();}}).finally(()=>{s.sidebarPending=false;});
+              }
+            }
             track.requestFrame?.();s.frames++;
             // Carry fractional frame time forward; resetting to 'now' drops to
             // ~20 FPS when 60 Hz animation-frame timestamps fluctuate slightly.
@@ -96,7 +126,7 @@
       try{s.nextFrame=performance.now();recorder.start(1000);draw(s.nextFrame);this.onChange(this.status);}
       catch(error){cancelAnimationFrame(s.raf);recorder.onstop=null;stream.getTracks().forEach(t=>t.stop());if(recorder.state!=='inactive')recorder.stop();this.session=null;this.onResolution(0);s.resolve(null);throw error;}
     }
-    stop(){const s=this.session;if(!s)return Promise.resolve(null);if(!s.stopping){s.stopping=true;s.stoppedAt=performance.now();cancelAnimationFrame(s.raf);if(s.recorder.state!=='inactive')s.recorder.stop();this.onChange(this.status);}return s.done;}
+    stop(){if(this.preparing){this.preparing=null;this.onChange(this.last);return Promise.resolve(null);}const s=this.session;if(!s)return Promise.resolve(null);if(!s.stopping){s.stopping=true;s.stoppedAt=performance.now();cancelAnimationFrame(s.raf);if(s.recorder.state!=='inactive')s.recorder.stop();this.onChange(this.status);}return s.done;}
   }
-  globalThis.CellLabVideo={ArenaRecorder,framing,finalizeWebM,plan,candidates,QUALITIES};
+  globalThis.CellLabVideo={ArenaRecorder,framing,captureBounds,finalizeWebM,plan,candidates,QUALITIES};
 })();

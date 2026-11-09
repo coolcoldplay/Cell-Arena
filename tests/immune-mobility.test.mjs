@@ -39,7 +39,9 @@ test('compressed cells do not manufacture additional target mass and ratchet the
 });
 
 test('tissue can become confluent without irreversibly pinning a healthy immune patrol at minimum-area floors',async t=>{
-  const s=new CellLab.Simulation({width:96,height:72,scene:'empty',boundary:'wrap',warmup:0,seed:17,settings:{...settings,immuneGrowth:0}});
+  // Isolate mechanics: the imposed danger field must not evolve antigen-positive
+  // neighbours and turn this patrol-only fixture into a contact-scan experiment.
+  const s=new CellLab.Simulation({width:96,height:72,scene:'empty',boundary:'wrap',warmup:0,seed:17,settings:{...settings,immuneGrowth:0,mutation:0,tumorMutationGain:0,antigenStressGain:0,contactEscape:0,signalEscape:0}});
   for(let y=0;y<72;y+=12)for(let x=0;x<96;x+=12){const id=s.C.makeNewCellID(2),points=[];
     for(let a=x;a<x+12;a++)for(let b=y;b<y+12;b++)if(Math.hypot(a-24,b-36)>6){s.C.setpix([a,b],id);points.push(s.C.grid.p2i([a,b]));}
     const m=s.cells[id];m.target=s.C.getVolume(id);m.genome.antigen=0;s.applyGenome(m);s.refreshPositions();assert.ok(s.section.initialize(m,points));s.updateMechanics(m);

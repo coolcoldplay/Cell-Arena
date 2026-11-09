@@ -100,3 +100,38 @@ dialog{max-width:700px;width:calc(100% - 32px);max-height:86dvh;overflow:auto;ov
 .patrol-metrics{padding:7px 0;border-top:0}.patrol-current{font:12px Consolas,monospace;margin:6px 0}.patrol-definition{font-size:12px;color:var(--muted);line-height:1.6}.patrol-definition summary{cursor:pointer}.patrol-definition p{margin:6px 0}
 .cycle-summary{margin:8px 0;padding:8px 0;border-block:1px solid var(--line);font-size:12px;line-height:1.5}.cycle-summary p{margin:3px 0;overflow-wrap:anywhere}
 .antigen-key i{width:12px;height:9px;background:transparent;border:1px solid #d12f39}
+
+/* A dashboard in the existing sidebar; the arena keeps its full height. */
+.statistics-actions{display:flex;gap:5px;padding:5px 0}.statistics-actions button{flex:1;white-space:nowrap;font-size:12px}
+aside.statistics-focused>:not(.dish-head):not(.sidebar-scroll){display:none!important}
+aside.statistics-focused .sidebar-scroll>:not(#statistics-panel){display:none!important}
+aside.statistics-focused .sidebar-scroll{padding:0 8px 8px;scroll-padding-top:40px}
+aside.statistics-focused #statistics-panel{margin:0;border:0}
+aside.statistics-focused #statistics-panel>summary{display:none}
+aside.statistics-focused .statistics-actions{position:sticky;top:0;z-index:3;background:var(--bg);border-bottom:1px solid var(--line)}
+aside.statistics-focused .legend{gap:4px 9px;padding:5px 0}
+aside.statistics-focused .legend .proliferation-key,aside.statistics-focused .legend .edge-key,aside.statistics-focused .legend .antigen-key,aside.statistics-focused .legend .cycle-key{display:none}
+aside.statistics-focused .metrics{gap:4px;padding:3px 0}
+aside.statistics-focused .metrics>div{padding:3px 5px}
+aside.statistics-focused .metrics b{font-size:18px}
+aside.statistics-focused .metrics span{margin-top:1px}
+aside.statistics-focused .cycle-summary{padding:3px 0;margin:3px 0}
+aside.statistics-focused .patrol-current{margin:3px 0}
+aside.statistics-focused .death-overview{padding:3px 0}
+aside.statistics-focused .death-causes b{margin:1px 0}
+aside.statistics-focused .death-overview>.hint,aside.statistics-focused .death-visual-key,aside.statistics-focused .chart-panel>.hint,aside.statistics-focused .ecology-line>span:last-child:not([id]){display:none}
+aside.statistics-focused .performance-line,aside.statistics-focused .ecology-line{line-height:1.45;padding:4px 0;gap:2px 8px}
+aside.statistics-focused .chart-panel{padding:5px 0}
+aside.statistics-focused #history{height:clamp(85px,11dvh,125px);margin-top:3px}
+aside.statistics-focused #statistics-scenario{margin:0}
+aside.statistics-focused #statistics-scenario>summary{padding:4px 0}
+aside.statistics-focused #scenario-description{display:none}
+aside.statistics-focused .scenario-metrics{margin:3px 0}
+aside.statistics-focused #restore-scenario{display:none}
+aside.statistics-focused .death-ledger{padding:4px 0}
+aside.statistics-focused .death-ledger summary{display:flex;flex-wrap:wrap;gap:4px 8px}
+aside.statistics-focused #record-options{margin-bottom:3px}
+aside.statistics-focused #record-options>summary{padding:4px 0}
+@media(max-width:850px){.statistics-actions button{min-height:40px}.statistics-actions{padding:6px 0}}
+
+@media(max-width:850px){.record-scope-hint{display:none}}

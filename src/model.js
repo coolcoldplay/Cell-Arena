@@ -8,7 +8,7 @@
   // Phenomenological MCS parameters; not hours or molecular concentrations.
   Object.assign(DEFAULTS,{tumorCycle:240,tumorQuiescence:1,immuneCycle:220,antigenMemory:900,il2Secretion:1,il2HalfLife:180,exhaustionRate:1});
   Object.assign(DEFAULTS,{normalMutationGain:2,tumorMutationGain:2,mutationBias:0,antigenStressGain:.5,contactEscape:.1,signalEscape:.05,evolutionMemory:800});
-  Object.assign(DEFAULTS,{damagePolarization:1,damageDeactivation:1,suppressiveSecretion:1,suppressionStrength:1,immuneRegulationMemory:400});
+  Object.assign(DEFAULTS,{damagePolarization:1,damageDeactivation:1,suppressiveSecretion:1,suppressionStrength:1,immuneRegulationMemory:400,suppressionRecovery:1});
   const newCycle=()=>({phase:'G0',progress:0,entry:0,blockedFor:0,arrest:'',drive:0,pressure:0,retry:0});
   const CYCLE_STAGES=['G1','S','G2','M'],CYCLE_FRACTIONS={G1:.4,S:.35,G2:.18,M:.07};
   // Exploratory defaults, deliberately narrower than the manual slider limits.
@@ -17,11 +17,24 @@
   const RANDOM_RANGES={normalMotility:[.05,.25,.05],tumorMotility:[.35,1.2,.05],immuneMotility:[.75,1.4,.05],chemotaxis:[.7,2.2,.1],alignment:[.1,1,.1],cohesion:[.6,1.6,.1],repulsion:[.4,1.2,.1],immuneSeparation:[.7,1.7,.1],noise:[.35,1,.05],halfLife:[80,220,10],growth:[.5,1.4,.05],apoptosis:[0,8,1],antigen:[30,95,5],kill:[.6,1.8,.1],temperature:[8,18,1],supply:[1.6,2.8,.05],metabolism:[.6,1.1,.05],escape:[1.5,3.5,.1],recruitment:[.6,2,.1],immuneGrowth:[.15,.65,.05],immuneDivisions:[2,4,1],mutation:[2,15,1],mutationSize:[.05,.2,.01],sectionYield:[.25,.4,.01],stressMutation:[.2,2,.1],inflammation:[0,1.5,.1],progression:[.5,3,.1],tumorMorphology:[0,2,1],branchLength:[2,3.2,.1],branchStrength:[3,7,.5],networkAdhesion:[.4,1.4,.1],branching:[.5,1.5,.1]};
   Object.assign(RANDOM_RANGES,{tumorCycle:[180,320,20],tumorQuiescence:[.6,1.4,.1],immuneCycle:[160,280,20],antigenMemory:[600,1400,100],il2Secretion:[.6,1.5,.1],il2HalfLife:[120,260,20],exhaustionRate:[.5,1.5,.1]});
   Object.assign(RANDOM_RANGES,{normalMutationGain:[1,5,1],tumorMutationGain:[1,5,1],mutationBias:[0,0,1],antigenStressGain:[.2,1,.1],contactEscape:[.05,.3,.05],signalEscape:[.02,.12,.02],evolutionMemory:[600,1200,100]});
-  Object.assign(RANDOM_RANGES,{damagePolarization:[.5,1.5,.1],damageDeactivation:[.5,1.5,.1],suppressiveSecretion:[.5,1.5,.1],suppressionStrength:[.5,1.5,.1],immuneRegulationMemory:[200,600,50]});
+  Object.assign(RANDOM_RANGES,{damagePolarization:[.5,1.5,.1],damageDeactivation:[.5,1.5,.1],suppressiveSecretion:[.5,1.5,.1],suppressionStrength:[.5,1.5,.1],immuneRegulationMemory:[200,600,50],suppressionRecovery:[.5,1.5,.1]});
+  // Random development experiments stay near competing, viable regimes rather
+  // than combining unrelated extremes or pre-planting malignant cells.
+  Object.assign(RANDOM_RANGES,{supply:[2.3,2.8,.05],metabolism:[1.05,1.3,.05],stressMutation:[3,6,.5],progression:[1.5,4,.5],inflammation:[.6,1.6,.1],normalMutationGain:[3,6,.5],tumorMutationGain:[3,7,.5],growth:[.8,1.35,.05],tumorMotility:[.6,1.2,.05],normalMotility:[.05,.15,.05],immuneMotility:[1,1.4,.05],kill:[1,1.8,.1],recruitment:[1,2,.1],immuneGrowth:[.3,.65,.05],immuneDivisions:[3,4,1],immuneCycle:[180,240,20],antigenMemory:[900,1500,100],tumorCycle:[180,280,20],chemotaxis:[1.5,2.5,.1],escape:[1.8,3,.1],mutation:[8,16,1],mutationSize:[.12,.24,.02],antigenStressGain:[.5,1.5,.1],contactEscape:[.2,.8,.1],signalEscape:[.1,.4,.05],damagePolarization:[2.5,4.5,.25],damageDeactivation:[.7,1.5,.1],suppressiveSecretion:[1,1.8,.1],suppressionStrength:[.8,1.6,.1],suppressionRecovery:[1,2.5,.25],immuneRegulationMemory:[150,350,50],tumorMorphology:[0,1,1]});
   function randomSettings(seed){
     let state=seed>>>0;
     const random=()=>{state=(state+0x6d2b79f5)>>>0;let n=Math.imul(state^(state>>>15),1|state);n^=n+Math.imul(n^(n>>>7),61|n);return ((n^(n>>>14))>>>0)/4294967296;};
     return Object.fromEntries(Object.entries(RANDOM_RANGES).map(([key,[lo,hi,step]])=>[key,Number((lo+Math.floor(random()*(Math.round((hi-lo)/step)+1))*step).toFixed(2))]));
+  }
+  function ecologyLayout(seed,randomized){
+    let state=(seed^0x58a1c9e7)>>>0;
+    const random=()=>{state=(state+0x6d2b79f5)>>>0;let n=Math.imul(state^(state>>>15),1|state);n^=n+Math.imul(n^(n>>>7),61|n);return ((n^(n>>>14))>>>0)/4294967296;};
+    const niches=randomized?[
+      {x:.4+.2*random(),y:.4+.2*random(),rx:.22+.04*random(),ry:.26+.05*random(),floor:.04+.03*random()},
+      ...Array.from({length:2},()=>({x:.24+.5*random(),y:.25+.5*random(),rx:.11+.05*random(),ry:.14+.06*random(),floor:.10+.08*random()}))
+    ]:[{x:.5,y:.5,rx:.25,ry:.30,floor:.05},{x:.28,y:.38,rx:.13,ry:.18,floor:.16},{x:.70,y:.68,rx:.14,ry:.15,floor:.12}];
+    const patrols=randomized?Array.from({length:16},(_,i)=>({x:.18+(i%4)*.213+(random()-.5)*.03,y:.2+Math.floor(i/4)*.2+(random()-.5)*.03,key:random()})).sort((a,b)=>a.key-b.key).slice(0,12+Math.floor(random()*5)).map(p=>[p.x,p.y]):Array.from({length:12},(_,i)=>[.2+(i%4)*.2,.25+Math.floor(i/4)*.25]);
+    return {niches,patrols};
   }
   const POPULATIONS=['normal','abnormal','tumor','immune'];
   const sameHistoryRow=(a,b)=>!!a&&Object.keys(b).every(key=>a[key]===b[key]);
@@ -42,7 +55,8 @@
   }
   const SIGNALS=['cohesion','danger','trail','il2','normalDamage','inhibition'];
   const PRESETS={
-    oncogenesis:{label:'肿瘤发生发展',environmentProfile:'poor-core',founderTolerance:2.4,description:'正常细胞铺满培养皿，4 颗免疫细胞分散在单层内部。中心酸清除弱、氧糖补给略低；代谢与炎症压力提高随机变异，经异常中间态产生肿瘤；耐受变异、细胞死亡与免疫监视共同筛选存活克隆。',settings:{supply:2.8,metabolism:1.2,inflammation:1,stressMutation:5,progression:5,normalMutationGain:4,tumorMutationGain:4,growth:1.2,apoptosis:2,tumorMotility:1.5,normalMotility:.05,cohesion:1.3,escape:4,immuneGrowth:.15,immuneDivisions:2,kill:1.2}},
+    oncogenesis:{label:'肿瘤发生发展',environmentProfile:'mosaic',founderTolerance:2.3,description:'密铺正常组织与 12 颗分散免疫细胞，从零肿瘤开始。三处供给较弱的区域与健康边缘形成差异；异常、癌变、免疫清除、抑制与恢复相互竞争，逃逸克隆可能再次扩增。没有定时转变或预设结局。',settings:{supply:2.5,metabolism:1.2,inflammation:1.2,stressMutation:4,progression:2.5,normalMutationGain:5,tumorMutationGain:6,growth:1.05,tumorCycle:220,apoptosis:3,tumorMotility:.9,normalMotility:.1,cohesion:1.1,escape:2.4,immuneMotility:1.3,immuneGrowth:.5,immuneDivisions:3,immuneCycle:200,antigenMemory:1200,kill:1.4,recruitment:1.4,chemotaxis:1.8,mutation:12,mutationSize:.2,antigenStressGain:1.2,contactEscape:.6,signalEscape:.3,damagePolarization:3.5,damageDeactivation:1.2,suppressiveSecretion:1.5,suppressionStrength:1.3,suppressionRecovery:1.5,immuneRegulationMemory:200}},
+    random:{label:'随机肿瘤演化',environmentProfile:'mosaic',founderTolerance:2.3,description:'随机化的密铺正常组织、12–16 颗内部免疫细胞与三处弱供给区域。参数在发生发展附近抽样，肿瘤必须由局部异常产生；相同种子和参数可重现开局，结局由局部相互作用产生。',settings:{}},
     cold:{label:'免疫冷肿瘤扩散转移',description:'正常细胞铺满背景，中央嵌入 19 颗低抗原肿瘤，外围仅 3 颗免疫细胞。梭形肿瘤侵袭扩增，压力提高性状变异，部分克隆可能暴露抗原；免疫招募较弱。这是二维局部播散，不含血管或跨器官转移。',settings:{supply:2.8,metabolism:.65,stressMutation:0,progression:1,growth:1.4,tumorCycle:180,apoptosis:2,tumorMotility:1.5,tumorMorphology:1,normalMotility:.25,cohesion:.4,sectionYield:.4,immuneMotility:.8,antigen:15,kill:1,chemotaxis:.6,recruitment:.35,immuneGrowth:.15,immuneDivisions:2,alignment:.2,noise:.85,mutation:8,normalMutationGain:1,tumorMutationGain:5,antigenStressGain:.3,contactEscape:.15,signalEscape:.1}},
     hot:{label:'免疫热肿瘤治愈',description:'正常细胞铺满背景，中央嵌入 37 颗高抗原肿瘤，18 颗免疫细胞分散在病灶周边的组织内。接触识别、招募及 IL-2 扩增支持早期清除；少数存活克隆可能丢失抗原并再次扩增。结局随种子改变，关闭杀伤可作对照。',settings:{supply:2.8,metabolism:.65,stressMutation:0,progression:1,growth:.75,tumorCycle:280,apoptosis:0,tumorMotility:.35,immuneMotility:1.2,antigen:100,kill:2,chemotaxis:2.5,recruitment:2.4,immuneGrowth:.65,immuneDivisions:3,immuneCycle:200,antigenMemory:1200,il2Secretion:1.2,noise:.45,halfLife:180,mutation:2,mutationSize:.05,antigenStressGain:.15,contactEscape:.35,signalEscape:.12}},
     ecosystem:{label:'免疫共培养',settings:{}},
@@ -157,7 +171,7 @@
       this.counters={manualRemoved:0,divisions:0,immuneDivisions:0,kills:0,apoptosis:0,environment:0,apoptosisStarted:0,killStarted:0,environmentStarted:0,recognitions:0,mutations:0,abnormalInitiations:0,malignantTransitions:0,abnormalKills:0,normalEnvironmentDeaths:0,abnormalEnvironmentDeaths:0};this.birthSerial=0;this.lineage=[];this.deathHistory=[];this.recentClearances=[];this.manualDeathRemovals={spontaneous:0,kill:0,environment:0};
       this.deathEffects=[];this.sources=[];this.sourceSerial=0;
       Object.assign(this.counters,{normalTraitMutations:0,stressMutations:0,antigenExposures:0,antigenEscapes:0});
-      Object.assign(this.counters,{suppressiveTransitions:0,injuryDeactivations:0,signalDeactivations:0});
+      Object.assign(this.counters,{suppressiveTransitions:0,suppressiveRecoveries:0,injuryDeactivations:0,signalDeactivations:0});
       const s=this.settings;
       this.C=new CPM.CPM([width,height],{
         seed,torus:[this.wrap,this.wrap],T:s.temperature,
@@ -215,6 +229,11 @@
       // Core acid clearance is limited more strongly than nutrient supply, so
       // chronic injury can coexist with a viable, better supplied frontier.
       this.supplyMap=new Float32Array(bins).fill(1);
+      this.ecology=PRESETS[scene]?.environmentProfile==='mosaic'?ecologyLayout(seed,scene==='random'):null;
+      if(this.ecology)for(let i=0;i<bins;i++){
+        const x=(i%this.fields.oxygen.width+.5)*this.fieldScale/width,y=(Math.floor(i/this.fields.oxygen.width)+.5)*this.fieldScale/height;
+        for(const n of this.ecology.niches){const radius=Math.hypot((x-n.x)/n.rx,(y-n.y)/n.ry);this.supplyMap[i]=Math.min(this.supplyMap[i],n.floor+(1-n.floor)*clamp((radius-.55)/.65));}
+      }
       if(PRESETS[scene]?.environmentProfile==='poor-core')for(let i=0;i<bins;i++){
         const x=(i%this.fields.oxygen.width+.5)*this.fieldScale/this.scale,y=(Math.floor(i/this.fields.oxygen.width)+.5)*this.fieldScale/this.scale;
         const radius=Math.hypot((x-this.worldWidth/2)/(this.worldWidth*.22),(y-this.worldHeight/2)/(this.worldHeight*.25));
@@ -262,10 +281,10 @@
       m.nucleusStrainX=0;m.nucleusStrainY=0;m.fieldBins=new Map();m.sectionFraction=1;m.sectionPressure=0;m.hasNucleus=false;if(genome)this.applyGenome(m);
       m.cycle=newCycle();m.antigenMemory=0;m.il2=0;m.il2Response=0;m.il2Production=0;m.chronicStimulation=0;m.exhaustion=0;
       m.normalTolerance=1;m.mutationPressure=0;m.immuneEncounters=0;m.immuneContactMemory=0;m.recruitmentExposure=0;m.lastAntigenChange=null;
-      m.immunePhenotype=kind===IMMUNE?'cytotoxic':null;m.normalDamageExposure=0;m.inhibition=0;m.immuneRefractory=0;
+      m.immunePhenotype=kind===IMMUNE?'cytotoxic':null;m.normalDamageExposure=0;m.inhibition=0;m.immuneRefractory=0;m.recruitmentTargetID=0;m.recruitmentTargetBirth=0;
       this.cells[id]=m;this.contacts.set(id,new Map());this.updateMechanics(m);return m;
     }
-    applyGenome(m){m.antigenLevel=m.genome.antigen;m.antigen=m.antigenLevel>=.18;}
+    applyGenome(m){const recognized=m.antigen;m.antigenLevel=m.genome.antigen;m.antigen=m.antigenLevel>=.18;if(recognized&&!m.antigen)this.releaseAntigenTarget(m);}
     immuneTarget(m){return !!m&&!m.dying&&(m.kind===TUMOR||(m.kind===NORMAL&&m.state==='abnormal'))&&m.antigen;}
     beginAbnormal(id){
       const m=this.cells[id];if(!m||m.dying||m.kind!==NORMAL||m.state!=='normal')return false;
@@ -341,9 +360,18 @@
       const before=m.antigenLevel;m.antigenLevel=level;m.antigen=level>=.18;if(m.genome)m.genome.antigen=level;
       m.lastAntigenChange={time:this.C.time,cause};this.counters[cause==='escape'?'antigenEscapes':'antigenExposures']++;
       this.log('antigen-'+cause,m.id,0,{birth:m.birth,from:before,to:level,encounters:m.immuneEncounters,exposure:m.recruitmentExposure});
-      // Loss ends recognition immediately; it never repairs already delivered damage.
-      for(const [key,h]of this.histories)if(h.target===m.id)this.histories.delete(key);
-      for(const ctl of this.live())if(ctl.targetID===m.id){ctl.targetID=0;ctl.phase='search';this.updateMechanics(ctl);}
+      if(!m.antigen)this.releaseAntigenTarget(m);
+    }
+    releaseAntigenTarget(m){
+      // Invalidate both current synapses and recent recruitment from this exact
+      // birth identity. Already released fields, damage and CTL memory remain.
+      const scanned=new Set();
+      for(const [key,h]of this.histories)if(h.target===m.id){scanned.add(h.ctl);this.histories.delete(key);}
+      for(const ctl of this.live())if(ctl.kind===IMMUNE){
+        const bound=ctl.targetID===m.id,recruiting=ctl.recruitmentTargetID===m.id&&ctl.recruitmentTargetBirth===m.birth;
+        if(bound||recruiting){ctl.recruitment=0;ctl.recruitmentTargetID=0;ctl.recruitmentTargetBirth=0;}
+        if(bound||(!ctl.targetID&&scanned.has(ctl.id))){ctl.targetID=0;ctl.phase='search';this.updateMechanics(ctl);}
+      }
     }
     updateMechanics(m){
       if(this.section)this.section.sync(m);
@@ -420,7 +448,7 @@
       const nearest=(x,y)=>{let best=null,d=Infinity;const row=Math.floor(y/H*ny),col=Math.floor(x/W*nx);
         for(let yy=Math.max(0,row-2);yy<=Math.min(ny-1,row+2);yy++)for(let xx=Math.max(0,col-2);xx<=Math.min(nx-1,col+2);xx++){const site=rows[yy][xx],q=(site.x-x)**2+(site.y-y)**2;if(q<d){d=q;best=site;}}return [best,d];};
       const patrols=[];
-      const hot=this.scene==='hot',positions=!tumorCount?[[.24,.27],[.73,.25],[.32,.73],[.77,.69]]:hot?Array.from({length:18},(_,i)=>[.5+64*Math.cos(i*Math.PI/9)/W,.5+64*Math.sin(i*Math.PI/9)/H]):[[.08,.28],[.92,.5],[.08,.76]];
+      const hot=this.scene==='hot',positions=!tumorCount?(this.ecology?.patrols||[[.24,.27],[.73,.25],[.32,.73],[.77,.69]]):hot?Array.from({length:18},(_,i)=>[.5+64*Math.cos(i*Math.PI/9)/W,.5+64*Math.sin(i*Math.PI/9)/H]):[[.08,.28],[.92,.5],[.08,.76]];
       for(const [fx,fy]of positions){
         let spot=null,score=-Infinity;for(let y=H*fy-7;y<=H*fy+7;y++)for(let x=W*fx-7;x<=W*fx+7;x++){const d=nearest(x,y)[1];if(d>score){score=d;spot=[x,y];}}
         const [x,y]=spot,site={x,y,id:this.C.makeNewCellID(IMMUNE),points:[],weight:0};let lo=-100,hi=100;
@@ -539,15 +567,7 @@
       const W=this.worldWidth,H=this.worldHeight,C=this.C,r=this.scale;
       const seed=(kind,x,y,radius)=>this.seed(kind,x*r,y*r,radius*r);
       if(this.scene==='random'){
-        const centers=Array.from({length:C.ran(1,3)},()=>[W*(.25+.5*C.random()),H*(.25+.5*C.random())]),density=.55+.3*C.random();
-        // Jittered, non-overlapping founders; local patches bias the mixture.
-        // Only initialization has access to these centers; sensing stays local.
-        for(let y=13;y<H-9;y+=22)for(let x=13;x<W-9;x+=22){
-          if(C.random()>density)continue;
-          const near=centers.some(([cx,cy])=>Math.hypot(x-cx,y-cy)<Math.min(W,H)*.22);
-          const roll=C.random(),kind=roll<(near?.6:.08)?TUMOR:roll>.88?IMMUNE:NORMAL;
-          seed(kind,x+C.ran(-3,3),y+C.ran(-3,3),kind===IMMUNE?3:kind===TUMOR?7:8);
-        }
+        this.populateMonolayer();
         return;
       }
       if(this.scene==='network'){
@@ -692,8 +712,10 @@
         }
         if(m.dying)continue;
         if(m.kind===NORMAL)deposit('cohesion',.045*dt);
-        if(m.state==='abnormal')deposit('danger',.035*dt);
-        if(m.kind===TUMOR)deposit('danger',.10*dt);
+        // This constitutive lesion cue is an explicit recognizable-phenotype
+        // proxy; antigen-negative bodies do not carry a moving chemo-beacon.
+        if(m.state==='abnormal'&&m.antigen)deposit('danger',.035*dt);
+        if(m.kind===TUMOR&&m.antigen)deposit('danger',.10*dt);
         const effector=m.immunePhenotype!=='suppressive'&&m.immuneRefractory<=0;
         if(m.kind===IMMUNE&&m.immunePhenotype==='suppressive')deposit('inhibition',.30*dt*this.settings.suppressiveSecretion*m.fitness);
         if(m.kind===IMMUNE&&effector&&m.recruitment>0)deposit('trail',.38*dt*this.settings.recruitment*m.fitness);
@@ -730,11 +752,14 @@
       for(const m of this.live()){
         if(m.dying)continue;let gx=0,gy=0,ax=0,ay=0,rx=0,ry=0,ix=0,iy=0,total=0;
         const gradient=key=>{const f=this.fields[key];let x=0,y=0,n=0;for(const [i,amount] of m.fieldBins){const g=f.gradient(i%f.width,Math.floor(i/f.width));x+=g[0]*amount;y+=g[1]*amount;n+=amount;}return [x/(n||1),y/(n||1)];};
-        if(m.kind===IMMUNE){const a=gradient('danger'),b=gradient('trail');gx=a[0]+b[0]*1.8;gy=a[1]+b[1]*1.8;}
+        if(m.kind===IMMUNE){
+          if(m.immunePhenotype==='suppressive')[gx,gy]=gradient('normalDamage');
+          else {const a=gradient('danger'),b=gradient('trail');gx=a[0]+b[0]*1.8;gy=a[1]+b[1]*1.8;}
+        }
         else if(m.kind===NORMAL){[gx,gy]=gradient('cohesion');}
         else {const g=gradient('cohesion');gx=g[0]*.25;gy=g[1]*.25;}
         const magnitude=Math.hypot(gx,gy);if(magnitude>0){const gain=Math.min(1,magnitude/.035);gx=gx/magnitude*gain;gy=gy/magnitude*gain;}
-        // This cue reads only local damage/recruitment gradients. Concentration
+        // This cue reads only phenotype-specific local gradients. Concentration
         // or contact with another immune cell does not confer recognition.
         if(m.kind===IMMUNE)m.immuneCue=clamp(s.chemotaxis/1.6)*Math.min(1,magnitude/.035);
         for(const edge of this.contacts.get(m.id)?.values()||[]){
@@ -787,7 +812,7 @@
           ctl.phase=chosen.h.recognized?'kill':'scan';
           // Only the currently contacting, antigen-positive target gets damage.
           if(chosen.h.recognized){
-            ctl.targetID=chosen.target.id;ctl.activation=700;ctl.recruitment=200;
+            ctl.targetID=chosen.target.id;ctl.activation=700;ctl.recruitment=200;ctl.recruitmentTargetID=chosen.target.id;ctl.recruitmentTargetBirth=chosen.target.birth;
             chosen.target.damage+=dt*.012*this.settings.kill*chosen.target.antigenLevel*Math.min(1,chosen.edge.length/(3*this.scale))*ctl.fitness*(1-.8*ctl.exhaustion);
             if(chosen.target.damage>=1)this.beginDeath(chosen.target.id,'kill');
           }
@@ -804,10 +829,22 @@
       const s=this.settings;
       for(const m of this.live())if(m.kind===IMMUNE&&!m.dying){
         m.immuneRefractory=Math.max(0,m.immuneRefractory-dt);
-        const injury=this.fieldOnCell(m,'normalDamage'),u=injury/(.35+injury);
+        // Endogenous injury is diluted over a cell's occupied field bins. Its
+        // dimensionless response scale must match that source, not a 30-unit
+        // manually painted pulse; otherwise natural tissue injury is inert.
+        const injury=this.fieldOnCell(m,'normalDamage'),u=injury/(.03+injury);
         m.normalDamageExposure=clamp(u+(m.normalDamageExposure-u)*Math.exp(-dt/s.immuneRegulationMemory));
         m.inhibition=this.fieldOnCell(m,'inhibition');
-        if(m.immunePhenotype==='suppressive')continue;
+        if(m.immunePhenotype==='suppressive'){
+          // Both recent history and present dose must fall. Self-secreted
+          // inhibition does not lock the cell into its suppressive phenotype.
+          const relief=clamp((.5-Math.max(m.normalDamageExposure,u))/.5),hazard=.001*s.suppressionRecovery*relief**2;
+          if(hazard>0&&this.C.random()<-Math.expm1(-hazard*dt)){
+            this.deactivateImmune(m);m.immunePhenotype='cytotoxic';this.counters.suppressiveRecoveries++;
+            this.log('immune-recovery',m.id,0,{birth:m.birth,normalDamageExposure:m.normalDamageExposure});
+          }
+          continue;
+        }
         if(m.activation>0){
           const injuryRate=.0008*s.damageDeactivation*m.normalDamageExposure**2,signalRate=.0012*s.suppressionStrength*m.inhibition/(.35+m.inhibition),hazard=injuryRate+signalRate;
           if(hazard>0&&this.C.random()<-Math.expm1(-hazard*dt)){
@@ -825,7 +862,7 @@
       }
     }
     deactivateImmune(m){
-      m.activation=0;m.recruitment=0;m.il2Production=0;m.targetID=0;m.phase='search';m.immuneRefractory=240;
+      m.activation=0;m.recruitment=0;m.recruitmentTargetID=0;m.recruitmentTargetBirth=0;m.il2Production=0;m.targetID=0;m.phase='search';m.immuneRefractory=240;
       for(const [key,h]of this.histories)if(h.ctl===m.id)this.histories.delete(key);
       // This changes function, not geometry, stored antigen memory or already
       // delivered target damage. The refractory interval prevents same-step reactivation.
@@ -1141,7 +1178,7 @@
       if(['antigenStressGain','contactEscape','signalEscape'].includes(name))value=clamp(value,0,5);
       if(name==='mutationBias')value=clamp(value,-100,100);
       if(name==='evolutionMemory')value=clamp(value,100,4000);
-      if(['damagePolarization','damageDeactivation','suppressiveSecretion','suppressionStrength'].includes(name))value=clamp(value,0,5);
+      if(['damagePolarization','damageDeactivation','suppressiveSecretion','suppressionStrength','suppressionRecovery'].includes(name))value=clamp(value,0,5);
       if(name==='immuneRegulationMemory')value=clamp(value,100,2000);
       this.settings[name]=value;if(name==='temperature')this.C.conf.T=value;
       this.section?.updateJunctions(0);
@@ -1205,7 +1242,7 @@
     advance(steps){for(let n=0;n<steps;n++){this.mechanicalStep();if(this.C.time%4===0)this.updateEnvironment(4);this.biologicalStep();}}
     async advanceAsync(steps,backend){for(let n=0;n<steps;n++){this.mechanicalStep();if(this.C.time%4===0){this.prepareEnvironment();await backend.step(this,4);}this.biologicalStep();}}
     initializeScenario(){
-      if(!['oncogenesis','cold','hot'].includes(this.scene))return;
+      if(!['oncogenesis','random','cold','hot'].includes(this.scene))return;
       const live=this.live(),tumors=live.filter(m=>m.kind===TUMOR);
       this.scenarioState={initial:{normal:live.filter(m=>m.kind===NORMAL).length,tumor:tumors.length,immune:live.filter(m=>m.kind===IMMUNE).length,antigenPositive:tumors.filter(m=>m.antigen).length,clones:tumors.map(m=>m.clone)},tumorDivisions:0,distalDivisions:0,peakTumor:tumors.length,everTumor:tumors.length>0,clearanceAt:null};
     }
@@ -1223,7 +1260,7 @@
       const elapsed=state.clearanceAt===null?0:this.C.time-state.clearanceAt,c=this.counters,abnormal=live.filter(m=>m.state==='abnormal'&&!m.dying).length;
       const maxAdversity=Math.max(0,...live.filter(m=>!m.dying).map(m=>m.adversity));
       let phase='',achieved=false;
-      if(this.scene==='oncogenesis'){
+      if(this.scene==='oncogenesis'||this.scene==='random'){
         achieved=active.length>0&&state.tumorDivisions>0;
         phase=achieved?'新生肿瘤克隆扩增':active.length?'肿瘤已发生':c.malignantTransitions?'肿瘤已出现，当前无存活肿瘤':c.abnormalInitiations?'已发生异常中间态':maxAdversity>.08?'环境压力累积':'局部资源消耗';
       }else if(this.scene==='cold'){
@@ -1234,8 +1271,8 @@
         achieved=state.everTumor&&!tumors.length&&elapsed>=150&&c.kills>0;
         phase=achieved?'当前区域持续清除':!tumors.length&&state.everTumor?'清除后继续观察':!active.length&&tumors.length?'靶细胞凋亡清除中':c.kills?'免疫清除进行中':c.recognitions?'接触识别与招募':'浸润与接触扫描';
       }
-      const preset=PRESETS[this.scene],baseline={...DEFAULTS,...preset.settings};
-      return {label:preset.label,description:preset.description,profile:{environment:preset.environmentProfile||'uniform',founderTolerance:preset.founderTolerance||1},phase,achieved,initial:{...state.initial,clones:[...state.initial.clones]},tumor:active.length,tumorBodies:tumors.length,abnormal,farTumor:far,distalRadius:55,tumorDivisions:state.tumorDivisions,distalDivisions:state.distalDivisions,peakTumor:state.peakTumor,clearanceAt:state.clearanceAt,clearanceElapsed:elapsed,maxAdversity,customized:Object.keys(DEFAULTS).some(k=>this.settings[k]!==baseline[k])};
+      const preset=PRESETS[this.scene],baseline={...DEFAULTS,...(this.scene==='random'?randomSettings(this.seedValue):preset.settings)};
+      return {label:preset.label,description:preset.description,profile:{environment:preset.environmentProfile||'uniform',founderTolerance:preset.founderTolerance||1,...(this.ecology?{niches:this.ecology.niches.map(n=>({...n}))}:{})},phase,achieved,initial:{...state.initial,clones:[...state.initial.clones]},tumor:active.length,tumorBodies:tumors.length,abnormal,farTumor:far,distalRadius:55,tumorDivisions:state.tumorDivisions,distalDivisions:state.distalDivisions,peakTumor:state.peakTumor,clearanceAt:state.clearanceAt,clearanceElapsed:elapsed,maxAdversity,customized:Object.keys(DEFAULTS).some(k=>this.settings[k]!==baseline[k])};
     }
     populationRow(){const counts=[0,0,0,0];let px=0,py=0,n=0,abnormal=0;for(const m of this.live()){counts[m.kind]++;if(m.state==='abnormal')abnormal++;if(!m.dying){px+=m.px;py+=m.py;n++;}}
       return {time:this.C.time,normal:counts[1]-abnormal,abnormal,tumor:counts[2],immune:counts[3],order:n?Math.hypot(px,py)/n:0,...this.counters};

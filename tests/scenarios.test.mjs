@@ -10,7 +10,7 @@ test('guided scenarios start from honest phenotypes and retain intended immune p
   for(const worldWidth of [192,240,384]){
     const options={worldWidth,worldHeight:worldWidth*.75,refinement:1.5,warmup:0};
     const a=new CellLab.Simulation({...options,scene:'oncogenesis'}),cold=new CellLab.Simulation({...options,scene:'cold'}),hot=new CellLab.Simulation({...options,scene:'hot'});
-    assert.ok(a.live().filter(m=>m.kind===1).length>=30);assert.equal(a.live().filter(m=>m.kind===2).length,0);assert.equal(a.live().filter(m=>m.state==='abnormal').length,0);assert.equal(a.scenarioReport().initial.immune,4);assert.ok(a.live().every(m=>m.stress===0));
+    assert.ok(a.live().filter(m=>m.kind===1).length>=30);assert.equal(a.live().filter(m=>m.kind===2).length,0);assert.equal(a.live().filter(m=>m.state==='abnormal').length,0);assert.equal(a.scenarioReport().initial.immune,12);assert.ok(a.live().every(m=>m.stress===0));
     assert.ok(a.fields.oxygen.values.every(v=>v===1));assert.ok(a.fields.acid.values.every(v=>v===0));
     assert.equal(cold.scenarioReport().initial.immune,3);assert.equal(hot.scenarioReport().initial.immune,18);
     assert.equal(cold.scenarioReport().initial.tumor,19);assert.equal(hot.scenarioReport().initial.tumor,37);assert.equal(hot.scenarioReport().initial.antigenPositive,37);
@@ -47,8 +47,8 @@ test('oncogenesis produces unplanted malignant cells; a resulting clone can expa
   assert.ok(s.live().filter(m=>m.kind===2&&m.clone===clone).length>=2);assert.ok(s.scenarioReport().achieved);
 });
 
-test('turning off environmental metabolism or the first mutation gate prevents scheduled cancer emergence',async()=>{
-  for(const settings of [{metabolism:0},{stressMutation:0}]){const s=await make('oncogenesis',settings);s.advance(2200);assert.equal(s.counters.abnormalInitiations,0);assert.equal(s.counters.malignantTransitions,0);assert.equal(s.scenarioReport().tumor,0);assert.equal(s.scenarioReport().achieved,false);if(settings.stressMutation===0)assert.ok(s.scenarioReport().maxAdversity>.15);}
+test('turning off metabolism or both independent initiation pathways prevents scheduled cancer emergence',async()=>{
+  for(const settings of [{metabolism:0},{stressMutation:0,inflammation:0}]){const s=await make('oncogenesis',settings);s.advance(2200);assert.equal(s.counters.abnormalInitiations,0);assert.equal(s.counters.malignantTransitions,0);assert.equal(s.scenarioReport().tumor,0);assert.equal(s.scenarioReport().achieved,false);if(settings.stressMutation===0)assert.ok(s.scenarioReport().maxAdversity>.15);}
 });
 
 test('cold tumor spreads and divides beyond the original lesion using existing mechanics',async()=>{

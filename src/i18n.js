@@ -695,6 +695,8 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
 免疫抑制|Immune suppression
 损伤应答与免疫抑制|Injury response & immune suppression
 损伤暴露转抑制态|Injury-driven suppressive conversion
+抑制态恢复速度|Suppressive-state recovery rate
+当前正常损伤信号和累计暴露均降低后，蓝色细胞按概率恢复粉色；越大恢复越快，0 关闭恢复|Blue cells can return to pink once both current normal-injury signals and accumulated exposure fall; higher values speed recovery, 0 disables it
 损伤暴露退激活|Injury-driven deactivation
 抑制态信号分泌|Suppressive signal secretion
 抑制信号退激活|Signal-driven deactivation
@@ -708,9 +710,11 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
 正常损伤暴露|Normal-injury exposure
 局部抑制信号|Local suppression signal
 抑制样表型：分泌抑制信号，保留运动，停止抗肿瘤杀伤|Suppressive-like phenotype: secretes suppression, retains movement, stops antitumor killing
+抑制样表型：趋向正常损伤，分泌抑制信号；暴露降低后可恢复粉色|Suppressive-like phenotype: moves toward normal injury and secretes suppression; may return to pink after exposure falls
 再激活等待|Reactivation delay
 其中抑制|Of these, suppressive
 转抑制态|Suppressive transitions
+恢复静息态|Recoveries to resting state
 损伤退激活|Injury deactivations
 信号退激活|Signal deactivations
 `);
@@ -728,6 +732,23 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
     const result=lines.join('\n');if(/[\p{Script=Han}]/u.test(result))missing.add(source);
     if(cache.size>1024)cache.clear();cache.set(source,result);return result;
   }
+  add(`
+恢复当前情境的参数和推荐种子，保留区域、精细度与边界选择|Restore scenario parameters and its recommended seed; keep area, refinement and boundary
+手机端仅录制 Arena，组合录像已结束|Mobile records the Arena only; combined recording has ended
+占满侧栏|Fill sidebar
+返回控制|Back to controls
+录制范围|Capture area
+仅 Arena|Arena only
+Arena ＋ 右侧栏|Arena + sidebar
+准备录制…|Preparing recording…
+录像未能开始|Recording could not start
+侧栏录制不可用|Sidebar capture is unavailable
+组合录制包含侧栏当前可见的内容；统计可先占满侧栏。Arena 30 FPS，侧栏最多每秒刷新 5 次。|Combined capture includes the currently visible sidebar. Expand statistics first for a dashboard view. Arena: 30 FPS; sidebar: up to 5 updates/second.
+用于本地绘制录像中的实时侧栏。|Renders the live sidebar locally for video capture.
+随机发生发展|Random tumor development
+密铺正常组织与 12 颗分散免疫细胞，从零肿瘤开始。三处供给较弱的区域与健康边缘形成差异；异常、癌变、免疫清除、抑制与恢复相互竞争，逃逸克隆可能再次扩增。没有定时转变或预设结局。|Confluent normal tissue and 12 dispersed immune cells, starting without tumors. Three low-supply niches contrast with healthy edges. Abnormal change, malignancy, clearance, suppression and recovery compete; escape clones may expand again. No scheduled transitions or predetermined outcome.
+随机化的密铺正常组织、12–16 颗内部免疫细胞与三处弱供给区域。参数在发生发展附近抽样，肿瘤必须由局部异常产生；相同种子和参数可重现开局，结局由局部相互作用产生。|Randomized confluent normal tissue, 12–16 internal immune cells and three low-supply niches. Parameters are sampled near the development preset; tumors must arise from local abnormal cells. Seed and parameters reproduce the start; local interactions determine the course.
+`);
   function mount(control){
     let language='zh';try{if(localStorage.getItem('cell-arena-language')==='en')language='en';}catch{}
     const texts=new WeakMap(),attributes=new WeakMap(),names=['title','aria-label','placeholder'];

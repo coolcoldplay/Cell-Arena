@@ -21,7 +21,7 @@ test('legacy population budgets do not restrict additions; failed geometry still
 test('large dishes ignore old budgets and retain geometric seeding density and scenario populations',()=>{
   for(const scene of ['oncogenesis','cold','hot']){
     const s=make({width:512,height:384,scene,settings:{capacity:40}}),initial=s.scenarioReport().initial;
-    assert.ok(initial.normal>200);assert.equal(initial.tumor,scene==='oncogenesis'?0:scene==='cold'?19:37);assert.equal(initial.immune,scene==='oncogenesis'?4:scene==='cold'?3:18);assert.equal(s.snapshot().orphans,0);
+    assert.ok(initial.normal>200);assert.equal(initial.tumor,scene==='oncogenesis'?0:scene==='cold'?19:37);assert.equal(initial.immune,scene==='oncogenesis'?12:scene==='cold'?3:18);assert.equal(s.snapshot().orphans,0);
   }
 });
 

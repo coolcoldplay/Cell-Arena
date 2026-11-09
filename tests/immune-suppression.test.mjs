@@ -7,7 +7,7 @@ const make=(settings={},boundary='solid',sectionModel=false)=>new CellLab.Simula
 function body(s,kind,x,y,w=12,h=12){const id=s.C.makeNewCellID(kind);for(let xx=x;xx<x+w;xx++)for(let yy=y;yy<y+h;yy++)s.C.setpix([xx,yy],id);s.refreshPositions();s.scanContacts();return s.cells[id];}
 
 test('injured normal tissue emits source-tagged danger; tumor alarm and healthy normals do not',()=>{
-  const s=make(),normal=body(s,1,15,15),tumor=body(s,2,65,45);s.updateSignals(4);
+  const s=make({antigen:100}),normal=body(s,1,15,15),tumor=body(s,2,65,45);s.updateSignals(4);
   assert.equal(s.fieldOnCell(normal,'normalDamage'),0);assert.ok(s.fieldOnCell(tumor,'danger')>0);assert.equal(s.fieldOnCell(tumor,'normalDamage'),0);
   normal.stress=.7;s.updateSignals(4);assert.ok(s.fieldOnCell(normal,'normalDamage')>0);
   for(let i=0;i<s.fields.danger.values.length;i++)assert.ok(s.fields.danger.values[i]+1e-6>=s.fields.normalDamage.values[i]);

@@ -1,5 +1,13 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';vm.runInThisContext(await readFile('src/recorder.js','utf8'));
 const rect=(left,top,width,height)=>({left,top,width,height,right:left+width,bottom:top+height});
+test('combined recording frames the live arena and sidebar on desktop and mobile',()=>{
+ const arena=rect(0,0,1100,900),sidebar=rect(1100,0,340,900);
+ assert.deepEqual(CellLabVideo.captureBounds(arena,sidebar,'arena'),arena);
+ assert.deepEqual(CellLabVideo.captureBounds(arena,sidebar,'workspace'),rect(0,0,1440,900));
+ assert.deepEqual(CellLabVideo.captureBounds(rect(0,0,390,280),rect(0,280,390,420),'workspace'),rect(0,0,390,700));
+ assert.throws(()=>CellLabVideo.captureBounds(arena,null,'workspace'));
+ assert.throws(()=>CellLabVideo.captureBounds(arena,sidebar,'screen'));
+});
 test('recording crops the visible arena consistently under cover zoom and pan',()=>{const r=CellLabVideo.framing(rect(-120,0,1340,1000),rect(0,0,1100,1000),1100,1000,{width:2680,height:2000});assert.deepEqual(r,{sx:240,sy:0,sw:2200,sh:2000,dx:0,dy:0,dw:1100,dh:1000});assert.equal(r.dw/r.sw,r.dh/r.sh);});
 test('recording keeps proportions when the viewport is resized or the full culture is shown',()=>{const r=CellLabVideo.framing(rect(0,88,1100,825),rect(0,0,1100,1000),550,500,{width:2200,height:1650});assert.equal(r.sy,0);assert.equal(r.dy,44);assert.equal(r.dw,550);assert.equal(r.dh,412.5);assert.equal(r.dw/r.sw,r.dh/r.sh);assert.equal(CellLabVideo.framing(rect(200,200,10,10),rect(0,0,100,100),100,100,{width:10,height:10}),null);});
 test('recording quality sets real even pixel dimensions independently of CSS size',()=>{
