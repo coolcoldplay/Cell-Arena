@@ -29,7 +29,8 @@ test('fixed core profile changes actual reaction rates without changing field ge
 });
 
 test('oncogenesis emerges through stress, intermediate state and viable clonal expansion without planted tumors',async()=>{
-  const s=await make('oncogenesis');s.advance(3000);const report=s.scenarioReport();
+  // A confluent layer must create space through stress and rearrangement before expansion.
+  const s=await make('oncogenesis');s.advance(6000);const report=s.scenarioReport();
   assert.ok(report.achieved);assert.ok(report.tumorDivisions>0);assert.ok(report.tumor>0);assert.equal(report.customized,false);assert.equal(s.snapshot().orphans,0);
   const malignant=s.events.filter(e=>e.type==='malignant');assert.ok(malignant.length>0);
   for(const event of malignant){const first=s.events.find(e=>e.type==='abnormal'&&e.id===event.id);assert.ok(first);assert.ok(first.stress>.06);assert.ok(event.time-first.time>=160);assert.ok(event.genome.tolerance>=2.04&&event.genome.tolerance<=2.76);}

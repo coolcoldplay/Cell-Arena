@@ -540,6 +540,8 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
 。通讯、代谢、遗传、切面约束和交互为本网页的模型扩展；详细机制参考见模型文档。|. Communication, metabolism, inheritance, section constraints and interaction are extensions in this page; detailed mechanism references are in the model documentation.
 `);
   const templates=[
+    [/^子代 P(\d+) · 沿谱系分裂 (\d+) 次$/,(_,p,n)=>`Generation P${p} · ${n} divisions along lineage`],
+    [/^首达 #([\d/]+) · (\d+) MCS$/,(_,n,t)=>`First #${n} · ${t} MCS`],
     [/^(减小|增大)(.+)$/,(_,action,name)=>`${action==='减小'?'Decrease':'Increase'} ${translate(name)}`],
     [/^(正常细胞|异常中间态|肿瘤细胞|未激活免疫|已激活免疫)(胞体|胞核)颜色$/,(_,type,part)=>`${dictionary.get(type)} ${dictionary.get(part).toLowerCase()} color`],
     [/^应用(.+)配色$/,(_,name)=>`Apply ${translate(name)} palette`],
@@ -557,6 +559,29 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
     [/^视频已导出 · (MP4|WebM) · (\d+) × (\d+) · (\d+) 秒 · ([\d.]+) MB$/,(_,format,w,h,s,mb)=>`Video saved · ${format} · ${w} × ${h} · ${s} s · ${mb} MB`],
     [/^正常、异常、肿瘤和免疫细胞数量：从 0 到 (\d+) MCS 的完整过程$/,(_,t)=>`Normal, abnormal, tumor and immune populations from 0 to ${t} MCS`]
   ];
+  add(`
+迷宫招募场：0—30 固定色标，圆心持续供给，入口清除。|Maze recruitment field: fixed 0–30 scale, sustained center supply and entrance drainage.
+免疫细胞迷宫|Immune cell maze
+免疫迷宫|Maze
+向圆心出发|Race to the center
+探索中|Exploring
+已移除|Removed
+＋ 持续场源|＋ Field sources
+持续区域|Persistent region
+氧糖补给|Oxygen & glucose
+乏氧高酸|Hypoxia & acidity
+区域半径|Region radius
+放置场源|Place source
+擦除场源|Erase source
+持续作用，直至擦除；实体墙阻断扩散。氧糖补给直接改变营养场。|Persists until erased; walls block diffusion. Nutrient sources directly replenish oxygen and glucose.
+放置或擦除持续场源 · 不改变细胞位置|Place or erase persistent field sources
+显示运动轨迹|Show movement trails
+轨迹保留时长|Trail duration
+开启后记录；按模拟时间保留，暂停时不消退。|Recorded while enabled, retained in model time; trails do not fade while paused.
+免疫迷宫需要至少 144 的区域短边|The maze needs a world with its shorter side at least 144 units
+正常细胞铺满培养皿，4 颗免疫细胞分散在单层内部。中心酸清除弱、氧糖补给略低；局部代谢压力经异常中间态推动随机癌变，免疫细胞进行接触监视。|Normal cells fill the dish with 4 immune cells dispersed inside the monolayer. Reduced central acid clearance and nutrient supply allow local stress to drive stochastic transformation through an abnormal state, under contact-based immune surveillance.
+圆心持续释放最强招募信号，入口清除信号；开局已建立沿通道扩散的浓度场。6 颗免疫细胞从等距入口出发，仅凭局部梯度与随机探索前进，胞核进入中心终点区计时。|The center maintains a maximal recruitment source and entrances drain the signal. Diffusion through the passages is equilibrated before the race. Six immune cells start at evenly spaced entrances, using local gradients and random exploration. Arrival is recorded when the nucleus enters the central finish zone.
+`);
   let terms;
   function translate(value,language='en'){
     const source=String(value);if(language!=='en'||!/[\p{Script=Han}]/u.test(source))return source;

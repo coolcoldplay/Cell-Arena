@@ -76,12 +76,12 @@
     for(let i=0;i<values.length;i++)values[i]=.35*clamp((.45-oxygen.values[i])/.45)+.4*clamp((.5-glucose.values[i])/.5)+.25*clamp((acid.values[i]-.25)/.75);
     return {width:oxygen.width,height:oxygen.height,values};
   }
-  function signals(fields,enabled,opacity={}){
+  function signals(fields,enabled,opacity={},scales={}){
     const keys=Object.keys(SIGNALS).filter(k=>enabled.has(k));if(!keys.length)return null;
     const f=fields[keys[0]],rgba=new Uint8Array(f.values.length*4);
     for(let i=0;i<f.values.length;i++){
       let total=0,r=0,g=0,b=0,transparent=1;
-      for(const key of keys){const weight=(1-Math.exp(-Math.max(0,fields[key].values[i])/.35))*clamp(opacity[key]??1),c=SIGNALS[key].color;total+=weight;transparent*=1-weight;r+=weight*c[0];g+=weight*c[1];b+=weight*c[2];}
+      for(const key of keys){const weight=(1-Math.exp(-Math.max(0,fields[key].values[i])/(.35*(scales[key]??1))))*clamp(opacity[key]??1),c=SIGNALS[key].color;total+=weight;transparent*=1-weight;r+=weight*c[0];g+=weight*c[1];b+=weight*c[2];}
       if(total){const p=i*4;rgba[p]=Math.round(r/total);rgba[p+1]=Math.round(g/total);rgba[p+2]=Math.round(b/total);rgba[p+3]=Math.round(255*(1-transparent));}
     }
     return {width:f.width,height:f.height,rgba};
@@ -91,7 +91,7 @@
       if(this.snapshot!==s){this.snapshot=s;this.adverse=null;this.signalMask=null;this.signal=null;}
       if(view==='adversity'&&!this.adverse)this.adverse=adversity(s.fields);
       const mask=protect+':'+Object.keys(SIGNALS).map(k=>enabled.has(k)?'on:'+clamp(opacity[k]??1):'off').join(',');
-      if(mask!==this.signalMask){this.signal=signals(s.fields,enabled,opacity);this.bodySignal=protect?signals(s.fields,enabled,Object.fromEntries(Object.keys(SIGNALS).map(k=>[k,bodyOpacity(opacity[k]??1,true)]))):this.signal;this.signalMask=mask;}
+      if(mask!==this.signalMask){this.signal=signals(s.fields,enabled,opacity,s.maze?{trail:30}:{});this.bodySignal=protect?signals(s.fields,enabled,Object.fromEntries(Object.keys(SIGNALS).map(k=>[k,bodyOpacity(opacity[k]??1,true)])),s.maze?{trail:30}:{}):this.signal;this.signalMask=mask;}
       return {field:view==='adversity'?this.adverse:s.fields[view],info:FIELD_INFO[view],signal:this.signal,bodySignal:this.bodySignal};
     }
   }

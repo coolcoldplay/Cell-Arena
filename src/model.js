@@ -33,14 +33,14 @@
   }
   const SIGNALS=['cohesion','danger','trail'];
   const PRESETS={
-    oncogenesis:{label:'肿瘤发生发展',environmentProfile:'poor-core',founderTolerance:2.4,description:'纯正常上皮，中心酸清除弱、氧糖补给略低，外围环境较好。局部代谢压力经异常中间态推动随机癌变；新生肿瘤采用较高遗传耐受基线，观察存活克隆向外围扩增。',settings:{supply:2.8,metabolism:1.2,inflammation:1,stressMutation:8,progression:8,growth:1.2,apoptosis:2,tumorMotility:1.5,normalMotility:.05,cohesion:1.3,escape:4,immuneGrowth:.15,immuneDivisions:2,kill:1.2}},
+    oncogenesis:{label:'肿瘤发生发展',environmentProfile:'poor-core',founderTolerance:2.4,description:'正常细胞铺满培养皿，4 颗免疫细胞分散在单层内部。中心酸清除弱、氧糖补给略低；局部代谢压力经异常中间态推动随机癌变，免疫细胞进行接触监视。',settings:{supply:2.8,metabolism:1.2,inflammation:1,stressMutation:8,progression:8,growth:1.2,apoptosis:2,tumorMotility:1.5,normalMotility:.05,cohesion:1.3,escape:4,immuneGrowth:.15,immuneDivisions:2,kill:1.2}},
     cold:{label:'免疫冷肿瘤扩散转移',description:'中心 19 颗低抗原肿瘤，外围仅 3 颗免疫细胞，肿瘤保留快速生长与迁移。观察原灶外播散及远端增殖；这是二维扩散代理，不含血管运输或跨器官转移。',settings:{supply:2.4,metabolism:.8,stressMutation:0,progression:1,growth:1.4,apoptosis:2,tumorMotility:1.15,immuneMotility:.8,antigen:15,kill:1,chemotaxis:.6,recruitment:.35,immuneGrowth:.15,immuneDivisions:2,alignment:.2,noise:.85,mutation:8}},
     hot:{label:'免疫热肿瘤治愈',description:'中心 37 颗肿瘤形成局部密集病灶，周边 18 颗免疫细胞，抗原暴露充分。依靠真实接触识别、局部招募及有限克隆扩增，尝试清除当前区域肿瘤。',settings:{supply:2.8,metabolism:.65,stressMutation:0,progression:1,growth:.75,apoptosis:0,tumorMotility:.35,immuneMotility:1.2,antigen:100,kill:2,chemotaxis:2.5,recruitment:2.4,immuneGrowth:.65,immuneDivisions:3,noise:.45,halfLife:180,mutation:2,mutationSize:.05}},
     ecosystem:{label:'免疫共培养',settings:{}},
     network:{label:'胶质瘤样分枝成网',settings:{tumorMorphology:2,tumorMotility:.12,branchLength:2.8,branchStrength:5,networkAdhesion:1,growth:.18,apoptosis:0,metabolism:.65,supply:2.6,stressMutation:0,alignment:.15,noise:.35}},
     collective:{label:'群体迁移',settings:{normalMotility:.85,alignment:2,cohesion:1.2,repulsion:.4,noise:.35,growth:0,apoptosis:0}},
     invasion:{label:'肿瘤扩张',settings:{growth:.7,tumorMotility:1,apoptosis:10}},
-    maze:{label:'通道搜索',settings:{chemotaxis:2.3,halfLife:240,growth:.12,apoptosis:0}},
+    maze:{label:'免疫细胞迷宫',description:'圆心持续释放最强招募信号，入口清除信号；开局已建立沿通道扩散的浓度场。6 颗免疫细胞从等距入口出发，仅凭局部梯度与随机探索前进，胞核进入中心终点区计时。',settings:{chemotaxis:3,halfLife:400,immuneMotility:1.4,noise:.5,immuneSeparation:.8,growth:0,immuneGrowth:0,apoptosis:0,metabolism:.3,supply:3,stressMutation:0,inflammation:0,escape:1}},
     stress:{label:'密度与逃逸',settings:{supply:.8,metabolism:1.15,growth:.6,tumorMotility:.9,apoptosis:0,escape:3}},
     surveillance:{label:'异常监视',settings:{supply:.8,metabolism:1.2,stressMutation:3,progression:.7,kill:2,apoptosis:0}}
   };
@@ -127,7 +127,7 @@
     }
   }
   class Simulation {
-    constructor({width,height,worldWidth=240,worldHeight=180,refinement,scene='ecosystem',seed=17,boundary='solid',settings={},warmup=35,kernel='fast',sectionModel=true}={}){
+    constructor({width,height,worldWidth=240,worldHeight=180,refinement,scene='ecosystem',seed=17,boundary='solid',settings={},sources,warmup=35,kernel='fast',sectionModel=true}={}){
       this.scale=refinement??(width===undefined?1.5:1);
       if(![1,1.5,2,3,4].includes(this.scale))throw Error('Unsupported lattice refinement');
       width=width??Math.round(worldWidth*this.scale);height=height??Math.round(worldHeight*this.scale);
@@ -140,7 +140,7 @@
       delete this.settings.capacity;
       this.cells=[];this.contacts=new Map();this.histories=new Map();this.events=[];this.history=[];this.wallID=0;this.version=0;
       this.counters={manualRemoved:0,divisions:0,immuneDivisions:0,kills:0,apoptosis:0,environment:0,apoptosisStarted:0,killStarted:0,environmentStarted:0,recognitions:0,mutations:0,abnormalInitiations:0,malignantTransitions:0,abnormalKills:0,normalEnvironmentDeaths:0,abnormalEnvironmentDeaths:0};this.birthSerial=0;this.lineage=[];this.deathHistory=[];this.recentClearances=[];this.manualDeathRemovals={spontaneous:0,kill:0,environment:0};
-      this.deathEffects=[];
+      this.deathEffects=[];this.sources=[];this.sourceSerial=0;
       const s=this.settings;
       this.C=new CPM.CPM([width,height],{
         seed,torus:[this.wrap,this.wrap],T:s.temperature,
@@ -206,8 +206,10 @@
       for(const f of this.massFields.slice(1))f.blocked=this.fields.oxygen.blocked;
       this.binAreas=new Float32Array(bins);for(let y=0;y<height;y++)for(let x=0;x<width;x++)this.binAreas[this.fieldIndex(x,y)]++;
       if(scene!=='empty')this.populate();
+      if(sources){this.sources=[];for(const source of sources)this.addSource(source.x*this.scale,source.y*this.scale,source.type,source.radius*this.scale);}
+      if(this.maze)this.equilibrateMaze();
       this.record(); // The initial population belongs at model time zero.
-      this.refreshPositions();for(let i=0;i<warmup;i++){if(C.borderpixels.length)C.timeStep();if(this.section){this.refreshPositions();this.scanContacts();this.section.update(1);}}
+      this.refreshPositions();for(let i=0;i<(this.maze?0:warmup);i++){if(C.borderpixels.length)C.timeStep();if(this.section){this.refreshPositions();this.scanContacts();this.section.update(1);}}
       this.cleanup();this.refreshPositions();this.updateEnvironment(0);this.updateMetabolism(0);this.updateLocal(0);this.initializeScenario();this.record();
     }
     live(){return this.cells.filter(Boolean);}
@@ -311,6 +313,85 @@
       this.version++;return id;
     }
     insert(kind,x,y,radius=4){return globalThis.CellLabInsertion.insert(this,kind,x,y,radius);}
+    populateMonolayer(){
+      // Power-Voronoi initialization only; subsequent shapes obey ordinary CPM.
+      // Tissue reaches all four boundaries. Small interstitial immune territories
+      // cut convex epithelial polygons, without deleting a nucleus or leaving holes.
+      const W=this.worldWidth,H=this.worldHeight,s=this.scale,rows=[],sites=[],step=16.6,dy=step*Math.sqrt(3)/2;
+      const ny=Math.max(2,Math.round(H/dy)),nx=Math.max(2,Math.round(W/step));
+      for(let row=0;row<ny;row++){const list=[];for(let col=0;col<nx;col++){
+        const x=clamp((col+.5+(row%2? .22:-.22))*W/nx+(this.C.random()-.5)*2,3,W-3),y=(row+.5)*H/ny+(this.C.random()-.5)*2;
+        const site={x,y,id:this.C.makeNewCellID(NORMAL),points:[]};sites.push(site);list.push(site);
+      }rows.push(list);}
+      const nearest=(x,y)=>{let best=null,d=Infinity;const row=Math.floor(y/H*ny),col=Math.floor(x/W*nx);
+        for(let yy=Math.max(0,row-2);yy<=Math.min(ny-1,row+2);yy++)for(let xx=Math.max(0,col-2);xx<=Math.min(nx-1,col+2);xx++){const site=rows[yy][xx],q=(site.x-x)**2+(site.y-y)**2;if(q<d){d=q;best=site;}}return [best,d];};
+      const patrols=[];
+      for(const [fx,fy]of [[.24,.27],[.73,.25],[.32,.73],[.77,.69]]){
+        let spot=null,score=-Infinity;for(let y=H*fy-7;y<=H*fy+7;y++)for(let x=W*fx-7;x<=W*fx+7;x++){const d=nearest(x,y)[1];if(d>score){score=d;spot=[x,y];}}
+        const [x,y]=spot,site={x,y,id:this.C.makeNewCellID(IMMUNE),points:[],weight:0};let lo=-100,hi=100;
+        for(let n=0;n<15;n++){const mid=(lo+hi)/2;let area=0;for(let yy=Math.max(0,Math.floor(y-12));yy<Math.min(H,y+12);yy++)for(let xx=Math.max(0,Math.floor(x-12));xx<Math.min(W,x+12);xx++)if((xx-x)**2+(yy-y)**2+mid<nearest(xx,yy)[1])area++;if(area>72)lo=mid;else hi=mid;}site.weight=(lo+hi)/2;patrols.push(site);
+      }
+      for(let y=0;y<this.height;y++)for(let x=0;x<this.width;x++){
+        const xx=(x+.5)/s,yy=(y+.5)/s;let [site,d]=nearest(xx,yy);
+        for(const ctl of patrols){const q=(ctl.x-xx)**2+(ctl.y-yy)**2+ctl.weight;if(q<d){d=q;site=ctl;}}
+        const i=this.C.grid.p2i([x,y]);this.C.setpixi(i,site.id);site.points.push(i);
+      }
+      this.refreshPositions();for(const site of [...sites,...patrols]){const m=this.cells[site.id];m.base=m.target=this.C.getVolume(m.id);if(this.section&&!this.section.initialize(m,site.points))throw Error('Monolayer nucleus does not fit');this.updateMechanics(m);}this.C.stat_values={};
+    }
+    populateMaze(){
+      const tau=2*Math.PI,W=this.worldWidth,H=this.worldHeight,r=this.scale,cx=W/2,cy=H/2,R=Math.min(W,H)/2-6,hub=Math.min(14,R*.25),rings=Math.max(2,Math.round((R-hub)/18)),pitch=(R-hub)/rings;
+      if(Math.min(W,H)<144)throw Error('免疫迷宫需要至少 144 的区域短边');
+      const counts=[],offsets=[],nodes=[{ring:-1,j:0}],edges=[];
+      let sectors=6;for(let k=0;k<rings;k++){const inner=hub+k*pitch;if(tau*inner/sectors>32)sectors*=2;counts.push(sectors);offsets.push(nodes.length);for(let j=0;j<sectors;j++)nodes.push({ring:k,j});}
+      const key=(a,b)=>a<b?a+':'+b:b+':'+a;
+      for(let k=0;k<rings;k++)for(let j=0;j<counts[k];j++){const a=offsets[k]+j;edges.push([a,offsets[k]+(j+1)%counts[k]]);edges.push([a,k?offsets[k-1]+Math.floor(j*counts[k-1]/counts[k]):0]);}
+      for(let i=edges.length-1;i>0;i--){const j=this.C.ran(0,i);[edges[i],edges[j]]=[edges[j],edges[i]];}
+      const parent=nodes.map((_,i)=>i),root=a=>{while(parent[a]!==a){parent[a]=parent[parent[a]];a=parent[a];}return a;},open=new Set();
+      for(const [a,b]of edges){const ra=root(a),rb=root(b);if(ra!==rb){parent[ra]=rb;open.add(key(a,b));}}
+      const angles=Array.from({length:6},(_,j)=>(j*counts.at(-1)/6+.5)*tau/counts.at(-1)),difference=(a,b)=>Math.abs(Math.atan2(Math.sin(a-b),Math.cos(a-b))),field=this.fields.trail;
+      const wall=(x,y)=>{const radius=Math.hypot(x-cx,y-cy),angle=(Math.atan2(y-cy,x-cx)+tau)%tau;
+        if(radius>R+3)return false;
+        if(Math.abs(radius-R)<=3)return !angles.some(a=>difference(a,angle)*R<8);
+        for(let k=0;k<rings;k++){const boundary=hub+k*pitch;if(Math.abs(radius-boundary)<=3){const j=Math.floor(angle/tau*counts[k]),a=offsets[k]+j,b=k?offsets[k-1]+Math.floor(j*counts[k-1]/counts[k]):0;if(!open.has(key(a,b))||difference(angle,(j+.5)*tau/counts[k])*boundary>8)return true;}}
+        if(radius<hub||radius>R)return false;const k=Math.min(rings-1,Math.floor((radius-hub)/pitch)),n=counts[k],j=Math.round(angle/tau*n)%n;
+        return difference(angle,j*tau/n)*radius<=3&&!open.has(key(offsets[k]+j,offsets[k]+(j+n-1)%n));};
+      this.wallID=this.C.makeNewCellID(WALL);
+      // Align physical obstacles to field bins: cells and signals see the same
+      // impermeable geometry, including narrow doors around curved walls.
+      for(let by=0;by<field.height;by++)for(let bx=0;bx<field.width;bx++)if(wall((bx+.5)*4,(by+.5)*4))for(let y=by*this.fieldScale;y<Math.min(this.height,(by+1)*this.fieldScale);y++)for(let x=bx*this.fieldScale;x<Math.min(this.width,(bx+1)*this.fieldScale);x++)this.C.setpix([x,y],this.wallID);
+      this.rebuildMask();this.maze={cx:cx*r,cy:cy*r,radius:R*r,goalRadius:hub*.55*r,rings,corridor:pitch-6,racers:[],arrivals:[],startedAt:0};
+      for(let j=0;j<6;j++){
+        const a=angles[j],distance=R-pitch/2,x=(cx+distance*Math.cos(a))*r,y=(cy+distance*Math.sin(a))*r;let id=this.seed(IMMUNE,x,y,4*r);
+        if(!id){for(let d=-3*r;d<=3*r&&!id;d+=r)id=this.seed(IMMUNE,x+Math.cos(a)*d,y+Math.sin(a)*d,3*r);}
+        if(!id)throw Error('Maze entrance cannot fit an immune cell');const m=this.cells[id];m.px=-Math.cos(a);m.py=-Math.sin(a);this.maze.racers.push({id,birth:m.birth,number:j+1,x:m.x,y:m.y,arrivedAt:null});this.updateMechanics(m);
+      }
+      this.addSource(cx*r,cy*r,'trail',Math.max(4,hub*.35)*r);
+    }
+    addSource(x,y,type,radius=10*this.scale){
+      if(![...SIGNALS,'nutrient','hostile'].includes(type)||![x,y,radius].every(Number.isFinite)||radius<=0)return 0;
+      x=clamp(x,0,this.width-1);y=clamp(y,0,this.height-1);radius=clamp(radius,2*this.scale,40*this.scale);
+      const existing=this.sources.find(s=>s.type===type&&Math.hypot(s.x-x,s.y-y)<Math.max(2*this.scale,radius*.5));if(existing)return existing.id;
+      const source={id:++this.sourceSerial,x,y,type,radius};this.sources.push(source);this.applySources();this.version++;return source.id;
+    }
+    removeSources(x,y,radius=10*this.scale){const n=this.sources.length;this.sources=this.sources.filter(s=>Math.hypot(s.x-x,s.y-y)>radius+s.radius);this.version++;return n-this.sources.length;}
+    sourceBins(source){const f=this.fields.oxygen,result=[],step=this.fieldScale;for(let y=Math.max(0,Math.floor((source.y-source.radius)/step));y<Math.min(f.height,(source.y+source.radius)/step+1);y++)for(let x=Math.max(0,Math.floor((source.x-source.radius)/step));x<Math.min(f.width,(source.x+source.radius)/step+1);x++){const i=y*f.width+x;if(!f.blocked[i]&&Math.hypot((x+.5)*step-source.x,(y+.5)*step-source.y)<=source.radius)result.push(i);}return result;}
+    applySources(channel=null){
+      for(const source of this.sources){if(channel&&source.type!==channel)continue;for(const i of this.sourceBins(source)){
+        if(SIGNALS.includes(source.type))this.fields[source.type].values[i]=30;
+        else if(source.type==='nutrient'){this.fields.oxygen.values[i]=1;this.fields.glucose.values[i]=1;}
+        else{this.fields.oxygen.values[i]=.06;this.fields.acid.values[i]=.95;}
+      }}
+      if(this.maze&&(!channel||channel==='trail')){const f=this.fields.trail,m=this.maze;for(let i=0;i<f.values.length;i++)if(Math.hypot((i%f.width+.5)*this.fieldScale-m.cx,(Math.floor(i/f.width)+.5)*this.fieldScale-m.cy)>m.radius+2*this.scale)f.values[i]=0;}
+    }
+    equilibrateMaze(){
+      // Solve the local no-flux diffusion equation before the race. A constant
+      // central reservoir and outer bath maintain this experimental gradient;
+      // no shortest paths, goal coordinates or graph distances enter polarity.
+      const f=this.fields.trail,n=f.values.length,fixed=new Uint8Array(n),neighbours=Array.from({length:n},()=>[]);
+      this.applySources('trail');for(let i=0;i<n;i++){const x=i%f.width,y=Math.floor(i/f.width);if(f.blocked[i]||f.values[i]===30||Math.hypot((x+.5)*this.fieldScale-this.maze.cx,(y+.5)*this.fieldScale-this.maze.cy)>this.maze.radius+2*this.scale)fixed[i]=1;
+        for(const [xx,yy]of [[x-1,y],[x+1,y],[x,y-1],[x,y+1]])if(xx>=0&&xx<f.width&&yy>=0&&yy<f.height&&!f.blocked[yy*f.width+xx])neighbours[i].push(yy*f.width+xx);}
+      for(let step=0;step<16000;step++){let error=0;for(let i=0;i<n;i++)if(!fixed[i]&&neighbours[i].length){let sum=0;for(const j of neighbours[i])sum+=f.values[j];const change=(sum/neighbours[i].length-f.values[i])*1.7;f.values[i]+=change;error=Math.max(error,Math.abs(change));}if(error<.00001)break;}
+    }
     populate(){
       const W=this.worldWidth,H=this.worldHeight,C=this.C,r=this.scale;
       const seed=(kind,x,y,radius)=>this.seed(kind,x*r,y*r,radius*r);
@@ -334,8 +415,7 @@
       if(this.scene==='oncogenesis'){
         // Every epithelial body begins normal: no seeded tumor, abnormal state,
         // preloaded stress or time-triggered transformation.
-        const points=[];for(let y=H*.18;y<H*.84;y+=20)for(let x=W*.18;x<W*.84;x+=20)points.push([x,y]);background(points);
-        for(const [x,y] of [[.1,.25],[.9,.35],[.1,.65],[.9,.75]])seed(IMMUNE,W*x,H*y,3);
+        this.populateMonolayer();
         return;
       }
       if(this.scene==='cold'||this.scene==='hot'){
@@ -358,11 +438,7 @@
         return;
       }
       if(this.scene==='maze'){
-        for(let y=0;y<(H-26)*r;y++)this.paint(Math.round(W*.36*r),y,Math.ceil(r),false,false);
-        for(let y=28*r;y<H*r;y++)this.paint(Math.round(W*.68*r),y,Math.ceil(r),false,false);
-        this.rebuildMask();
-        for(let i=0;i<5;i++)seed(IMMUNE,20+(i%2)*18,20+i*(H-40)/5,4);
-        for(let i=0;i<4;i++)seed(TUMOR,W-30,27+i*(H-40)/4,7);
+        this.populateMaze();
         return;
       }
       if(this.scene==='stress'){
@@ -448,6 +524,7 @@
     }
     updateEnvironment(dt){this.prepareEnvironment();this.integrateEnvironment(dt);}
     updateMetabolism(dt){
+      this.applySources();
       for(const m of this.live()){
         if(m.dying)continue;let o=0,g=0,a=0,n=0;
         // Integrate over the actual footprint; an amoeboid centroid can lie outside it.
@@ -475,7 +552,7 @@
       }
       const decay=Math.LN2/this.settings.halfLife;
       // Fixed substeps keep the explicit solver positive for any requested dt.
-      for(let remaining=dt;remaining>0;remaining-=2){const sub=Math.min(2,remaining);for(const key of SIGNALS)this.fields[key].step(.09*sub,decay*sub);}
+      for(let remaining=dt;remaining>0;remaining-=2){const sub=Math.min(2,remaining);for(const key of SIGNALS){this.fields[key].step(.09*sub,this.maze&&key==='trail'?0:decay*sub);this.applySources(key);}}
     }
     updatePolarity(dt){
       const s=this.settings,next=[];
@@ -780,6 +857,7 @@
     }
     scenarioDistance(x,y){return Math.hypot(x/this.scale-this.worldWidth/2,y/this.scale-this.worldHeight/2);}
     updateScenarioState(){
+      if(this.maze)for(const racer of this.maze.racers){const m=this.cells[racer.id];if(racer.arrivedAt===null&&m?.birth===racer.birth&&!m.dying&&Math.hypot((m.nucleusX??m.x)-this.maze.cx,(m.nucleusY??m.y)-this.maze.cy)<=this.maze.goalRadius){racer.arrivedAt=this.C.time;this.maze.arrivals.push({number:racer.number,time:this.C.time});this.log('maze-arrival',m.id,0,{number:racer.number});}}
       const state=this.scenarioState;if(!state)return;const tumors=this.live().filter(m=>m.kind===TUMOR).length;
       state.peakTumor=Math.max(state.peakTumor,tumors);
       if(tumors){state.everTumor=true;state.clearanceAt=null;}
@@ -827,7 +905,8 @@
       for(const c of cells){const m=this.cells[c.id];for(const key of ['sectionFraction','sectionPressure','planarTarget','offPlaneTarget','hasNucleus','nucleusX','nucleusY','nucleusRadius','birth','nucleusStrainX','nucleusStrainY','state','origin','abnormalSince','abnormalAge','transformedAt','adversity','immuneCue','inflammatorySignal','inflammatoryExposure','morphologyMode','branchCount','networkDegree','deathStartedAt','deathPhase','deathProgress','deathIntact'])c[key]=m[key];}
       const fields={};for(const [key,f] of Object.entries(this.fields))fields[key]={width:f.width,height:f.height,values:f.values.slice()};
       const history=this.populationHistory(true),historySamples=this.history.length+(history.at(-1)===this.history.at(-1)?0:1);
-      return {kernel:this.kernel,width:this.width,height:this.height,worldWidth:this.worldWidth,worldHeight:this.worldHeight,refinement:this.scale,fieldScale:this.fieldScale,fieldMask:this.fields.oxygen.blocked.slice(),scene:this.scene,scenario:this.scenarioReport(),boundary:this.boundary,time:this.C.time,seed:this.seedValue,settings:{...this.settings},counters:{...this.counters},manualDeathRemovals:{...this.manualDeathRemovals},deaths:this.deathSummary(),recentDeaths:this.deathHistory.slice(-8).map(d=>({...d})),recentClearances:this.recentClearances.map(d=>({...d})),deathEffects:this.deathEffects.map(e=>({...e})),grid,activity,walls,orphans,cells,fields,history,historySamples,events:this.events.slice(-12)};
+      const maze=this.maze?{...this.maze,racers:this.maze.racers.map(r=>({...r,alive:this.cells[r.id]?.birth===r.birth&&!this.cells[r.id].dying})),arrivals:this.maze.arrivals.map(a=>({...a}))}:null;
+      return {kernel:this.kernel,width:this.width,height:this.height,worldWidth:this.worldWidth,worldHeight:this.worldHeight,refinement:this.scale,fieldScale:this.fieldScale,fieldMask:this.fields.oxygen.blocked.slice(),scene:this.scene,scenario:this.scenarioReport(),maze,sources:this.sources.map(s=>({...s})),boundary:this.boundary,time:this.C.time,seed:this.seedValue,settings:{...this.settings},counters:{...this.counters},manualDeathRemovals:{...this.manualDeathRemovals},deaths:this.deathSummary(),recentDeaths:this.deathHistory.slice(-8).map(d=>({...d})),recentClearances:this.recentClearances.map(d=>({...d})),deathEffects:this.deathEffects.map(e=>({...e})),grid,activity,walls,orphans,cells,fields,history,historySamples,events:this.events.slice(-12)};
     }
   }
   globalThis.CellLab={Simulation,SignalField,StepClock,DEFAULTS,PRESETS,BODY_COLORS,TYPE_NAMES,NORMAL,TUMOR,IMMUNE,WALL,sampleHistory,randomSettings,RANDOM_RANGES};
