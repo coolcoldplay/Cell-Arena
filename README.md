@@ -23,7 +23,9 @@
 
 基于 [Artistoo（Wortel 与 Textor，eLife，2021）](https://doi.org/10.7554/eLife.61288) 构建，采用其开源细胞 Potts 模型库。网页「模型与来源」简要介绍 Artistoo、本网页新增模拟特点与使用方法；详细机制见 [MODEL.md](MODEL.md)。直接包含的库、改写／移植的内核、MT19937 随机数实现及其完整许可范围见 [代码来源与第三方声明](THIRD_PARTY_NOTICES.md)。
 
-直接打开 `dist/index.html`（或兼容入口 `dist/artistoo-playground.html`）即可离线运行。官方 Artistoo、WebAssembly、GPU 着色器、模型、Worker 和页面均内嵌，无 npm 依赖或 CDN。
+直接打开 `dist/index.html`（或兼容入口 `dist/artistoo-playground.html`）即可离线运行。官方 Artistoo、WebAssembly、GPU 着色器、模型、Worker 和页面均内嵌，模拟运行无需 npm 依赖或 CDN。
+
+正式网站 `https://coolcoldplay.github.io/Cell-Arena/` 使用 [Cloudflare Web Analytics](https://developers.cloudflare.com/web-analytics/) 记录访问与页面性能。统计加载器位于 `src/index.html`，使用 Cloudflare 提供的公开站点标识，只在该 HTTPS 主机和项目路径下加载；本地 HTTP、离线文件和其他托管地址不加载统计脚本。统计被阻止或不可用不会阻止模拟启动，实验参数和细胞数据没有接入统计上报。
 
 本地开发使用 Node.js 24 或更高版本，无需 `npm install`：
 

@@ -1,6 +1,7 @@
 import {openBrowser,delay} from './browser-session.mjs';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 const target=process.argv[2]||'dist/index.html',remote=target.startsWith('https://');
+const analyticsExpected=remote&&new URL(target).origin==='https://coolcoldplay.github.io'&&/^\/Cell-Arena(?:\/|$)/.test(new URL(target).pathname);
 const out='output/publication/'+(remote?'live':'local');await mkdir(out,{recursive:true});
 const b=await openBrowser(target,9390,{gpu:true}),{evaluate,call}=b,checks=[];
 const check=(ok,name,details={})=>{checks.push({name,passed:!!ok,...details});if(!ok)throw Error(name);};
@@ -12,7 +13,7 @@ try{
   await evaluate(`artistooLab.rpc('playing',{value:false})`);
   const initial=await evaluate(`({title:document.title,brand:document.querySelector('.brand b').textContent,scene:artistooLab.snapshot.scene,kernel:artistooLab.snapshot.kernel,secure:isSecureContext,renderer:artistooLab.renderer,networkScripts:document.querySelectorAll('script[src]').length})`);
   check(initial.title.startsWith('Cell-Arena')&&initial.brand==='Cell-Arena','Published title and branding are Cell-Arena',initial);
-  check(initial.scene==='oncogenesis'&&initial.kernel==='wasm'&&initial.networkScripts===0,'The self-contained model and WASM Worker start successfully');
+  check(initial.scene==='oncogenesis'&&initial.kernel==='wasm'&&initial.networkScripts===(analyticsExpected?1:0),'The self-contained model and WASM Worker start successfully; analytics loads only on the production site');
   check(!remote||initial.secure,'The public website runs in a secure context');
   await click('#about');await click('#code-credits > summary');await click('#code-credits details:last-child > summary');
   const notices=await evaluate(`({artistoo:document.getElementById('license-artistoo').textContent,mt:document.getElementById('license-mt19937').textContent,visible:document.getElementById('license-mt19937').getBoundingClientRect().height>0,link:document.querySelector('footer a[href$="THIRD_PARTY_NOTICES.md"]').href})`);
@@ -35,6 +36,6 @@ try{
   await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await delay(100);
   check(await evaluate('document.documentElement.scrollWidth<=392&&document.querySelector(".brand b").getBoundingClientRect().right<390'),'Public branding and layout fit a mobile screen');await shot('cell-arena-mobile');
   check(b.errors.length===0&&await evaluate('artistooLab.errors.length===0'),'No browser or Worker runtime errors');
-  check(remote?b.requests.every(url=>new URL(url).origin===new URL(target).origin):b.requests.length===0,'No third-party runtime downloads or login dependencies',{requests:b.requests});
+  check(remote?b.requests.every(url=>{const u=new URL(url);return u.origin===new URL(target).origin||analyticsExpected&&(u.origin==='https://static.cloudflareinsights.com'&&u.pathname==='/beacon.min.js'||u.origin==='https://cloudflareinsights.com'&&/^\/cdn-cgi\/rum\/?$/.test(u.pathname));}):b.requests.length===0,'Only production Cloudflare analytics may use third-party requests; offline simulation remains self-contained',{requests:b.requests});
 }catch(error){checks.push({passed:false,error:String(error)});console.error(error);process.exitCode=1;}
 finally{await writeFile(out+'/checks.json',JSON.stringify({target,checks},null,2));await writeFile(out+'/tested-manifest.json',await readFile('dist/manifest.json'));console.log(JSON.stringify(checks,null,2));await b.close();}

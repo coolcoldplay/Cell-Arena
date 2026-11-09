@@ -14534,4 +14534,15 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
   start('oncogenesis',{preset:true}).then(()=>rpc('visible',{value:!document.hidden})).then(resolveReady).catch(fail);
 })();
 </script>
+<!-- Optional analytics for the published site; local/offline copies never load it. -->
+<script id="cloudflare-analytics" type="module">
+if (location.origin === 'https://coolcoldplay.github.io' &&
+    (location.pathname === '/Cell-Arena' || location.pathname.startsWith('/Cell-Arena/'))) {
+  const beacon = document.createElement('script');
+  beacon.type = 'module';
+  beacon.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+  beacon.dataset.cfBeacon = JSON.stringify({token: 'ff8c4a19b15f4b0aaca02a32967d7032'});
+  document.body.appendChild(beacon);
+}
+</script>
 </body></html>

@@ -99,4 +99,15 @@
   <details id="code-credits"><summary>代码来源、版本与许可</summary><p>Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定提交 e997d81213a5dcdfc40ad976a18958f412f00cc9 的官方文件原样内嵌。优化 JS 约束与 WebAssembly 内核包含对 Artistoo 顺序 CPM 与约束代码的专门化／移植，Act 配色沿用其 Canvas.drawActivityValues。</p><p>随 Artistoo 带入的 MT19937 随机数实现由 Makoto Matsumoto 与 Takuji Nishimura 编写，包内另保留 Sean McCullough 的 JavaScript 封装署名，采用 BSD 三条款许可；WASM 随机数部分移植同一实现。两个完整许可证均保留在本页面。</p><p>逐文件范围见 <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/THIRD_PARTY_NOTICES.md" target="_blank" rel="noreferrer">代码来源与第三方声明</a>。通讯、代谢、遗传、切面约束和交互为本网页的模型扩展；详细机制参考见模型文档。</p><details><summary>Artistoo · MIT 完整许可证</summary><pre id="license-artistoo">/* INLINE_LICENSE */</pre></details><details><summary>MT19937 · BSD-3-Clause 完整许可证</summary><pre id="license-mt19937">/* INLINE_MT_LICENSE */</pre></details></details>
 </dialog>
 <script id="worker-source" type="text/plain">/* INLINE_WORKER */</script><script>/* INLINE_APP */</script>
+<!-- Optional analytics for the published site; local/offline copies never load it. -->
+<script id="cloudflare-analytics" type="module">
+if (location.origin === 'https://coolcoldplay.github.io' &&
+    (location.pathname === '/Cell-Arena' || location.pathname.startsWith('/Cell-Arena/'))) {
+  const beacon = document.createElement('script');
+  beacon.type = 'module';
+  beacon.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+  beacon.dataset.cfBeacon = JSON.stringify({token: 'ff8c4a19b15f4b0aaca02a32967d7032'});
+  document.body.appendChild(beacon);
+}
+</script>
 </body></html>

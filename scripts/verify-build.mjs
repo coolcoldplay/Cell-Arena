@@ -22,7 +22,8 @@ for(const [source,id,notice] of [['vendor/LICENSE','license-artistoo','licenses/
 assert.doesNotMatch(html,/\/\* INLINE_/,'No unresolved build placeholders');
 // Skip inline script bodies: upstream API documentation contains inert HTML examples.
 const scripts=[...html.matchAll(/<script\b([^>]*)>[\s\S]*?<\/script>/gi)];
-assert.equal(scripts.length,2,'The Worker source and app entry must both be present');
+assert.equal(scripts.length,3,'The Worker source, app entry and optional analytics loader must be present');
+assert.ok(scripts.some(match=>/id="cloudflare-analytics"/.test(match[1])),'The production-only analytics loader must be present');
 assert.ok(scripts.every(match=>!(/\bsrc\s*=/i.test(match[1]))),'Runtime scripts must be self-contained');
 const markup=html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'');
 assert.ok(!(/<link\b(?=[^>]*\brel=["']stylesheet["'])/i.test(markup)),'Styles must be self-contained');
