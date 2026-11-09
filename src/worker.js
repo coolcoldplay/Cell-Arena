@@ -40,6 +40,7 @@ async function handle(event){
     else if(command==='visible'){visible=!!payload.value;resetClock();}
     else if(command==='speed'){speed=Math.max(.25,Math.min(8,Number(payload.value)||1));clock.rate=30*speed;resetClock();}
     else if(command==='set')sim.set(payload.name,Number(payload.value));
+    else if(command==='observe')value=sim.observe(payload.id,payload.birth);
     else if(command==='backend'){await backend.configure(sim,['auto','cpu','gpu'].includes(payload.mode)?payload.mode:'auto');resetClock();}
     else if(command==='advance'){if(dragSession)value=false;else{playing=false;resetClock();const steps=Math.min(10000,Math.max(1,payload.steps||1));if(backend.active==='gpu')await sim.advanceAsync(steps,backend);else sim.advance(steps);}}
     else if(command==='seed'){const radius=(payload.kind===3?3:4)*sim.scale;value=payload.manual&&payload.push?sim.insert(payload.kind,payload.x,payload.y,radius):sim.seed(payload.kind,payload.x,payload.y,radius);if(payload.manual)value={...sim.lastSeedResult};}

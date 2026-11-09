@@ -8,7 +8,7 @@ test('four preset palettes preserve readable nuclei and distinct immune activati
   const contrast=(a,b)=>(Math.max(luminance(a),luminance(b))+.05)/(Math.min(luminance(a),luminance(b))+.05);
   for(const [id,preset] of Object.entries(D.COLOR_PRESETS)){
     const palette=D.normalizeColors(preset.colors),before=JSON.stringify(preset);
-    for(const key of ['normal','abnormal','tumor','immune','activated'])assert.ok(contrast(palette[key].body,palette[key].nucleus)>=3,id+' '+key+' nuclear contrast');
+    for(const key of ['normal','abnormal','tumor','immune','activated','suppressive']){assert.ok(preset.colors[key]?.body,'raw palette preview has every state');assert.ok(contrast(palette[key].body,palette[key].nucleus)>=3,id+' '+key+' nuclear contrast');}
     const paleTumor='#'+D.bodyColor({kind:2,genome:{proliferation:.25}},palette).map(v=>v.toString(16).padStart(2,'0')).join('');
     assert.ok(contrast(paleTumor,palette.tumor.nucleus)>=3,id+' preserves nuclei at the lightest proliferation shade');
     assert.ok(luminance(palette.immune.body)>luminance(palette.activated.body));

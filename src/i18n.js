@@ -513,8 +513,8 @@ GPU（含传输）|GPU (including transfers)\u0020
 情境：|Scenario:\u0020
 录制中|Recording
 纯正常上皮，中心酸清除弱、氧糖补给略低，外围环境较好。局部代谢压力经异常中间态推动随机癌变；新生肿瘤采用较高遗传耐受基线，观察存活克隆向外围扩增。|Normal epithelium with poor acid clearance and lower nutrient supply in the center. Local stress drives stochastic transformation through an abnormal state. New tumors have a higher tolerance baseline; surviving clones can expand outward.
-中心 19 颗低抗原肿瘤，外围仅 3 颗免疫细胞，肿瘤保留快速生长与迁移。观察原灶外播散及远端增殖；这是二维扩散代理，不含血管运输或跨器官转移。|19 low-antigen tumors in the center, only 3 peripheral immune cells. Observe rapid tumor growth, outward spread and distal division. This 2D spread proxy excludes vascular transport and cross-organ metastasis.
-中心 37 颗肿瘤形成局部密集病灶，周边 18 颗免疫细胞，抗原暴露充分。依靠真实接触识别、局部招募及有限克隆扩增，尝试清除当前区域肿瘤。|A dense central lesion of 37 tumors with 18 surrounding immune cells and high antigen exposure. Actual contact recognition, local recruitment and limited clonal expansion can clear tumors in the dish.
+正常细胞铺满背景，中央嵌入 19 颗低抗原肿瘤，外围仅 3 颗免疫细胞。梭形肿瘤在有限组织让位下侵袭、扩增；招募与扩增支持较弱。这是二维局部播散代理，不含血管或跨器官转移。|A confluent normal sheet contains 19 central low-antigen tumors and only 3 peripheral immune cells. Spindle-shaped tumors invade and grow through bounded tissue yielding, with weak recruitment and expansion support. This is a 2D local-spread proxy, without vascular or cross-organ metastasis.
+正常细胞铺满背景，中央嵌入 37 颗高抗原肿瘤，18 颗免疫细胞分散在病灶周边的组织内。通过接触识别、局部招募及 IL-2 支持的有限扩增清除肿瘤；关闭杀伤可作对照。|A confluent normal sheet contains 37 central high-antigen tumors and 18 immune cells in the surrounding tissue. Contact recognition, local recruitment and IL-2-supported limited expansion support clearance; turn off killing for a control.
 `);
   add(`
 新生肿瘤克隆扩增|New tumor clone expansion
@@ -543,6 +543,7 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
     [/^当前存活已检查 (\d+) \/ (\d+)$/,(_,n,total)=>`Living cells inspected: ${n} / ${total}`],
     [/^本细胞已检查 (\d+) 颗不同组织细胞$/,(_,n)=>`This cell inspected ${n} distinct tissue cells`],
     [/^子代 P(\d+) · 沿谱系分裂 (\d+) 次$/,(_,p,n)=>`Generation P${p} · ${n} divisions along lineage`],
+    [/^观察谱系：相对第 (\d+) 代 · 标记 (\d+) 颗$/,(_,g,n)=>`Observed family: relative generation ${g} · ${n} cells marked`],
     [/^首达 #([\d/]+) · (\d+) MCS$/,(_,n,t)=>`First #${n} · ${t} MCS`],
     [/^(减小|增大)(.+)$/,(_,action,name)=>`${action==='减小'?'Decrease':'Increase'} ${translate(name)}`],
     [/^(正常细胞|异常中间态|肿瘤细胞|未激活免疫|已激活免疫)(胞体|胞核)颜色$/,(_,type,part)=>`${dictionary.get(type)} ${dictionary.get(part).toLowerCase()} color`],
@@ -651,6 +652,67 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
 持续抗原刺激逐渐降低扩增和杀伤；补足营养不会立即清空耗竭|Chronic antigen stimulation gradually reduces expansion and killing; refeeding does not instantly erase exhaustion
 手动分裂（实验干预）|Manual division (intervention)
 实验干预：绕过周期许可，仍受胞体、胞核和分裂几何限制|Experimental intervention: bypass cycle licensing while retaining body, nucleus and division geometry constraints
+`);
+  add(`
+演化实验|Evolution experiments
+突变与抗原演化|Mutation & antigen evolution
+正常细胞压力致变|Stress-induced normal variation
+肿瘤压力致变|Stress-induced tumor variation
+突变适应偏向|Mutation adaptation bias
+压力诱导抗原暴露|Stress-induced antigen exposure
+接触选择下的抗原丢失|Contact-selected antigen loss
+持续招募下的抗原丢失|Antigen loss under recruitment exposure
+选择压力记忆时长|Selection memory timescale
+遗传性状变化幅度；默认双向随机，可用适应偏向进行对照实验|Size of heritable changes; bidirectional by default, with optional adaptation bias for experiments
+氧糖不足、高酸与持续炎症提高耐受性状变化及癌变风险；0 关闭额外放大|Low oxygen/glucose, acidity and sustained inflammation amplify tolerance variation and transformation risk; 0 disables amplification
+局部压力提高分裂时突变率，并允许存活肿瘤在两次分裂之间发生性状变化|Local stress raises division-time mutation rates and allows trait changes in surviving tumors between divisions
+负值偏向不利、0 双向随机、正值偏向耐受与逃逸；这是实验偏置，不保证生存获益|Negative favors adverse changes, 0 is unbiased, positive favors tolerance/escape; an experimental bias, not guaranteed benefit
+抗原阴性肿瘤在持续恶劣环境下转为阳性的速率；可检验假设，非普遍生物规律|Rate of antigen-negative tumors becoming positive under stress; an experimental hypothesis, not a universal biological rule
+存活靶细胞每次有效免疫接触积累选择压力；持续接触只记一次，分离后可重新计数|Surviving targets accumulate selection pressure from effective immune encounters; continuous contact counts once, separation permits another encounter
+持续招募信号暴露提高存活抗原阳性细胞的表型丢失风险；不会直接治愈已受损细胞|Sustained recruitment exposure raises phenotypic loss risk in surviving antigen-positive cells without repairing existing damage
+接触记忆的半衰期与招募暴露的积累时间尺度；离开后衰减，分裂后稀释|Half-life of contact memory and accumulation timescale of recruitment exposure; decays after departure and dilutes at division
+正常耐受变异|Normal tolerance changes
+肿瘤间期变异|Tumor interphase changes
+压力抗原暴露|Stress-induced antigen gains
+选择性抗原丢失|Selected antigen losses
+环境致变压力|Mutagenic environmental pressure
+耐受性状|Tolerance trait
+有效免疫接触|Effective immune encounters
+接触选择记忆|Contact selection memory
+持续招募暴露|Sustained recruitment exposure
+`);
+  add(`
+正常细胞铺满培养皿，4 颗免疫细胞分散在单层内部。中心酸清除弱、氧糖补给略低；代谢与炎症压力提高随机变异，经异常中间态产生肿瘤；耐受变异、细胞死亡与免疫监视共同筛选存活克隆。|Normal cells fill the dish with 4 dispersed immune cells. Reduced central acid clearance and nutrient supply cause local stress. Metabolic and inflammatory pressure increase variation through an abnormal intermediate; tolerance variation, death and immune surveillance select surviving clones.
+正常细胞铺满背景，中央嵌入 19 颗低抗原肿瘤，外围仅 3 颗免疫细胞。梭形肿瘤侵袭扩增，压力提高性状变异，部分克隆可能暴露抗原；免疫招募较弱。这是二维局部播散，不含血管或跨器官转移。|A confluent normal sheet contains 19 central low-antigen tumors and 3 peripheral immune cells. Spindle tumors invade and expand; stress increases trait variation and may expose antigen, under weak recruitment. A 2D local-spread model, without vascular or cross-organ metastasis.
+正常细胞铺满背景，中央嵌入 37 颗高抗原肿瘤，18 颗免疫细胞分散在病灶周边的组织内。接触识别、招募及 IL-2 扩增支持早期清除；少数存活克隆可能丢失抗原并再次扩增。结局随种子改变，关闭杀伤可作对照。|A confluent normal sheet contains 37 central antigen-positive tumors and 18 surrounding immune cells. Contact recognition, recruitment and IL-2 support early clearance; occasional survivors may lose antigen and regrow. Outcomes vary by seed. Turn killing off for a control.
+`);
+  add(`
+免疫抑制样细胞|Suppressive-like immune cell
+免疫抑制样|Suppressive-like immune
+正常细胞损伤信号|Normal-cell injury signal
+免疫抑制信号|Immune suppression signal
+正常损伤|Normal injury
+免疫抑制|Immune suppression
+损伤应答与免疫抑制|Injury response & immune suppression
+损伤暴露转抑制态|Injury-driven suppressive conversion
+损伤暴露退激活|Injury-driven deactivation
+抑制态信号分泌|Suppressive signal secretion
+抑制信号退激活|Signal-driven deactivation
+正常损伤暴露记忆|Normal-injury exposure memory
+正常细胞损伤信号暴露越强、越久，粉色巡逻细胞转蓝概率越高；0 关闭转变|Stronger and longer normal-injury exposure raises pink-to-blue conversion risk; 0 disables conversion
+持续正常细胞损伤信号提高红色免疫细胞退回粉色的概率|Sustained normal-injury signals raise the chance that red immune cells return to pink
+蓝色细胞沿自身胞体分泌独立免疫抑制信号，随局部代谢效能变化|Blue cells secrete a separate suppressive signal along their body, scaled by metabolic fitness
+局部抑制信号提高红色转粉色的概率；退激活后 240 MCS 内不能立即重新识别|Local suppression raises red-to-pink transition risk, followed by a 240 MCS reactivation delay
+暴露按胞体附近的正常损伤信号积累，离开后渐减；肿瘤报警与 IL-2 不直接触发|Exposure integrates normal-injury signal across the body and decays after departure; tumor alarm and IL-2 do not directly trigger it
+免疫抑制／再激活等待|Immune suppression / reactivation delay
+正常损伤暴露|Normal-injury exposure
+局部抑制信号|Local suppression signal
+抑制样表型：分泌抑制信号，保留运动，停止抗肿瘤杀伤|Suppressive-like phenotype: secretes suppression, retains movement, stops antitumor killing
+再激活等待|Reactivation delay
+其中抑制|Of these, suppressive
+转抑制态|Suppressive transitions
+损伤退激活|Injury deactivations
+信号退激活|Signal deactivations
 `);
   let terms;
   function translate(value,language='en'){

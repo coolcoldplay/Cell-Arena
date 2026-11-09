@@ -80,7 +80,8 @@ test('recent disappearances follow clearance time, including an older slow-clear
 test('natural spontaneous deaths agree across JS and WASM and account for every missing body',async()=>{
   const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm')),runs=[];
   for(const kernel of ['fast','wasm']){
-    const s=new CellLab.Simulation({width:96,height:72,scene:'empty',warmup:0,seed:17,settings:{growth:0,immuneGrowth:0,metabolism:0,apoptosis:30,tumorMotility:0}});
+    // Isolate death accounting from the independently stochastic evolution routes.
+    const s=new CellLab.Simulation({width:96,height:72,scene:'empty',warmup:0,seed:17,settings:{growth:0,immuneGrowth:0,metabolism:0,apoptosis:30,tumorMotility:0,normalMutationGain:0,tumorMutationGain:0,antigenStressGain:0,contactEscape:0,signalEscape:0}});
     for(let y=10;y<70;y+=17)for(let x=10;x<94;x+=17)s.seed(2,x,y,5);
     const initial=s.live().length;if(kernel==='wasm')await CellLabWasm.install(s,module);
     for(let n=0;n<6;n++){

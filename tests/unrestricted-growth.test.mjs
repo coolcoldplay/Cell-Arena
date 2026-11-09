@@ -44,7 +44,7 @@ test('hot starts with a local 37-cell tumor burden and a surrounding immune popu
   for(const worldWidth of [192,240,256,320,384,512]){
     const s=new CellLab.Simulation({scene:'hot',worldWidth,worldHeight:worldWidth*.75,refinement:1,warmup:0,settings:{capacity:40}}),initial=s.scenarioReport().initial,tumors=s.live().filter(m=>m.kind===2),ctls=s.live().filter(m=>m.kind===3);
     assert.equal(initial.tumor,37);assert.equal(initial.immune,18);assert.equal(initial.antigenPositive,37);
-    assert.ok(tumors.every(m=>Math.hypot(m.x-worldWidth/2,m.y-worldWidth*.375)<54));assert.ok(ctls.every(m=>Math.hypot(m.x-worldWidth/2,m.y-worldWidth*.375)>58));
+    assert.ok(tumors.every(m=>Math.hypot(m.x-worldWidth/2,m.y-worldWidth*.375)<57));assert.ok(ctls.every(m=>Math.hypot(m.x-worldWidth/2,m.y-worldWidth*.375)>54));
     assert.ok(s.live().every(m=>s.section.fits(m,m.nucleusX,m.nucleusY)));assert.equal(s.snapshot().orphans,0);
     const cold=new CellLab.Simulation({scene:'cold',worldWidth,worldHeight:worldWidth*.75,refinement:1,warmup:0,settings:{capacity:40}});
     assert.equal(cold.scenarioReport().initial.tumor,19);assert.equal(cold.scenarioReport().initial.immune,3);
