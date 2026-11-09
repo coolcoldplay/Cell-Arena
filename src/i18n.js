@@ -560,6 +560,9 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
     [/^正常、异常、肿瘤和免疫细胞数量：从 0 到 (\d+) MCS 的完整过程$/,(_,t)=>`Normal, abnormal, tumor and immune populations from 0 to ${t} MCS`]
   ];
   add(`
+招募扩散：沿通道|Recruitment: along corridors
+招募扩散：穿墙|Recruitment: through walls
+仅切换招募因子扩散；细胞仍不能穿墙|Switch recruitment diffusion only; cells cannot cross walls
 迷宫招募场：0—30 固定色标，圆心持续供给，入口清除。|Maze recruitment field: fixed 0–30 scale, sustained center supply and entrance drainage.
 免疫细胞迷宫|Immune cell maze
 免疫迷宫|Maze

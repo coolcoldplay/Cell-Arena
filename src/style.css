@@ -95,3 +95,5 @@ dialog{max-width:700px;width:calc(100% - 32px);max-height:86dvh;overflow:auto;ov
 }
 
 .maze-score{padding:5px 10px;font:12px Consolas,monospace;background:#e8dbc3;border-block:1px solid var(--line);display:flex;gap:5px 9px;flex-wrap:wrap;flex-shrink:0}.maze-score[hidden]{display:none}.maze-score b{color:#724a24}.maze-score span{white-space:nowrap}
+
+.maze-diffusion{position:absolute;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:4;max-width:calc(100% - 24px);min-height:36px;padding:7px 10px;background:#f7f0e3eb;box-shadow:2px 2px 0 #a7917099;font-size:12px}

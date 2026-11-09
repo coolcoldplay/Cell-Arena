@@ -54,9 +54,10 @@
     }
     contacts(){
       const s=this.s,C=s.C,live=s.live();this.grid.set(C.grid._pixels.subarray(0,this.length));this.pool.set(C.borderpixels.elements);this.contactPresent.fill(0);for(const m of live)this.contactPresent[m.id]=1;
+      for(const [id,kind]of Object.entries(C.t2k))if(kind===4)this.contactPresent[Number(id)]=2;
       const count=this.e.contacts(C.borderpixels.length);if(count<0)return this.originalContacts();
       for(const m of live){let map=s.contacts.get(m.id);if(!map){map=new Map();s.contacts.set(m.id,map);}map.clear();}
-      for(let n=0;n<count;n++){const i=n*5,d=this.contactData;s.contacts.get(d[i]).set(d[i+1],{id:d[i+1],length:d[i+2],nx:d[i+3],ny:d[i+4]});}
+      for(let n=0;n<count;n++){const i=n*5,d=this.contactData;if(s.cells[d[i]])s.contacts.get(d[i]).set(d[i+1],{id:d[i+1],length:d[i+2],nx:d[i+3],ny:d[i+4]});}
       for(const m of live){let length=0;for(const e of s.contacts.get(m.id).values())length+=e.length;m.confinement=Math.max(0,Math.min(1,length/Math.max(1,4*Math.sqrt(C.getVolume(m.id)))));}
       return s.contacts;
     }

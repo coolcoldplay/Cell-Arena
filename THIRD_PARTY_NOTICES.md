@@ -34,6 +34,7 @@ Cell-Arena 基于 Artistoo 构建。下表说明直接包含、改写／移植�
 ## 3. 视觉与科学参考
 
 - [Artistoo · Cancer Invasion](https://artistoo.net/examples/CancerInvasion.html)：参考类型配色、关闭 Act 时的胞体显示、细胞边界观感，以及填满培养区域的上皮单层布局。新增的加权 Voronoi 初始分区与圆形迷宫由本项目实现。本仓库不包含该示例网页或其截图；本项目的情境、交互、代谢场和谱系规则见源代码及模型说明。
+- [Artistoo · NoTorusDemo](https://artistoo.net/examples/NoTorusDemo.html)：参考窄通道与细胞尺寸比例及 Act 迁移显示；圆弧迷宫、接头与扩散切换由本项目实现，没有包含该示例脚本。
 - Act 迁移模型、CTL 招募、代谢竞争、累积杀伤和癌前监视等论文：在 [MODEL.md](MODEL.md#机制参考) 与网页“模型与来源”中列出作者、题目／主题和原始论文链接，属于机制依据，不作为代码许可证使用。
 - 局部吸引、分离、方向协同等群体运动启发是规则层面的参考；没有另行打包蚁群或鸟群算法库。
 - U87 形态和胶质瘤连接网络的原始研究在 [MORPHOLOGY.md](MORPHOLOGY.md#原始研究与证据边界) 列出。动态突起与接触稳定规则是本项目的定性扩展，没有复制这些论文的仿真代码、图像或视频。

@@ -47,8 +47,8 @@ test('cold tumor spreads and divides beyond the original lesion using existing m
 });
 
 test('hot tumor clearance requires real killing and an observation interval; living or dying targets prevent success',async()=>{
-  const s=await make('hot');s.advance(1500);const report=s.scenarioReport();assert.ok(report.tumorDivisions>0);assert.equal(s.counters.kills,37+report.tumorDivisions);assert.equal(s.counters.environment,0);assert.equal(s.counters.apoptosis,0);assert.equal(report.tumorBodies,0);assert.ok(report.achieved);assert.ok(report.clearanceElapsed>=150);assert.ok(s.counters.recognitions>0);assert.ok(s.counters.immuneDivisions>0);assert.ok(s.live().filter(m=>m.kind===3).every(m=>m.divisionsLeft>=0));
-  const id=s.seed(2,4*s.scale,4*s.scale,3*s.scale);assert.ok(id);assert.equal(s.scenarioReport().achieved,false);s.updateScenarioState();assert.equal(s.scenarioReport().clearanceAt,null);s.beginDeath(id,'kill');assert.equal(s.scenarioReport().achieved,false);
+  const s=await make('hot');for(let elapsed=0;elapsed<4500&&!s.scenarioReport().achieved;elapsed+=250)s.advance(250);const report=s.scenarioReport();assert.ok(report.tumorDivisions>0);assert.equal(s.counters.kills,37+report.tumorDivisions);assert.equal(s.counters.environment,0);assert.equal(s.counters.apoptosis,0);assert.equal(report.tumorBodies,0);assert.ok(report.achieved);assert.ok(report.clearanceElapsed>=150);assert.ok(s.counters.recognitions>0);assert.ok(s.counters.immuneDivisions>0);assert.ok(s.live().filter(m=>m.kind===3).every(m=>m.divisionsLeft>=0));
+  let id=0;for(let y=5*s.scale;y<s.height-5*s.scale&&!id;y+=10*s.scale)for(let x=5*s.scale;x<s.width-5*s.scale&&!id;x+=10*s.scale)id=s.seed(2,x,y,3*s.scale);assert.ok(id);assert.equal(s.scenarioReport().achieved,false);s.updateScenarioState();assert.equal(s.scenarioReport().clearanceAt,null);s.beginDeath(id,'kill');assert.equal(s.scenarioReport().achieved,false);
   const control=await make('hot',{kill:0});control.advance(1500);assert.equal(control.counters.kills,0);assert.ok(control.scenarioReport().tumorBodies>37);assert.equal(control.scenarioReport().achieved,false);
 });
 

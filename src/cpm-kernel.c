@@ -85,7 +85,9 @@ __attribute__((export_name("energy"))) double energy(int src,int tgt,int a,int b
   double *m=a?ca:cb;double act=m[ACT]?m[ACT]*(activity_at(tgt)-activity_at(src))/params[(int)m[KIND]]:0;h+=act;
   if(section)h+=shape_energy(tgt,ca)-shape_energy(tgt,cb);
   double vol=0;if(ca[PRESENT])vol+=ca[LV]*(2*(ca[VOLUME]-ca[TARGET])+1);if(cb[PRESENT])vol+=cb[LV]*(-2*(cb[VOLUME]-cb[TARGET])+1);h+=vol;
-  double direction=0;if(ca[PRESENT]&&ca[DRIVE]&&!ca[DYING]){int mask=(1<<ybits)-1;double dx=(tgt>>ybits)-(src>>ybits),dy=(tgt&mask)-(src&mask);if(wrap){if(dx>1)dx-=width;else if(dx< -1)dx+=width;if(dy>1)dy-=height;else if(dy< -1)dy+=height;}direction=-ca[DRIVE]*(dx*ca[PX]+dy*ca[PY]);}return h+direction;
+  double direction=0;int mask=(1<<ybits)-1;double dx=(tgt>>ybits)-(src>>ybits),dy=(tgt&mask)-(src&mask);if(wrap){if(dx>1)dx-=width;else if(dx< -1)dx+=width;if(dy>1)dy-=height;else if(dy< -1)dy+=height;}
+  if(ca[PRESENT]&&!ca[DYING])direction=-ca[DRIVE]*(dx*ca[PX]+dy*ca[PY]);
+  if(cb[KIND]==3&&!cb[DYING])direction-=cb[DRIVE]*(dx*cb[PX]+dy*cb[PY]);return h+direction;
 }
 static inline void insert(int j){if(where[j]>=0)return;where[j]=count;pool[count++]=j;}
 static inline void remove_pixel(int j){int slot=where[j];if(slot<0)return;where[j]=-1;int last=pool[--count];if(last!=j){pool[slot]=last;where[last]=slot;}}
@@ -114,7 +116,7 @@ __attribute__((export_name("contacts"))) int contacts(int length){
   for(int i=0;i<32768;i++)contact_table[i]=0;contact_count=0;
   // Same border traversal and first-insertion order as the reference Map path.
   for(int p=0;p<length;p++){int i=pool[p],a=grid[i];if(!contact_present[a])continue;int *r=rings+i*8;
-    int b=r[3]<0?0:grid[r[3]];if(a!=b&&contact_present[b])if(!add_contact(a,b,1,0)||!add_contact(b,a,-1,0))return -1;
-    b=r[5]<0?0:grid[r[5]];if(a!=b&&contact_present[b])if(!add_contact(a,b,0,1)||!add_contact(b,a,0,-1))return -1;
+    int b=r[3]<0?0:grid[r[3]];if(a!=b&&contact_present[b]&&(contact_present[a]==1||contact_present[b]==1))if(!add_contact(a,b,1,0)||!add_contact(b,a,-1,0))return -1;
+    b=r[5]<0?0:grid[r[5]];if(a!=b&&contact_present[b]&&(contact_present[a]==1||contact_present[b]==1))if(!add_contact(a,b,0,1)||!add_contact(b,a,0,-1))return -1;
   }return contact_count;
 }

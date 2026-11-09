@@ -3,6 +3,32 @@ for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js
 const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm'));
 const settings={growth:2,metabolism:0,apoptosis:0,immuneGrowth:1,normalMotility:.1,tumorMotility:.35,immuneMotility:1.5,noise:0,alignment:0,cohesion:0,repulsion:0,antigen:0,chemotaxis:3};
 
+test('immune motility biases rear withdrawal as well as front protrusion, with the same metabolic and synapse gating',()=>{
+  const s=new CellLab.Simulation({width:64,height:48,scene:'empty',warmup:0}),id=s.seed(3,30,24,5),m=s.cells[id],d=s.C.soft_constraints.find(c=>c.constructor.name==='LocalDirection');
+  m.px=1;m.py=0;const at=x=>s.C.grid.p2i([x,24]);
+  for(const [fitness,target]of [[1,0],[.2,0],[1,99]]){m.fitness=fitness;m.targetID=target;s.updateMechanics(m);
+    assert.ok(d.deltaH(at(24),at(25),0,id)<0,'a rear pixel may retract into the neighbouring medium');
+    assert.equal(d.deltaH(at(24),at(25),0,id),d.deltaH(at(35),at(36),id,0));
+    assert.ok(d.deltaH(at(36),at(35),0,id)>0,'front withdrawal opposes polarity');
+  }
+  s.settings.immuneMotility=0;s.updateMechanics(m);assert.equal(d.deltaH(at(24),at(25),0,id),0);
+});
+test('solid wall contact is mechanical confinement and never an antigen contact',async()=>{
+ for(const wasm of [false,true]){const s=new CellLab.Simulation({width:64,height:48,scene:'empty',warmup:0}),id=s.seed(3,30,24,3);
+  for(let y=16;y<=32;y++)s.paint(34,y,0);if(wasm)await CellLabWasm.install(s,module);s.scanContacts();s.immuneInteractions(20);
+  assert.ok(s.cells[id].confinement>0,'a narrow solid channel must relax the soft cortex too');assert.equal(s.cells[id].activation,0);assert.equal(s.histories.size,0);
+ }
+});
+test('basal patrol explores new neighbours in a fully occupied healthy monolayer without a target or imposed gradient',async t=>{
+  const s=new CellLab.Simulation({scene:'oncogenesis',worldWidth:240,worldHeight:180,refinement:1,settings:{metabolism:0,stressMutation:0,progression:0,immuneGrowth:0}});
+  await CellLabWasm.install(s,module);const count=s.live().length,tracks=s.live().filter(c=>c.kind===3).map(c=>({id:c.id,x:c.nucleusX,y:c.nucleusY,span:0,seen:new Set()}));
+  for(let n=0;n<800;n++){s.advance(1);for(const p of tracks){const m=s.cells[p.id];p.span=Math.max(p.span,Math.hypot(m.nucleusX-p.x,m.nucleusY-p.y));for(const id of s.contacts.get(m.id)?.keys()||[])p.seen.add(id);}}
+  t.diagnostic(JSON.stringify(tracks.map(p=>({id:p.id,range:p.span,neighbours:p.seen.size}))));
+  for(const p of tracks){assert.ok(p.span>14,`patrol ${p.id} range ${p.span}`);assert.ok(p.seen.size>=6,'patrol must change contact partners, not just wobble');}
+  assert.equal(s.live().length,count);assert.equal(s.counters.recognitions,0);assert.equal(s.counters.kills,0);
+  for(const m of s.live()){assert.equal(s.components(m.id).length,1);assert.ok(s.section.fits(m,m.nucleusX,m.nucleusY));assert.ok(m.sectionFraction>=1-s.settings.sectionYield);}
+});
+
 test('compressed cells do not manufacture additional target mass and ratchet their hard area floor above occupied space',()=>{
   for(const kind of [1,2,3]){
     const s=new CellLab.Simulation({width:64,height:48,scene:'empty',warmup:0,settings}),id=s.seed(kind,25,25,5),m=s.cells[id];

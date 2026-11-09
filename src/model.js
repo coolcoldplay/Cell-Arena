@@ -119,20 +119,26 @@
   }
   class LocalDirection extends CPM.SoftConstraint {
     constructor(sim){super({});this.sim=sim;}
-    deltaH(src,tgt,id){
-      const m=this.sim.cells[id];if(!m||!m.drive||m.dying)return 0;
+    deltaH(src,tgt,id,oldID){
+      const m=this.sim.cells[id],rear=this.sim.cells[oldID];
       let dx=this.sim.xs[tgt]-this.sim.xs[src],dy=this.sim.ys[tgt]-this.sim.ys[src];
       if(this.sim.wrap){if(dx>1)dx-=this.sim.width;else if(dx< -1)dx+=this.sim.width;if(dy>1)dy-=this.sim.height;else if(dy< -1)dy+=this.sim.height;}
-      return -m.drive*(dx*m.px+dy*m.py);
+      let energy=m&&!m.dying?-m.drive*(dx*m.px+dy*m.py):0;
+      // The same local polarity that extends an immune front contracts its rear.
+      // Without this term a passive epithelial neighbour cannot refill the tail,
+      // pinning a healthy patrol in confluent tissue. Hard geometry still decides
+      // whether the copy is possible; drive already includes fitness/synapse gates.
+      if(rear?.kind===IMMUNE&&!rear.dying)energy-=rear.drive*(dx*rear.px+dy*rear.py);
+      return energy;
     }
   }
   class Simulation {
-    constructor({width,height,worldWidth=240,worldHeight=180,refinement,scene='ecosystem',seed=17,boundary='solid',settings={},sources,warmup=35,kernel='fast',sectionModel=true}={}){
+    constructor({width,height,worldWidth=240,worldHeight=180,refinement,scene='ecosystem',seed=17,boundary='solid',settings={},sources,mazeSignalThroughWalls=false,warmup=35,kernel='fast',sectionModel=true}={}){
       this.scale=refinement??(width===undefined?1.5:1);
       if(![1,1.5,2,3,4].includes(this.scale))throw Error('Unsupported lattice refinement');
       width=width??Math.round(worldWidth*this.scale);height=height??Math.round(worldHeight*this.scale);
       if(!Number.isInteger(width)||!Number.isInteger(height)||width<32||height<24||width>1024||height>768)throw Error('计算格点需在 32×24 至 1024×768 内，请降低区域或精细度');
-      this.worldWidth=width/this.scale;this.worldHeight=height/this.scale;this.fieldScale=FIELD_SCALE*this.scale;
+      this.worldWidth=width/this.scale;this.worldHeight=height/this.scale;this.fieldScale=scene==='maze'?Math.max(1,Math.round(this.scale*1.25)):FIELD_SCALE*this.scale;
       this.width=width;this.height=height;this.scene=scene;this.seedValue=seed;this.wrap=boundary==='wrap';this.boundary=boundary;
       this.settings={...DEFAULTS,...(scene==='random'?randomSettings(seed):PRESETS[scene]?.settings||{}),...settings};
       // Legacy saved configurations may contain a population budget. It has
@@ -207,7 +213,7 @@
       this.binAreas=new Float32Array(bins);for(let y=0;y<height;y++)for(let x=0;x<width;x++)this.binAreas[this.fieldIndex(x,y)]++;
       if(scene!=='empty')this.populate();
       if(sources){this.sources=[];for(const source of sources)this.addSource(source.x*this.scale,source.y*this.scale,source.type,source.radius*this.scale);}
-      if(this.maze)this.equilibrateMaze();
+      if(this.maze){this.maze.signalThroughWalls=!!mazeSignalThroughWalls;if(mazeSignalThroughWalls)this.fields.trail.blocked.fill(0);this.equilibrateMaze();}
       this.record(); // The initial population belongs at model time zero.
       this.refreshPositions();for(let i=0;i<(this.maze?0:warmup);i++){if(C.borderpixels.length)C.timeStep();if(this.section){this.refreshPositions();this.scanContacts();this.section.update(1);}}
       this.cleanup();this.refreshPositions();this.updateEnvironment(0);this.updateMetabolism(0);this.updateLocal(0);this.initializeScenario();this.record();
@@ -277,7 +283,13 @@
         m.lambdaP=m.dying?0:[0,.35,.42,.65][m.kind]/this.scale;
         m.perimeter=[0,155,195,90][m.kind]*this.scale*Math.sqrt(Math.max(1,m.planarTarget)/m.base);
         if(m.morphologyMode){m.lambdaP=.18/this.scale;m.perimeter+=2.8*(m.processLength||0);const hold=1/(1+.45*m.networkDegree);m.activity*=.25*hold;m.drive*=.4*hold;}
-        if(m.kind===IMMUNE){m.activity*=125/240;m.drive*=35/25;}
+        if(m.kind===IMMUNE){
+          m.activity*=125/240;m.drive*=35/25;
+          // Relax only the soft cortical perimeter cost under mechanical contact.
+          // Nuclear exclusion, finite neck width, reach and connectivity remain
+          // hard constraints; sparse cells retain the original surface tension.
+          m.lambdaP/=1+2*m.confinement;
+        }
       }
       if(m.deathIntact){
         // Surface tension rounds the real lattice body. Swelling still pays
@@ -339,33 +351,66 @@
       this.refreshPositions();for(const site of [...sites,...patrols]){const m=this.cells[site.id];m.base=m.target=this.C.getVolume(m.id);if(this.section&&!this.section.initialize(m,site.points))throw Error('Monolayer nucleus does not fit');this.updateMechanics(m);}this.C.stat_values={};
     }
     populateMaze(){
-      const tau=2*Math.PI,W=this.worldWidth,H=this.worldHeight,r=this.scale,cx=W/2,cy=H/2,R=Math.min(W,H)/2-6,hub=Math.min(14,R*.25),rings=Math.max(2,Math.round((R-hub)/18)),pitch=(R-hub)/rings;
+      const tau=2*Math.PI,W=this.worldWidth,H=this.worldHeight,r=this.scale,cx=W/2,cy=H/2,R=Math.min(W,H)/2-6,hub=10,rings=Math.max(3,Math.round((R-hub)/10)),pitch=(R-hub)/rings,halfWall=2,door=4;
       if(Math.min(W,H)<144)throw Error('免疫迷宫需要至少 144 的区域短边');
-      const counts=[],offsets=[],nodes=[{ring:-1,j:0}],edges=[];
-      let sectors=6;for(let k=0;k<rings;k++){const inner=hub+k*pitch;if(tau*inner/sectors>32)sectors*=2;counts.push(sectors);offsets.push(nodes.length);for(let j=0;j<sectors;j++)nodes.push({ring:k,j});}
+      const counts=[],offsets=[],nodes=[{ring:-1,j:0,x:0,y:0}],edges=[];
+      let sectors=6;for(let k=0;k<rings;k++){const inner=hub+k*pitch;if(tau*inner/sectors>18)sectors*=2;counts.push(sectors);offsets.push(nodes.length);for(let j=0;j<sectors;j++){const a=(j+.5)*tau/sectors,d=inner+pitch/2;nodes.push({ring:k,j,x:d*Math.cos(a),y:d*Math.sin(a)});}}
       const key=(a,b)=>a<b?a+':'+b:b+':'+a;
-      for(let k=0;k<rings;k++)for(let j=0;j<counts[k];j++){const a=offsets[k]+j;edges.push([a,offsets[k]+(j+1)%counts[k]]);edges.push([a,k?offsets[k-1]+Math.floor(j*counts[k-1]/counts[k]):0]);}
-      for(let i=edges.length-1;i>0;i--){const j=this.C.ran(0,i);[edges[i],edges[j]]=[edges[j],edges[i]];}
-      const parent=nodes.map((_,i)=>i),root=a=>{while(parent[a]!==a){parent[a]=parent[parent[a]];a=parent[a];}return a;},open=new Set();
-      for(const [a,b]of edges){const ra=root(a),rb=root(b);if(ra!==rb){parent[ra]=rb;open.add(key(a,b));}}
-      const angles=Array.from({length:6},(_,j)=>(j*counts.at(-1)/6+.5)*tau/counts.at(-1)),difference=(a,b)=>Math.abs(Math.atan2(Math.sin(a-b),Math.cos(a-b))),field=this.fields.trail;
-      const wall=(x,y)=>{const radius=Math.hypot(x-cx,y-cy),angle=(Math.atan2(y-cy,x-cx)+tau)%tau;
-        if(radius>R+3)return false;
-        if(Math.abs(radius-R)<=3)return !angles.some(a=>difference(a,angle)*R<8);
-        for(let k=0;k<rings;k++){const boundary=hub+k*pitch;if(Math.abs(radius-boundary)<=3){const j=Math.floor(angle/tau*counts[k]),a=offsets[k]+j,b=k?offsets[k-1]+Math.floor(j*counts[k-1]/counts[k]):0;if(!open.has(key(a,b))||difference(angle,(j+.5)*tau/counts[k])*boundary>8)return true;}}
-        if(radius<hub||radius>R)return false;const k=Math.min(rings-1,Math.floor((radius-hub)/pitch)),n=counts[k],j=Math.round(angle/tau*n)%n;
-        return difference(angle,j*tau/n)*radius<=3&&!open.has(key(offsets[k]+j,offsets[k]+(j+n-1)%n));};
-      this.wallID=this.C.makeNewCellID(WALL);
-      // Align physical obstacles to field bins: cells and signals see the same
-      // impermeable geometry, including narrow doors around curved walls.
-      for(let by=0;by<field.height;by++)for(let bx=0;bx<field.width;bx++)if(wall((bx+.5)*4,(by+.5)*4))for(let y=by*this.fieldScale;y<Math.min(this.height,(by+1)*this.fieldScale);y++)for(let x=bx*this.fieldScale;x<Math.min(this.width,(bx+1)*this.fieldScale);x++)this.C.setpix([x,y],this.wallID);
-      this.rebuildMask();this.maze={cx:cx*r,cy:cy*r,radius:R*r,goalRadius:hub*.55*r,rings,corridor:pitch-6,racers:[],arrivals:[],startedAt:0};
-      for(let j=0;j<6;j++){
-        const a=angles[j],distance=R-pitch/2,x=(cx+distance*Math.cos(a))*r,y=(cy+distance*Math.sin(a))*r;let id=this.seed(IMMUNE,x,y,4*r);
-        if(!id){for(let d=-3*r;d<=3*r&&!id;d+=r)id=this.seed(IMMUNE,x+Math.cos(a)*d,y+Math.sin(a)*d,3*r);}
-        if(!id)throw Error('Maze entrance cannot fit an immune cell');const m=this.cells[id];m.px=-Math.cos(a);m.py=-Math.sin(a);this.maze.racers.push({id,birth:m.birth,number:j+1,x:m.x,y:m.y,arrivedAt:null});this.updateMechanics(m);
+      for(let k=0;k<rings;k++)for(let j=0;j<counts[k];j++){const a=offsets[k]+j;edges.push([a,offsets[k]+(j+1)%counts[k],0]);edges.push([a,k?offsets[k-1]+Math.floor(j*counts[k-1]/counts[k]):0,1]);}
+      const entrances=Array.from({length:6},(_,j)=>offsets.at(-1)+j*counts.at(-1)/6),angles=entrances.map(i=>(nodes[i].j+.5)*tau/counts.at(-1));
+      // Geometry construction only: reject trivial short routes from any start.
+      // This graph is discarded. Cell polarity reads only its local field samples.
+      let open,best=-Infinity;
+      for(let attempt=0;attempt<48;attempt++){
+        const shuffled=edges.map(e=>({e,cost:this.C.random()+e[2]*.12})).sort((a,b)=>a.cost-b.cost),parent=nodes.map((_,i)=>i),root=a=>{while(parent[a]!==a){parent[a]=parent[parent[a]];a=parent[a];}return a;},doors=new Set(),adj=nodes.map(()=>[]);
+        for(const {e:[a,b]}of shuffled){const ra=root(a),rb=root(b);if(ra!==rb){parent[ra]=rb;doors.add(key(a,b));adj[a].push(b);adj[b].push(a);}}
+        const distances=new Float64Array(nodes.length).fill(-1),queue=[0];distances[0]=0;
+        for(let h=0;h<queue.length;h++){const a=queue[h];for(const b of adj[a])if(distances[b]<0){distances[b]=distances[a]+Math.hypot(nodes[a].x-nodes[b].x,nodes[a].y-nodes[b].y);queue.push(b);}}
+        const paths=entrances.map(i=>distances[i]),min=Math.min(...paths),max=Math.max(...paths),score=min-Math.max(0,max-R*8);
+        if(score>best){best=score;open=doors;}if(min>R*2.8&&max<R*8)break;
       }
-      this.addSource(cx*r,cy*r,'trail',Math.max(4,hub*.35)*r);
+      // Analytic arcs and radial segments define BOTH the wall raster and
+      // the smooth drawing. Field resolution no longer sets the visible steps.
+      const curves=[],circle=(radius,gates,sectorAngle=null)=>{
+        const gaps=[];for(const angle of gates){const half=sectorAngle===null?door/radius:sectorAngle/2;for(const shift of [-tau,0,tau]){const lo=Math.max(0,angle-half+shift),hi=Math.min(tau,angle+half+shift);if(hi>lo)gaps.push([lo,hi]);}}
+        gaps.sort((a,b)=>a[0]-b[0]);let end=0;for(const [lo,hi]of gaps){if(lo>end+1e-8)curves.push([0,radius*r,end,lo]);end=Math.max(end,hi);}if(end<tau-1e-8)curves.push([0,radius*r,end,tau]);
+      };
+      circle(R,angles);
+      for(let k=0;k<rings;k++){
+        const inner=hub+k*pitch,n=counts[k],gates=[];
+        for(let j=0;j<n;j++){
+          const a=offsets[k]+j,b=k?offsets[k-1]+Math.floor(j*counts[k-1]/n):0;
+          if(open.has(key(a,b)))gates.push((j+.5)*tau/n);
+          if(!open.has(key(a,offsets[k]+(j+n-1)%n))){const angle=j*tau/n,ux=Math.cos(angle)*r,uy=Math.sin(angle)*r;curves.push([1,inner*ux,inner*uy,(inner+pitch)*ux,(inner+pitch)*uy]);}
+        }
+        circle(inner,gates,tau/n);
+      }
+      // Radial walls meet an arc at its centerline. At an open boundary they
+      // stop at the edge of their own corridor instead of poking into the next.
+      const joins=(radius,angle)=>curves.some(c=>c[0]===0&&Math.abs(c[1]-radius)<1e-6&&[angle,angle+tau].some(a=>a>=c[2]-1e-8&&a<=c[3]+1e-8));
+      for(const c of curves)if(c[0]===1){let inner=Math.hypot(c[1],c[2]),outer=Math.hypot(c[3],c[4]);const ux=c[3]/outer,uy=c[4]/outer,angle=(Math.atan2(uy,ux)+tau)%tau;if(!joins(inner,angle))inner+=halfWall*r;if(!joins(outer,angle))outer-=halfWall*r;c[1]=inner*ux;c[2]=inner*uy;c[3]=outer*ux;c[4]=outer*uy;}
+      this.wallID=this.C.makeNewCellID(WALL);const half=halfWall*r,centerX=cx*r,centerY=cy*r;
+      for(const curve of curves){
+        let points,distance;
+        if(curve[0]===0){const [,radius,start,end]=curve,ax=radius*Math.cos(start),ay=radius*Math.sin(start),bx=radius*Math.cos(end),by=radius*Math.sin(end);points=[[ax,ay],[bx,by]];for(let angle=0;angle<=tau;angle+=Math.PI/2)if(angle>=start&&angle<=end)points.push([radius*Math.cos(angle),radius*Math.sin(angle)]);
+          distance=(x,y)=>{const angle=(Math.atan2(y,x)+tau)%tau;return angle>=start&&angle<=end?(Math.hypot(x,y)-radius)**2:Infinity;};
+        }else{const [,ax,ay,bx,by]=curve,vx=bx-ax,vy=by-ay,len=vx*vx+vy*vy;points=[[ax,ay],[bx,by]];distance=(x,y)=>{const t=((x-ax)*vx+(y-ay)*vy)/len;if(t<0||t>1)return Infinity;return (x-ax-t*vx)**2+(y-ay-t*vy)**2;};}
+        const x0=Math.max(0,Math.floor(centerX+Math.min(...points.map(p=>p[0]))-half)),x1=Math.min(this.width-1,Math.ceil(centerX+Math.max(...points.map(p=>p[0]))+half)),y0=Math.max(0,Math.floor(centerY+Math.min(...points.map(p=>p[1]))-half)),y1=Math.min(this.height-1,Math.ceil(centerY+Math.max(...points.map(p=>p[1]))+half));
+        for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)if(distance(x+.5-centerX,y+.5-centerY)<=half*half)this.C.setpix([x,y],this.wallID);
+      }
+      this.rebuildMask();this.maze={cx:centerX,cy:centerY,radius:R*r,goalRadius:hub*.55*r,rings,corridor:pitch-2*halfWall,curves,wallWidth:2*half,wallID:this.wallID,cutouts:[],signalThroughWalls:false,racers:[],arrivals:[],startedAt:0};
+      for(let j=0;j<6;j++){
+        const a=angles[j],distance=R-pitch/2,x=Math.round((cx+distance*Math.cos(a))*r),y=Math.round((cy+distance*Math.sin(a))*r),start=this.C.grid.p2i([x,y]);
+        // A resting round cell is wider than the corridor. Seed a connected,
+        // full-area body along the available passage, rather than a tiny dot.
+        const queue=[start],seen=new Set([start]),points=[];
+        for(let h=0;h<queue.length&&points.length<Math.round(72*r*r);h++){const i=queue[h];if(this.C.pixti(i))continue;points.push(i);for(const n of this.faces[i])if(!seen.has(n)&&Math.hypot(this.xs[n]-x,this.ys[n]-y)<10*r){seen.add(n);queue.push(n);}}
+        if(points.length<40*r*r)throw Error('Maze entrance cannot fit an immune cell');
+        const id=this.C.makeNewCellID(IMMUNE);for(const i of points)this.C.setpixi(i,id);this.refreshPositions();const m=this.cells[id];
+        if(!this.section.initialize(m,points))throw Error('Maze entrance cannot fit an immune nucleus');
+        m.px=-Math.cos(a);m.py=-Math.sin(a);this.maze.racers.push({id,birth:m.birth,number:j+1,x:m.x,y:m.y,arrivedAt:null});this.updateMechanics(m);
+      }
+      this.addSource(cx*r,cy*r,'trail',4*r);
     }
     addSource(x,y,type,radius=10*this.scale){
       if(![...SIGNALS,'nutrient','hostile'].includes(type)||![x,y,radius].every(Number.isFinite)||radius<=0)return 0;
@@ -384,13 +429,27 @@
       if(this.maze&&(!channel||channel==='trail')){const f=this.fields.trail,m=this.maze;for(let i=0;i<f.values.length;i++)if(Math.hypot((i%f.width+.5)*this.fieldScale-m.cx,(Math.floor(i/f.width)+.5)*this.fieldScale-m.cy)>m.radius+2*this.scale)f.values[i]=0;}
     }
     equilibrateMaze(){
-      // Solve the local no-flux diffusion equation before the race. A constant
-      // central reservoir and outer bath maintain this experimental gradient;
-      // no shortest paths, goal coordinates or graph distances enter polarity.
-      const f=this.fields.trail,n=f.values.length,fixed=new Uint8Array(n),neighbours=Array.from({length:n},()=>[]);
-      this.applySources('trail');for(let i=0;i<n;i++){const x=i%f.width,y=Math.floor(i/f.width);if(f.blocked[i]||f.values[i]===30||Math.hypot((x+.5)*this.fieldScale-this.maze.cx,(y+.5)*this.fieldScale-this.maze.cy)>this.maze.radius+2*this.scale)fixed[i]=1;
+      // Preconditioned conjugate gradients solve the same local no-flux
+      // diffusion equilibrium. No route or distance-to-goal enters cell motion.
+      const f=this.fields.trail,n=f.values.length,fixed=new Uint8Array(n),neighbours=Array.from({length:n},()=>[]),active=[];
+      this.applySources('trail');for(let i=0;i<n;i++){const x=i%f.width,y=Math.floor(i/f.width);if(f.blocked[i]||f.values[i]===30||Math.hypot((x+.5)*this.fieldScale-this.maze.cx,(y+.5)*this.fieldScale-this.maze.cy)>this.maze.radius+2*this.scale)fixed[i]=1;else active.push(i);
         for(const [xx,yy]of [[x-1,y],[x+1,y],[x,y-1],[x,y+1]])if(xx>=0&&xx<f.width&&yy>=0&&yy<f.height&&!f.blocked[yy*f.width+xx])neighbours[i].push(yy*f.width+xx);}
-      for(let step=0;step<16000;step++){let error=0;for(let i=0;i<n;i++)if(!fixed[i]&&neighbours[i].length){let sum=0;for(const j of neighbours[i])sum+=f.values[j];const change=(sum/neighbours[i].length-f.values[i])*1.7;f.values[i]+=change;error=Math.max(error,Math.abs(change));}if(error<.00001)break;}
+      const x=new Float64Array(n),residual=new Float64Array(n),p=new Float64Array(n),ap=new Float64Array(n);let rz=0;
+      for(const i of active){for(const j of neighbours[i])if(fixed[j])residual[i]+=f.values[j]/30;p[i]=residual[i]/(neighbours[i].length||1);rz+=residual[i]*p[i];}
+      const tolerance=Math.max(1e-18,rz*1e-16);
+      for(let step=0;step<6000&&rz>tolerance;step++){
+        let pap=0;for(const i of active){let v=neighbours[i].length*p[i];for(const j of neighbours[i])if(!fixed[j])v-=p[j];ap[i]=v;pap+=p[i]*v;}
+        if(pap<=0)break;const alpha=rz/pap;let next=0;
+        for(const i of active){x[i]+=alpha*p[i];residual[i]-=alpha*ap[i];next+=residual[i]*residual[i]/(neighbours[i].length||1);}
+        const beta=next/rz;for(const i of active)p[i]=residual[i]/(neighbours[i].length||1)+beta*p[i];rz=next;
+      }
+      for(const i of active)f.values[i]=30*clamp(x[i]);
+    }
+    setMazeSignalMode(throughWalls){
+      if(!this.maze)return false;
+      this.maze.signalThroughWalls=!!throughWalls;const f=this.fields.trail;
+      if(throughWalls)f.blocked.fill(0);else f.blocked.set(this.fields.oxygen.blocked);
+      f.values.fill(0);this.equilibrateMaze();this.version++;return true;
     }
     populate(){
       const W=this.worldWidth,H=this.worldHeight,C=this.C,r=this.scale;
@@ -462,6 +521,8 @@
     }
     paint(x,y,radius=2,erase=false,rebuild=true){
       const C=this.C;let changed=0;radius=Math.round(radius);
+      if(this.maze&&erase)this.maze.cutouts.push([Math.round(x)+.5,Math.round(y)+.5,radius]);
+      if(this.maze&&!erase&&this.wallID===this.maze.wallID)this.wallID=0;
       for(let dx=-radius;dx<=radius;dx++)for(let dy=-radius;dy<=radius;dy++){
         if(dx*dx+dy*dy>radius*radius)continue;const xx=Math.round(x+dx),yy=Math.round(y+dy);if(xx<0||yy<0||xx>=this.width||yy>=this.height)continue;
         const old=C.pixt([xx,yy]);
@@ -473,16 +534,18 @@
     rebuildMask(){
       for(const f of Object.values(this.fields))f.blocked.fill(0);
       for(const [p,id] of this.C.pixels())if(this.C.cellKind(id)===WALL){const x=Math.floor(p[0]/this.fieldScale),y=Math.floor(p[1]/this.fieldScale);for(const f of Object.values(this.fields)){const i=y*f.width+x;f.blocked[i]=1;f.values[i]=0;}}
+      if(this.maze?.signalThroughWalls)this.fields.trail.blocked.fill(0);
     }
-    clearWalls(){const points=[...this.C.pixels()].filter(([,id])=>this.C.cellKind(id)===WALL).map(([p])=>p);for(const p of points)this.C.setpix(p,0);this.wallID=0;this.C.stat_values={};this.rebuildMask();}
+    clearWalls(){const points=[...this.C.pixels()].filter(([,id])=>this.C.cellKind(id)===WALL).map(([p])=>p);for(const p of points)this.C.setpix(p,0);if(this.maze){this.maze.curves=[];this.maze.cutouts=[];this.maze.wallID=0;}this.wallID=0;this.C.stat_values={};this.rebuildMask();}
     scanContacts(){
       const contacts=this.contacts,grid=this.C.grid._pixels;
       for(const m of this.live()){let map=contacts.get(m.id);if(!map){map=new Map();contacts.set(m.id,map);}map.clear();}
-      const add=(a,b,dx,dy)=>{const map=contacts.get(a);let edge=map.get(b);if(!edge){edge={id:b,length:0,nx:0,ny:0};map.set(b,edge);}edge.length++;edge.nx+=dx;edge.ny+=dy;};
+      const add=(a,b,dx,dy)=>{if(!this.cells[a])return;const map=contacts.get(a);let edge=map.get(b);if(!edge){edge={id:b,length:0,nx:0,ny:0};map.set(b,edge);}edge.length++;edge.nx+=dx;edge.ny+=dy;};
+      const present=id=>!!this.cells[id]||this.C.cellKind(id)===WALL;
       for(const i of this.C.borderpixels.elements){
-        const a=grid[i];if(!this.cells[a])continue;const ring=this.rings[i];
-        const right=ring[3],b=right<0?0:grid[right];if(a!==b&&this.cells[b]){add(a,b,1,0);add(b,a,-1,0);}
-        const down=ring[5],c=down<0?0:grid[down];if(a!==c&&this.cells[c]){add(a,c,0,1);add(c,a,0,-1);}
+        const a=grid[i];if(!present(a))continue;const ring=this.rings[i];
+        const right=ring[3],b=right<0?0:grid[right];if(a!==b&&present(b)){add(a,b,1,0);add(b,a,-1,0);}
+        const down=ring[5],c=down<0?0:grid[down];if(a!==c&&present(c)){add(a,c,0,1);add(c,a,0,-1);}
       }
       for(const m of this.live()){let length=0;for(const e of contacts.get(m.id).values())length+=e.length;m.confinement=clamp(length/Math.max(1,4*Math.sqrt(this.C.getVolume(m.id))));}
       return this.contacts;
