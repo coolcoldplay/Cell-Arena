@@ -745,7 +745,7 @@ Arena ＋ 右侧栏|Arena + sidebar
 侧栏录制不可用|Sidebar capture is unavailable
 组合录制包含侧栏当前可见的内容；统计可先占满侧栏。Arena 30 FPS，侧栏最多每秒刷新 5 次。|Combined capture includes the currently visible sidebar. Expand statistics first for a dashboard view. Arena: 30 FPS; sidebar: up to 5 updates/second.
 用于本地绘制录像中的实时侧栏。|Renders the live sidebar locally for video capture.
-随机发生发展|Random tumor development
+随机肿瘤演化|Random tumor development
 密铺正常组织与 12 颗分散免疫细胞，从零肿瘤开始。三处供给较弱的区域与健康边缘形成差异；异常、癌变、免疫清除、抑制与恢复相互竞争，逃逸克隆可能再次扩增。没有定时转变或预设结局。|Confluent normal tissue and 12 dispersed immune cells, starting without tumors. Three low-supply niches contrast with healthy edges. Abnormal change, malignancy, clearance, suppression and recovery compete; escape clones may expand again. No scheduled transitions or predetermined outcome.
 随机化的密铺正常组织、12–16 颗内部免疫细胞与三处弱供给区域。参数在发生发展附近抽样，肿瘤必须由局部异常产生；相同种子和参数可重现开局，结局由局部相互作用产生。|Randomized confluent normal tissue, 12–16 internal immune cells and three low-supply niches. Parameters are sampled near the development preset; tumors must arise from local abnormal cells. Seed and parameters reproduce the start; local interactions determine the course.
 `);

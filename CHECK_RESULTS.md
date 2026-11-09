@@ -1,6 +1,6 @@
 ## 2026-11-10：免疫恢复、随机发生发展、整栏统计与组合 MP4
 
-- 构建 822946 bytes；HTML SHA-256 `1148dd860fa5e3c163d10f266faff820d25ebc44b5b91db13a5ad30eb7068373`。`npm run verify:build`、`git diff --check` 通过；Artistoo / WASM 未修改。
+- 构建 822946 bytes；HTML SHA-256 `8d4a923212f9131e2ba9506deababa986d2de32b27368c7b8d339d6c4a238127`。`npm run verify:build`、`git diff --check` 通过；Artistoo / WASM 未修改。
 - **211/211** 模型与单元回归通过：`node --test --test-concurrency=4 tests/*.test.mjs`，证据 `output/immune-suppression/full-verified.log`。覆盖恢复速率与零关闭、暴露滞后、蓝色趋向正常损伤、抗原丢失后解绑和停止对应招募、保留其他有效靶关系及已释放场、参数导入、随机布局可重现、几何／核区与 JS/WASM 一致性。新增恢复测试先观察到 7 个失败再实现通过；新增组合录像几何测试同样先失败后通过。
 - **11/11** 免疫浏览器检查通过：实际持续源使 4 颗 CTL 转蓝；与相反招募梯度竞争时，蓝色胞核平均向正常损伤源移动 33 个格点 / 500 MCS。关闭恢复后维持蓝色，开启后 4 颗均回到静息粉色并准确计数；负抗原靶不自行产生移动报警源。英译、手机触摸、导出导入与真实 Worker 均通过。`scripts/check-immune-recovery.mjs`。
 - **15/15** 统计／组合录像浏览器检查通过：1440×1000 下整栏统计的可用高度和内容高度均为 978 px；主要数值与全程曲线无需滚动，明细可按需展开。暂停时切换布局不推进模型；新增细胞和推进模型同步更新计数／曲线。实际下载并解码 H.264 MP4，核对右栏从免疫 0 到 20、历史曲线改变和切回控件后的画面差异；目视核对解码帧无重叠。390×700 视口只提供 Arena 录像，并强制忽略旧组合选择，统计展开／恢复和英文无横向溢出。`scripts/check-statistics-video.mjs`，证据 `output/statistics-video/local/`。手机验证为 Chrome 视口模拟，未声称完成真机 Safari 验证。
