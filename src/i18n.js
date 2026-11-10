@@ -881,6 +881,76 @@ Arena ＋ 右侧栏|Arena + sidebar
 展开面板|Expand panel
 返回画布|Back to arena
 `);
+  add(`
+周期、干性与巡逻|Cycles, stemness and patrol
+周期—营养耦合|Cycle–nutrient coupling
+营养储备容量|Nutrient buffer capacity
+复制压力敏感性|Replication stress sensitivity
+DNA 修复速度|DNA repair rate
+肿瘤 DNA 检查点强度|Tumor DNA checkpoint strength
+肿瘤性状代价|Tumor trait cost
+正常组织修复速度|Normal tissue repair rate
+正常修复谱系分裂上限|Normal repair lineage division limit
+新生肿瘤干性比例|New tumor stem fraction
+干细胞对称分裂概率|Symmetric stem division probability
+对称分裂中的自我更新|Self-renewal among symmetric divisions
+干性细胞周期时长倍率|Stem cell cycle duration multiplier
+干性 DNA 修复倍率|Stem DNA repair multiplier
+环境诱导干性可塑性|Environment-driven stem plasticity
+分化肿瘤谱系分裂上限|Differentiated tumor division limit
+肿瘤干性与分化|Tumor stemness and differentiation
+周期、储备与复制损伤|Cycle, reserves and replication damage
+机制与参数依据|Mechanisms and parameter evidence
+胶质瘤启发的可调模型，非统一肿瘤定律。|A tunable glioma-inspired model, not a universal tumor rule.
+肿瘤干性：自我更新／分化|Tumor stemness: self-renewal / differentiation
+分化肿瘤|Differentiated tumor
+剩余分裂|Divisions remaining
+无限制|Unlimited
+干性生态位记忆|Stem niche memory
+性状资源代价|Trait resource cost
+能量储备|Energy reserve
+合成储备|Precursor reserve
+DNA 损伤|DNA damage
+营养储备不足|Insufficient reserves
+DNA 损伤检查点|DNA damage checkpoint
+接触抑制：缺少空隙|Contact inhibition: no local gap
+剩余修复分裂|Repair divisions remaining
+空隙接触|Free membrane
+正常修复分裂|Normal repair divisions
+复制损伤死亡触发|Replication-damage death initiations
+计入环境死亡|Included in environmental deaths
+干性重获|Stem reacquisition
+对称自我更新|Symmetric renewal
+对称分化|Symmetric differentiation
+不对称|Asymmetric
+干性|Stem-like
+分化|Differentiated
+↻ 再次模拟此局|↻ Simulate this round again
+重新模拟历史局|Historical round restarted
+已按原种子和初始参数开始新一局|New run started with original seed and initial parameters
+模型版本已变化，演化可能不同。|The model version has changed; outcomes may differ.
+按种子与初始参数重新模拟，不重放手动操作。|Re-simulates the seed and initial parameters; does not replay manual actions.
+红色周期文字表示肿瘤干性细胞|Red cycle labels identify stem-like tumor cells
+全屏 Arena|Fullscreen Arena
+退出全屏|Exit fullscreen
+`);
+  add(`
+0 恢复旧周期门控；1 启用分阶段消耗、储备与复制损伤。依据：Colombo 2011；系数为模型假设|0 restores legacy cycle gates; 1 enables phase demand, reserves and replication damage. Colombo 2011 motivates the mechanism; coefficients are model assumptions.
+能量与合成原料的有限缓冲；分裂按实际胞体比例分配。依据：Colombo 2011；无量纲容量|Finite energy and precursor buffers, partitioned by actual daughter size. Colombo 2011; dimensionless model capacity.
+S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；速率未标定|Hypoxia, depleted reserves and high acid create S-phase damage pressure. Foskolou 2017; uncalibrated rate and acid proxy.
+消耗储备修复复制损伤，不消除免疫杀伤损伤。依据：Foskolou 2017；速率未标定|Uses reserves to repair replication damage; immune injury is separate. Foskolou 2017; uncalibrated rate.
+越高越早因 DNA 损伤阻滞；正常与免疫保持完整检查点。模型阈值未标定|Higher values arrest earlier under DNA damage; normal and immune cells retain full checkpoints. Uncalibrated model threshold.
+强增殖、侵袭与耐受增加资源成本，并有温和功能权衡；0 关闭。依据：Giese 1996；代价函数为假设|Strong growth, invasion and tolerance cost resources with mild functional tradeoffs; 0 disables. Giese 1996; cost function is a hypothesis.
+只有邻接真实空隙、营养足够且额度未耗尽才进入修复周期。依据：Gudipaty 2017；速度未标定|Repair requires actual local gaps, nutrients and an unused division allowance. Gudipaty 2017; uncalibrated speed.
+每次分裂两个子代均扣一次；0 禁止修复分裂。依据：Hayflick 1961；次数为演示设置，非通用寿命|Both daughters lose one lineage division per split; 0 blocks repair. Hayflick 1961 motivates finite capacity, not this demo limit.
+只影响初始、新增和新恶性转化的肿瘤；独立于抗原。依据：Chen 2012；比例未标定|Applies to initial, added and newly transformed tumors; independent of antigen. Chen 2012; fraction uncalibrated.
+其余为一干性、一分化的不对称分裂。依据：Driessens 2012；概率未标定|Other divisions produce one stem and one differentiated daughter. Driessens 2012; probabilities uncalibrated.
+对称分裂时产生两个干性子代的概率，其余产生两个分化子代。依据：Driessens 2012|Conditional chance of two stem daughters in a symmetric division; otherwise two differentiated daughters. Driessens 2012.
+相对分化肿瘤的周期时长；1 无差别。胶质瘤慢周期亚群启发：Chen 2012，并非所有干细胞都慢|Cycle duration relative to differentiated tumors; 1 removes the difference. Glioma-inspired (Chen 2012); not all stem cells cycle slowly.
+仅增强 DNA 修复，不降低免疫接触杀伤。依据：Bao 2006；倍率未标定|Increases DNA repair only, without reducing immune killing. Bao 2006; multiplier uncalibrated.
+存活分化肿瘤在持续局部低氧生态位中有概率重新获得干性；0 关闭。Li 2009／Chaffer 2013 启发的代理模型|Viable differentiated tumors may reacquire stemness in a sustained local hypoxic niche; 0 disables. Proxy inspired by Li 2009 and Chaffer 2013.
+0 保持无限分裂；大于 0 启用有限扩增层级；干性自我更新不受此限。依据：Chen 2012|0 retains unlimited tumor divisions; positive values enable a finite progeny hierarchy. Stem renewal is unlimited. Chen 2012.
+`);
   function mount(control){
     let language='zh';try{if(localStorage.getItem('cell-arena-language')==='en')language='en';}catch{}
     const texts=new WeakMap(),attributes=new WeakMap(),names=['title','aria-label','placeholder'];
@@ -888,7 +958,7 @@ Arena ＋ 右侧栏|Arena + sidebar
     function textNode(node){if(skip(node.parentElement))return;const value=node.nodeValue,previous=texts.get(node),source=previous&&previous.result===value?previous.source:value,result=translate(source,language);texts.set(node,{source,result});if(value!==result)node.nodeValue=result;}
     function attribute(element,name){if(skip(element)||!element.hasAttribute(name))return;let record=attributes.get(element);if(!record){record={};attributes.set(element,record);}const value=element.getAttribute(name),previous=record[name],source=previous&&previous.result===value?previous.source:value,result=translate(source,language);record[name]={source,result};if(value!==result)element.setAttribute(name,result);}
     function walk(root){if(root.nodeType===3){textNode(root);return;}if(root.nodeType!==1&&root.nodeType!==9)return;if(root.nodeType===1){if(skip(root))return;for(const name of names)attribute(root,name);}const walker=document.createTreeWalker(root,NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT);while(walker.nextNode()){const n=walker.currentNode;if(n.nodeType===3)textNode(n);else for(const name of names)attribute(n,name);}}
-    function set(value){language=value==='en'?'en':'zh';control.value=language;control.textContent=language==='en'?'Eng':'Chi';control.title=language==='en'?'切换为中文':'Switch to English';control.setAttribute('aria-label',control.title);document.documentElement.lang=language==='en'?'en':'zh-CN';document.title=translate('Cell-Arena · 细胞生态竞技场',language);for(const block of document.querySelectorAll('[data-language]'))block.hidden=block.dataset.language!==language;walk(document.body);try{localStorage.setItem('cell-arena-language',language);}catch{}}
+    function set(value){language=value==='en'?'en':'zh';control.value=language;control.textContent=language==='en'?'Chi':'Eng';control.title=language==='en'?'切换为中文':'Switch to English';control.setAttribute('aria-label',control.title);document.documentElement.lang=language==='en'?'en':'zh-CN';document.title=translate('Cell-Arena · 细胞生态竞技场',language);for(const block of document.querySelectorAll('[data-language]'))block.hidden=block.dataset.language!==language;walk(document.body);try{localStorage.setItem('cell-arena-language',language);}catch{}}
     const observer=new MutationObserver(records=>{for(const m of records){if(m.type==='characterData')textNode(m.target);else if(m.type==='attributes')attribute(m.target,m.attributeName);else for(const node of m.addedNodes)walk(node);}});
     observer.observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:names});
     control.addEventListener('change',()=>set(control.value));control.addEventListener('click',()=>set(language==='en'?'zh':'en'));set(language);

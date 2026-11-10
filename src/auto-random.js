@@ -3,8 +3,8 @@
 (() => {
   'use strict';
   const phases={G0:0,G1:1,S:2,G2:3,M:4},NOTICE_MS=10000;
-  const events=['divisions','immuneDivisions','manualRemoved','kills','apoptosis','environment','lifespan','apoptosisStarted','killStarted','environmentStarted','lifespanStarted','mutations','normalTraitMutations','abnormalInitiations','malignantTransitions','antigenExposures','antigenEscapes','suppressiveTransitions','suppressiveRecoveries','injuryDeactivations','signalDeactivations'];
-  function state(c){return (c.kind||0)|(c.state==='abnormal'?4:0)|(c.immunePhenotype==='suppressive'?8:0)|(c.activation>0?16:0)|(c.antigen?32:0)|(c.dying?64:0)|(({spontaneous:1,kill:2,environment:3,lifespan:4}[c.deathCause]||0)<<7)|((phases[c.cycle?.phase]||0)<<10)|(c.cycle?.arrest?16384:0);}
+  const events=['stemAsymmetric','stemSelfRenewal','stemDifferentiation','stemReversions','normalDivisions','replicationDeaths','divisions','immuneDivisions','manualRemoved','kills','apoptosis','environment','lifespan','apoptosisStarted','killStarted','environmentStarted','lifespanStarted','mutations','normalTraitMutations','abnormalInitiations','malignantTransitions','antigenExposures','antigenEscapes','suppressiveTransitions','suppressiveRecoveries','injuryDeactivations','signalDeactivations'];
+  function state(c){return (c.kind||0)|(c.state==='abnormal'?4:0)|(c.immunePhenotype==='suppressive'?8:0)|(c.activation>0?16:0)|(c.antigen?32:0)|(c.dying?64:0)|(({spontaneous:1,kill:2,environment:3,lifespan:4}[c.deathCause]||0)<<7)|((phases[c.cycle?.phase]||0)<<10)|(c.cycle?.arrest?16384:0)|(c.isStem?32768:0);}
   class Controller {
     constructor(){this.minutes=0;this.reset();}
     configure(value,now=0){this.minutes=Number.isFinite(value)&&value>=0&&value<=1440?value:0;this.reset(now);}

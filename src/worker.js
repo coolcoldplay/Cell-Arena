@@ -32,11 +32,11 @@ async function handle(event){
       sim=new CellLab.Simulation(payload);const module=await wasmModule;if(module&&payload.kernel!=='reference'&&payload.kernel!=='fast')try{await CellLabWasm.install(sim,module);}catch(e){kernelNote=String(e);}
       await backend.configure(sim,backend.mode);revision++;resetClock();
     }else if(command==='import'){
-      const profile=CellLabExperiment.parse(payload.data),next=new CellLab.Simulation(profile.config),compute=new CellLabGPU.ComputeBackend();
-      const module=await wasmModule;if(module)try{await CellLabWasm.install(next,module);}catch(e){next.kernelNote=String(e);}
+      const profile=CellLabExperiment.parse(payload.data),next=new CellLab.Simulation({...profile.config,...(['reference','fast'].includes(payload.kernel)?{kernel:payload.kernel}:{})}),compute=new CellLabGPU.ComputeBackend();
+      const module=await wasmModule;if(module&&payload.kernel!=='fast'&&payload.kernel!=='reference')try{await CellLabWasm.install(next,module);}catch(e){next.kernelNote=String(e);}
       // Build and configure the replacement before committing it. Invalid input
       // leaves the running experiment, clock and backend untouched.
-      await compute.configure(next,backend.mode);backend.gpu?.destroy();backend=compute;sim=next;dragSession=null;playing=false;speed=profile.speed;clock.rate=30*speed;revision++;resetClock();value={mode:profile.mode,sourceTime:profile.sourceTime,ignored:profile.ignored};
+      await compute.configure(next,['cpu','gpu','auto'].includes(payload.computeMode)?payload.computeMode:backend.mode);backend.gpu?.destroy();backend=compute;sim=next;dragSession=null;playing=false;speed=profile.speed;clock.rate=30*speed;revision++;resetClock();value={mode:profile.mode,sourceTime:profile.sourceTime,ignored:profile.ignored};
     }else if(!sim)throw Error('The model has not started');
     else if(command==='playing'){if(dragSession){dragSession.resume=!!payload.value;playing=false;}else playing=!!payload.value;resetClock();}
     else if(command==='beginDrag'){
@@ -73,7 +73,7 @@ async function handle(event){
     else if(command==='mazeSignal'){value=sim.setMazeSignalMode(payload.throughWalls);resetClock();}
     else if(command==='divide'){
       const target=payload.id||sim.live().filter(c=>!c.dying).sort((a,b)=>sim.C.getVolume(b.id)-sim.C.getVolume(a.id))[0]?.id;value=sim.divide(target);
-    }else if(command==='export')value={format:'cell-arena-experiment',schemaVersion:1,version:'4.0.0',speed,kernel:sim.kernel,compute:backend.info(),scene:sim.scene,scenario:sim.scenarioReport(),normalSupport:sim.normalSupportReport(),cycles:sim.cycleReport(),patrol:{...sim.patrolReport(),checkedBirths:[...sim.patrol.checked]},maze:sim.maze?structuredClone(sim.maze):null,sources:sim.sources.map(s=>({type:s.type,x:s.x/sim.scale,y:s.y/sim.scale,radius:s.radius/sim.scale})),supplyMap:Array.from(sim.supplyMap),boundary:sim.boundary,seed:sim.seedValue,worldWidth:sim.worldWidth,worldHeight:sim.worldHeight,refinement:sim.scale,settings:sim.settings,time:sim.C.time,history:sim.populationHistory(),events:sim.events,counters:sim.counters,manualDeathRemovals:sim.manualDeathRemovals,deaths:sim.deathSummary(),deathHistory:sim.deathHistory,lineage:sim.lineage,cells:sim.snapshot().cells};
+    }else if(command==='export')value={format:'cell-arena-experiment',schemaVersion:1,version:'4.0.0',modelRevision:CellLab.MODEL_REVISION,warmup:sim.initialWarmup,speed,kernel:sim.kernel,compute:backend.info(),scene:sim.scene,scenario:sim.scenarioReport(),normalSupport:sim.normalSupportReport(),cycles:sim.cycleReport(),patrol:{...sim.patrolReport(),checkedBirths:[...sim.patrol.checked]},maze:sim.maze?structuredClone(sim.maze):null,sources:sim.sources.map(s=>({type:s.type,x:s.x/sim.scale,y:s.y/sim.scale,radius:s.radius/sim.scale})),supplyMap:Array.from(sim.supplyMap),boundary:sim.boundary,seed:sim.seedValue,worldWidth:sim.worldWidth,worldHeight:sim.worldHeight,refinement:sim.scale,settings:sim.settings,time:sim.C.time,history:sim.populationHistory(),events:sim.events,counters:sim.counters,manualDeathRemovals:sim.manualDeathRemovals,deaths:sim.deathSummary(),deathHistory:sim.deathHistory,lineage:sim.lineage,cells:sim.snapshot().cells};
     else if(command==='snapshot')value={time:sim.C.time,cells:sim.live().length};
     else throw Error('Unknown command: '+command);
     if(['seed','sprinkle','divide'].includes(command))sim.record();

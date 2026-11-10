@@ -77,6 +77,7 @@
     while(gain>1&&!fits(gain))gain=Math.max(1,gain-.06);
     return points.map(([x,y])=>[x*gain,y*gain]);
   }
+  function cycleColor(m){return m.kind===2&&m.isStem?'#c0262e':'#243c49';}
   function cycleText(m){
     if(m.dying)return '';
     return ['G0','G1','S','G2','M'].includes(m.cycle?.phase)?m.cycle.phase:'';
@@ -177,5 +178,5 @@
     const wall=!!s.walls[q],blocked=wall||!!s.fieldMask?.[bin];
     return {x,y,bin,time:s.time,cell:s.cells.find(m=>m.id===s.grid[q])||null,wall,blocked,values:blocked?null:Object.fromEntries(['oxygen','glucose','acid',...Object.keys(SIGNALS)].map(key=>[key,s.fields[key]?.values[bin]??0]))};
   }
-  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,immuneSuppressive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,antigenMarked,selectionBounds,selectionBoxes,bodyOpacity,adversity,signals,sample,Cache};
+  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,immuneSuppressive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,cycleColor,antigenMarked,selectionBounds,selectionBoxes,bodyOpacity,adversity,signals,sample,Cache};
 })();

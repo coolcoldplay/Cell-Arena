@@ -20,11 +20,11 @@
     let x=i32(i%p.width);let y=i32(i/p.width);let c=input[i].xyz;
     let lap=sample(x-1,y,c)+sample(x+1,y,c)+sample(x,y-1,c)+sample(x,y+1,c)-4.*c;
     let d=max(vec3f(0.),c+vec3f(.10,.065,.045)*lap);let o=d.x;let g=d.y;let a=d.z;
-    let r=density[i].xyz;let lo=.55*r.x+r.y+.7*r.z;let lg=.4*r.x+1.35*r.y+.8*r.z;
+    let r=density[i].xyz;let lo=r.x;let lg=r.y;
     let supply=p.supply*(.65+.35*density[i].w);let clearance=p.supply*density[i].w;
     let no=o+.012*supply*(1.-o)-.024*p.metabolism*lo*o/(.2+o);
     let ng=g+.010*supply*(1.-g)-.023*p.metabolism*lg*g/(.15+g);
-    let na=a+.014*p.metabolism*(.3*r.x+1.2*r.y+.45*r.z)*g/(.15+g)*(1.+.8*(1.-o))-.009*clearance*a;
+    let na=a+.014*p.metabolism*r.z*g/(.15+g)*(1.+.8*(1.-o))-.009*clearance*a;
     output[i]=vec4f(clamp(vec3f(no,ng,na),vec3f(0.),vec3f(1.)),0.);
   }`;
   class GPUFields {
@@ -47,7 +47,7 @@
       if(this.dead)throw Error(this.loss||'WebGPU device lost');
       if(!Number.isInteger(dt)||dt<1)throw Error('GPU field step requires positive integral MCS');
       const {oxygen,glucose,acid}=s.fields,n=this.n,d=this.device;
-      for(let i=0;i<n;i++){this.state[i*4]=oxygen.values[i];this.state[i*4+1]=glucose.values[i];this.state[i*4+2]=acid.values[i];this.mass[i*4]=s.loads[1][i];this.mass[i*4+1]=s.loads[2][i];this.mass[i*4+2]=s.loads[3][i];this.mass[i*4+3]=s.supplyMap[i];this.mask[i]=oxygen.blocked[i];}
+      for(let i=0;i<n;i++){this.state[i*4]=oxygen.values[i];this.state[i*4+1]=glucose.values[i];this.state[i*4+2]=acid.values[i];this.mass[i*4]=s.metabolicLoads[0][i];this.mass[i*4+1]=s.metabolicLoads[1][i];this.mass[i*4+2]=s.metabolicLoads[2][i];this.mass[i*4+3]=s.supplyMap[i];this.mask[i]=oxygen.blocked[i];}
       const u=new Uint32Array(this.uniform),f=new Float32Array(this.uniform);u[0]=this.width;u[1]=this.height;u[2]=s.wrap?1:0;f[4]=s.normalSupportReport().effectiveSupply;f[5]=s.settings.metabolism;
       d.queue.writeBuffer(this.buffers[0],0,this.state);d.queue.writeBuffer(this.loads,0,this.mass);d.queue.writeBuffer(this.blocked,0,this.mask);d.queue.writeBuffer(this.params,0,this.uniform);
       const e=d.createCommandEncoder();for(let j=0;j<dt;j++){const pass=e.beginComputePass();pass.setPipeline(this.pipeline);pass.setBindGroup(0,this.groups[j%2]);pass.dispatchWorkgroups(Math.ceil(n/64));pass.end();}

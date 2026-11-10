@@ -206,14 +206,23 @@ aside.statistics-focused #record-options>summary{padding:4px 0}
 @media(max-width:850px){.panel-head{gap:4px}.panel-head .header-icon{flex-basis:34px;width:34px;min-height:40px;height:40px}.panel-head #language{min-width:38px;width:38px;font-size:13px;padding:3px}.panel-head #mobile-expand{min-width:30px;width:30px;padding:4px;font-size:19px}.file-menu button{min-height:44px}}
 
 #language,#language:hover,#language:active{border-color:transparent;background:transparent;box-shadow:none;translate:none}#language:hover{text-decoration:underline}#language:focus-visible{outline:1px dashed var(--accent);outline-offset:-2px}
+
+/* Native fullscreen and a layout fallback share the same exit control. */
+.fullscreen-exit{position:absolute;right:max(12px,env(safe-area-inset-right));top:max(12px,env(safe-area-inset-top));z-index:90;min-height:38px;padding:6px 12px;opacity:.85;background:var(--paper)}
+.fullscreen-exit:hover,.fullscreen-exit:focus{opacity:1}
+body.arena-fullscreen .workspace{display:block!important;width:100vw!important;height:100dvh!important;padding:0!important;gap:0!important}
+body.arena-fullscreen .workspace>aside{display:none!important}
+body.arena-fullscreen .simulation,body.arena-fullscreen .viewport{width:100vw!important;height:100dvh!important;max-height:none!important;min-height:0!important;margin:0!important;border:0!important}
+body.arena-fullscreen .mobile-tools,body.arena-fullscreen #mobile-dock{display:none!important}
+.replay-round{margin:5px 0;font-size:12px;min-height:32px}
 </style></head>
 <body>
 <main class="workspace">
   <section class="simulation" aria-label="Arena 培养皿">
-    <div class="viewport"><canvas id="world" title="中键或 Alt + 左键拖动平移视野" width="960" height="720" aria-label="可拖动细胞、点击播种、添加信号或绘制障碍的交互培养皿"></canvas><button id="maze-diffusion" class="maze-diffusion" hidden aria-pressed="false" title="仅切换招募因子扩散；细胞仍不能穿墙">招募扩散：沿通道</button><div id="brush-preview" hidden aria-hidden="true"></div><section id="auto-round-notice" class="auto-round-notice" hidden aria-labelledby="auto-round-title"><div><b id="auto-round-title">即将随机换局</b><span><strong id="auto-round-seconds">10</strong> s</span></div><p id="auto-round-reason" role="status" aria-live="polite"></p><small id="auto-round-paused" hidden>已暂停倒计时</small><button id="auto-round-cancel">继续本局 · 关闭自动换局</button></section><div id="toast" role="status" aria-live="polite"></div></div>
+    <div class="viewport"><button id="exit-arena-fullscreen" class="fullscreen-exit" hidden title="退出全屏" aria-label="退出全屏">↙ <span>退出全屏</span></button><canvas id="world" title="中键或 Alt + 左键拖动平移视野" width="960" height="720" aria-label="可拖动细胞、点击播种、添加信号或绘制障碍的交互培养皿"></canvas><button id="maze-diffusion" class="maze-diffusion" hidden aria-pressed="false" title="仅切换招募因子扩散；细胞仍不能穿墙">招募扩散：沿通道</button><div id="brush-preview" hidden aria-hidden="true"></div><section id="auto-round-notice" class="auto-round-notice" hidden aria-labelledby="auto-round-title"><div><b id="auto-round-title">即将随机换局</b><span><strong id="auto-round-seconds">10</strong> s</span></div><p id="auto-round-reason" role="status" aria-live="polite"></p><small id="auto-round-paused" hidden>已暂停倒计时</small><button id="auto-round-cancel">继续本局 · 关闭自动换局</button></section><div id="toast" role="status" aria-live="polite"></div></div>
   </section>
   <aside aria-label="模拟控制面板">
-    <div class="panel-head"><a class="brand" href="https://github.com/coolcoldplay/Cell-Arena" target="_blank" rel="noreferrer"><span class="mark" aria-hidden="true">C</span><b>Cell-Arena</b></a><button id="language" type="button" value="zh" aria-label="Switch to English" title="Switch to English" data-no-i18n>Chi</button><button id="mobile-expand" class="mobile-only" aria-expanded="false" aria-controls="sidebar-scroll" aria-label="展开面板" title="展开面板">↑</button><button id="file-actions" class="header-icon" aria-label="导入与导出" title="导入与导出" aria-expanded="false" aria-controls="file-menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h9l5 5v13H5Z"/><path d="M14 3v6h5M8 13h8M8 17h6"/></svg></button><button id="record-video" class="header-icon" aria-label="录制视频" title="录制视频" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle class="record-dot" cx="12" cy="12" r="4"/></svg></button><button id="about" class="header-icon" aria-label="模型与来源" title="模型与来源"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 1 1 5 2c-1 1-2 1-2 3M12 17v1"/></svg></button><div id="file-menu" class="file-menu" role="group" aria-label="导入与导出" hidden><button id="snapshot">保存画面 ↓</button><button id="export-data">导出实验数据 ↓</button><button id="import-data">导入实验参数 ↑</button><button id="file-export-rounds">导出历局 CSV</button></div></div>
+    <div class="panel-head"><a class="brand" href="https://github.com/coolcoldplay/Cell-Arena" target="_blank" rel="noreferrer"><span class="mark" aria-hidden="true">C</span><b>Cell-Arena</b></a><button id="language" type="button" value="zh" aria-label="Switch to English" title="Switch to English" data-no-i18n>Eng</button><button id="mobile-expand" class="mobile-only" aria-expanded="false" aria-controls="sidebar-scroll" aria-label="展开面板" title="展开面板">↑</button><button id="file-actions" class="header-icon" aria-label="导入与导出" title="导入与导出" aria-expanded="false" aria-controls="file-menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h9l5 5v13H5Z"/><path d="M14 3v6h5M8 13h8M8 17h6"/></svg></button><button id="record-video" class="header-icon" aria-label="录制视频" title="录制视频" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle class="record-dot" cx="12" cy="12" r="4"/></svg></button><button id="arena-fullscreen" class="header-icon" aria-label="全屏 Arena" title="全屏 Arena" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9V3h6M15 3h6v6M21 15v6h-6M9 21H3v-6"/></svg></button><button id="about" class="header-icon" aria-label="模型与来源" title="模型与来源"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 1 1 5 2c-1 1-2 1-2 3M12 17v1"/></svg></button><div id="file-menu" class="file-menu" role="group" aria-label="导入与导出" hidden><button id="snapshot">保存画面 ↓</button><button id="export-data">导出实验数据 ↓</button><button id="import-data">导入实验参数 ↑</button><button id="file-export-rounds">导出历局 CSV</button></div></div>
     <div class="dish-head"><div><span id="status-dot" class="status-dot"></span><b id="scene-title">肿瘤发生发展</b><span id="run-state">正在准备</span></div><button id="record-indicator" class="quiet" title="停止录制并下载" hidden>■ 00:00</button><div><span id="clock">0</span> <span class="unit">MCS</span></div></div>
     <nav class="scenes" aria-label="实验场景"><button data-scene="oncogenesis" class="active" title="肿瘤发生发展">发生发展</button><button data-scene="cold" title="免疫冷肿瘤扩散转移">冷肿瘤</button><button data-scene="hot" title="免疫热肿瘤治愈">热肿瘤</button><button data-scene="maze" title="免疫细胞迷宫">免疫迷宫</button><button data-scene="empty" title="空白自建：暂停摆放细胞，准备好后开始模拟">空白自建</button></nav>
     <div class="transport"><button id="play" class="primary">Ⅱ 暂停</button><button id="reset">↺ 重来</button><button id="shuffle" title="在合理模型范围内随机生成参数与细胞布局">随机</button><div class="playback-row"><label class="speed-label">速度 <input id="speed" type="range" min="0.25" max="8" step="0.25" value="1"><output id="speed-out">1×</output></label></div></div>
@@ -247,7 +256,7 @@ aside.statistics-focused #record-options>summary{padding:4px 0}
         <label class="select-row">画面放大<select id="zoom"><option value="100">100%</option><option value="150">150%</option><option value="200">200%</option><option value="300">300%</option></select><button id="fullscreen" class="quiet">全屏 ↗</button></label>
       </div></details><details class="subsection" id="module-markings"><summary>细胞与热图 <span>Act · 标记 · 环境分量</span></summary><div class="section-body">
         <label class="select-row">环境热图<select id="field-view"><option value="none" selected>关闭</option><option value="adversity">综合恶劣度</option><option value="oxygen">氧可用量</option><option value="glucose">葡萄糖可用量</option><option value="acid">酸负荷</option><option value="density">局部细胞密度</option></select></label>
-        <div class="checks" role="group" aria-label="细胞标记"><label><input id="nuclei" type="checkbox" checked>显示细胞核</label><label title="红色细线标出可识别抗原的肿瘤和癌前细胞"><input id="antigen-marks" type="checkbox" checked>抗原轮廓</label><label><input id="cycle-marks" type="checkbox">周期文字</label></div>
+        <div class="checks" role="group" aria-label="细胞标记"><label><input id="nuclei" type="checkbox" checked>显示细胞核</label><label title="红色细线标出可识别抗原的肿瘤和癌前细胞"><input id="antigen-marks" type="checkbox" checked>抗原轮廓</label><label><input title="红色周期文字表示肿瘤干性细胞" id="cycle-marks" type="checkbox">周期文字</label></div>
         <div class="checks"><label><input id="show-tracks" type="checkbox">显示运动轨迹</label></div><label class="slider"><span>轨迹保留时长<output id="track-duration-out">400 MCS</output></span><input id="track-duration" type="range" min="20" max="2000" value="400" step="20"></label><p class="hint">开启后记录；按模拟时间保留，暂停时不消退。</p><div class="checks"><label><input id="edge-activity" type="checkbox" checked>启用所选类型的 Act 显示</label><label><input id="normal-activity" type="checkbox">正常细胞 Act</label><label><input id="tumor-activity" type="checkbox">肿瘤细胞 Act</label><label><input id="immune-activity" type="checkbox">免疫细胞 Act</label><label><input id="cell-seams" type="checkbox" checked>细分界线</label><label><input id="arrows" type="checkbox">极性箭头</label></div>
         <p class="hint">默认配色：免疫未激活淡红，实际识别后激活深红；肿瘤遗传增殖性状越高越黑，范围 0.25–3。核区默认用深蓝、深红或浅金。可在「细胞配色」分别修改；各类 Act 独立开启，开启后覆盖局部胞体色。</p>
       </div></details><details class="subsection" id="module-colors"><summary>细胞配色 <span>预设 · 胞体 · 胞核</span></summary><div class="section-body">
@@ -257,9 +266,9 @@ aside.statistics-focused #record-options>summary{padding:4px 0}
 </section>
       <section id="parameter-groups" aria-label="五组演化参数"><div class="parameter-heading"><b>演化参数</b><button id="lock-all-parameters" class="quiet" aria-pressed="false" title="锁定参数在自动换局与随机生成时保持不变">全部锁定</button></div><nav id="parameter-module-nav" aria-label="参数分组快捷入口"><button data-module="module-environment" aria-pressed="true">微环境</button><button data-module="module-normal" aria-pressed="false">体细胞</button><button data-module="module-tumor" aria-pressed="false">肿瘤</button><button data-module="module-immune" aria-pressed="false">免疫</button><button data-module="module-other" aria-pressed="false">其他</button></nav><details class="section" open id="module-environment"><summary><b>微环境</b><span>资源 / 信号 / 炎性促癌</span></summary><div class="section-body"><div id="environment-sliders"></div><details class="subsection" id="evolution-controls"><summary>演化实验</summary><div id="evolution-sliders"></div></details></div></details>
 <details class="section" open hidden id="module-normal"><summary><b>正常细胞</b><span>运动 / 聚集 / 癌变</span></summary><div class="section-body"><div id="normal-sliders"></div></div></details>
-<details class="section" open hidden id="module-tumor"><summary><b>肿瘤细胞</b><span>生长 / 侵袭 / 遗传</span></summary><div class="section-body"><div id="tumor-sliders"></div><details class="subsection" id="tumor-evolution-controls"><summary>突变与抗原演化</summary><div id="tumor-evolution-sliders"></div></details><details class="subsection" id="tumor-cycle-controls"><summary>细胞周期与静息</summary><div id="tumor-cycle-sliders"></div></details><details class="subsection" id="module-mechanics"><summary>形态与穿行 <span>分枝 · 成网 · 让位</span></summary><div class="section-body"><label class="select-row">肿瘤形态<select id="tumor-morphology"><option value="0">紧凑 / 阿米巴样</option><option value="1">间质样 · 梭形双极</option><option value="2">胶质瘤样 · 分枝成网</option></select></label><p class="hint">切换后，已有肿瘤逐渐重塑真实胞体。分枝接触持续 20 MCS 后开始稳定连接；分离或死亡即解除。U87 等胶质瘤形态研究启发，未经细胞系标定。</p><div id="branch-sliders"></div><button id="network-demo">重新开始分枝成网示例</button><p id="network-status" class="hint"></p></div></details></div></details>
+<details class="section" open hidden id="module-tumor"><summary><b>肿瘤细胞</b><span>生长 / 侵袭 / 遗传</span></summary><div class="section-body"><div id="tumor-sliders"></div><details class="subsection" id="tumor-evolution-controls"><summary>突变与抗原演化</summary><div id="tumor-evolution-sliders"></div></details><details class="subsection" id="tumor-cycle-controls"><summary>细胞周期与静息</summary><div id="tumor-cycle-sliders"></div></details><details class="subsection" id="stem-controls"><summary>肿瘤干性与分化</summary><div id="stem-sliders"></div><p class="hint"><a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/BIOLOGY_REFERENCES.md" target="_blank" rel="noreferrer">机制与参数依据</a> · 胶质瘤启发的可调模型，非统一肿瘤定律。</p></details><details class="subsection" id="module-mechanics"><summary>形态与穿行 <span>分枝 · 成网 · 让位</span></summary><div class="section-body"><label class="select-row">肿瘤形态<select id="tumor-morphology"><option value="0">紧凑 / 阿米巴样</option><option value="1">间质样 · 梭形双极</option><option value="2">胶质瘤样 · 分枝成网</option></select></label><p class="hint">切换后，已有肿瘤逐渐重塑真实胞体。分枝接触持续 20 MCS 后开始稳定连接；分离或死亡即解除。U87 等胶质瘤形态研究启发，未经细胞系标定。</p><div id="branch-sliders"></div><button id="network-demo">重新开始分枝成网示例</button><p id="network-status" class="hint"></p></div></details></div></details>
 <details class="section" open hidden id="module-immune"><summary><b>免疫细胞</b><span>巡逻 / 杀伤 / 扩增</span></summary><div class="section-body"><div id="immune-sliders"></div><details class="subsection" id="immune-regulation-controls"><summary>损伤应答与免疫抑制</summary><div id="immune-regulation-sliders"></div></details><details class="subsection" id="immune-cycle-controls"><summary>细胞周期与扩增</summary><div id="immune-cycle-sliders"></div></details></div></details>
-<details class="section" open hidden id="module-other"><summary><b>其他</b><span>共用力学 / 计算</span></summary><div class="section-body"><div class="modes" role="group" aria-label="运动规则预设"><button data-mode="wander">分散探索</button><button data-mode="cluster">偏向凝聚</button><button data-mode="flock">偏向群迁</button></div><div id="other-sliders"></div><details class="subsection" id="module-performance"><summary>性能与计算 <span>后端 · 实际速度</span></summary><div class="section-body"><label class="select-row">性能模式<select id="performance-mode"><option value="auto">自动平衡</option><option value="power">省电</option><option value="smooth">流畅优先</option><option value="quality">高清优先</option></select></label><p id="adaptive-status" class="hint" role="status"></p><p id="adaptive-timing" class="hint"></p><button id="recheck-performance" type="button">重新测量</button><p class="hint">按实际耗时调整自动画质和刷新频率，保留物理格点与全部生物机制。手动分辨率和录像质量保持所选设置。</p><label class="select-row">微环境计算<select id="compute-backend"><option value="auto">自动 · 实测选择</option><option value="cpu">CPU</option><option value="gpu">WebGPU</option></select></label><p id="backend-status" class="hint"></p><p id="render-performance" class="hint"></p><p id="compute-note" class="hint"></p><p id="population-load" class="hint" role="status"></p><p class="hint">增殖由空间、营养、累积压力与细胞自身状态决定。算力不足时提示实际速度，继续完整计算形变、接触和微环境；可降低播放倍率或绘图分辨率。</p></div></details></div></details></section>
+<details class="section" open hidden id="module-other"><summary><b>其他</b><span>共用力学 / 计算</span></summary><div class="section-body"><div class="modes" role="group" aria-label="运动规则预设"><button data-mode="wander">分散探索</button><button data-mode="cluster">偏向凝聚</button><button data-mode="flock">偏向群迁</button></div><details class="subsection" id="resource-controls"><summary>周期、储备与复制损伤</summary><div id="resource-sliders"></div></details><div id="other-sliders"></div><details class="subsection" id="module-performance"><summary>性能与计算 <span>后端 · 实际速度</span></summary><div class="section-body"><label class="select-row">性能模式<select id="performance-mode"><option value="auto">自动平衡</option><option value="power">省电</option><option value="smooth">流畅优先</option><option value="quality">高清优先</option></select></label><p id="adaptive-status" class="hint" role="status"></p><p id="adaptive-timing" class="hint"></p><button id="recheck-performance" type="button">重新测量</button><p class="hint">按实际耗时调整自动画质和刷新频率，保留物理格点与全部生物机制。手动分辨率和录像质量保持所选设置。</p><label class="select-row">微环境计算<select id="compute-backend"><option value="auto">自动 · 实测选择</option><option value="cpu">CPU</option><option value="gpu">WebGPU</option></select></label><p id="backend-status" class="hint"></p><p id="render-performance" class="hint"></p><p id="compute-note" class="hint"></p><p id="population-load" class="hint" role="status"></p><p class="hint">增殖由空间、营养、累积压力与细胞自身状态决定。算力不足时提示实际速度，继续完整计算形变、接触和微环境；可降低播放倍率或绘图分辨率。</p></div></details></div></details></section>
       <details id="statistics-panel" class="panel-details" hidden><summary>数量与事件统计</summary>
         <div class="statistics-actions"><button id="statistics-expand" aria-pressed="false">占满侧栏</button><button id="statistics-play">Ⅱ 暂停</button><button id="statistics-record">● 录制 MP4</button></div><div id="statistics-record-settings"></div>
         <div class="stats-heading"><span>当前存活</span><b id="alive-count">0</b><span id="scenario-phase">正在准备情境</span></div>
@@ -280,7 +289,7 @@ aside.statistics-focused #record-options>summary{padding:4px 0}
         <section class="death-overview" aria-label="死亡清除原因"><div class="death-heading"><span>死亡清除</span><b id="total-death-count">0</b><small id="total-death-progress">清除中 0</small></div>
           <div class="death-causes"><div><span>免疫杀伤</span><b id="kill-count">0</b></div><div><span>环境死亡</span><b id="environment-death-count">0</b></div><div><span>自发凋亡</span><b id="death-count">0</b></div><div><span>寿命凋亡</span><b id="lifespan-death-count">0</b></div></div>
         </section>
-        <details class="stats-detail" id="immune-statistics"><summary>免疫巡逻与细胞周期</summary><div class="patrol-summary"><span>巡逻覆盖率 <b id="patrol-coverage">0.0%</b></span><span>已检查 <b id="patrol-checked">0</b></span><span>接触识别 <b id="recognition-count">0</b></span></div><p id="patrol-current"></p><div class="cycle-summary"><p id="cycle-tumor"></p><p id="cycle-immune"></p></div>
+        <details class="stats-detail" id="immune-statistics"><summary>周期、干性与巡逻</summary><div class="patrol-summary"><span>巡逻覆盖率 <b id="patrol-coverage">0.0%</b></span><span>已检查 <b id="patrol-checked">0</b></span><span>接触识别 <b id="recognition-count">0</b></span></div><p id="patrol-current"></p><div class="cycle-summary"><p id="cycle-normal"></p><p id="stem-summary"></p><p id="repair-summary"></p><p id="stem-events"></p><p id="cycle-tumor"></p><p id="cycle-immune"></p></div>
           <details class="patrol-definition"><summary>巡逻统计口径</summary><p>覆盖率＝免疫胞体实际经过的面积／当前非障碍面积，封闭区域仍计入分母。拖动路径不计入自主巡逻。</p><p>检查需连续膜接触累积达到 6 个有效 MCS，按接触长度和代谢效能加权。正常、癌前、肿瘤均可计入；按出生身份去重，分裂子代重新统计。已检查不等于已识别抗原。</p></details>
         </details>
         <details class="stats-detail" id="evolution-statistics"><summary>演化事件</summary><p id="mutation-count"></p><p id="abnormal-events"></p><p id="evolution-events"></p><p id="immune-regulation-events"></p></details>
@@ -306,16 +315,18 @@ aside.statistics-focused #record-options>summary{padding:4px 0}
     <li><strong>微环境与通讯：</strong>局部氧、糖、酸负荷，以及凝聚、损伤和免疫招募信号共同影响细胞运动、生长与存活。</li>
     <li><strong>免疫监视：</strong>分散巡逻、局部趋化、抗原接触识别、累积杀伤、识别后招募、有限克隆扩增与可调杀伤寿命。</li>
     <li><strong>肿瘤演化：</strong>正常 → 癌前细胞 → 肿瘤；增殖、侵袭、耐受和抗原表达可遗传、突变，并区分不同死亡过程。</li>
-    <li><strong>细胞周期：</strong>G0 静息与 G1／S／G2／M 推进；营养、压缩和损伤控制周期。CTL 使用独立 IL-2 与抗原刺激记忆扩增，慢性刺激可累积耗竭。</li>
+    <li><strong>干性与修复：</strong>肿瘤干细胞的对称／不对称分裂、分化与环境可塑性；有限代正常组织修复，肿瘤性状具有资源代价。</li>
+    <li><strong>细胞周期：</strong>分阶段营养需求、有限能量／合成储备与复制损伤检查点。G0 静息与 G1／S／G2／M 推进；营养、压缩和损伤控制周期。CTL 使用独立 IL-2 与抗原刺激记忆扩增，慢性刺激可累积耗竭。</li>
     <li><strong>形态与穿行：</strong>有限切面让位、核区约束、可变形胞核，以及可选的间质样分枝与接触成网。</li>
   </ul>
+  <p><a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/BIOLOGY_REFERENCES.md" target="_blank" rel="noreferrer">新增机制与参数的文献对照表</a>：Nature 的肿瘤谱系追踪、胶质瘤干性及 DNA 修复研究，Cell 的干性可塑性研究。具体概率、倍率和 MCS 时长是未标定的演示设置。</p>
   <h3>怎么使用</h3>
   <ol>
     <li>选择内置情境直接运行，或在「空白自建」中摆放细胞后开始；「随机」可探索不同开局。</li>
     <li>用画布工具添加、拖动或擦除细胞，绘制障碍、释放信号；「追踪」查看选中细胞和局部环境。</li>
     <li>「显示」调整外观；「参数」用五个快捷按钮切换分组，锁图标保留随机换局时的固定参数。手机用顶部箭头展开或返回画布。</li>
   </ol>
-  <p>「统计」查看全程曲线和历局结果；顶部文件图标导出／导入参数、保存画面或导出历局 CSV，录制图标开始／停止视频。导入参数会重新开局，不恢复中途状态。</p>
+  <p>「统计」查看全程曲线和带序号、种子的历局结果，可按初始参数再次模拟（不重放手动操作）；顶部文件图标导出／导入参数、保存画面或导出历局 CSV，录制图标开始／停止视频。导入参数会重新开局，不恢复中途状态。</p>
   <p>「肿瘤细胞／免疫细胞 → 细胞周期」调整周期参数；「追踪」查看阶段及阻滞原因。双击「信号」可添加持续 IL-2 场源，并在「显示 → 观察图层」查看其分布。</p>
   <p class="hint">这是未经实验标定的二维切面演示，MCS 为模拟步数，不等同于真实时间或完整三维肿瘤。<a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MODEL.md" target="_blank" rel="noreferrer">详细模型与机制参考</a> · <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MORPHOLOGY.md" target="_blank" rel="noreferrer">形态模型</a></p>
   </div><div data-language="en" hidden><h2>Model &amp; sources</h2>
@@ -325,16 +336,18 @@ aside.statistics-focused #record-options>summary{padding:4px 0}
   <li><strong>Environment and communication:</strong> local oxygen, glucose, acid load, cohesion, damage and immune recruitment signals influence movement, growth and survival.</li>
   <li><strong>Immune surveillance:</strong> dispersed patrol, local chemotaxis, contact-based antigen recognition, cumulative killing, recruitment after recognition, limited clonal expansion and a configurable tumor-kill lifespan.</li>
   <li><strong>Tumor evolution:</strong> normal → precancerous → tumor transitions; inherited and mutable growth, invasion, tolerance and antigen traits, with distinct death processes.</li>
-  <li><strong>Cell cycles:</strong> G0 quiescence and G1/S/G2/M progression, gated by nutrients, compression and injury. CTLs expand using separate IL-2 support and antigen memory; chronic stimulation can accumulate exhaustion.</li>
+  <li><strong>Stemness and repair:</strong> symmetric and asymmetric stem divisions, differentiation and niche plasticity; finite normal repair lineages and tumor trait costs.</li>
+  <li><strong>Cell cycles:</strong> phase-specific nutrient demand, finite energy/precursor reserves and replication-damage checkpoints. G0 quiescence and G1/S/G2/M progression, gated by nutrients, compression and injury. CTLs expand using separate IL-2 support and antigen memory; chronic stimulation can accumulate exhaustion.</li>
   <li><strong>Shape and passage:</strong> limited section-area yielding, nuclear constraints, deformable nuclei, and optional mesenchymal branching and contact networks.</li>
 </ul>
+<p><a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/BIOLOGY_REFERENCES.md" target="_blank" rel="noreferrer">Mechanism and parameter evidence</a>: primary lineage-tracing, glioma stemness, DNA repair and plasticity studies. Rates, multipliers and MCS durations are uncalibrated demo settings.</p>
 <h3>Getting started</h3>
 <ol>
   <li>Choose a preset to run, or place cells in a Blank setup before starting. Random explores different starting conditions.</li>
   <li>Use arena tools to add, drag or erase cells, draw barriers and release signals. Track shows the selected cell and local environment.</li>
   <li>Display contains appearance controls; Parameters has five quick-switch groups. Lock icons preserve chosen settings across random rounds. On phones, use the top arrow to expand the panel or return to the arena.</li>
 </ol>
-<p>Statistics shows the full population history and past-round results. The top file icon offers image, parameter and round-CSV export plus parameter import; the recording icon starts or stops video. Importing parameters starts a fresh run; it does not restore a checkpoint.</p>
+<p>Statistics shows the full population history and numbered past-round results with saved seeds. Re-simulate their initial configurations; manual interventions are not replayed. The top file icon offers image, parameter and round-CSV export plus parameter import; the recording icon starts or stops video. Importing parameters starts a fresh run; it does not restore a checkpoint.</p>
 <p>Open Tumor or Immune → Cell cycle to adjust cycle parameters. Track a cell for its phase and arrest reason. Double-tapping Signal creates a persistent IL-2 source; Display → Observation layers shows its distribution.</p>
 <p class="hint">This is an uncalibrated 2D section demo. MCS counts simulation steps, not real time or full 3D tumor dynamics. <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MODEL.md" target="_blank" rel="noreferrer">Detailed model and references</a> · <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MORPHOLOGY.md" target="_blank" rel="noreferrer">Morphology model</a></p>
 </div>
@@ -390,7 +403,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 </pre></details></details>
 </dialog>
-<script id="worker-source" type="text/plain">globalThis.CELL_LAB_WASM='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';
+<script id="worker-source" type="text/plain">globalThis.CELL_LAB_WASM='AGFzbQEAAAABQgtgAnx8AXxgAXwBfGADf39/AX9gAX8Bf2AGf39/f39/AGAAAX9gAABgBH9/f38BfGACf38BfGAAAXxgBH9/f38BfwIXAgRtYXRoA3BvdwAABG1hdGgDZXhwAAEDDg0CAwQFBgcICAMJCgMKBAUBcAEBAQUGAQGAEIAQBgkBfwFB8KLYPwsHUQgGbWVtb3J5AgAHcG9pbnRlcgADBGluaXQABBBnZW9tZXRyeV92ZXJzaW9uAAUGcmFzdGVyAAYGZW5lcmd5AAcDcnVuAAoIY29udGFjdHMADQqngwENtQEBA38CQCACRQ0AIAJBB3EhA0EAIQQCQCACQQhJDQAgAkF4cSEFQQAhBANAIAAgBGoiAiABOgAAIAJBAWogAToAACACQQJqIAE6AAAgAkEDaiABOgAAIAJBBGogAToAACACQQVqIAE6AAAgAkEGaiABOgAAIAJBB2ogAToAACAFIARBCGoiBEcNAAsLIANFDQAgACAEaiECA0AgAiABOgAAIAJBAWohAiADQX9qIgMNAAsLIAALlQIBAX9BgIiAgAAhAQJAAkACQAJAAkACQAJAAkACQAJAAkACQAJAAkACQAJAAkACQAJAAkACQAJAAkACQCAADhgXAAECAwQFBgcICRYKCwwNDg8QERITFBUWC0GAiICBAA8LQYCIwIEADwtBgIiAggAPC0GAiMCCAA8LQYCIwJIADwtBgIjAogAPC0GAiMCkAA8LQdCbwKQADwtB0JvArAAPC0HQn8CsAA8LQdChwKwADwtB0KHUrAAPC0HQodisAA8LQdCh+KwADwtB0KG4rQAPC0HQobiwAA8LQdChvLAADwtB0KH8sAAPC0HQofyxAA8LQdChvLIADwtB0KH8sgAPC0HgofyyAA8LQeChjLMAIQELIAELxQQBBH9BACEGQQAgATYC7KGMtwBBACAANgLooYy3AEEAIAI2AvChjLcAQQAgAzYC9KGMtwBBACAENgL4oYy3AEEAIAU2AvyhjLcAQQBBATYCpKKMtwBBAEF/NgKUooy3AEEAQv////8fNwK8ooy3AEEAQQEgA3QiAjYCnKKMtwBBAEF+IAN3IgU2ApCijLcAQQAgAjYCyKKMtwBBACAFNgKwooy3AEEAQQAgAmsiBzYCrKKMtwBBAEEBIAJrIgg2AqiijLcAQQAgAkEBaiIJNgKgooy3AEEAIAJBf2oiBTYCmKKMtwBBACAJNgLMooy3AEEAIAU2AsSijLcAQQAgCDYCuKKMtwBBACAHNgK0ooy3AEEAQQA2AoCijLcAAkAgBEEBSA0AQdCijLcAQQAgBEECdCICEIKAgIAAGkHQooy5AEEAIAIQgoCAgAAaIARBAXEhCCABQX9qIQEgAEF/aiEAAkAgBEEBRg0AIARBfnEhB0EAIQYDQEEAIQICQCAGIAN2IgRBAUgNACAEIABIIAYgBXEiAkEAR3EgAiABSHEhAgsgBkHQooy7AGogAjoAAAJAAkAgBkEBaiICIAN2IgRBAU4NAEEAIQIMAQsgBCAASCACIAVxIgJBAEdxIAIgAUhxIQILIAZB0aKMuwBqIAI6AAAgByAGQQJqIgZHDQALCyAIRQ0AAkACQCAGIAN2IgJBAU4NAEEAIQIMAQsgAiAASCAGIAVxIgJBAEdxIAIgAUhxIQILIAZB0KKMuwBqIAI6AAALCwQAQQEL+AQCHX8BfEEAIQBBACEBQQAhAgJAQQAoAuyhjLcAIgNBAUgNAEEAIQACQEEAKALooYy3ACIEQQFODQBBACEBQQAhAgwBC0EAKAL0oYy3ACEFIARBAXQhBiAEQQZ0IQdB0KH8sAAhCEEAIQJBACEBQQAhAEEAIQkDQAJAIAkgCUEgaiIKIAMgCiADSCILGyIMTg0AIAQgCWwhDUEAIQ5BICEPIAghEANAAkAgDiAOQSBqIhEgBCARIARIIhIbTg0AIAQgDyAEIA9IGyETIBAhFANAIA4gDWohFSAJIA4gBXQiFmpBAXRBgIiAgABqIRcgFCEYIAkhGQNAIBggFy8BACIaOwEAIBVB0KG8sgBqIBpB0KG4sABqLQAAIhtBBEYiHDoAAAJAAkACQCAbQX9qQf8BcUEDSQ0AIBVB0KH8sQBqQQA6AAAgAiAaQQBHIBtBBEdxaiECIBxFDQEMAgsgFiAZakGAiICBAGotAAC4IBtBA3RB0JvArABqKwMAo0QAAAAAAOBvQKIiHUQAAAAAAOBvQGYhGwJAAkAgHUQAAAAAAADgP6AiHZlEAAAAAAAA4EFjRQ0AIB2qIRoMAQtBgICAgHghGgsgFUHQofyxAGpBfyAaIBsbOgAACyAAQQFqIQAgASAWIBlqQdChvLAAai0AAGohAQsgF0ECaiEXIBggBmohGCAVIARqIRUgGUEBaiIZIAxIDQALIBRBAmohFCAOQQFqIg4gE0cNAAsLIBBBwABqIRAgD0EgaiEPIBEhDiASDQALCyAIIAdqIQggCiEJIAsNAAsLQQAgADYC2KH8sgBBACABNgLUofyyAEEAIAI2AtCh/LIAC/QOBgJ/AXwDfwJ8BX8EfCADQQh0IQQgAkEIdEHQm8CkAGohBUQAAAAAAAAAACEGAkACQCABQYCIgIIAai0AACIHDQBBACEIQQAhCUQAAAAAAAAAACEKRAAAAAAAAAAAIQsMAQsCQCABQdCijLsAai0AAEUNACAHQQJ0IQxEAAAAAAAAAAAhC0EAIQ1EAAAAAAAAAAAhCkEAIQlBACEIA0ACQCANQbCijLcAaigCACABakEBdEGAiICAAGovAQAiDiACRiIPDQAgCyAOIAIQiICAgACgIQsLQQEhEAJAIA4gA0YNACAKIA4gAxCIgICAAKAhCkF/IRALIBAgCGohCEF/QQEgDxsgCWohCSAMIA1BBGoiDUcNAAwCCwsgAUEFdEGAiMCCAGohDUEAIQlEAAAAAAAAAAAhCyAHIQ9EAAAAAAAAAAAhCkEAIQgDQAJAIA0oAgBBAXRBgIiAgABqLwEAIg4gAkYiDA0AIAsgDiACEIiAgIAAoCELC0EBIRACQCAOIANGDQAgCiAOIAMQiICAgACgIQpBfyEQCyANQQRqIQ0gECAIaiEIQX9BASAMGyAJaiEJIA9Bf2oiDw0ACwsgBEHQm8CkAGohDQJAIAUrA0AiEUQAAAAAAAAAAGENACARIAUrAyAiBiAJt6AgBSsDOCISoSITIBOiIAYgEqEiBiAGoqGiRAAAAAAAAAAAoCEGCyALIAqhIQtEAAAAAAAAAAAhCgJAIA0rA0AiEUQAAAAAAAAAAGENACAGIBEgDSsDICISIAi3oCANKwM4IhOhIhQgFKIgEiAToSISIBKioaKgIQYLIAsgBqAhBgJAIAUgDSACGyIQKwNIIhFEAAAAAAAAAABhDQBEAAAAAAAAAAAhEkQAAAAAAAAAACELAkAgAUEBdEGAiICAAGovAQAiCUUNAEQAAAAAAAAAACELIAFBgIiAgQBqLQAAQf8BcSIIRQ0AIAi4IQoCQAJAIAcNAEEBIQ4MAQsCQCABQdCijLsAai0AAEUNACAHQQJ0IQNBACEIQQEhDgNAAkAgCEGwooy3AGooAgAgAWoiAkEBdEGAiICAAGovAQAgCUcNAAJAIAJBgIiAgQBqLQAAIgINAEQAAAAAAAAAACELDAULIA5BAWohDiAKIAK4oiEKCyADIAhBBGoiCEcNAAwCCwsgAUEFdEGAiMCCAGohCEEBIQ4DQAJAIAgoAgAiAkEBdEGAiICAAGovAQAgCUcNAAJAIAJBgIiAgQBqLQAAIgINAEQAAAAAAAAAACELDAQLIA5BAWohDiAKIAK4oiEKCyAIQQRqIQggB0F/aiIHDQALCyAKRAAAAAAAAPA/IA63oxCAgICAACELCwJAIABBAXRBgIiAgABqLwEAIglFDQAgAEGAiICBAGotAABB/wFxIghFDQAgCLghCgJAAkAgAEGAiICCAGotAAAiAg0AQQEhDgwBCwJAIABB0KKMuwBqLQAARQ0AIAJBAnQhA0EAIQhBASEOA0ACQCAIQbCijLcAaigCACAAaiICQQF0QYCIgIAAai8BACAJRw0AIAJBgIiAgQBqLQAAIgJFDQQgDkEBaiEOIAogAriiIQoLIAMgCEEEaiIIRw0ADAILCyAAQQV0QYCIwIIAaiEIQQEhDgNAAkAgCCgCACIDQQF0QYCIgIAAai8BACAJRw0AIANBgIiAgQBqLQAAIgNFDQMgDkEBaiEOIAogA7iiIQoLIAhBBGohCCACQX9qIgINAAsLIApEAAAAAAAA8D8gDrejEICAgIAAIRILIBEgCyASoaIhCgJAAkAgECsDCCILmUQAAAAAAADgQWNFDQAgC6ohCAwBC0GAgICAeCEICyAKIAhBA3RB0JvArABqKwMAoyEKCyAGIAqgIQYCQEEAKAL8oYy3AEUNACAGIAEgBRCJgICAACABIA0QiYCAgAChoCEGC0QAAAAAAAAAACEKAkAgBSsDACITRAAAAAAAAAAAYQ0AIAUrAzAgBSsDGCAFKwMooSIKIAqgRAAAAAAAAPA/oKJEAAAAAAAAAACgIQoLAkAgDSsDAEQAAAAAAAAAAGENACAKIA0rAzBEAAAAAAAA8D8gDSsDGCANKwMooSILIAugoaKgIQoLIAFBACgC9KGMtwAiCHUgACAIdWsiCbchEUF/IAh0QX9zIgggAXEgCCAAcWsiCLchEgJAQQAoAvChjLcARQ0AAkACQCAJQQJIDQAgEUEAKALooYy3ALehIREMAQsgCUF+Sg0AIBFBACgC6KGMtwC3oCERCwJAIAhBAkgNACASQQAoAuyhjLcAt6EhEgwBCyAIQX5KDQAgEkEAKALsoYy3ALegIRILRAAAAAAAAAAAIQsCQCATRAAAAAAAAAAAYQ0ARAAAAAAAAAAAIQsgBSsDEEQAAAAAAAAAAGINACARIAUrA1iiIBIgBSsDYKKgIAUrA1CaoiELCwJAIA0rAwhEAAAAAAAACEBiDQAgDSsDEEQAAAAAAAAAAGINACALIA0rA1AgESANKwNYoiASIA0rA2CioKKhIQsLIAYgCqAgC6AL3wQDAn8DfAF/IAFBCHRB0JvApABqIQIgAEEIdEHQm8CkAGohAwJAAkAgAEUNACABRQ0ARAAAAAAAAABAIQQgAysDaCABt2ENASACKwNoIAC3YQ0BCwJAIAMrAwBEAAAAAAAAAABhDQAgAisDAEQAAAAAAAAAAGENACADKwMIIgUgAisDCCIGYQ0ARAAAAAAAACJAIQQgBUQAAAAAAAAIQGENASAGRAAAAAAAAAhAYQ0BIAMgAkEAIAZEAAAAAAAAAEBhGyAFRAAAAAAAAABAYRsiB0UNACAHKwNwRAAAAAAAAAjAokQAAAAAAAAzQKBEAAAAAAAAIkClDwsCQAJAIAMrAwgiBZlEAAAAAAAA4EFjRQ0AIAWqIQMMAQtBgICAgHghAwsgA0EFbCEDAkACQCACKwMIIgaZRAAAAAAAAOBBY0UNACAGqiECDAELQYCAgIB4IQILRAAAAAAAAD5AIAMgAmpBA3RB+JvArABqKwMAIgQgBEQAAAAAAAA+QGMbIAQgBkQAAAAAAAAAQGEbIAQgBUQAAAAAAAAAQGEbIARBACsD0J3ArABEAAAAAAAAAABiGyEEQQArA8idwKwARAAAAAAAAAAAYQ0AIAVEAAAAAAAAAEBiDQAgBkQAAAAAAAAAQGINACAAQRB0IAFyIAFBEHQgAHIgACABSBsiA0Gx8wVsQf//B3EiAUECdEHQodisAGooAgAiAEUNAAJAA0AgACADRg0BIAFBAWpB//8HcSIBQQJ0QdCh2KwAaigCACIADQAMAgsLIAQgAUEDdEHQofisAGorAwChIQQLIAQL+ggDAXwCfwx8RAAAAAAAAAAAIQICQAJAIAErA3hEAAAAAAAAAABhDQBEAAAAAAAAAAAhAiABKwMQRAAAAAAAAAAAYg0AQQAoAvChjLcAIQMCQCABKwOwAUQAAAAAAAAAAGENACAAQQAoAvShjLcAIgR1tyABKwOAAaEhBUF/IAR0QX9zIABxtyABKwOIAaEhBgJAIANFDQACQAJAIAVBACgC6KGMtwAiALciAkQAAAAAAADgP6JkRQ0AIAUgAqEhBQwBCyAFQQAgAGu3RAAAAAAAAOA/omNFDQAgBSACoCEFCwJAIAZBACgC7KGMtwAiALciAkQAAAAAAADgP6JkRQ0AIAYgAqEhBgwBCyAGQQAgAGu3RAAAAAAAAOA/omNFDQAgBiACoCEGCwJAAkAgASsD0AEiAplEAAAAAAAA4EFjRQ0AIAKqIQAMAQtBgICAgHghAAsCQAJAIAErA8gBIgKZRAAAAAAAAOBBY0UNACACqiEDDAELQYCAgIB4IQMLIAYgBqIgBSAFoqCfIAErA7gBoSIHRAAAAAAAAAAApSEIAkAgAEEBTg0ARJx1AIg85Dd+IQkMAwsgAEEGbCADaiEEIANBAnRB5KG4rQBqIQBEnHUAiDzkN34hCQNARAAAAAAAAAAAIQogBiAAQXBqKgIAuyILoSEMIAUgAEFsaioCALsiAqEhDSAAQXxqKgIAuyEOIAAqAgC7IQ8CQCAAQXRqKgIAuyACoSICIAKiIABBeGoqAgC7IAuhIgsgC6KgIhBEAAAAAAAAAABhDQAgDSACoiAMIAuioCAQoyEKCyANIAIgCkQAAAAAAAAAAKVEAAAAAAAA8D+kIgqioSICIAKiIAwgCyAKoqEiAiACoqCfIA8gDqEgCqIgDqChRAAAAAAAAAAApSICIAkgAiAJYxshCSACIAggAiAIYxshCCAAQRhqIQAgA0EGaiIDIARODQMMAAsLIABBACgC9KGMtwAiBHW3IAFBgAFqKwMAoSECQX8gBHRBf3MgAHG3IAFBiAFqKwMAoSELAkAgA0UNAAJAAkAgAkEAKALooYy3ACIAtyIIRAAAAAAAAOA/omRFDQAgAiAIoSECDAELIAJBACAAa7dEAAAAAAAA4D+iY0UNACACIAigIQILAkAgC0EAKALsoYy3ACIAtyIIRAAAAAAAAOA/omRFDQAgCyAIoSELDAELIAtBACAAa7dEAAAAAAAA4D+iY0UNACALIAigIQsLRAAAAAAAABRARAAAAAAAACRARAAAAAAAADJAIAErAwgiCEQAAAAAAAAAQGEbIAhEAAAAAAAA8D9hGyACIAKiIAsgC6KgnyABKwOgAaNEAAAAAAAA8L+gRAAAAAAAAAAApSICIAKioiECCyACDwsgCCAIIAErA8ABoqIgASsD2AEgByABKwPgASICRAAAAAAAABRAoqNEAAAAAAAAAAClRAAAAAAAAPA/pEQAAAAAAADwPyAJIAJEAAAAAAAA+D+io0QAAAAAAAAAAKVEAAAAAAAA8D+koaKioQufPAUEfwN8CH8BfA1/QQAgADYC0KLMuwBBAEEANgLUosy7AAJAQQAoAvihjLcAIgFBAUgNAEHgosy7AEH/ASABQQJ0EIKAgIAAGgsCQCAAQQFIDQAgAEEDcSECQQAhAQJAIABBBEkNACAAQXxxIQNBACEBQYCIwKIAIQQDQCAEKAIAQQJ0QeCizLsAaiABNgIAIARBBGooAgBBAnRB4KLMuwBqIAFBAWo2AgAgBEEIaigCAEECdEHgosy7AGogAUECajYCACAEQQxqKAIAQQJ0QeCizLsAaiABQQNqNgIAIARBEGohBCABQQRqIgEgA0cNAAsLIAJFDQAgAUECdEGAiMCiAGohBANAIAQoAgBBAnRB4KLMuwBqIAE2AgAgBEEEaiEEIAFBAWohASACQX9qIgINAAsLAkAgAA0AQQAPC0QAAAAAAAAAACEFA0ACQAJAEIuAgIAAIAC3IgaiIgeZRAAAAAAAAOBBY0UNACAHqiEBDAELQYCAgIB4IQELIAFBAnRBgIjAogBqKAIAIQEQi4CAgAAhByABQdCijLsAaiIILQAAIQICQAJAIAcgAUGAiICCAGoiCS0AALiiIgeZRAAAAAAAAOBBY0UNACAHqiEEDAELQYCAgIB4IQQLRAAAAAAAAPA/IAajIQYCQAJAIAJFDQAgBEECdEGwooy3AGooAgAgAWohAwwBCyABQQN0IARqQQJ0QYCIwIIAaigCACEDCyAFIAagIQUCQCADQQF0QYCIgIAAai8BACIEIAFBAXRBgIiAgABqIgovAQAiAEYNACAEQQh0IgtB2JvApABqKwMARAAAAAAAABBAYQ0AIABBCHQiDEHYm8CkAGorAwBEAAAAAAAAEEBhDQAgC0HQm8CkAGohDSAMQdCbwKQAaiEOAkACQEEAKAL8oYy3ACIPRQ0AAkAgDisDAEQAAAAAAAAAAGENACAOKwMQRAAAAAAAAAAAYg0AIA4rAxggDisDqAFlDQMgDisDeEQAAAAAAAAAAGENACABQQAoAvShjLcAIgt1tyAOQYABaisDAKEhBiABQX8gC3RBf3NxtyAOQYgBaisDAKEhBwJAQQAoAvChjLcARQ0AAkACQCAGQQAoAuihjLcAIgu3IhBEAAAAAAAA4D+iZEUNACAGIBChIQYMAQsgBkEAIAtrt0QAAAAAAADgP6JjRQ0AIAYgEKAhBgsCQCAHQQAoAuyhjLcAIgu3IhBEAAAAAAAA4D+iZEUNACAHIBChIQcMAQsgB0EAIAtrt0QAAAAAAADgP6JjRQ0AIAcgEKAhBwsgBiAGoiAHIAeioCAOKwOQASIGIAaiZQ0DCwJAIA0rAwBEAAAAAAAAAABhIhENACANKwMQRAAAAAAAAAAAYg0AAkAgDSsDeEQAAAAAAAAAAGENACABQQAoAvShjLcAIgt1tyANQYABaisDAKEhBiABQX8gC3RBf3NxtyANQYgBaisDAKEhBwJAQQAoAvChjLcARQ0AAkACQCAGQQAoAuihjLcAIgu3IhBEAAAAAAAA4D+iZEUNACAGIBChIQYMAQsgBkEAIAtrt0QAAAAAAADgP6JjRQ0AIAYgEKAhBgsCQCAHQQAoAuyhjLcAIgu3IhBEAAAAAAAA4D+iZEUNACAHIBChIQcMAQsgB0EAIAtrt0QAAAAAAADgP6JjRQ0AIAcgEKAhBwsgBiAGoiAHIAeioCANKwOYASIGIAaiZA0ECyABQQV0QYCIwJIAaiESQQAoAqiijLcAIRNBACgCpKKMtwAhFEEAKAKgooy3ACEVQQAoApyijLcAIRZBACgCmKKMtwAhF0EAKAKsooy3ACEYQQAoApSijLcAIRlBACgCkKKMtwAhGkEEIQxBfyEbA0ACQAJAIAJFDQAgDEGQooy3AGooAgAgAWohCwwBCyASIAxqKAIAIQsLAkAgC0EASA0AIAtBAXRBgIiAgABqLwEAIARHDQACQAJAIAtB0KKMuwBqLQAAIhxFDQAgCyAaaiEdDAELIAtBBXRBgIjAkgBqKAIAIR0LAkAgHUEASA0AAkAgHSABRg0AIB1BAXRBgIiAgABqLwEAIARHDQELAkACQCAcRQ0AIAsgGWohHQwBCyALQQV0QYSIwJIAaigCACEdCyAdQQBIDQACQCAdIAFGDQAgHUEBdEGAiICAAGovAQAgBEcNAQsCQAJAIBxFDQAgCyAYaiEdDAELIAtBBXRBnIjAkgBqKAIAIR0LIB1BAEgNACAdIAFGDQMgHUEBdEGAiICAAGovAQAgBEYNAwsCQAJAIBxFDQAgCyAXaiEdDAELIAtBBXRBiIjAkgBqKAIAIR0LAkAgHUEASA0AAkAgHSABRg0AIB1BAXRBgIiAgABqLwEAIARHDQELAkACQCAcRQ0AIAsgGWohHQwBCyALQQV0QYSIwJIAaigCACEdCyAdQQBIDQACQCAdIAFGDQAgHUEBdEGAiICAAGovAQAgBEcNAQsCQAJAIBxFDQAgCyAWaiEdDAELIAtBBXRBjIjAkgBqKAIAIR0LIB1BAEgNACAdIAFGDQMgHUEBdEGAiICAAGovAQAgBEYNAwsCQAJAIBxFDQAgCyAVaiEdDAELIAtBBXRBkIjAkgBqKAIAIR0LAkAgHUEASA0AAkAgHSABRg0AIB1BAXRBgIiAgABqLwEAIARHDQELAkACQCAcRQ0AIAsgFmohHQwBCyALQQV0QYyIwJIAaigCACEdCyAdQQBIDQACQCAdIAFGDQAgHUEBdEGAiICAAGovAQAgBEcNAQsCQAJAIBxFDQAgCyAUaiEdDAELIAtBBXRBlIjAkgBqKAIAIR0LIB1BAEgNACAdIAFGDQMgHUEBdEGAiICAAGovAQAgBEYNAwsCQAJAIBxFDQAgCyATaiEdDAELIAtBBXRBmIjAkgBqKAIAIR0LIB1BAEgNAAJAIB0gAUYNACAdQQF0QYCIgIAAai8BACAERw0BCwJAAkAgHEUNACALIBRqIR0MAQsgC0EFdEGUiMCSAGooAgAhHQsgHUEASA0AAkAgHSABRg0AIB1BAXRBgIiAgABqLwEAIARHDQELAkACQCAcRQ0AIAsgGGohCwwBCyALQQV0QZyIwJIAaigCACELCyALQQBIDQAgCyABRg0CIAtBAXRBgIiAgABqLwEAIARGDQILIAxBCGohDCAbQQJqIhtBBkkNAAwECwsCQCAADQAgEQ0AAkAgAkUNAEEAKAKUooy3ACABaiILQQBIDQEgC0EBdEGAiICAAGovAQAgBEcNAUEAKAKcooy3ACABaiILQQBIDQEgC0EBdEGAiICAAGovAQAgBEcNAUEAKAKkooy3ACABaiILQQBIDQEgC0EBdEGAiICAAGovAQAgBEcNAUEAKAKsooy3ACABaiILQQBIDQFBASESIAtBAXRBgIiAgABqLwEAIARGDQMMAQsgAUEDdEECdCIMQQRyQYCIwJIAaigCACILQQBIDQAgC0EBdEGAiICAAGovAQAgBEcNACAMQQxyQYCIwJIAaigCACILQQBIDQAgC0EBdEGAiICAAGovAQAgBEcNACAMQRRyQYCIwJIAaigCACILQQBIDQAgC0EBdEGAiICAAGovAQAgBEcNACAMQRxyQYCIwJIAaigCACILQQBIDQBBASESIAtBAXRBgIiAgABqLwEAIARGDQILAkAgEQ0AIA0rAxBEAAAAAAAAAABiDQAgASABIAQgABCMgICAAEUNAwsCQCACRQ0AAkBBACgClKKMtwAgAWoiC0F/TA0AIAsgASAEIAAQjICAgABFDQQLAkBBACgCnKKMtwAgAWoiC0EASA0AIAsgASAEIAAQjICAgABFDQQLAkBBACgCpKKMtwAgAWoiC0EASA0AIAsgASAEIAAQjICAgABFDQQLQQAoAqyijLcAIAFqIgtBAEgNASALIAEgBCAAEIyAgIAADQEMAwsCQCABQQN0QQJ0IgtBBHJBgIjAkgBqKAIAIgxBAEgNACAMIAEgBCAAEIyAgIAARQ0DCwJAIAtBDHJBgIjAkgBqKAIAIgxBAEgNACAMIAEgBCAAEIyAgIAARQ0DCwJAIAtBFHJBgIjAkgBqKAIAIgxBAEgNACAMIAEgBCAAEIyAgIAARQ0DCyALQRxyQYCIwJIAaigCACILQQBIDQAgCyABIAQgABCMgICAAEUNAgsCQCAADQBBASESDAELQQAhEiAOKwMARAAAAAAAAAAAYQ0AIA4rAxBEAAAAAAAAAABiDQAgAUEDdCEbAkACQAJAIAJFDQBBACELAkBBACgCkKKMtwAgAWoiDEF/TA0AIAxBAXRBgIiAgABqLwEAIABGIQsLAkBBACgClKKMtwAgAWoiDEEASA0AIAtBAnIgCyAMQQF0QYCIgIAAai8BACAARhshCwsCQEEAKAKYooy3ACABaiIMQQBIDQAgC0EEciALIAxBAXRBgIiAgABqLwEAIABGGyELCwJAQQAoApyijLcAIAFqIgxBAEgNACALQQhyIAsgDEEBdEGAiICAAGovAQAgAEYbIQsLAkBBACgCoKKMtwAgAWoiDEEASA0AIAtBEHIgCyAMQQF0QYCIgIAAai8BACAARhshCwsCQEEAKAKkooy3ACABaiIMQQBIDQAgC0EgciALIAxBAXRBgIiAgABqLwEAIABGGyELCwJAQQAoAqiijLcAIAFqIgxBAEgNACALQcAAciALIAxBAXRBgIiAgABqLwEAIABGGyELC0EAKAKsooy3ACABaiIMQX9KDQEMAgtBACELAkAgG0ECdCIMQYCIwJIAaigCACIcQQBIDQAgHEEBdEGAiICAAGovAQAgAEYhCwsCQCAMQQRyQYCIwJIAaigCACIcQQBIDQAgC0ECciALIBxBAXRBgIiAgABqLwEAIABGGyELCwJAIAxBCHJBgIjAkgBqKAIAIhxBAEgNACALQQRyIAsgHEEBdEGAiICAAGovAQAgAEYbIQsLAkAgDEEMckGAiMCSAGooAgAiHEEASA0AIAtBCHIgCyAcQQF0QYCIgIAAai8BACAARhshCwsCQCAMQRByQYCIwJIAaigCACIcQQBIDQAgC0EQciALIBxBAXRBgIiAgABqLwEAIABGGyELCwJAIAxBFHJBgIjAkgBqKAIAIhxBAEgNACALQSByIAsgHEEBdEGAiICAAGovAQAgAEYbIQsLAkAgDEEYckGAiMCSAGooAgAiHEEASA0AIAtBwAByIAsgHEEBdEGAiICAAGovAQAgAEYbIQsLIAxBHHJBgIjAkgBqKAIAIgxBAEgNAQsgC0GAAXIgCyAMQQF0QYCIgIAAai8BACAARhshCwsgC0HQn8CsAGotAAANACALRQ0BQQBBACgCgKKMtwBBAWoiHDYCgKKMtwACQCAcQX9HDQACQEEAKAL4oYy3ACIMQQFIDQBB0KKMtwBBACAMQQJ0IgwQgoCAgAAaQdCijLkAQQAgDBCCgICAABoLQQEhHEEAQQE2AoCijLcACwJAAkAgC0EBcQ0AQX8hDEEAIREMAQsCQAJAIAJFDQBBACgCkKKMtwAgAWohDAwBCyAbQQJ0QYCIwJIAaigCACEMCyAMQQJ0QdCijLkAaiAcNgIAQQEhEQsCQCALQQJxRQ0AAkACQCACRQ0AQQAoApSijLcAIAFqIR0MAQsgG0ECdEEEckGAiMCSAGooAgAhHQsgHUECdEHQooy5AGogHDYCACAdIAwgDEEASBshDCARQQFqIRELAkAgC0EEcUUNAAJAAkAgAkUNAEEAKAKYooy3ACABaiEdDAELIBtBAnRBCHJBgIjAkgBqKAIAIR0LIB1BAnRB0KKMuQBqIBw2AgAgHSAMIAxBAEgbIQwgEUEBaiERCwJAIAtBCHFFDQACQAJAIAJFDQBBACgCnKKMtwAgAWohHQwBCyAbQQJ0QQxyQYCIwJIAaigCACEdCyAdQQJ0QdCijLkAaiAcNgIAIB0gDCAMQQBIGyEMIBFBAWohEQsCQCALQRBxRQ0AAkACQCACRQ0AQQAoAqCijLcAIAFqIR0MAQsgG0ECdEEQckGAiMCSAGooAgAhHQsgHUECdEHQooy5AGogHDYCACAdIAwgDEEASBshDCARQQFqIRELAkAgC0EgcUUNAAJAAkAgAkUNAEEAKAKkooy3ACABaiEdDAELIBtBAnRBFHJBgIjAkgBqKAIAIR0LIB1BAnRB0KKMuQBqIBw2AgAgHSAMIAxBAEgbIQwgEUEBaiERCwJAIAtBwABxRQ0AAkACQCACRQ0AQQAoAqiijLcAIAFqIR0MAQsgG0ECdEEYckGAiMCSAGooAgAhHQsgHUECdEHQooy5AGogHDYCACAdIAwgDEEASBshDCARQQFqIRELAkAgC0GAAXFFDQACQAJAIAJFDQBBACgCrKKMtwAgAWohAgwBCyAbQQJ0QRxyQYCIwJIAaigCACECCyACQQJ0QdCijLkAaiAcNgIAIAIgDCAMQQBIGyEMIBFBAWohEQtBACAMNgLwotS9ACAMQQJ0QdCijLcAaiAcNgIAAkACQCAPDQBBACESQQEhHUEAIRoMAQtBACESQQAoAqyijLcAIQ9BACgCpKKMtwAhGkEAKAKcooy3ACEXQQAoApSijLcAIRVBASEbQfCi1L0AIQtBACEMA0AgESALKAIAIgJBAnRB0KKMuQBqKAIAIBxGayIRRQ0CIAxBAWohDAJAAkACQCACQdCijLsAai0AAEUNAAJAIAIgFWoiHUEASA0AIB0gAUYNACAdQQF0QYCIgIAAai8BACAARw0AIB1BAnRB0KKMtwBqIhMoAgAgHEYNACATIBw2AgAgG0ECdEHwotS9AGogHTYCACAbQQFqIRsLAkAgAiAXaiIdQQBIDQAgHSABRg0AIB1BAXRBgIiAgABqLwEAIABHDQAgHUECdEHQooy3AGoiEygCACAcRg0AIBMgHDYCACAbQQJ0QfCi1L0AaiAdNgIAIBtBAWohGwsCQCACIBpqIh1BAEgNACAdIAFGDQAgHUEBdEGAiICAAGovAQAgAEcNACAdQQJ0QdCijLcAaiITKAIAIBxGDQAgEyAcNgIAIBtBAnRB8KLUvQBqIB02AgAgG0EBaiEbCyACIA9qIgJBAEgNAiACIAFGDQIgAkEBdEGAiICAAGovAQAgAEcNAiACQQJ0QdCijLcAaiIdKAIAIBxHDQEMAgsCQCACQQN0QQJ0IgJBBHJBgIjAkgBqKAIAIh1BAEgNACAdIAFGDQAgHUEBdEGAiICAAGovAQAgAEcNACAdQQJ0QdCijLcAaiITKAIAIBxGDQAgEyAcNgIAIBtBAnRB8KLUvQBqIB02AgAgG0EBaiEbCwJAIAJBDHJBgIjAkgBqKAIAIh1BAEgNACAdIAFGDQAgHUEBdEGAiICAAGovAQAgAEcNACAdQQJ0QdCijLcAaiITKAIAIBxGDQAgEyAcNgIAIBtBAnRB8KLUvQBqIB02AgAgG0EBaiEbCwJAIAJBFHJBgIjAkgBqKAIAIh1BAEgNACAdIAFGDQAgHUEBdEGAiICAAGovAQAgAEcNACAdQQJ0QdCijLcAaiITKAIAIBxGDQAgEyAcNgIAIBtBAnRB8KLUvQBqIB02AgAgG0EBaiEbCyACQRxyQYCIwJIAaigCACICQQBIDQEgAiABRg0BIAJBAXRBgIiAgABqLwEAIABHDQEgAkECdEHQooy3AGoiHSgCACAcRg0BCyAdIBw2AgAgG0ECdEHwotS9AGogAjYCACAbQQFqIRsLIAtBBGohCyAMIBtIDQAMAwsLA0AgESAaQQJ0QfCi1L0AaigCACIMQQJ0QdCijLkAaigCACAcRmsiEUUNASAaQQFqIRoCQCAMQYCIgIIAai0AACILRQ0AAkAgDEHQooy7AGotAABFDQAgC0ECdCEbQQAhAgNAAkAgAkGwooy3AGooAgAgDGoiCyABRg0AIAtBAXRBgIiAgABqLwEAIABHDQAgC0ECdEHQooy3AGoiDygCACAcRg0AIA8gHDYCACAdQQJ0QfCi1L0AaiALNgIAIB1BAWohHQsgGyACQQRqIgJHDQAMAgsLIAxBBXRBgIjAggBqIQIDQAJAIAIoAgAiDCABRg0AIAxBAXRBgIiAgABqLwEAIABHDQAgDEECdEHQooy3AGoiGygCACAcRg0AIBsgHDYCACAdQQJ0QfCi1L0AaiAMNgIAIB1BAWohHQsgAkEEaiECIAtBf2oiCw0ACwsgGiAdSA0ADAILCwJAIAMgASAEIAAQh4CAgAAiBkQAAAAAAAAAAGMNABCLgICAACAGmkEAKwPAncCsAKMQgYCAgABjRQ0BCwJAAkAgCS0AACIdDQBBACEJQQAhAwwBCwJAIAgtAABFDQAgHUEBcSERQQAhA0EAIQlBACELAkAgHUEBRg0AIB1B/gFxIRtBACEDQbCijLcAIQJBACEJQQAhCwNAQQFBfyACQQRqKAIAIAFqQQF0QYCIgIAAai8BACIMIABGG0EBQX8gAigCACABakEBdEGAiICAAGovAQAiHCAARhsgCWpqIQlBf0EBIAwgBEYbQX9BASAcIARGGyADamohAyACQQhqIQIgGyALQQJqIgtHDQALCyARRQ0BQQFBfyALQQJ0QbCijLcAaigCACABakEBdEGAiICAAGovAQAiAiAARhsgCWohCUF/QQEgAiAERhsgA2ohAwwBCyAdQQFxIRFBACEDQQAhCUEAIQsCQCAdQQFGDQAgHUH+AXEhGyABQQV0QYCIwIIAaiECQQAhA0EAIQlBACELA0BBAUF/IAJBBGooAgBBAXRBgIiAgABqLwEAIgwgAEYbQQFBfyACKAIAQQF0QYCIgIAAai8BACIcIABGGyAJamohCUF/QQEgDCAERhtBf0EBIBwgBEYbIANqaiEDIAJBCGohAiAbIAtBAmoiC0cNAAsLIBFFDQBBAUF/IAsgAUEDdGpBAnRBgIjAggBqKAIAQQF0QYCIgIAAai8BACICIABGGyAJaiEJQX9BASACIARGGyADaiEDCwJAIARFDQAgDSANKwMYRAAAAAAAAPA/oDkDGCANIA0rAyAgA7egOQMgCwJAIBINACAOIA4rAxhEAAAAAAAA8L+gIgY5AxggDiAOKwMgIAm3oDkDICAGRAAAAAAAAAAAYg0AIA5CADcDCAsgCiAEOwEAIAFBgIjAgQBqIgktAAAhDkEAIQIgCUEAOgAAQQAoAtCizLsAIRwCQCAdRQ0AIB1BAnQhCiABQQV0QYCIwIIAaiEbIAgtAAAhC0EAIQMDQAJAAkAgC0H/AXFFDQAgA0Gwooy3AGooAgAgAWohAgwBCyAbIANqKAIAIQILAkAgAkEBdEGAiICAAGovAQAiCCAERg0AIAkgCS0AAEEBajoAAAsCQCAIIABHDQAgAkGAiMCBAGoiDCAMLQAAIgxBAWo6AAAgDA0AIAJBAnRB4KLMuwBqIgwoAgBBf0oNACAMIBw2AgAgHEECdEGAiMCiAGogAjYCACAcQQFqIRwLAkAgCCAERw0AIAJBgIjAgQBqIgggCC0AAEF/aiIIOgAAIAhB/wFxDQAgAkECdEHgosy7AGoiCCgCACIMQQBIDQAgCEF/NgIAIBxBf2oiHEECdEGAiMCiAGooAgAiCCACRg0AIAhBAnRB4KLMuwBqIAw2AgAgDEECdEGAiMCiAGogCDYCAAsgCiADQQRqIgNHDQALIAktAAAhAgtBACAcNgLQosy7AAJAAkAgDkH/AXENACACQf8BcUUNASABQQJ0QeCizLsAaiIAKAIAQX9KDQEgACAcNgIAQQAgHEEBajYC0KLMuwAgHEECdEGAiMCiAGogATYCAAwBCyACQf8BcQ0AIAFBAnRB4KLMuwBqIgAoAgAiAkEASA0AIABBfzYCAEEAIBxBf2oiADYC0KLMuwAgAEECdEGAiMCiAGooAgAiACABRg0AIABBAnRB4KLMuwBqIAI2AgAgAkECdEGAiMCiAGogADYCAAtBAEEAKALUosy7ACIAQQFqNgLUosy7ACAAQQN0IgBB4KGMswBqIAE2AgAgAEHkoYyzAGogBDYCAAJAAkAgDSsDCCIGmUQAAAAAAADgQWNFDQAgBqohBAwBC0GAgICAeCEECyABQYCIgIEAaiEBAkACQCAEQQN0QdCbwKwAaisDACIGRAAAAAAAAPBBYyAGRAAAAAAAAAAAZnFFDQAgBqshBAwBC0EAIQQLIAEgBDoAAAsCQCAFRAAAAAAAAPA/Y0UNAEEAKALQosy7ACIADQELC0EAKALUosy7AAuUAwECfwJAAkBBACgCwJvApAAiAEHvBEoNACAAQQFqIQEgAEECdEGAiMCkAGooAgAhAAwBC0EAKAKAiMCkACEBQfR4IQADQCAAQYyPwKQAaiABQYCAgIB4cSAAQZCPwKQAaigCACIBQf7///8HcXJBAXYgAEHAm8CkAGooAgBzQQAgAUEBcWtB3+GiyHlxczYCACAAQQRqIgANAAtBACgCjI/ApAAhAUHQcyEAA0AgAEG8m8CkAGogAUGAgICAeHEgAEHAm8CkAGooAgAiAUH+////B3FyQQF2IABBsJTApABqKAIAc0EAIAFBAXFrQd/hosh5cXM2AgAgAEEEaiIADQALQQEhAUEAQQAoAoCIwKQAIgBB/v///wdxQQAoArybwKQAQYCAgIB4cXJBAXZBACgCsJTApABzQQAgAEEBcWtB3+GiyHlxczYCvJvApAALQQAgATYCwJvApAAgAEELdiAAcyIAQQd0QYCtsel5cSAAcyIAQQ90QYCAmP5+cSAAcyIAQRJ2IABzuEQAAAAAAADwPaILjxABDn8gAiEEAkAgACABRg0AIABBAXRBgIiAgABqLwEAIQQLQQEhBQJAIARBCHRB0JvApABqIgYrAwBEAAAAAAAAAABhDQAgBisDEEQAAAAAAAAAAGINAAJAIAQgAkYNACAEIANHDQELAkACQCAAQdCijLsAai0AACIHRQ0AQQAhA0EAIQYCQEEAKAKQooy3ACAAaiIIQX9MDQAgAiEGAkAgCCABRg0AIAhBAXRBgIiAgABqLwEAIQYLIAYgBEYhBgsCQEEAKAKUooy3ACAAaiIIQQBIDQAgAiEDAkAgCCABRg0AIAhBAXRBgIiAgABqLwEAIQMLIAZBAnIgBiADIARGIgMbIQYLAkBBACgCmKKMtwAgAGoiCEEASA0AIAIhCQJAIAggAUYNACAIQQF0QYCIgIAAai8BACEJCyAGQQRyIAYgCSAERhshBgsCQEEAKAKcooy3ACAAaiIIQQBIDQAgAiEJAkAgCCABRg0AIAhBAXRBgIiAgABqLwEAIQkLIAkgBEcNACADQQFqIQMgBkEIciEGCwJAQQAoAqCijLcAIABqIghBAEgNACACIQkCQCAIIAFGDQAgCEEBdEGAiICAAGovAQAhCQsgBkEQciAGIAkgBEYbIQYLAkBBACgCpKKMtwAgAGoiCEEASA0AIAIhCQJAIAggAUYNACAIQQF0QYCIgIAAai8BACEJCyAJIARHDQAgA0EBaiEDIAZBIHIhBgsCQEEAKAKoooy3ACAAaiIIQQBIDQAgAiEJAkAgCCABRg0AIAhBAXRBgIiAgABqLwEAIQkLIAZBwAByIAYgCSAERhshBgtBACgCrKKMtwAgAGoiCEEASA0BIAIhCQJAIAggAUYNACAIQQF0QYCIgIAAai8BACEJCyAJIARHDQEgA0EBaiEDIAZBgAFyIQYMAQtBACEDQQAhBgJAIABBA3QiCEECdCIJQYCIwJIAaigCACIKQQBIDQAgAiEGAkAgCiABRg0AIApBAXRBgIiAgABqLwEAIQYLIAYgBEYhBgsCQCAJQQRyQYCIwJIAaigCACIJQQBIDQAgAiEDAkAgCSABRg0AIAlBAXRBgIiAgABqLwEAIQMLIAZBAnIgBiADIARGIgMbIQYLAkAgCEECdCIJQQhyQYCIwJIAaigCACIKQQBIDQAgAiELAkAgCiABRg0AIApBAXRBgIiAgABqLwEAIQsLIAZBBHIgBiALIARGGyEGCwJAIAlBDHJBgIjAkgBqKAIAIglBAEgNACACIQoCQCAJIAFGDQAgCUEBdEGAiICAAGovAQAhCgsgCiAERw0AIANBAWohAyAGQQhyIQYLAkAgCEECdCIJQRByQYCIwJIAaigCACIKQQBIDQAgAiELAkAgCiABRg0AIApBAXRBgIiAgABqLwEAIQsLIAZBEHIgBiALIARGGyEGCwJAIAlBFHJBgIjAkgBqKAIAIglBAEgNACACIQoCQCAJIAFGDQAgCUEBdEGAiICAAGovAQAhCgsgCiAERw0AIANBAWohAyAGQSByIQYLAkAgCEECdCIIQRhyQYCIwJIAaigCACIJQQBIDQAgAiEKAkAgCSABRg0AIAlBAXRBgIiAgABqLwEAIQoLIAZBwAByIAYgCiAERhshBgsgCEEcckGAiMCSAGooAgAiCEEASA0AIAIhCQJAIAggAUYNACAIQQF0QYCIgIAAai8BACEJCyAJIARHDQAgA0EBaiEDIAZBgAFyIQYLIANBAkkNACAGQdCfwKwAai0AAA0AIABBBXRBgIjAkgBqIQxBACgCrKKMtwAhDUEAKAKkooy3ACEOQQAoApyijLcAIQ9BACgClKKMtwAhEEEEIQhBfyEDA0ACQEEBIANBAmoiA3QiCiAGcUUNAAJAAkAgB0UNACAIQZCijLcAaigCACAAaiEFDAELIAwgCGooAgAhBQsCQAJAAkAgBUHQooy7AGotAABFDQACQAJAIBAgBWoiCUF/TA0AIAIhCwJAIAkgAUYNACAJQQF0QYCIgIAAai8BACELC0EBIQkgCyAERg0BC0EAIQkLAkAgDyAFaiILQQBIDQAgAiERAkAgCyABRg0AIAtBAXRBgIiAgABqLwEAIRELIBEgBEcNACAJQQFqIQkLAkAgDiAFaiILQQBIDQAgAiERAkAgCyABRg0AIAtBAXRBgIiAgABqLwEAIRELIBEgBEcNACAJQQFqIQkLIA0gBWoiBUEASA0CIAIhCwJAIAUgAUYNACAFQQF0QYCIgIAAai8BACELCyALIARGDQEMAgsCQAJAIAVBA3RBAnQiBUEEckGAiMCSAGooAgAiCUEASA0AIAIhCwJAIAkgAUYNACAJQQF0QYCIgIAAai8BACELC0EBIQkgCyAERg0BC0EAIQkLAkAgBUEMckGAiMCSAGooAgAiC0EASA0AIAIhEQJAIAsgAUYNACALQQF0QYCIgIAAai8BACERCyARIARHDQAgCUEBaiEJCwJAIAVBFHJBgIjAkgBqKAIAIgtBAEgNACACIRECQCALIAFGDQAgC0EBdEGAiICAAGovAQAhEQsgESAERw0AIAlBAWohCQsgBUEcckGAiMCSAGooAgAiBUEASA0BIAIhCwJAIAUgAUYNACAFQQF0QYCIgIAAai8BACELCyALIARHDQELIAlBAWohCQsgCkF/c0F/IAlBAUYbIAZxIQYLIAhBCGohCCADQQZJDQALAkAgBg0AQQEPCyAGQdCfwKwAai0AAEEARyEFCyAFC6gHAQx/QQAhAUHgosy9AEEAQYCACBCCgICAABpBAEEANgLgotS9AEHgofyyAEEAQYCAEBCCgICAACECAkAgAEEBSA0AQYCIwKIAIQNBASEEQQAhBQJAA0ACQCADKAIAIgFBAXRBgIiAgABqLwEAIgZB0KHUrABqIgctAAAiCEUNAAJAAkACQCABQdCijLsAai0AAA0AIAFBBXQiCUGUiMCSAGooAgAhCiAJQYyIwJIAaigCACELIAhBA0cNAiABQQN0IQEgBkECdCACaiEMAkAgCUGEiMCSAGooAgAiCUEASA0AIAlBAXRBgIiAgABqLwEADQAgDCAMKAIAQQFqNgIACwJAIAFBAnQiAUEMckGAiMCSAGooAgAiCUEASA0AIAlBAXRBgIiAgABqLwEADQAgDCAMKAIAQQFqNgIACwJAIAFBFHJBgIjAkgBqKAIAIglBAEgNACAJQQF0QYCIgIAAai8BAA0AIAwgDCgCAEEBajYCAAsgAUEcckGAiMCSAGooAgAiAUEASA0CIAFBAXRBgIiAgABqLwEARQ0BDAILQQAoAqSijLcAIAFqIQpBACgCnKKMtwAgAWohCyAIQQNHDQEgBkECdCACaiEMAkBBACgClKKMtwAgAWoiCUF/TA0AIAlBAXRBgIiAgABqLwEADQAgDCAMKAIAQQFqNgIACwJAQQAoApyijLcAIAFqIglBAEgNACAJQQF0QYCIgIAAai8BAA0AIAwgDCgCAEEBajYCAAsCQEEAKAKkooy3ACABaiIJQQBIDQAgCUEBdEGAiICAAGovAQANACAMIAwoAgBBAWo2AgALQQAoAqyijLcAIAFqIgFBAEgNASABQQF0QYCIgIAAai8BAA0BCyAMIAwoAgBBAWo2AgALQQAhAQJAIAtBAEgNACALQQF0QYCIgIAAai8BACEBCwJAIAEgBkYNACABQdCh1KwAai0AACILRQ0AAkAgCEECRw0AIAtBAkYNAQsgBiABQQFBABCOgICAAEUNAyABIAZBf0EAEI6AgIAARQ0DC0EAIQECQCAKQQBIDQAgCkEBdEGAiICAAGovAQAhAQsgASAGRg0AIAFB0KHUrABqLQAAIghFDQACQCAHLQAAQQJHDQAgCEECRg0BCyAGIAFBAEEBEI6AgIAARQ0CIAEgBkEAQX8QjoCAgABFDQILIANBBGohAyAFQQFqIgUgAEghBCAAIAVHDQALC0F/QQAoAuCi1L0AIARBAXEbIQELIAELywIBBH8CQCAAQRB0IAFyQbHz3fF5bEERdiIEQQJ0QeCizL0AaiIFKAIAIgZFDQADQAJAIAZBBWwiBUECdCIGQbyhwKwAaigCACAARw0AIAZBwKHArABqKAIAIAFHDQAgBUECdCIGQcShwKwAaiIEIAQoAgBBAWo2AgAgBkHIocCsAGoiBCAEKAIAIAJqNgIAIAZBzKHArABqIgYgBigCACADajYCAEEBDwsgBEEBakH//wFxIgRBAnRB4KLMvQBqIgUoAgAiBg0ACwtBACEGAkBBACgC4KLUvQAiBEH//wBKDQBBASEGIAUgBEEBaiIHNgIAQQAgBzYC4KLUvQAgBEEUbCIEQdChwKwAaiAANgIAIARB1KHArABqIAE2AgAgBEHYocCsAGpBATYCACAEQdyhwKwAaiACNgIAIARB4KHArABqIAM2AgALIAYLALQBBG5hbWUBmAEPAAZqc19wb3cBBmpzX2V4cAIGbWVtc2V0Awdwb2ludGVyBARpbml0BRBnZW9tZXRyeV92ZXJzaW9uBgZyYXN0ZXIHBmVuZXJneQgIYWRoZXNpb24JDHNoYXBlX2VuZXJneQoDcnVuCwxyYW5kb21fdmFsdWUMCmxvY2FsX2JvZHkNCGNvbnRhY3RzDgthZGRfY29udGFjdAcSAQAPX19zdGFja19wb2ludGVyACYJcHJvZHVjZXJzAQxwcm9jZXNzZWQtYnkBBWNsYW5nBjE2LjAuMAAsD3RhcmdldF9mZWF0dXJlcwIrD211dGFibGUtZ2xvYmFscysIc2lnbi1leHQ=';
 var CPM = (function (exports, module$1) {
 	'use strict';
 
@@ -11697,7 +11710,7 @@ var CPM = (function (exports, module$1) {
       this.grid=view(Uint16Array,0,n);this.activity=view(Uint8Array,1,n);this.degree=view(Uint8Array,2,n);this.nc=view(Uint8Array,3,n);this.neighbors=view(Int32Array,4,n*8);this.rings=view(Int32Array,5,n*8);this.pool=view(Int32Array,6,n);this.mt=view(Uint32Array,7,625);this.cells=view(Float64Array,8,65536*stride);this.params=view(Float64Array,9,64);this.connected=view(Uint8Array,10,256);this.log=view(Uint32Array,11,n*2+2);this.previous=[];
       if(!s.section)throw Error('The WASM kernel requires cross-section mechanics');
       this.connected.set(s.connected4);
-      this.contactData=view(Int32Array,12,16384*5);this.contactPresent=view(Uint8Array,13,65536);
+      this.contactData=view(Int32Array,12,16384*5);this.contactPresent=view(Uint8Array,13,65536);this.freeMembrane=view(Int32Array,23,65536);
       this.bondKeys=view(Uint32Array,14,BONDS);this.bondStrength=view(Float64Array,15,BONDS);this.bondSlots=[];
       this.segments=view(Float32Array,16,SEGMENTS*6);
       if(e.raster){const size=s.width*s.height;this.rasterKind=view(Uint8Array,17,65536);this.rasterVisited=view(Uint8Array,18,n);this.rasterGrid=view(Uint16Array,19,size);this.rasterActivity=view(Uint8Array,20,size);this.rasterWalls=view(Uint8Array,21,size);this.rasterCounts=view(Uint32Array,22,3);}
@@ -11739,12 +11752,12 @@ var CPM = (function (exports, module$1) {
       C.time++;C.stat_values={};for(const listener of C.post_mcs_listeners)listener();
     }
     contacts(){
-      const s=this.s,C=s.C,live=s.live();this.grid.set(C.grid._pixels.subarray(0,this.length));this.pool.set(C.borderpixels.elements);this.contactPresent.fill(0);for(const m of live)this.contactPresent[m.id]=1;
+      const s=this.s,C=s.C,live=s.live();this.grid.set(C.grid._pixels.subarray(0,this.length));this.pool.set(C.borderpixels.elements);this.contactPresent.fill(0);for(const m of live)this.contactPresent[m.id]=m.kind===1?3:1;
       for(const [id,kind]of Object.entries(C.t2k))if(kind===4)this.contactPresent[Number(id)]=2;
       const count=this.e.contacts(C.borderpixels.length);if(count<0)return this.originalContacts();
       for(const m of live){let map=s.contacts.get(m.id);if(!map){map=new Map();s.contacts.set(m.id,map);}map.clear();}
       for(let n=0;n<count;n++){const i=n*5,d=this.contactData;if(s.cells[d[i]])s.contacts.get(d[i]).set(d[i+1],{id:d[i+1],length:d[i+2],nx:d[i+3],ny:d[i+4]});}
-      for(const m of live){let length=0;for(const e of s.contacts.get(m.id).values())length+=e.length;m.confinement=Math.max(0,Math.min(1,length/Math.max(1,4*Math.sqrt(C.getVolume(m.id)))));}
+      for(const m of live){let length=0;for(const e of s.contacts.get(m.id).values())length+=e.length;m.confinement=Math.max(0,Math.min(1,length/Math.max(1,4*Math.sqrt(C.getVolume(m.id)))));m.freeMembrane=this.freeMembrane[m.id];m.freeFraction=m.freeMembrane/Math.max(1,m.freeMembrane+length);}
       return s.contacts;
     }
     raster(){
@@ -11780,11 +11793,11 @@ var CPM = (function (exports, module$1) {
     let x=i32(i%p.width);let y=i32(i/p.width);let c=input[i].xyz;
     let lap=sample(x-1,y,c)+sample(x+1,y,c)+sample(x,y-1,c)+sample(x,y+1,c)-4.*c;
     let d=max(vec3f(0.),c+vec3f(.10,.065,.045)*lap);let o=d.x;let g=d.y;let a=d.z;
-    let r=density[i].xyz;let lo=.55*r.x+r.y+.7*r.z;let lg=.4*r.x+1.35*r.y+.8*r.z;
+    let r=density[i].xyz;let lo=r.x;let lg=r.y;
     let supply=p.supply*(.65+.35*density[i].w);let clearance=p.supply*density[i].w;
     let no=o+.012*supply*(1.-o)-.024*p.metabolism*lo*o/(.2+o);
     let ng=g+.010*supply*(1.-g)-.023*p.metabolism*lg*g/(.15+g);
-    let na=a+.014*p.metabolism*(.3*r.x+1.2*r.y+.45*r.z)*g/(.15+g)*(1.+.8*(1.-o))-.009*clearance*a;
+    let na=a+.014*p.metabolism*r.z*g/(.15+g)*(1.+.8*(1.-o))-.009*clearance*a;
     output[i]=vec4f(clamp(vec3f(no,ng,na),vec3f(0.),vec3f(1.)),0.);
   }`;
   class GPUFields {
@@ -11807,7 +11820,7 @@ var CPM = (function (exports, module$1) {
       if(this.dead)throw Error(this.loss||'WebGPU device lost');
       if(!Number.isInteger(dt)||dt<1)throw Error('GPU field step requires positive integral MCS');
       const {oxygen,glucose,acid}=s.fields,n=this.n,d=this.device;
-      for(let i=0;i<n;i++){this.state[i*4]=oxygen.values[i];this.state[i*4+1]=glucose.values[i];this.state[i*4+2]=acid.values[i];this.mass[i*4]=s.loads[1][i];this.mass[i*4+1]=s.loads[2][i];this.mass[i*4+2]=s.loads[3][i];this.mass[i*4+3]=s.supplyMap[i];this.mask[i]=oxygen.blocked[i];}
+      for(let i=0;i<n;i++){this.state[i*4]=oxygen.values[i];this.state[i*4+1]=glucose.values[i];this.state[i*4+2]=acid.values[i];this.mass[i*4]=s.metabolicLoads[0][i];this.mass[i*4+1]=s.metabolicLoads[1][i];this.mass[i*4+2]=s.metabolicLoads[2][i];this.mass[i*4+3]=s.supplyMap[i];this.mask[i]=oxygen.blocked[i];}
       const u=new Uint32Array(this.uniform),f=new Float32Array(this.uniform);u[0]=this.width;u[1]=this.height;u[2]=s.wrap?1:0;f[4]=s.normalSupportReport().effectiveSupply;f[5]=s.settings.metabolism;
       d.queue.writeBuffer(this.buffers[0],0,this.state);d.queue.writeBuffer(this.loads,0,this.mass);d.queue.writeBuffer(this.blocked,0,this.mask);d.queue.writeBuffer(this.params,0,this.uniform);
       const e=d.createCommandEncoder();for(let j=0;j<dt;j++){const pass=e.beginComputePass();pass.setPipeline(this.pipeline);pass.setBindGroup(0,this.groups[j%2]);pass.dispatchWorkgroups(Math.ceil(n/64));pass.end();}
@@ -12053,6 +12066,11 @@ var CPM = (function (exports, module$1) {
   const DEFAULTS={normalMotility:.08,tumorMotility:.7,immuneMotility:1,chemotaxis:1.6,alignment:.8,cohesion:1,repulsion:.7,immuneSeparation:1,noise:.6,halfLife:140,growth:.8,apoptosis:8,antigen:65,kill:1,temperature:12,supply:1.8,metabolism:1,escape:2,recruitment:1,immuneGrowth:.35,immuneDivisions:3,mutation:6,mutationSize:.16,sectionYield:.35,stressMutation:1,inflammation:0,progression:1,tumorMorphology:0,branchLength:2.8,branchStrength:5,networkAdhesion:1,branching:1};
   const clamp=(v,lo=0,hi=1)=>Math.max(lo,Math.min(hi,v));
   Object.assign(DEFAULTS,{normalSupport:0,immuneKillLimit:10});
+  Object.assign(DEFAULTS,{cycleCoupling:1,reserveCapacity:80,replicationStress:1,dnaRepair:1,checkpointIntegrity:1,traitCost:.45,normalRepair:.25,normalDivisions:4});
+  Object.assign(DEFAULTS,{stemFraction:20,stemSymmetry:30,stemRenewal:60,stemCycleSlowdown:1.35,stemRepair:1.4,stemPlasticity:.25,tumorProgenyLimit:0});
+  const MODEL_REVISION='2026-11-cycle-stemness-1';
+  // Dimensionless phase-specific uptake and expenditure, not measured ATP units.
+  const PHASE_RESOURCE={G0:[.65,.65,.6,.48,.18],G1:[1.1,1.3,1.2,.85,.8],S:[1.25,1.15,1.0,.9,1.05],G2:[1.2,1.1,1.0,.8,.65],M:[1.3,1.15,1.1,1.15,.3]};
   // Phenomenological MCS parameters; not hours or molecular concentrations.
   Object.assign(DEFAULTS,{tumorCycle:240,tumorQuiescence:1,immuneCycle:220,antigenMemory:900,il2Secretion:1,il2HalfLife:180,exhaustionRate:1});
   Object.assign(DEFAULTS,{normalMutationGain:2,tumorMutationGain:2,mutationBias:0,antigenStressGain:.5,contactEscape:.1,signalEscape:.05,evolutionMemory:800});
@@ -12070,6 +12088,8 @@ var CPM = (function (exports, module$1) {
   // than combining unrelated extremes or pre-planting malignant cells.
   Object.assign(RANDOM_RANGES,{supply:[2.3,2.8,.05],metabolism:[1.05,1.3,.05],stressMutation:[3,6,.5],progression:[1.5,4,.5],inflammation:[.6,1.6,.1],normalMutationGain:[3,6,.5],tumorMutationGain:[3,7,.5],growth:[.8,1.35,.05],tumorMotility:[.6,1.2,.05],normalMotility:[.05,.15,.05],immuneMotility:[1,1.4,.05],kill:[1,1.8,.1],recruitment:[1,2,.1],immuneGrowth:[.3,.65,.05],immuneDivisions:[3,4,1],immuneCycle:[180,240,20],antigenMemory:[900,1500,100],tumorCycle:[180,280,20],chemotaxis:[1.5,2.5,.1],escape:[1.8,3,.1],mutation:[8,16,1],mutationSize:[.12,.24,.02],antigenStressGain:[.5,1.5,.1],contactEscape:[.2,.8,.1],signalEscape:[.1,.4,.05],damagePolarization:[2.5,4.5,.25],damageDeactivation:[.7,1.5,.1],suppressiveSecretion:[1,1.8,.1],suppressionStrength:[.8,1.6,.1],suppressionRecovery:[1,2.5,.25],immuneRegulationMemory:[150,350,50],tumorMorphology:[0,1,1]});
   Object.assign(RANDOM_RANGES,{normalSupport:[20,50,5],immuneKillLimit:[8,15,1]});
+  Object.assign(RANDOM_RANGES,{cycleCoupling:[.7,1,.1],reserveCapacity:[60,120,10],replicationStress:[.7,1.3,.1],dnaRepair:[.7,1.3,.1],checkpointIntegrity:[.7,1,.1],traitCost:[.2,.7,.1],normalRepair:[.15,.4,.05],normalDivisions:[3,5,1]});
+  Object.assign(RANDOM_RANGES,{stemFraction:[10,30,5],stemSymmetry:[20,40,5],stemRenewal:[45,65,5],stemCycleSlowdown:[1.15,1.6,.05],stemRepair:[1.1,1.6,.1],stemPlasticity:[.1,.5,.05],tumorProgenyLimit:[0,0,1]});
   function randomSettings(seed){
     let state=seed>>>0;
     const random=()=>{state=(state+0x6d2b79f5)>>>0;let n=Math.imul(state^(state>>>15),1|state);n^=n+Math.imul(n^(n>>>7),61|n);return ((n^(n>>>14))>>>0)/4294967296;};
@@ -12218,6 +12238,7 @@ var CPM = (function (exports, module$1) {
       if(!Number.isInteger(width)||!Number.isInteger(height)||width<32||height<24||width>1024||height>768)throw Error('计算格点需在 32×24 至 1024×768 内，请降低区域或精细度');
       this.worldWidth=width/this.scale;this.worldHeight=height/this.scale;this.fieldScale=scene==='maze'?Math.max(1,Math.round(this.scale*1.25)):FIELD_SCALE*this.scale;
       this.width=width;this.height=height;this.scene=scene;this.seedValue=seed;this.wrap=boundary==='wrap';this.boundary=boundary;
+      this.initialWarmup=warmup;
       this.settings={...DEFAULTS,...(scene==='random'?randomSettings(seed):PRESETS[scene]?.settings||{}),...settings};
       // Legacy saved configurations may contain a population budget. It has
       // no biological meaning and must not influence this run or its report.
@@ -12227,6 +12248,7 @@ var CPM = (function (exports, module$1) {
       this.counters={manualRemoved:0,divisions:0,immuneDivisions:0,kills:0,apoptosis:0,environment:0,apoptosisStarted:0,killStarted:0,environmentStarted:0,recognitions:0,mutations:0,abnormalInitiations:0,malignantTransitions:0,abnormalKills:0,normalEnvironmentDeaths:0,abnormalEnvironmentDeaths:0};this.birthSerial=0;this.lineage=[];this.deathHistory=[];this.recentClearances=[];this.manualDeathRemovals={spontaneous:0,kill:0,environment:0};
       this.deathEffects=[];this.sources=[];this.sourceSerial=0;
       this.counters.lifespan=0;this.counters.lifespanStarted=0;this.manualDeathRemovals.lifespan=0;
+      this.counters.normalDivisions=0;this.counters.replicationDeaths=0;Object.assign(this.counters,{stemAsymmetric:0,stemSelfRenewal:0,stemDifferentiation:0,stemReversions:0});
       Object.assign(this.counters,{normalTraitMutations:0,stressMutations:0,antigenExposures:0,antigenEscapes:0});
       Object.assign(this.counters,{suppressiveTransitions:0,suppressiveRecoveries:0,injuryDeactivations:0,signalDeactivations:0});
       const s=this.settings;
@@ -12300,6 +12322,8 @@ var CPM = (function (exports, module$1) {
       this.densities=[null,new Float32Array(bins),new Float32Array(bins),new Float32Array(bins)];
       this.densityFields=[null,...[1,2,3].map(()=>new SignalField(this.fields.oxygen.width,this.fields.oxygen.height,this.wrap))];
       this.massFields=[null,...[1,2,3].map(()=>new SignalField(this.fields.oxygen.width,this.fields.oxygen.height,this.wrap))];
+      this.metabolicFields=[0,1,2].map(()=>new SignalField(this.fields.oxygen.width,this.fields.oxygen.height,this.wrap));
+      for(const f of this.metabolicFields)f.blocked=this.fields.oxygen.blocked;
       for(const f of this.densityFields.slice(1))f.blocked=this.fields.oxygen.blocked;
       for(const f of this.massFields.slice(1))f.blocked=this.fields.oxygen.blocked;
       this.binAreas=new Float32Array(bins);for(let y=0;y<height;y++)for(let x=0;x<width;x++)this.binAreas[this.fieldIndex(x,y)]++;
@@ -12344,6 +12368,9 @@ var CPM = (function (exports, module$1) {
       m.state=kind===NORMAL?'normal':kind===TUMOR?'tumor':'immune';m.origin=m.state;m.abnormalAge=0;m.abnormalSince=null;m.transformedAt=null;m.immuneCue=0;m.inflammatorySignal=0;m.inflammatoryExposure=0;
       m.nucleusStrainX=0;m.nucleusStrainY=0;m.fieldBins=new Map();m.sectionFraction=1;m.sectionPressure=0;m.hasNucleus=false;if(genome)this.applyGenome(m);
       m.cycle=newCycle();m.antigenMemory=0;m.il2=0;m.il2Response=0;m.il2Production=0;m.chronicStimulation=0;m.exhaustion=0;
+      m.resources={energy:.65,precursor:.65,dnaDamage:0};m.freeMembrane=0;m.freeFraction=0;
+      if(kind===NORMAL)m.divisionsLeft=this.settings.normalDivisions;
+      this.initializeStemness(m);
       m.normalTolerance=1;m.mutationPressure=0;m.immuneEncounters=0;m.immuneContactMemory=0;m.recruitmentExposure=0;m.lastAntigenChange=null;m.tumorKills=0;
       m.immunePhenotype=kind===IMMUNE?'cytotoxic':null;m.normalDamageExposure=0;m.inhibition=0;m.immuneRefractory=0;m.recruitmentTargetID=0;m.recruitmentTargetBirth=0;
       this.cells[id]=m;this.contacts.set(id,new Map());this.updateMechanics(m);return m;
@@ -12355,6 +12382,7 @@ var CPM = (function (exports, module$1) {
       // A first stochastic alteration exposes a weak antigen, but retains normal
       // mechanics and metabolism. It does not grant a proliferative phenotype.
       m.state='abnormal';m.name='癌前细胞';m.abnormalSince=this.C.time;m.abnormalAge=0;
+      m.cycle=newCycle();
       m.antigenLevel=.2+.35*this.C.random();m.antigen=m.antigenLevel>=.18;
       this.counters.abnormalInitiations++;this.log('abnormal',id,0,{antigen:m.antigenLevel,stress:m.stress,adversity:m.adversity,inflammatoryExposure:m.inflammatoryExposure,inflammation:this.settings.inflammation});return true;
     }
@@ -12364,8 +12392,9 @@ var CPM = (function (exports, module$1) {
       // lineage and the already occupied nuclear disk; never reseed or teleport.
       for(const [bin,pixels] of m.fieldBins){this.occupancy[NORMAL][bin]-=pixels;this.occupancy[TUMOR][bin]+=pixels;}
       this.C.setCellKind(id,TUMOR);m.kind=TUMOR;m.state='tumor';m.name=TYPE_NAMES[TUMOR];m.base=330*this.scale*this.scale;m.age=0;m.transformedAt=this.C.time;
+      m.divisionsLeft=null;
       m.genome={tolerance:clamp((.85+.3*this.C.random())*(PRESETS[this.scene]?.founderTolerance||1)*m.normalTolerance,.25,3),proliferation:.85+.3*this.C.random(),invasion:.85+.3*this.C.random(),antigen:m.antigenLevel};
-      m.cycle=newCycle();this.applyGenome(m);this.updateMechanics(m);this.C.stat_values={};
+      m.cycle=newCycle();this.initializeStemness(m);this.applyGenome(m);this.updateMechanics(m);this.C.stat_values={};
       this.counters.malignantTransitions++;this.log('malignant',id,0,{clone:m.clone,genome:{...m.genome}});return true;
     }
     sampleInflammation(m,dt){
@@ -12440,7 +12469,7 @@ var CPM = (function (exports, module$1) {
     updateMechanics(m){
       if(this.section)this.section.sync(m);
       const invasion=m.genome?.invasion||1;
-      const speed=this.settings[['','normalMotility','tumorMotility','immuneMotility'][m.kind]]*(m.kind===TUMOR?invasion:1)*(m.kind===IMMUNE?Math.max(.04,m.fitness):Math.max(.12,m.fitness));
+      const speed=this.settings[['','normalMotility','tumorMotility','immuneMotility'][m.kind]]*(m.kind===TUMOR?invasion*this.traitEconomy(m).migration:1)*(m.kind===IMMUNE?Math.max(.04,m.fitness):Math.max(.12,m.fitness));
       const contactGate=(m.targetID?.08:m.kind===IMMUNE&&m.phase==='scan'?.55:1)*(m.cycle?.phase==='M'?.2:1)*(m.kind===IMMUNE?1-.45*(m.exhaustion||0):1);
       m.activity=m.dying?0:[0,50,180,240][m.kind]*speed*contactGate;
       m.drive=m.dying?0:[0,7,17,25][m.kind]*speed*contactGate;
@@ -12708,15 +12737,16 @@ var CPM = (function (exports, module$1) {
     clearWalls(){const points=[...this.C.pixels()].filter(([,id])=>this.C.cellKind(id)===WALL).map(([p])=>p);for(const p of points)this.C.setpix(p,0);if(this.maze){this.maze.curves=[];this.maze.cutouts=[];this.maze.wallID=0;}this.wallID=0;this.C.stat_values={};this.rebuildMask();}
     scanContacts(){
       const contacts=this.contacts,grid=this.C.grid._pixels;
-      for(const m of this.live()){let map=contacts.get(m.id);if(!map){map=new Map();contacts.set(m.id,map);}map.clear();}
+      for(const m of this.live()){let map=contacts.get(m.id);if(!map){map=new Map();contacts.set(m.id,map);}map.clear();m.freeMembrane=0;}
       const add=(a,b,dx,dy)=>{if(!this.cells[a])return;const map=contacts.get(a);let edge=map.get(b);if(!edge){edge={id:b,length:0,nx:0,ny:0};map.set(b,edge);}edge.length++;edge.nx+=dx;edge.ny+=dy;};
       const present=id=>!!this.cells[id]||this.C.cellKind(id)===WALL;
       for(const i of this.C.borderpixels.elements){
         const a=grid[i];if(!present(a))continue;const ring=this.rings[i];
+        if(this.cells[a]?.kind===NORMAL)for(const j of this.faces[i])if(j>=0&&grid[j]===0)this.cells[a].freeMembrane++;
         const right=ring[3],b=right<0?0:grid[right];if(a!==b&&present(b)){add(a,b,1,0);add(b,a,-1,0);}
         const down=ring[5],c=down<0?0:grid[down];if(a!==c&&present(c)){add(a,c,0,1);add(c,a,0,-1);}
       }
-      for(const m of this.live()){let length=0;for(const e of contacts.get(m.id).values())length+=e.length;m.confinement=clamp(length/Math.max(1,4*Math.sqrt(this.C.getVolume(m.id))));}
+      for(const m of this.live()){let length=0;for(const e of contacts.get(m.id).values())length+=e.length;m.confinement=clamp(length/Math.max(1,4*Math.sqrt(this.C.getVolume(m.id))));m.freeFraction=m.freeMembrane/Math.max(1,m.freeMembrane+length);}
       return this.contacts;
     }
     fieldIndex(x,y){return Math.floor(y/this.fieldScale)*this.fields.oxygen.width+Math.floor(x/this.fieldScale);}
@@ -12735,29 +12765,32 @@ var CPM = (function (exports, module$1) {
       // local metabolic budget. Keep its contribution in the same local bins.
       {
         for(let kind=1;kind<=3;kind++)this.massFields[kind].values.fill(0);
+        for(const f of this.metabolicFields)f.values.fill(0);
         for(const m of this.live()){
           const cycling=m.cycle.phase!=='G0'&&!m.cycle.arrest;
           // The same phase-weighted loads feed both CPU and WebGPU reactions.
           // Keep density geometric; quiescence saves resources, not occupied area.
           const demand=m.dying?.6:m.kind===TUMOR?(cycling?1.15:.6):m.kind===IMMUNE?(cycling?1.35:.8):1;
-          for(const [i,pixels] of m.fieldBins)if(!blocked[i])this.massFields[m.kind].values[i]+=demand*pixels/((this.section?Math.max(.5,m.sectionFraction):1)*this.binAreas[i]);
+          const profile=this.metabolicProfile(m);
+          for(const [i,pixels] of m.fieldBins)if(!blocked[i]){const mass=pixels/((this.section?Math.max(.5,m.sectionFraction):1)*this.binAreas[i]);this.massFields[m.kind].values[i]+=demand*mass;this.metabolicFields[0].values[i]+=profile.oxygen*mass;this.metabolicFields[1].values[i]+=profile.glucose*mass;this.metabolicFields[2].values[i]+=profile.acid*mass;}
         }
         this.loads=[null];for(let kind=1;kind<=3;kind++){const f=this.massFields[kind];f.step(.2,0);f.step(.2,0);this.loads[kind]=f.values;}
+        this.metabolicLoads=this.metabolicFields.map(f=>{f.step(.2,0);f.step(.2,0);return f.values;});
       }
     }
     integrateEnvironment(dt){
       const {oxygen,glucose,acid}=this.fields,blocked=oxygen.blocked,n=oxygen.values.length;
       const effectiveSupply=this.normalSupportReport().effectiveSupply;
-      const [_,rn,rt,ri]=this.loads;
+      const [loadOxygen,loadGlucose,loadAcid]=this.metabolicLoads;
       for(let remaining=dt;remaining>0;remaining--){const sub=Math.min(1,remaining);
         oxygen.step(.10*sub,0);glucose.step(.065*sub,0);acid.step(.045*sub,0);
         for(let i=0;i<n;i++){
           if(blocked[i])continue;
           const o=oxygen.values[i],g=glucose.values[i],a=acid.values[i],s=effectiveSupply*(.65+.35*this.supplyMap[i]),clearance=effectiveSupply*this.supplyMap[i],k=this.settings.metabolism;
-          const loadO=.55*rn[i]+rt[i]+.7*ri[i],loadG=.4*rn[i]+1.35*rt[i]+.8*ri[i];
+          const loadO=loadOxygen[i],loadG=loadGlucose[i];
           oxygen.values[i]=clamp(o+sub*(.012*s*(1-o)-.024*k*loadO*o/(.2+o)));
           glucose.values[i]=clamp(g+sub*(.010*s*(1-g)-.023*k*loadG*g/(.15+g)));
-          acid.values[i]=clamp(a+sub*(.014*k*(.3*rn[i]+1.2*rt[i]+.45*ri[i])*g/(.15+g)*(1+.8*(1-o))-.009*clearance*a));
+          acid.values[i]=clamp(a+sub*(.014*k*loadAcid[i]*g/(.15+g)*(1+.8*(1-o))-.009*clearance*a));
         }
       }
     }
@@ -13100,24 +13133,93 @@ var CPM = (function (exports, module$1) {
       m.exhaustion=clamp(m.exhaustion+dt*this.settings.exhaustionRate*m.chronicStimulation**2/2400-(signal?0:dt*(1-m.chronicStimulation)/5000));
       m.il2=this.fieldOnCell(m,'il2');m.il2Response=m.il2/(.15+m.il2)*(.15+.85*m.antigenMemory);
     }
+    initializeStemness(m){
+      m.isStem=m.kind===TUMOR&&this.settings.stemFraction>0&&this.C.random()<this.settings.stemFraction/100;m.stemNiche=0;
+      m.tumorDivisionsLeft=m.kind===TUMOR&&!m.isStem&&this.settings.tumorProgenyLimit>0?this.settings.tumorProgenyLimit:null;
+    }
+    stemProgram(m,dt){
+      if(dt<=0||m.dying||m.kind!==TUMOR)return;
+      // A local, sustained hypoxic niche is a proxy for plasticity signals.
+      // This is not a claim that hypoxia alone universally makes a CSC.
+      const niche=clamp((.55-m.oxygen)/.4)*clamp((m.glucose-.1)/.3);
+      m.stemNiche+=(niche-m.stemNiche)*(-Math.expm1(-dt/240));
+      if(m.isStem||!this.settings.stemPlasticity||m.stemNiche<.2||m.fitness<.15||m.resources.energy<.15)return;
+      const hazard=.00003*this.settings.stemPlasticity*m.stemNiche*m.stemNiche;
+      if(this.C.random()<-Math.expm1(-hazard*dt)){m.isStem=true;m.tumorDivisionsLeft=null;this.counters.stemReversions++;this.log('stem-reversion',m.id,0,{niche:m.stemNiche});}
+    }
+    stemDivision(m,daughter,parentStem,parentBudget){
+      if(m.kind!==TUMOR)return '';
+      let mode='differentiated',fates=[false,false];
+      if(parentStem){
+        if(this.C.random()<this.settings.stemSymmetry/100){
+          const renew=this.C.random()<this.settings.stemRenewal/100;fates=[renew,renew];mode=renew?'self-renewal':'differentiation';
+          this.counters[renew?'stemSelfRenewal':'stemDifferentiation']++;
+        }else{const first=this.C.random()<.5;fates=[first,!first];mode='asymmetric';this.counters.stemAsymmetric++;}
+      }
+      for(const [i,c]of [m,daughter].entries()){
+        c.isStem=fates[i];c.stemNiche=m.stemNiche;
+        c.tumorDivisionsLeft=c.isStem?null:parentStem?(this.settings.tumorProgenyLimit||null):parentBudget===null?null:Math.max(0,parentBudget-1);
+      }
+      return mode;
+    }
+    traitEconomy(m){
+      if(m.kind!==TUMOR||!m.genome||!this.settings.traitCost)return {demand:1,growth:1,migration:1};
+      const g=m.genome,k=this.settings.traitCost,p=Math.max(0,g.proliferation-1),v=Math.max(0,g.invasion-1),t=Math.max(0,g.tolerance-1);
+      return {demand:1+k*(.35*p*p+.25*v*v+.2*t*t),growth:1/(1+k*(.2*v*v+.15*t*t)),migration:1/(1+k*.2*p*p)};
+    }
+    metabolicProfile(m){
+      const cycling=m.cycle.phase!=='G0'&&!m.cycle.arrest,legacy=m.dying?.6:m.kind===TUMOR?(cycling?1.15:.6):m.kind===IMMUNE?(cycling?1.35:.8):1;
+      const base=m.kind===TUMOR?[1,1.35,1.2]:m.kind===IMMUNE?[.7,.8,.45]:[.55,.4,.3];
+      const phase=PHASE_RESOURCE[m.cycle.phase],k=m.dying?0:this.settings.cycleCoupling,cost=this.traitEconomy(m).demand;
+      // Arrested effectors may remain activated; cell cycle is not effector state.
+      const effector=m.kind===IMMUNE&&m.activation>0&&m.immunePhenotype!=='suppressive',active=cycling||effector;
+      const factors=m.kind===NORMAL&&!cycling?[1,1,1]:active?phase:PHASE_RESOURCE.G0;
+      const phaseFloor=effector?1.15:0;
+      return {oxygen:base[0]*((1-k)*legacy+k*Math.max(phaseFloor,factors[0]))*cost,glucose:base[1]*((1-k)*legacy+k*Math.max(phaseFloor,factors[1]))*cost,acid:base[2]*((1-k)*legacy+k*Math.max(phaseFloor,factors[2]))*cost,energyCost:(active?phase[3]:.48)*cost+(effector?.18:0),materialCost:cycling?phase[4]:.18};
+    }
+    reserveAmounts(m){const capacity=this.settings.reserveCapacity*Math.max(.05,m.target/Math.max(1,m.base));return {energy:capacity*m.resources.energy,precursor:capacity*m.resources.precursor};}
+    updateResources(m,dt){
+      const k=this.settings.cycleCoupling;if(!k||dt<=0||m.dying)return;
+      const r=m.resources,p=this.metabolicProfile(m),capacity=this.settings.reserveCapacity;
+      const acid=clamp(1-.85*m.acid/Math.sqrt(m.genome?.tolerance||m.normalTolerance||1)),glucose=1.15*m.glucose/(.15+m.glucose),oxygen=1.2*m.oxygen/(.2+m.oxygen);
+      // Finite buffered pools. No glucose means no replenishment even in G0.
+      const intake=glucose*(.25+.75*oxygen)*acid;
+      r.energy=clamp(r.energy+dt*k*(1.35*intake-p.energyCost)/capacity);
+      r.precursor=clamp(r.precursor+dt*k*(1.2*glucose*acid-p.materialCost)/capacity);
+      const shortage=.7*clamp((.4-r.energy)/.4)+.9*clamp((.35-r.precursor)/.35)+.5*clamp((.18-m.oxygen)/.18);
+      const injury=m.cycle.phase==='S'?this.settings.replicationStress*(shortage+.12*m.acid)/300:0;
+      const repair=this.settings.dnaRepair*(m.isStem?this.settings.stemRepair:1)*Math.min(r.energy,r.precursor)*acid*(m.cycle.phase==='S'?.35:1)/500;
+      const repaired=Math.min(r.dnaDamage,dt*k*repair);r.dnaDamage=clamp(r.dnaDamage+dt*k*injury-repaired);
+      r.energy=clamp(r.energy-repaired*.15);r.precursor=clamp(r.precursor-repaired*.2);
+      if(r.dnaDamage>=.98&&this.beginDeath(m.id,'environment')){m.deathRecord.trigger='replication';this.counters.replicationDeaths++;}
+    }
     cycleStep(m,dt){
+      if(dt<=0)return;
       const c=m.cycle,immune=m.kind===IMMUNE,s=this.settings;
+      const normal=m.kind===NORMAL,committed=['S','G2','M'].includes(c.phase),economy=this.traitEconomy(m);
       if(immune)this.immuneProgram(m,dt);
+      this.updateResources(m,dt);if(m.dying)return;
       const area=this.C.getVolume(m.id),fraction=this.section?m.sectionFraction:1;
       const ratio=area/Math.max(1,m.target*fraction);
       // Trigger within the finite deformation allowance: at default sensitivity
       // the gate is reached at ~87% of the current section target, before 82%.
       c.pressure=clamp((.96-ratio)/.12);
-      const capacity=immune?s.immuneGrowth*2:s.growth*m.genome.proliferation;
-      const nutrientRate=m.fitness*(1-m.stress);
-      const committed=['S','G2','M'].includes(c.phase),il2Support=immune&&committed?m.il2/(.15+m.il2)*Math.max(.4,.15+.85*m.antigenMemory):m.il2Response;
+      const capacity=normal?s.normalRepair:immune?s.immuneGrowth*2:s.growth*m.genome.proliferation*economy.growth;
+      const stored=Math.min(1,m.resources.energy/.25,m.resources.precursor/.25)*clamp(1-.85*m.acid/Math.sqrt(m.genome?.tolerance||1));
+      const nutrientRate=(m.fitness*(1-s.cycleCoupling)+stored*s.cycleCoupling)*(1-m.stress);
+      const il2Support=immune&&committed?m.il2/(.15+m.il2)*Math.max(.4,.15+.85*m.antigenMemory):m.il2Response;
       c.drive=capacity*nutrientRate*(immune?il2Support*(1-m.exhaustion)**2:1);
       let reason='';
       if(immune&&(m.immunePhenotype==='suppressive'||m.immuneRefractory>0))reason='suppression';
       else if(capacity<=0)reason='disabled';
-      else if(m.oxygen<.12||m.glucose<.15||nutrientRate<.16)reason='nutrients';
+      else if(m.kind===TUMOR&&!m.isStem&&m.tumorDivisionsLeft===0)reason='lineage';
+      else if(normal&&m.divisionsLeft<=0)reason='lineage';
+      else if(normal&&!committed&&m.freeFraction<.12)reason='contact';
+      else if(m.oxygen<(committed&&s.cycleCoupling?.04:.12)||m.glucose<(committed&&s.cycleCoupling?.03:.15)||nutrientRate<.16)reason='nutrients';
       else if(m.acid>.8)reason='acid';
       else if(m.damage>.55||m.stress>.75)reason='injury';
+      else if(s.cycleCoupling&&Math.min(m.resources.energy,m.resources.precursor)<(committed?.08:.22))reason='reserve';
+      else if(s.cycleCoupling&&m.resources.dnaDamage>(1-.55*(normal||immune?1:s.checkpointIntegrity)))reason='dna';
       else if(immune&&m.divisionsLeft<=0)reason='lineage';
       else if(immune&&m.exhaustion>.72)reason='exhaustion';
       else if(immune&&!committed&&m.antigenMemory<.2)reason='antigen';
@@ -13138,9 +13240,11 @@ var CPM = (function (exports, module$1) {
         if(c.entry>=20+(m.birth%5)*2){c.phase='G1';c.progress=0;c.entry=0;}
         return;
       }
-      const desired=m.base*(immune?1.7:1),growth=immune?s.immuneGrowth:s.growth*m.genome.proliferation;
+      const desired=m.base*(normal?2:immune?1.7:1),growth=normal?s.normalRepair:immune?s.immuneGrowth:s.growth*m.genome.proliferation*economy.growth;
+      const massBefore=m.target,amounts=this.reserveAmounts(m);
       this.growTarget(m,desired,dt*this.scale*this.scale*growth*nutrientRate*(immune?il2Support*(1-m.exhaustion)**2:1));
-      const duration=(immune?s.immuneCycle:s.tumorCycle)*CYCLE_FRACTIONS[c.phase];
+      if(s.cycleCoupling&&m.target>massBefore){const newCapacity=s.reserveCapacity*Math.max(.05,m.target/m.base);m.resources.energy=clamp(amounts.energy/newCapacity);m.resources.precursor=clamp(amounts.precursor/newCapacity);}
+      const duration=(normal?360:immune?s.immuneCycle:s.tumorCycle*(m.isStem?s.stemCycleSlowdown:1))*CYCLE_FRACTIONS[c.phase];
       c.progress=Math.min(1,c.progress+dt*c.drive/duration);
       // Biomass is a separate checkpoint. Time alone never makes cytoplasm.
       const minimum=c.phase==='G1'?desired*.68:desired*.98;
@@ -13153,8 +13257,8 @@ var CPM = (function (exports, module$1) {
       if(!this.divide(m.id)){c.arrest='geometry';c.retry=12;}
     }
     cycleReport(){
-      const report={tumor:{G0:0,G1:0,S:0,G2:0,M:0,arrested:0},immune:{G0:0,G1:0,S:0,G2:0,M:0,arrested:0}};
-      for(const m of this.live())if(!m.dying&&(m.kind===TUMOR||m.kind===IMMUNE)){const r=report[m.kind===TUMOR?'tumor':'immune'];r[m.cycle.phase]++;if(m.cycle.phase!=='G0'&&m.cycle.arrest)r.arrested++;}
+      const report=Object.fromEntries(['normal','tumor','immune'].map(k=>[k,{G0:0,G1:0,S:0,G2:0,M:0,arrested:0}]));
+      for(const m of this.live())if(!m.dying&&m.state!=='abnormal'){const r=report[m.kind===TUMOR?'tumor':m.kind===IMMUNE?'immune':'normal'];r[m.cycle.phase]++;if(m.cycle.phase!=='G0'&&m.cycle.arrest)r.arrested++;}
       return report;
     }
     biology(dt){
@@ -13179,13 +13283,15 @@ var CPM = (function (exports, module$1) {
         if(dt>0&&this.checkImmuneLifespan(m))continue;
         this.evolutionStep(m,dt);this.transformation(m,dt,true);
         if(m.kind===TUMOR){
+          this.stemProgram(m,dt);
           const hazard=this.settings.apoptosis/100/1000;
           if(this.C.random()<1-Math.exp(-hazard*dt)){this.beginDeath(m.id,'spontaneous');continue;}
           this.cycleStep(m,dt);
         }else if(m.kind===IMMUNE){
           this.cycleStep(m,dt);
           if(m.target<m.base)this.growTarget(m,m.base,dt*.8*this.scale*this.scale*m.fitness);
-        }else if(m.target<m.base)this.growTarget(m,m.base,dt*.8*this.scale*this.scale*m.fitness);
+        }else if(m.state==='normal'){this.cycleStep(m,dt);if(m.target<m.base)this.growTarget(m,m.base,dt*.8*this.scale*this.scale*m.fitness);}
+        else if(m.target<m.base)this.growTarget(m,m.base,dt*.8*this.scale*this.scale*m.fitness);
         this.updateMechanics(m);
       }
       if(dt>0)this.shedDeathRemnants();
@@ -13221,12 +13327,14 @@ var CPM = (function (exports, module$1) {
       const parts=[];while(remaining.size){const seed=remaining.values().next().value,queue=[seed],part=[];remaining.delete(seed);while(queue.length){const i=queue.pop();part.push(i);for(const n of (this.section?this.faces[i]:this.neighbors[i]))if(remaining.delete(n))queue.push(n);}parts.push(part);}return parts;
     }
     divide(id){
-      const m=this.cells[id];if(!m||m.dying||m.state==='abnormal'||this.C.getVolume(id)<80*this.scale*this.scale||(m.kind===IMMUNE&&(m.divisionsLeft<=0||(this.settings.immuneKillLimit>0&&m.tumorKills>=this.settings.immuneKillLimit))))return 0;
+      const m=this.cells[id];if(!m||m.dying||m.state==='abnormal'||(m.kind===TUMOR&&!m.isStem&&m.tumorDivisionsLeft===0)||this.C.getVolume(id)<80*this.scale*this.scale||(m.kind===NORMAL&&m.divisionsLeft<=0)||(m.kind===IMMUNE&&(m.divisionsLeft<=0||(this.settings.immuneKillLimit>0&&m.tumorKills>=this.settings.immuneKillLimit))))return 0;
       // Relabelling existing cytoplasm is not a new protrusion. Preserve its Act
       // age instead of letting GridManipulator turn the whole daughter red.
       const activity=[];for(const [p,cid] of this.C.pixels())if(cid===id){const i=this.C.grid.p2i(p);activity.push([i,this.act.pxact(i)]);}
       const restoreActivity=()=>{for(const [i,a] of activity)this.act.setActivity(i,a);};
       const parentTarget=m.target,parentFraction=m.sectionFraction,parentArea=this.C.getVolume(id),divisionX=m.x,divisionY=m.y;
+      const parentStem=m.isStem,parentBudget=m.tumorDivisionsLeft;
+      const parentBase=m.base,parentResources={...m.resources},parentAmounts=this.reserveAmounts(m);
       this.C.stat_values={};const child=this.wrap?this.gm.divideCellTorus(id):this.gm.divideCell(id);
       this.refreshPositions();const daughter=this.cells[child],nuclei=this.section&&daughter?[this.section.findNucleus(m,activity.map(x=>x[0])),this.section.findNucleus(daughter,activity.map(x=>x[0]))]:null;
       if(!this.C.getVolume(child)||this.components(id).length!==1||this.components(child).length!==1||(nuclei&&nuclei.some(p=>!p))){
@@ -13240,21 +13348,26 @@ var CPM = (function (exports, module$1) {
       for(const c of [m,daughter]){
         c.cycle=newCycle();Object.assign(c,inherited);c.tumorKills=0;
         c.target=this.section?parentTarget*this.C.getVolume(c.id)/parentArea:this.C.getVolume(c.id);c.sectionFraction=parentFraction;c.age=0;c.damage=damage;c.targetID=0;c.phase='search';c.generation=generation;c.clone=m.clone;c.parentBirth=parentBirth;c.birth=++this.birthSerial;c.divisionsLeft=left;
+        if(c.kind===NORMAL)c.base=parentBase;
+        const share=this.C.getVolume(c.id)/parentArea,cap=this.settings.reserveCapacity*Math.max(.05,c.target/c.base);
+        c.resources={energy:clamp(parentAmounts.energy*share/cap),precursor:clamp(parentAmounts.precursor*share/cap),dnaDamage:parentResources.dnaDamage};
         c.stress=m.stress;c.fitness=m.fitness;c.oxygen=m.oxygen;c.glucose=m.glucose;c.acid=m.acid;c.adversity=m.adversity;c.activation=m.activation;c.recruitment=c===m?m.recruitment:0;
         c.state=m.state;c.origin=m.origin;c.abnormalSince=m.abnormalSince;c.abnormalAge=m.abnormalAge;c.transformedAt=m.transformedAt;c.inflammatorySignal=m.inflammatorySignal;c.inflammatoryExposure=m.inflammatoryExposure;c.nucleusStrainX=m.nucleusStrainX;c.nucleusStrainY=m.nucleusStrainY;
         if(genome){c.genome=this.mutate(genome,c);this.applyGenome(c);}
         if(nuclei){const p=nuclei[c===m?0:1];c.nucleusX=p[0];c.nucleusY=p[1];c.hasNucleus=true;}
         if(this.section)this.section.resetProtrusions(c);this.updateMechanics(c);
       }
+      const divisionMode=this.stemDivision(m,daughter,parentStem,parentBudget);
       daughter.px=m.px;daughter.py=m.py;
       if(this.observation?.members.has(parentBirth)){
         const next=this.observation.members.get(parentBirth)+1;this.observation.members.delete(parentBirth);
         this.observation.members.set(m.birth,next);this.observation.members.set(daughter.birth,next);
       }
       for(const [key,h] of this.histories)if(h.ctl===id||h.target===id)this.histories.delete(key);
-      this.lineage.push({time:this.C.time,parent:parentBirth,children:[m.birth,daughter.birth],ids:[id,child],clone:m.clone,generation,genomes:genome?[{...m.genome},{...daughter.genome}]:null});
+      this.lineage.push({time:this.C.time,parent:parentBirth,children:[m.birth,daughter.birth],ids:[id,child],clone:m.clone,generation,divisionMode,stemStates:[m.isStem,daughter.isStem],genomes:genome?[{...m.genome},{...daughter.genome}]:null});
       if(this.lineage.length>4000)this.lineage.shift();
       if(m.kind===IMMUNE)this.counters.immuneDivisions++;
+      if(m.kind===NORMAL)this.counters.normalDivisions++;
       if(m.kind===TUMOR&&this.scenarioState){this.scenarioState.tumorDivisions++;if(this.scenarioState.initial.clones.includes(m.clone)&&this.scenarioDistance(divisionX,divisionY)>55)this.scenarioState.distalDivisions++;}
       this.counters.divisions++;this.log('divide',id,child,{generation,clone:m.clone});this.refreshPositions();this.scanContacts();this.immuneInteractions(0);if(m.kind===NORMAL)this.updateNormalReference();return child;
     }
@@ -13268,7 +13381,7 @@ var CPM = (function (exports, module$1) {
     }
     mutate(parent,context=null,{probability,keys=['tolerance','proliferation','invasion','antigen']}={}){
       const child={...parent};
-      const chance=probability??Math.min(1,this.settings.mutation/100*(1+this.settings.tumorMutationGain*(context?.mutationPressure||0)));
+      const chance=probability??Math.min(1,this.settings.mutation/100*(1+this.settings.tumorMutationGain*(context?.mutationPressure||0))*(1+2*this.settings.cycleCoupling*(context?.resources?.dnaDamage||0)));
       for(const key of keys)if(this.C.random()<chance){
         const step=this.mutationStep(key,context);
         const value=key==='antigen'?clamp(child[key]+step):clamp(child[key]*Math.exp(step),.25,3);
@@ -13278,8 +13391,16 @@ var CPM = (function (exports, module$1) {
     }
     set(name,value){
       if(!(name in DEFAULTS)||!Number.isFinite(value))return;
+      if(['stemFraction','stemSymmetry','stemRenewal'].includes(name))value=clamp(value,0,100);
+      if(['stemCycleSlowdown','stemRepair'].includes(name))value=clamp(value,1,3);
+      if(name==='stemPlasticity')value=clamp(value,0,3);
+      if(name==='tumorProgenyLimit'){value=Math.round(clamp(value,0,20));for(const m of this.live())if(m.kind===TUMOR&&!m.isStem){const consumed=this.settings.tumorProgenyLimit>0?this.settings.tumorProgenyLimit-(m.tumorDivisionsLeft??0):0;m.tumorDivisionsLeft=value?Math.max(0,value-consumed):null;}}
       if(name==='normalSupport')value=clamp(value,0,100);
       if(name==='immuneKillLimit')value=Math.round(clamp(value,0,100));
+      if(['cycleCoupling','checkpointIntegrity','normalRepair'].includes(name))value=clamp(value,0,1);
+      if(['replicationStress','dnaRepair','traitCost'].includes(name))value=clamp(value,0,3);
+      if(name==='reserveCapacity')value=clamp(value,10,240);
+      if(name==='normalDivisions'){value=Math.round(clamp(value,0,12));for(const m of this.live())if(m.kind===NORMAL)m.divisionsLeft=Math.max(0,value-m.generation);}
       if(name==='sectionYield')value=clamp(value,0,.5);
       if(name==='stressMutation'||name==='progression')value=clamp(value,0,20);
       if(name==='inflammation')value=clamp(value,0,10);
@@ -13446,15 +13567,15 @@ var CPM = (function (exports, module$1) {
       this.refreshPositions();const {grid,activity,walls,orphans,visitedPixels,freePixels}=this.snapshotRaster();
       const cells=this.live().map(m=>({id:m.id,kind:m.kind,x:m.x,y:m.y,px:m.px,py:m.py,area:this.C.getVolume(m.id),target:m.target,antigen:m.antigen,antigenLevel:m.antigenLevel,damage:m.damage,dying:m.dying,deathCause:m.deathCause,phase:m.phase,targetID:m.targetID,age:m.age,genome:m.genome?{...m.genome}:null,clone:m.clone,generation:m.generation,divisionsLeft:m.divisionsLeft,activation:m.activation,recruitment:m.recruitment,oxygen:m.oxygen,glucose:m.glucose,acid:m.acid,stress:m.stress,fitness:m.fitness,confinement:m.confinement}));
       for(const c of cells){const m=this.cells[c.id];for(const key of ['sectionFraction','sectionPressure','planarTarget','offPlaneTarget','hasNucleus','nucleusX','nucleusY','nucleusRadius','birth','nucleusStrainX','nucleusStrainY','state','origin','abnormalSince','abnormalAge','transformedAt','adversity','immuneCue','inflammatorySignal','inflammatoryExposure','morphologyMode','branchCount','networkDegree','deathStartedAt','deathPhase','deathProgress','deathIntact'])c[key]=m[key];if(c.kind===IMMUNE){c.patrolChecked=m.patrolCheckedBirth===m.birth?m.patrolChecked||0:0;c.patrolScanning=!!m.patrolScanning;c.patrolTurning=!!m.patrolMotion?.turnTime;}}
-      for(const c of cells){const m=this.cells[c.id];c.cycle={...m.cycle};for(const key of ['antigenMemory','il2','il2Response','il2Production','chronicStimulation','exhaustion','normalTolerance','mutationPressure','immuneEncounters','immuneContactMemory','recruitmentExposure','lastAntigenChange','immunePhenotype','normalDamageExposure','inhibition','immuneRefractory','tumorKills'])c[key]=m[key];}
+      for(const c of cells){const m=this.cells[c.id];c.cycle={...m.cycle};c.resources={...m.resources};c.traitEconomy=this.traitEconomy(m);c.freeFraction=m.freeFraction;for(const key of ['isStem','stemNiche','tumorDivisionsLeft','antigenMemory','il2','il2Response','il2Production','chronicStimulation','exhaustion','normalTolerance','mutationPressure','immuneEncounters','immuneContactMemory','recruitmentExposure','lastAntigenChange','immunePhenotype','normalDamageExposure','inhibition','immuneRefractory','tumorKills'])c[key]=m[key];}
       const fields={};for(const [key,f] of Object.entries(this.fields))fields[key]={width:f.width,height:f.height,values:f.values.slice()};
       const history=this.populationHistory(true),historySamples=this.history.length+(history.at(-1)===this.history.at(-1)?0:1);
       const maze=this.maze?{...this.maze,racers:this.maze.racers.map(r=>({...r,alive:this.cells[r.id]?.birth===r.birth&&!this.cells[r.id].dying})),arrivals:this.maze.arrivals.map(a=>({...a}))}:null;
       const observation=this.observationReport(),normalSupport=this.normalSupportReport();
-      return {kernel:this.kernel,width:this.width,height:this.height,worldWidth:this.worldWidth,worldHeight:this.worldHeight,refinement:this.scale,fieldScale:this.fieldScale,fieldMask:this.fields.oxygen.blocked.slice(),scene:this.scene,scenario:this.scenarioReport(),observation,normalSupport,cycles:this.cycleReport(),patrol:this.patrolReport({visitedPixels,freePixels}),maze,sources:this.sources.map(s=>({...s})),boundary:this.boundary,time:this.C.time,seed:this.seedValue,settings:{...this.settings},counters:{...this.counters},manualDeathRemovals:{...this.manualDeathRemovals},deaths:this.deathSummary(),recentDeaths:this.deathHistory.slice(-8).map(d=>({...d})),recentClearances:this.recentClearances.map(d=>({...d})),deathEffects:this.deathEffects.map(e=>({...e})),grid,activity,walls,orphans,cells,fields,history,historySamples,events:this.events.slice(-12)};
+      return {modelRevision:MODEL_REVISION,warmup:this.initialWarmup,kernel:this.kernel,width:this.width,height:this.height,worldWidth:this.worldWidth,worldHeight:this.worldHeight,refinement:this.scale,fieldScale:this.fieldScale,fieldMask:this.fields.oxygen.blocked.slice(),scene:this.scene,scenario:this.scenarioReport(),observation,normalSupport,cycles:this.cycleReport(),patrol:this.patrolReport({visitedPixels,freePixels}),maze,sources:this.sources.map(s=>({...s})),boundary:this.boundary,time:this.C.time,seed:this.seedValue,settings:{...this.settings},counters:{...this.counters},manualDeathRemovals:{...this.manualDeathRemovals},deaths:this.deathSummary(),recentDeaths:this.deathHistory.slice(-8).map(d=>({...d})),recentClearances:this.recentClearances.map(d=>({...d})),deathEffects:this.deathEffects.map(e=>({...e})),grid,activity,walls,orphans,cells,fields,history,historySamples,events:this.events.slice(-12)};
     }
   }
-  globalThis.CellLab={Simulation,SignalField,StepClock,DEFAULTS,PRESETS,BODY_COLORS,TYPE_NAMES,NORMAL,TUMOR,IMMUNE,WALL,sampleHistory,randomSettings,RANDOM_RANGES};
+  globalThis.CellLab={MODEL_REVISION,Simulation,SignalField,StepClock,DEFAULTS,PRESETS,BODY_COLORS,TYPE_NAMES,NORMAL,TUMOR,IMMUNE,WALL,sampleHistory,randomSettings,RANDOM_RANGES};
 })();
 
 /* Versioned parameter-file validation, shared by the UI and Worker. */
@@ -13465,6 +13586,8 @@ var CPM = (function (exports, module$1) {
   Object.assign(ranges,{normalSupport:[0,100],immuneKillLimit:[0,100]});
   Object.assign(ranges,{normalMutationGain:[0,12],tumorMutationGain:[0,12],mutationBias:[-100,100],antigenStressGain:[0,5],contactEscape:[0,5],signalEscape:[0,5],evolutionMemory:[100,4000]});
   Object.assign(ranges,{damagePolarization:[0,5],damageDeactivation:[0,5],suppressiveSecretion:[0,5],suppressionStrength:[0,5],immuneRegulationMemory:[100,2000],suppressionRecovery:[0,5]});
+  Object.assign(ranges,{cycleCoupling:[0,1],reserveCapacity:[10,240],replicationStress:[0,3],dnaRepair:[0,3],checkpointIntegrity:[0,1],traitCost:[0,3],normalRepair:[0,1],normalDivisions:[0,12]});
+  Object.assign(ranges,{stemFraction:[0,100],stemSymmetry:[0,100],stemRenewal:[0,100],stemCycleSlowdown:[1,3],stemRepair:[1,3],stemPlasticity:[0,3],tumorProgenyLimit:[0,20]});
   const signals=['cohesion','danger','trail','il2','normalDamage','inhibition'];
   const scenes=['oncogenesis','cold','hot','empty','random','ecosystem','network','collective','invasion','maze','stress','surveillance'];
   const flags=['edge-activity','normal-activity','tumor-activity','immune-activity','cell-seams','arrows','antigen-marks','nuclei','cycle-marks','protect-bodies','show-tracks'];
@@ -13482,7 +13605,7 @@ var CPM = (function (exports, module$1) {
     const worldWidth=number(data.worldWidth,1,1024,'worldWidth'),worldHeight=number(data.worldHeight,1,768,'worldHeight');
     const w=Math.round(worldWidth*refinement),h=Math.round(worldHeight*refinement);if(w<32||w>1024||h<24||h>768)invalid('grid dimensions');
     const settings={},ignored=[];
-    for(const [key,value]of Object.entries(data.settings)){if(!Object.hasOwn(ranges,key)){ignored.push(key);continue;}settings[key]=number(value,...ranges[key],key);if(['immuneDivisions','immuneKillLimit','tumorMorphology'].includes(key)&&!Number.isInteger(value))invalid(key);}
+    for(const [key,value]of Object.entries(data.settings)){if(!Object.hasOwn(ranges,key)){ignored.push(key);continue;}settings[key]=number(value,...ranges[key],key);if(['immuneDivisions','immuneKillLimit','tumorMorphology','normalDivisions','tumorProgenyLimit'].includes(key)&&!Number.isInteger(value))invalid(key);}
     const sources=data.sources===undefined?undefined:data.sources;if(sources!==undefined){if(!Array.isArray(sources)||sources.length>4096)invalid('sources');for(const v of sources){if(!object(v))invalid('source');choice(v.type,[...signals,'oxygen','glucose','acid','nutrient','hostile'],'source.type');number(v.x,0,worldWidth,'source.x');number(v.y,0,worldHeight,'source.y');number(v.radius,2,40,'source.radius');}}
     if(data.maze?.signalThroughWalls!==undefined&&typeof data.maze.signalThroughWalls!=='boolean')invalid('maze.signalThroughWalls');
     const display={},input=data.display??{};if(!object(input))invalid('display');
@@ -13497,7 +13620,7 @@ var CPM = (function (exports, module$1) {
     if(input.opacity!==undefined){if(!object(input.opacity))invalid('opacity');display.opacity={};for(const [k,v]of Object.entries(input.opacity))if(['adversity','oxygen','glucose','acid','density',...signals].includes(k))display.opacity[k]=number(v,0,1,'opacity.'+k);}
     if(input.flags!==undefined){if(!object(input.flags))invalid('flags');display.flags={};for(const [k,v]of Object.entries(input.flags))if(flags.includes(k)){if(typeof v!=='boolean')invalid(k);display.flags[k]=v;}}
     for(const [key,options]of [['zoom',['100','150','200','300']],['fit',['cover','contain']],['renderResolution',['auto','1920','2560','3840']]])if(input[key]!==undefined)display[key]=choice(input[key],options,key);
-    return {mode:'parameters',config:{scene:data.scene,mazeSignalThroughWalls:!!data.maze?.signalThroughWalls,seed,boundary,worldWidth,worldHeight,refinement,settings,...(sources?{sources:sources.map(s=>({type:s.type,x:s.x,y:s.y,radius:s.radius}))}:{}),warmup:data.scene==='empty'?0:35},display,speed:data.speed===undefined?1:number(data.speed,.25,8,'speed'),sourceTime:Number.isFinite(data.time)?data.time:0,ignored};
+    return {mode:'parameters',config:{scene:data.scene,mazeSignalThroughWalls:!!data.maze?.signalThroughWalls,seed,boundary,worldWidth,worldHeight,refinement,settings,...(sources?{sources:sources.map(s=>({type:s.type,x:s.x,y:s.y,radius:s.radius}))}:{}),warmup:data.warmup===undefined?(data.scene==='empty'?0:35):number(data.warmup,0,200,'warmup')},display,speed:data.speed===undefined?1:number(data.speed,.25,8,'speed'),sourceTime:Number.isFinite(data.time)?data.time:0,ignored};
   }
   globalThis.CellLabExperiment={parse,ranges,scenes,flags};
 })();
@@ -13536,11 +13659,11 @@ async function handle(event){
       sim=new CellLab.Simulation(payload);const module=await wasmModule;if(module&&payload.kernel!=='reference'&&payload.kernel!=='fast')try{await CellLabWasm.install(sim,module);}catch(e){kernelNote=String(e);}
       await backend.configure(sim,backend.mode);revision++;resetClock();
     }else if(command==='import'){
-      const profile=CellLabExperiment.parse(payload.data),next=new CellLab.Simulation(profile.config),compute=new CellLabGPU.ComputeBackend();
-      const module=await wasmModule;if(module)try{await CellLabWasm.install(next,module);}catch(e){next.kernelNote=String(e);}
+      const profile=CellLabExperiment.parse(payload.data),next=new CellLab.Simulation({...profile.config,...(['reference','fast'].includes(payload.kernel)?{kernel:payload.kernel}:{})}),compute=new CellLabGPU.ComputeBackend();
+      const module=await wasmModule;if(module&&payload.kernel!=='fast'&&payload.kernel!=='reference')try{await CellLabWasm.install(next,module);}catch(e){next.kernelNote=String(e);}
       // Build and configure the replacement before committing it. Invalid input
       // leaves the running experiment, clock and backend untouched.
-      await compute.configure(next,backend.mode);backend.gpu?.destroy();backend=compute;sim=next;dragSession=null;playing=false;speed=profile.speed;clock.rate=30*speed;revision++;resetClock();value={mode:profile.mode,sourceTime:profile.sourceTime,ignored:profile.ignored};
+      await compute.configure(next,['cpu','gpu','auto'].includes(payload.computeMode)?payload.computeMode:backend.mode);backend.gpu?.destroy();backend=compute;sim=next;dragSession=null;playing=false;speed=profile.speed;clock.rate=30*speed;revision++;resetClock();value={mode:profile.mode,sourceTime:profile.sourceTime,ignored:profile.ignored};
     }else if(!sim)throw Error('The model has not started');
     else if(command==='playing'){if(dragSession){dragSession.resume=!!payload.value;playing=false;}else playing=!!payload.value;resetClock();}
     else if(command==='beginDrag'){
@@ -13577,7 +13700,7 @@ async function handle(event){
     else if(command==='mazeSignal'){value=sim.setMazeSignalMode(payload.throughWalls);resetClock();}
     else if(command==='divide'){
       const target=payload.id||sim.live().filter(c=>!c.dying).sort((a,b)=>sim.C.getVolume(b.id)-sim.C.getVolume(a.id))[0]?.id;value=sim.divide(target);
-    }else if(command==='export')value={format:'cell-arena-experiment',schemaVersion:1,version:'4.0.0',speed,kernel:sim.kernel,compute:backend.info(),scene:sim.scene,scenario:sim.scenarioReport(),normalSupport:sim.normalSupportReport(),cycles:sim.cycleReport(),patrol:{...sim.patrolReport(),checkedBirths:[...sim.patrol.checked]},maze:sim.maze?structuredClone(sim.maze):null,sources:sim.sources.map(s=>({type:s.type,x:s.x/sim.scale,y:s.y/sim.scale,radius:s.radius/sim.scale})),supplyMap:Array.from(sim.supplyMap),boundary:sim.boundary,seed:sim.seedValue,worldWidth:sim.worldWidth,worldHeight:sim.worldHeight,refinement:sim.scale,settings:sim.settings,time:sim.C.time,history:sim.populationHistory(),events:sim.events,counters:sim.counters,manualDeathRemovals:sim.manualDeathRemovals,deaths:sim.deathSummary(),deathHistory:sim.deathHistory,lineage:sim.lineage,cells:sim.snapshot().cells};
+    }else if(command==='export')value={format:'cell-arena-experiment',schemaVersion:1,version:'4.0.0',modelRevision:CellLab.MODEL_REVISION,warmup:sim.initialWarmup,speed,kernel:sim.kernel,compute:backend.info(),scene:sim.scene,scenario:sim.scenarioReport(),normalSupport:sim.normalSupportReport(),cycles:sim.cycleReport(),patrol:{...sim.patrolReport(),checkedBirths:[...sim.patrol.checked]},maze:sim.maze?structuredClone(sim.maze):null,sources:sim.sources.map(s=>({type:s.type,x:s.x/sim.scale,y:s.y/sim.scale,radius:s.radius/sim.scale})),supplyMap:Array.from(sim.supplyMap),boundary:sim.boundary,seed:sim.seedValue,worldWidth:sim.worldWidth,worldHeight:sim.worldHeight,refinement:sim.scale,settings:sim.settings,time:sim.C.time,history:sim.populationHistory(),events:sim.events,counters:sim.counters,manualDeathRemovals:sim.manualDeathRemovals,deaths:sim.deathSummary(),deathHistory:sim.deathHistory,lineage:sim.lineage,cells:sim.snapshot().cells};
     else if(command==='snapshot')value={time:sim.C.time,cells:sim.live().length};
     else throw Error('Unknown command: '+command);
     if(['seed','sprinkle','divide'].includes(command))sim.record();
@@ -13954,8 +14077,8 @@ globalThis.CellLabSignalGesture=class {
 (() => {
   'use strict';
   const phases={G0:0,G1:1,S:2,G2:3,M:4},NOTICE_MS=10000;
-  const events=['divisions','immuneDivisions','manualRemoved','kills','apoptosis','environment','lifespan','apoptosisStarted','killStarted','environmentStarted','lifespanStarted','mutations','normalTraitMutations','abnormalInitiations','malignantTransitions','antigenExposures','antigenEscapes','suppressiveTransitions','suppressiveRecoveries','injuryDeactivations','signalDeactivations'];
-  function state(c){return (c.kind||0)|(c.state==='abnormal'?4:0)|(c.immunePhenotype==='suppressive'?8:0)|(c.activation>0?16:0)|(c.antigen?32:0)|(c.dying?64:0)|(({spontaneous:1,kill:2,environment:3,lifespan:4}[c.deathCause]||0)<<7)|((phases[c.cycle?.phase]||0)<<10)|(c.cycle?.arrest?16384:0);}
+  const events=['stemAsymmetric','stemSelfRenewal','stemDifferentiation','stemReversions','normalDivisions','replicationDeaths','divisions','immuneDivisions','manualRemoved','kills','apoptosis','environment','lifespan','apoptosisStarted','killStarted','environmentStarted','lifespanStarted','mutations','normalTraitMutations','abnormalInitiations','malignantTransitions','antigenExposures','antigenEscapes','suppressiveTransitions','suppressiveRecoveries','injuryDeactivations','signalDeactivations'];
+  function state(c){return (c.kind||0)|(c.state==='abnormal'?4:0)|(c.immunePhenotype==='suppressive'?8:0)|(c.activation>0?16:0)|(c.antigen?32:0)|(c.dying?64:0)|(({spontaneous:1,kill:2,environment:3,lifespan:4}[c.deathCause]||0)<<7)|((phases[c.cycle?.phase]||0)<<10)|(c.cycle?.arrest?16384:0)|(c.isStem?32768:0);}
   class Controller {
     constructor(){this.minutes=0;this.reset();}
     configure(value,now=0){this.minutes=Number.isFinite(value)&&value>=0&&value<=1440?value:0;this.reset(now);}
@@ -14019,18 +14142,19 @@ globalThis.CellLabSignalGesture=class {
     return {worldWidth,worldHeight,refinement:locks.refinement?current.refinement:pick(refinements),boundary:locks.boundary?current.boundary:pick(['wrap','solid'])};
   }
   function population(s){
-    const p={total:0,normal:0,abnormal:0,tumor:0,immune:0,tumorAntigenPositive:0,tumorAntigenNegative:0,immuneResting:0,immuneActive:0,immuneSuppressive:0,clearing:0,spontaneousClearing:0,environmentClearing:0,killClearing:0,lifespanClearing:0};
+    const p={total:0,normal:0,abnormal:0,tumor:0,immune:0,tumorStem:0,tumorDifferentiated:0,tumorAntigenPositive:0,tumorAntigenNegative:0,immuneResting:0,immuneActive:0,immuneSuppressive:0,clearing:0,spontaneousClearing:0,environmentClearing:0,killClearing:0,lifespanClearing:0};
     for(const c of s.cells||[])if(c.kind>0&&c.kind<4){
       if(c.dying){p.clearing++;const key=c.deathCause+'Clearing';if(key in p)p[key]++;continue;}
       p.total++;if(c.kind===1)p[c.state==='abnormal'?'abnormal':'normal']++;
-      else if(c.kind===2){p.tumor++;p[c.antigen?'tumorAntigenPositive':'tumorAntigenNegative']++;}
+      else if(c.kind===2){p.tumor++;p[c.isStem?'tumorStem':'tumorDifferentiated']++;p[c.antigen?'tumorAntigenPositive':'tumorAntigenNegative']++;}
       else{p.immune++;p[c.immunePhenotype==='suppressive'?'immuneSuppressive':c.activation>0?'immuneActive':'immuneResting']++;}
     }return p;
   }
   class Journal {
     constructor(){this.active=null;this.serial=0;}
-    begin(s,now,iso=new Date().toISOString(),locks={}){
+    begin(s,now,iso=new Date().toISOString(),locks={},display={},replayOf=null){
       this.active={id:iso+'-'+s.seed+'-'+(++this.serial),scene:s.scene,seed:s.seed,startedAt:iso,endedAt:null,lastSeenAt:iso,reason:'running',worldWidth:s.worldWidth,worldHeight:s.worldHeight,refinement:s.refinement,boundary:s.boundary,initialMCS:s.time,simulatedMCS:s.time,runningMs:0,initialSettings:{...s.settings},finalSettings:{...s.settings},initialLocks:{...locks},finalLocks:{...locks},parameterChanges:[],population:population(s),initialPopulation:population(s),cycles:copy(s.cycles||{}),sources:copy(s.sources||[]),counters:{...s.counters}};
+      Object.assign(this.active,{modelRevision:s.modelRevision||null,initialWarmup:s.warmup,initialKernel:s.kernel,initialCompute:s.compute?.active,initialSpeed:s.speed||1,initialDisplay:copy(display),initialSources:(s.sources||[]).map(v=>({type:v.type,x:v.x/s.refinement,y:v.y/s.refinement,radius:v.radius/s.refinement})),initialMaze:s.maze?{signalThroughWalls:!!s.maze.signalThroughWalls}:null,replayOf});
       this.epoch=s.revision+':'+s.seed;this.lastTick=now;this.running=!!s.playing;return this.current();
     }
     observe(s,now,running=true){
@@ -14044,14 +14168,19 @@ globalThis.CellLabSignalGesture=class {
     }
     current(){return this.active?copy(this.active):null;}
   }
-  const reasons={empty:'全部细胞消失','tumor-only':'仅剩肿瘤细胞','no-immune':'免疫细胞为 0','no-normal':'正常细胞为 0',idle:'数量与生物状态长时间不变','manual-random':'手动随机生成','manual-restart':'手动重来','scene-change':'切换情境','preset-reset':'恢复情境','import':'导入参数','external-reset':'重新开局',interrupted:'页面关闭／重新载入',running:'进行中'};
+  const reasons={'history-replay':'重新模拟历史局',empty:'全部细胞消失','tumor-only':'仅剩肿瘤细胞','no-immune':'免疫细胞为 0','no-normal':'正常细胞为 0',idle:'数量与生物状态长时间不变','manual-random':'手动随机生成','manual-restart':'手动重来','scene-change':'切换情境','preset-reset':'恢复情境','import':'导入参数','external-reset':'重新开局',interrupted:'页面关闭／重新载入',running:'进行中'};
   const reasonLabel=reason=>reasons[String(reason).replace(/^auto-/,'')]||reason;
+  function numbered(records){return records.slice().sort((a,b)=>a.startedAt.localeCompare(b.startedAt)||a.id.localeCompare(b.id)).map((r,i)=>({...r,roundNumber:i+1}));}
+  function replayExperiment(r){
+    return copy({format:'cell-arena-experiment',schemaVersion:1,version:'4.0.0',scene:r.scene,seed:r.seed,boundary:r.boundary,worldWidth:r.worldWidth,worldHeight:r.worldHeight,refinement:r.refinement,settings:r.initialSettings,warmup:r.initialWarmup,sources:r.initialSources,maze:r.initialMaze,speed:r.initialSpeed||1,display:{...(r.initialDisplay||{}),autoRandomMinutes:0}});
+  }
   function csv(records){
+    records=numbered(records);
     const params=[...new Set(records.flatMap(r=>[...Object.keys(r.initialSettings),...Object.keys(r.finalSettings)]))].sort();
     const events=[...new Set(records.flatMap(r=>Object.keys(r.counters)))].sort(),states=Object.keys(population({cells:[]}));
-    const columns=['run_id','started_at','ended_at','reason','reason_label','scene','seed','simulated_MCS','running_seconds','world_width','world_height','refinement','boundary',...states.map(k=>'end.'+k),...params.map(k=>'initial.'+k),...params.map(k=>'final.'+k),...events.map(k=>'event.'+k),'initial_locks','final_locks','parameter_changes','display','cycle_states','field_sources'];
+    const columns=['round_number','model_revision','replay_of','initial_sources','run_id','started_at','ended_at','reason','reason_label','scene','seed','simulated_MCS','running_seconds','world_width','world_height','refinement','boundary',...states.map(k=>'end.'+k),...params.map(k=>'initial.'+k),...params.map(k=>'final.'+k),...events.map(k=>'event.'+k),'initial_locks','final_locks','parameter_changes','display','cycle_states','field_sources'];
     const quote=value=>'"'+String(value??'').replaceAll('"','""')+'"';
-    return '\uFEFF'+[columns,...records.map(r=>[r.id,r.startedAt,r.endedAt,r.reason,reasonLabel(r.reason),r.scene,r.seed,r.simulatedMCS,(r.runningMs/1000).toFixed(3),r.worldWidth,r.worldHeight,r.refinement,r.boundary,...states.map(k=>r.population[k]||0),...params.map(k=>r.initialSettings[k]),...params.map(k=>r.finalSettings[k]),...events.map(k=>r.counters[k]||0),JSON.stringify(r.initialLocks),JSON.stringify(r.finalLocks),JSON.stringify(r.parameterChanges),JSON.stringify(r.display||{}),JSON.stringify(r.cycles||{}),JSON.stringify(r.sources||[])])].map(row=>row.map(quote).join(',')).join('\r\n')+'\r\n';
+    return '\uFEFF'+[columns,...records.map(r=>[r.roundNumber,r.modelRevision,r.replayOf,JSON.stringify(r.initialSources??null),r.id,r.startedAt,r.endedAt,r.reason,reasonLabel(r.reason),r.scene,r.seed,r.simulatedMCS,(r.runningMs/1000).toFixed(3),r.worldWidth,r.worldHeight,r.refinement,r.boundary,...states.map(k=>r.population[k]||0),...params.map(k=>r.initialSettings[k]),...params.map(k=>r.finalSettings[k]),...events.map(k=>r.counters[k]||0),JSON.stringify(r.initialLocks),JSON.stringify(r.finalLocks),JSON.stringify(r.parameterChanges),JSON.stringify(r.display||{}),JSON.stringify(r.cycles||{}),JSON.stringify(r.sources||[])])].map(row=>row.map(quote).join(',')).join('\r\n')+'\r\n';
   }
   // Store compact records, not grids or movies. Completed rounds are never
   // truncated to a display buffer; pagination only limits rendered rows.
@@ -14065,7 +14194,7 @@ globalThis.CellLabSignalGesture=class {
       archive:r=>transaction(tx=>{tx.objectStore('rounds').put(r);tx.objectStore('active').delete(tabKey);})
     };
   }
-  globalThis.CellLabRounds={Locks,Journal,randomGeometry,population,csv,reasonLabel,openStore};
+  globalThis.CellLabRounds={Locks,Journal,randomGeometry,population,csv,reasonLabel,openStore,numbered,replayExperiment};
 })();
 
 /* UI-only translation. No model state, random stream or simulation clock is read
@@ -14951,6 +15080,76 @@ Arena ＋ 右侧栏|Arena + sidebar
 展开面板|Expand panel
 返回画布|Back to arena
 `);
+  add(`
+周期、干性与巡逻|Cycles, stemness and patrol
+周期—营养耦合|Cycle–nutrient coupling
+营养储备容量|Nutrient buffer capacity
+复制压力敏感性|Replication stress sensitivity
+DNA 修复速度|DNA repair rate
+肿瘤 DNA 检查点强度|Tumor DNA checkpoint strength
+肿瘤性状代价|Tumor trait cost
+正常组织修复速度|Normal tissue repair rate
+正常修复谱系分裂上限|Normal repair lineage division limit
+新生肿瘤干性比例|New tumor stem fraction
+干细胞对称分裂概率|Symmetric stem division probability
+对称分裂中的自我更新|Self-renewal among symmetric divisions
+干性细胞周期时长倍率|Stem cell cycle duration multiplier
+干性 DNA 修复倍率|Stem DNA repair multiplier
+环境诱导干性可塑性|Environment-driven stem plasticity
+分化肿瘤谱系分裂上限|Differentiated tumor division limit
+肿瘤干性与分化|Tumor stemness and differentiation
+周期、储备与复制损伤|Cycle, reserves and replication damage
+机制与参数依据|Mechanisms and parameter evidence
+胶质瘤启发的可调模型，非统一肿瘤定律。|A tunable glioma-inspired model, not a universal tumor rule.
+肿瘤干性：自我更新／分化|Tumor stemness: self-renewal / differentiation
+分化肿瘤|Differentiated tumor
+剩余分裂|Divisions remaining
+无限制|Unlimited
+干性生态位记忆|Stem niche memory
+性状资源代价|Trait resource cost
+能量储备|Energy reserve
+合成储备|Precursor reserve
+DNA 损伤|DNA damage
+营养储备不足|Insufficient reserves
+DNA 损伤检查点|DNA damage checkpoint
+接触抑制：缺少空隙|Contact inhibition: no local gap
+剩余修复分裂|Repair divisions remaining
+空隙接触|Free membrane
+正常修复分裂|Normal repair divisions
+复制损伤死亡触发|Replication-damage death initiations
+计入环境死亡|Included in environmental deaths
+干性重获|Stem reacquisition
+对称自我更新|Symmetric renewal
+对称分化|Symmetric differentiation
+不对称|Asymmetric
+干性|Stem-like
+分化|Differentiated
+↻ 再次模拟此局|↻ Simulate this round again
+重新模拟历史局|Historical round restarted
+已按原种子和初始参数开始新一局|New run started with original seed and initial parameters
+模型版本已变化，演化可能不同。|The model version has changed; outcomes may differ.
+按种子与初始参数重新模拟，不重放手动操作。|Re-simulates the seed and initial parameters; does not replay manual actions.
+红色周期文字表示肿瘤干性细胞|Red cycle labels identify stem-like tumor cells
+全屏 Arena|Fullscreen Arena
+退出全屏|Exit fullscreen
+`);
+  add(`
+0 恢复旧周期门控；1 启用分阶段消耗、储备与复制损伤。依据：Colombo 2011；系数为模型假设|0 restores legacy cycle gates; 1 enables phase demand, reserves and replication damage. Colombo 2011 motivates the mechanism; coefficients are model assumptions.
+能量与合成原料的有限缓冲；分裂按实际胞体比例分配。依据：Colombo 2011；无量纲容量|Finite energy and precursor buffers, partitioned by actual daughter size. Colombo 2011; dimensionless model capacity.
+S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；速率未标定|Hypoxia, depleted reserves and high acid create S-phase damage pressure. Foskolou 2017; uncalibrated rate and acid proxy.
+消耗储备修复复制损伤，不消除免疫杀伤损伤。依据：Foskolou 2017；速率未标定|Uses reserves to repair replication damage; immune injury is separate. Foskolou 2017; uncalibrated rate.
+越高越早因 DNA 损伤阻滞；正常与免疫保持完整检查点。模型阈值未标定|Higher values arrest earlier under DNA damage; normal and immune cells retain full checkpoints. Uncalibrated model threshold.
+强增殖、侵袭与耐受增加资源成本，并有温和功能权衡；0 关闭。依据：Giese 1996；代价函数为假设|Strong growth, invasion and tolerance cost resources with mild functional tradeoffs; 0 disables. Giese 1996; cost function is a hypothesis.
+只有邻接真实空隙、营养足够且额度未耗尽才进入修复周期。依据：Gudipaty 2017；速度未标定|Repair requires actual local gaps, nutrients and an unused division allowance. Gudipaty 2017; uncalibrated speed.
+每次分裂两个子代均扣一次；0 禁止修复分裂。依据：Hayflick 1961；次数为演示设置，非通用寿命|Both daughters lose one lineage division per split; 0 blocks repair. Hayflick 1961 motivates finite capacity, not this demo limit.
+只影响初始、新增和新恶性转化的肿瘤；独立于抗原。依据：Chen 2012；比例未标定|Applies to initial, added and newly transformed tumors; independent of antigen. Chen 2012; fraction uncalibrated.
+其余为一干性、一分化的不对称分裂。依据：Driessens 2012；概率未标定|Other divisions produce one stem and one differentiated daughter. Driessens 2012; probabilities uncalibrated.
+对称分裂时产生两个干性子代的概率，其余产生两个分化子代。依据：Driessens 2012|Conditional chance of two stem daughters in a symmetric division; otherwise two differentiated daughters. Driessens 2012.
+相对分化肿瘤的周期时长；1 无差别。胶质瘤慢周期亚群启发：Chen 2012，并非所有干细胞都慢|Cycle duration relative to differentiated tumors; 1 removes the difference. Glioma-inspired (Chen 2012); not all stem cells cycle slowly.
+仅增强 DNA 修复，不降低免疫接触杀伤。依据：Bao 2006；倍率未标定|Increases DNA repair only, without reducing immune killing. Bao 2006; multiplier uncalibrated.
+存活分化肿瘤在持续局部低氧生态位中有概率重新获得干性；0 关闭。Li 2009／Chaffer 2013 启发的代理模型|Viable differentiated tumors may reacquire stemness in a sustained local hypoxic niche; 0 disables. Proxy inspired by Li 2009 and Chaffer 2013.
+0 保持无限分裂；大于 0 启用有限扩增层级；干性自我更新不受此限。依据：Chen 2012|0 retains unlimited tumor divisions; positive values enable a finite progeny hierarchy. Stem renewal is unlimited. Chen 2012.
+`);
   function mount(control){
     let language='zh';try{if(localStorage.getItem('cell-arena-language')==='en')language='en';}catch{}
     const texts=new WeakMap(),attributes=new WeakMap(),names=['title','aria-label','placeholder'];
@@ -14958,7 +15157,7 @@ Arena ＋ 右侧栏|Arena + sidebar
     function textNode(node){if(skip(node.parentElement))return;const value=node.nodeValue,previous=texts.get(node),source=previous&&previous.result===value?previous.source:value,result=translate(source,language);texts.set(node,{source,result});if(value!==result)node.nodeValue=result;}
     function attribute(element,name){if(skip(element)||!element.hasAttribute(name))return;let record=attributes.get(element);if(!record){record={};attributes.set(element,record);}const value=element.getAttribute(name),previous=record[name],source=previous&&previous.result===value?previous.source:value,result=translate(source,language);record[name]={source,result};if(value!==result)element.setAttribute(name,result);}
     function walk(root){if(root.nodeType===3){textNode(root);return;}if(root.nodeType!==1&&root.nodeType!==9)return;if(root.nodeType===1){if(skip(root))return;for(const name of names)attribute(root,name);}const walker=document.createTreeWalker(root,NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT);while(walker.nextNode()){const n=walker.currentNode;if(n.nodeType===3)textNode(n);else for(const name of names)attribute(n,name);}}
-    function set(value){language=value==='en'?'en':'zh';control.value=language;control.textContent=language==='en'?'Eng':'Chi';control.title=language==='en'?'切换为中文':'Switch to English';control.setAttribute('aria-label',control.title);document.documentElement.lang=language==='en'?'en':'zh-CN';document.title=translate('Cell-Arena · 细胞生态竞技场',language);for(const block of document.querySelectorAll('[data-language]'))block.hidden=block.dataset.language!==language;walk(document.body);try{localStorage.setItem('cell-arena-language',language);}catch{}}
+    function set(value){language=value==='en'?'en':'zh';control.value=language;control.textContent=language==='en'?'Chi':'Eng';control.title=language==='en'?'切换为中文':'Switch to English';control.setAttribute('aria-label',control.title);document.documentElement.lang=language==='en'?'en':'zh-CN';document.title=translate('Cell-Arena · 细胞生态竞技场',language);for(const block of document.querySelectorAll('[data-language]'))block.hidden=block.dataset.language!==language;walk(document.body);try{localStorage.setItem('cell-arena-language',language);}catch{}}
     const observer=new MutationObserver(records=>{for(const m of records){if(m.type==='characterData')textNode(m.target);else if(m.type==='attributes')attribute(m.target,m.attributeName);else for(const node of m.addedNodes)walk(node);}});
     observer.observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:names});
     control.addEventListener('change',()=>set(control.value));control.addEventListener('click',()=>set(language==='en'?'zh':'en'));set(language);
@@ -15046,6 +15245,7 @@ Arena ＋ 右侧栏|Arena + sidebar
     while(gain>1&&!fits(gain))gain=Math.max(1,gain-.06);
     return points.map(([x,y])=>[x*gain,y*gain]);
   }
+  function cycleColor(m){return m.kind===2&&m.isStem?'#c0262e':'#243c49';}
   function cycleText(m){
     if(m.dying)return '';
     return ['G0','G1','S','G2','M'].includes(m.cycle?.phase)?m.cycle.phase:'';
@@ -15146,7 +15346,7 @@ Arena ＋ 右侧栏|Arena + sidebar
     const wall=!!s.walls[q],blocked=wall||!!s.fieldMask?.[bin];
     return {x,y,bin,time:s.time,cell:s.cells.find(m=>m.id===s.grid[q])||null,wall,blocked,values:blocked?null:Object.fromEntries(['oxygen','glucose','acid',...Object.keys(SIGNALS)].map(key=>[key,s.fields[key]?.values[bin]??0]))};
   }
-  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,immuneSuppressive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,antigenMarked,selectionBounds,selectionBoxes,bodyOpacity,adversity,signals,sample,Cache};
+  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,immuneSuppressive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,cycleColor,antigenMarked,selectionBounds,selectionBoxes,bodyOpacity,adversity,signals,sample,Cache};
 })();
 
 /* Display-only WebGL2 rasterizer. All cell copies and contacts stay in the
@@ -15243,6 +15443,8 @@ Arena ＋ 右侧栏|Arena + sidebar
   Object.assign(ranges,{normalSupport:[0,100],immuneKillLimit:[0,100]});
   Object.assign(ranges,{normalMutationGain:[0,12],tumorMutationGain:[0,12],mutationBias:[-100,100],antigenStressGain:[0,5],contactEscape:[0,5],signalEscape:[0,5],evolutionMemory:[100,4000]});
   Object.assign(ranges,{damagePolarization:[0,5],damageDeactivation:[0,5],suppressiveSecretion:[0,5],suppressionStrength:[0,5],immuneRegulationMemory:[100,2000],suppressionRecovery:[0,5]});
+  Object.assign(ranges,{cycleCoupling:[0,1],reserveCapacity:[10,240],replicationStress:[0,3],dnaRepair:[0,3],checkpointIntegrity:[0,1],traitCost:[0,3],normalRepair:[0,1],normalDivisions:[0,12]});
+  Object.assign(ranges,{stemFraction:[0,100],stemSymmetry:[0,100],stemRenewal:[0,100],stemCycleSlowdown:[1,3],stemRepair:[1,3],stemPlasticity:[0,3],tumorProgenyLimit:[0,20]});
   const signals=['cohesion','danger','trail','il2','normalDamage','inhibition'];
   const scenes=['oncogenesis','cold','hot','empty','random','ecosystem','network','collective','invasion','maze','stress','surveillance'];
   const flags=['edge-activity','normal-activity','tumor-activity','immune-activity','cell-seams','arrows','antigen-marks','nuclei','cycle-marks','protect-bodies','show-tracks'];
@@ -15260,7 +15462,7 @@ Arena ＋ 右侧栏|Arena + sidebar
     const worldWidth=number(data.worldWidth,1,1024,'worldWidth'),worldHeight=number(data.worldHeight,1,768,'worldHeight');
     const w=Math.round(worldWidth*refinement),h=Math.round(worldHeight*refinement);if(w<32||w>1024||h<24||h>768)invalid('grid dimensions');
     const settings={},ignored=[];
-    for(const [key,value]of Object.entries(data.settings)){if(!Object.hasOwn(ranges,key)){ignored.push(key);continue;}settings[key]=number(value,...ranges[key],key);if(['immuneDivisions','immuneKillLimit','tumorMorphology'].includes(key)&&!Number.isInteger(value))invalid(key);}
+    for(const [key,value]of Object.entries(data.settings)){if(!Object.hasOwn(ranges,key)){ignored.push(key);continue;}settings[key]=number(value,...ranges[key],key);if(['immuneDivisions','immuneKillLimit','tumorMorphology','normalDivisions','tumorProgenyLimit'].includes(key)&&!Number.isInteger(value))invalid(key);}
     const sources=data.sources===undefined?undefined:data.sources;if(sources!==undefined){if(!Array.isArray(sources)||sources.length>4096)invalid('sources');for(const v of sources){if(!object(v))invalid('source');choice(v.type,[...signals,'oxygen','glucose','acid','nutrient','hostile'],'source.type');number(v.x,0,worldWidth,'source.x');number(v.y,0,worldHeight,'source.y');number(v.radius,2,40,'source.radius');}}
     if(data.maze?.signalThroughWalls!==undefined&&typeof data.maze.signalThroughWalls!=='boolean')invalid('maze.signalThroughWalls');
     const display={},input=data.display??{};if(!object(input))invalid('display');
@@ -15275,7 +15477,7 @@ Arena ＋ 右侧栏|Arena + sidebar
     if(input.opacity!==undefined){if(!object(input.opacity))invalid('opacity');display.opacity={};for(const [k,v]of Object.entries(input.opacity))if(['adversity','oxygen','glucose','acid','density',...signals].includes(k))display.opacity[k]=number(v,0,1,'opacity.'+k);}
     if(input.flags!==undefined){if(!object(input.flags))invalid('flags');display.flags={};for(const [k,v]of Object.entries(input.flags))if(flags.includes(k)){if(typeof v!=='boolean')invalid(k);display.flags[k]=v;}}
     for(const [key,options]of [['zoom',['100','150','200','300']],['fit',['cover','contain']],['renderResolution',['auto','1920','2560','3840']]])if(input[key]!==undefined)display[key]=choice(input[key],options,key);
-    return {mode:'parameters',config:{scene:data.scene,mazeSignalThroughWalls:!!data.maze?.signalThroughWalls,seed,boundary,worldWidth,worldHeight,refinement,settings,...(sources?{sources:sources.map(s=>({type:s.type,x:s.x,y:s.y,radius:s.radius}))}:{}),warmup:data.scene==='empty'?0:35},display,speed:data.speed===undefined?1:number(data.speed,.25,8,'speed'),sourceTime:Number.isFinite(data.time)?data.time:0,ignored};
+    return {mode:'parameters',config:{scene:data.scene,mazeSignalThroughWalls:!!data.maze?.signalThroughWalls,seed,boundary,worldWidth,worldHeight,refinement,settings,...(sources?{sources:sources.map(s=>({type:s.type,x:s.x,y:s.y,radius:s.radius}))}:{}),warmup:data.warmup===undefined?(data.scene==='empty'?0:35):number(data.warmup,0,200,'warmup')},display,speed:data.speed===undefined?1:number(data.speed,.25,8,'speed'),sourceTime:Number.isFinite(data.time)?data.time:0,ignored};
   }
   globalThis.CellLabExperiment={parse,ranges,scenes,flags};
 })();
@@ -15654,6 +15856,21 @@ Arena ＋ 右侧栏|Arena + sidebar
   const labels=['培养液','正常细胞','肿瘤细胞','免疫细胞','实体障碍'];
   const titles={random:'随机生成',empty:'空白自建',ecosystem:'免疫共培养',collective:'群体迁移',invasion:'肿瘤扩张',maze:'免疫细胞迷宫',stress:'密度与逃逸',surveillance:'癌前监视',network:'胶质瘤样分枝成网'};
   const controls=[
+    ['cycleCoupling','周期—营养耦合',0,1,.05,'0 恢复旧周期门控；1 启用分阶段消耗、储备与复制损伤。依据：Colombo 2011；系数为模型假设',''],
+    ['reserveCapacity','营养储备容量',10,240,10,'能量与合成原料的有限缓冲；分裂按实际胞体比例分配。依据：Colombo 2011；无量纲容量',''],
+    ['replicationStress','复制压力敏感性',0,3,.1,'S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；速率未标定','×'],
+    ['dnaRepair','DNA 修复速度',0,3,.1,'消耗储备修复复制损伤，不消除免疫杀伤损伤。依据：Foskolou 2017；速率未标定','×'],
+    ['checkpointIntegrity','肿瘤 DNA 检查点强度',0,1,.05,'越高越早因 DNA 损伤阻滞；正常与免疫保持完整检查点。模型阈值未标定',''],
+    ['traitCost','肿瘤性状代价',0,3,.05,'强增殖、侵袭与耐受增加资源成本，并有温和功能权衡；0 关闭。依据：Giese 1996；代价函数为假设','×'],
+    ['normalRepair','正常组织修复速度',0,1,.05,'只有邻接真实空隙、营养足够且额度未耗尽才进入修复周期。依据：Gudipaty 2017；速度未标定',''],
+    ['normalDivisions','正常修复谱系分裂上限',0,12,1,'每次分裂两个子代均扣一次；0 禁止修复分裂。依据：Hayflick 1961；次数为演示设置，非通用寿命',' 次'],
+    ['stemFraction','新生肿瘤干性比例',0,100,5,'只影响初始、新增和新恶性转化的肿瘤；独立于抗原。依据：Chen 2012；比例未标定','%'],
+    ['stemSymmetry','干细胞对称分裂概率',0,100,5,'其余为一干性、一分化的不对称分裂。依据：Driessens 2012；概率未标定','%'],
+    ['stemRenewal','对称分裂中的自我更新',0,100,5,'对称分裂时产生两个干性子代的概率，其余产生两个分化子代。依据：Driessens 2012','%'],
+    ['stemCycleSlowdown','干性细胞周期时长倍率',1,3,.05,'相对分化肿瘤的周期时长；1 无差别。胶质瘤慢周期亚群启发：Chen 2012，并非所有干细胞都慢','×'],
+    ['stemRepair','干性 DNA 修复倍率',1,3,.1,'仅增强 DNA 修复，不降低免疫接触杀伤。依据：Bao 2006；倍率未标定','×'],
+    ['stemPlasticity','环境诱导干性可塑性',0,3,.05,'存活分化肿瘤在持续局部低氧生态位中有概率重新获得干性；0 关闭。Li 2009／Chaffer 2013 启发的代理模型','×'],
+    ['tumorProgenyLimit','分化肿瘤谱系分裂上限',0,20,1,'0 保持无限分裂；大于 0 启用有限扩增层级；干性自我更新不受此限。依据：Chen 2012',' 次'],
     ['chemotaxis','趋化响应',0,3,.1,'局部信号影响运动方向；肿瘤也趋向高氧、高糖',''],
     ['alignment','正常／肿瘤方向协同',0,3,.1,'接触的同类细胞调整极性；免疫细胞不无条件跟随同类',''],
     ['cohesion','凝聚倾向',0,3,.1,'正常细胞的共吸引与同类黏附',''],
@@ -15712,10 +15929,12 @@ Arena ＋ 右侧栏|Arena + sidebar
     'branch-sliders':['branchLength','branchStrength','branching','networkAdhesion'],
     'environment-sliders':['supply','normalSupport','metabolism','halfLife','chemotaxis','escape','inflammation'],
     'evolution-sliders':['mutationBias','evolutionMemory'],
-    'normal-sliders':['normalMotility','cohesion','stressMutation','progression','normalMutationGain'],
+    'normal-sliders':['normalRepair','normalDivisions','normalMotility','cohesion','stressMutation','progression','normalMutationGain'],
     'tumor-sliders':['tumorMotility','growth','apoptosis','antigen'],
     'tumor-evolution-sliders':['mutation','mutationSize','tumorMutationGain','antigenStressGain','contactEscape','signalEscape'],
-    'tumor-cycle-sliders':['tumorCycle','tumorQuiescence'],
+    'tumor-cycle-sliders':['tumorCycle','tumorQuiescence','checkpointIntegrity','traitCost'],
+    'stem-sliders':['stemFraction','stemSymmetry','stemRenewal','stemCycleSlowdown','stemRepair','stemPlasticity','tumorProgenyLimit'],
+    'resource-sliders':['cycleCoupling','reserveCapacity','replicationStress','dnaRepair'],
     'immune-sliders':['immuneMotility','immuneSeparation','kill','immuneKillLimit','recruitment'],
     'immune-regulation-sliders':['damagePolarization','suppressionRecovery','damageDeactivation','suppressiveSecretion','suppressionStrength','immuneRegulationMemory'],
     'immune-cycle-sliders':['immuneGrowth','immuneDivisions','immuneCycle','antigenMemory','il2Secretion','il2HalfLife','exhaustionRate'],
@@ -15815,17 +16034,18 @@ Arena ＋ 右侧栏|Arena + sidebar
     journal.active.finalLocks=parameterLocks.toJSON();journal.active.display=displaySettings();lastCheckpoint=now;roundStore.checkpoint(journal.current()).catch(storageError);
   }
   function renderRoundHistory(){
-    const all=completedRounds.slice().sort((a,b)=>b.startedAt.localeCompare(a.startedAt)),pages=Math.max(1,Math.ceil(all.length/6));historyPage=Math.max(0,Math.min(pages-1,historyPage));
+    const all=CellLabRounds.numbered(completedRounds).reverse(),pages=Math.max(1,Math.ceil(all.length/6));historyPage=Math.max(0,Math.min(pages-1,historyPage));
     $('round-total').textContent=all.length;$('round-page').textContent=(historyPage+1)+' / '+pages;$('round-newer').disabled=!historyPage;$('round-older').disabled=historyPage>=pages-1;
     const list=$('round-list'),stamp=historyVersion+':'+historyPage;if(list.dataset.version===stamp)return;list.dataset.version=stamp;list.replaceChildren();
     if(!all.length){const p=document.createElement('p');p.className='hint';p.textContent='换局后在这里比较历局结果；CSV 也包含当前进行中的一局。';list.append(p);return;}
     for(const record of all.slice(historyPage*6,historyPage*6+6)){
       const row=document.createElement('details');row.className='round-result';
-      const head=document.createElement('summary'),reason=document.createElement('b'),time=document.createElement('span');reason.textContent=CellLabRounds.reasonLabel(record.reason);time.textContent=record.simulatedMCS.toLocaleString()+' MCS';const heading=document.createElement('div');heading.append(reason);head.append(heading,time);
+      const head=document.createElement('summary'),reason=document.createElement('b'),time=document.createElement('span');reason.textContent='#'+record.roundNumber+' · '+CellLabRounds.reasonLabel(record.reason);time.textContent=record.simulatedMCS.toLocaleString()+' MCS';const heading=document.createElement('div');heading.append(reason);head.append(heading,time);
       const state=document.createElement('p');state.textContent='正常 '+record.population.normal+' · 癌前 '+record.population.abnormal+' · 肿瘤 '+record.population.tumor+' · 免疫 '+record.population.immune;
       const info=document.createElement('small');info.textContent=new Date(record.startedAt).toLocaleString()+' · '+(record.runningMs/60000).toFixed(1)+' min · '+record.scene+' · '+record.seed;
       const phenotypes=document.createElement('p');phenotypes.textContent='免疫：静息 '+record.population.immuneResting+' · 激活 '+record.population.immuneActive+' · 抑制 '+record.population.immuneSuppressive+'\n肿瘤：抗原阳性 '+record.population.tumorAntigenPositive+' · 阴性 '+record.population.tumorAntigenNegative;
-      const params=document.createElement('pre');params.textContent=JSON.stringify(record.finalSettings,null,2);heading.append(state);row.append(head,info,phenotypes,params);list.append(row);
+      const params=document.createElement('pre');params.textContent=JSON.stringify(record.finalSettings,null,2);const replay=document.createElement('button');replay.className='replay-round';replay.textContent='↻ 再次模拟此局';replay.dataset.roundId=record.id;replay.addEventListener('click',async()=>{replay.disabled=true;try{await replayRound(record);}catch(e){fail(e);}finally{replay.disabled=false;}});
+      const note=document.createElement('p');note.className='hint';note.textContent=(record.modelRevision===snapshot?.modelRevision?'':'模型版本已变化，演化可能不同。')+'按种子与初始参数重新模拟，不重放手动操作。';heading.append(state);row.append(head,info,phenotypes,replay,note,params);list.append(row);
     }
   }
   for(const [id,results]of [['history-current-tab',false],['history-rounds-tab',true]])$(id).addEventListener('click',()=>{$('current-history').hidden=results;$('round-results').hidden=!results;$('history-current-tab').setAttribute('aria-pressed',String(!results));$('history-rounds-tab').setAttribute('aria-pressed',String(results));renderRoundHistory();dirty=true;});
@@ -15845,7 +16065,7 @@ Arena ＋ 右侧栏|Arena + sidebar
       else if(previous&&next&&previous.birth!==next.birth)selected=0;
       snapshot=m.data;if(snapshot.revision!==lastRevision){lastRevision=snapshot.revision;selected=0;observedBirth=0;adaptive.reset(performance.now());}
       autoRandom.observe(snapshot,performance.now());
-      if(!setupBusy){if(journal.active&&journal.epoch!==snapshot.revision+':'+snapshot.seed)archiveRound('external-reset');if(!journal.active)journal.begin(snapshot,performance.now(),undefined,parameterLocks.toJSON());journal.observe(snapshot,performance.now(),!document.hidden&&!stroke);}
+      if(!setupBusy){if(journal.active&&journal.epoch!==snapshot.revision+':'+snapshot.seed)archiveRound('external-reset');if(!journal.active)journal.begin(snapshot,performance.now(),undefined,parameterLocks.toJSON(),displaySettings());journal.observe(snapshot,performance.now(),!document.hidden&&!stroke);}
       performanceContext();
       if(raster.width!==snapshot.width||raster.height!==snapshot.height){raster.width=snapshot.width;raster.height=snapshot.height;image=rctx.createImageData(snapshot.width,snapshot.height);}
       pendingFrame=m.frame||0;trajectories.sample(snapshot);dirty=true;uiPending=true;
@@ -15916,11 +16136,14 @@ Arena ＋ 右侧栏|Arena + sidebar
       }
       $('environment-count').textContent='环境死亡其中：正常 '+s.counters.normalEnvironmentDeaths+' · 癌前 '+s.counters.abnormalEnvironmentDeaths;
       $('mutation-count').textContent='性状突变 '+s.counters.mutations;
+      $('stem-summary').textContent='肿瘤：干性 '+p.tumorStem+' · 分化 '+p.tumorDifferentiated;
+      $('repair-summary').textContent='正常修复分裂 '+s.counters.normalDivisions+' · 复制损伤死亡触发 '+s.counters.replicationDeaths+'（计入环境死亡）';
+      $('stem-events').textContent='不对称 '+s.counters.stemAsymmetric+' · 对称自我更新 '+s.counters.stemSelfRenewal+' · 对称分化 '+s.counters.stemDifferentiation+' · 干性重获 '+s.counters.stemReversions;
       $('abnormal-events').textContent='癌前发生 '+s.counters.abnormalInitiations+' · 癌前免疫清除 '+s.counters.abnormalKills;
       $('evolution-events').textContent='正常耐受变异 '+s.counters.normalTraitMutations+' · 肿瘤间期变异 '+s.counters.stressMutations+' · 压力抗原暴露 '+s.counters.antigenExposures;
       $('immune-regulation-events').textContent='转抑制态 '+s.counters.suppressiveTransitions+' · 恢复静息态 '+s.counters.suppressiveRecoveries+' · 损伤退激活 '+s.counters.injuryDeactivations+' · 信号退激活 '+s.counters.signalDeactivations;
       $('grid-info').textContent=s.width+' × '+s.height+' 格点 · '+s.refinement+'× 精细度';
-      for(const [key,label]of [['tumor','肿瘤'],['immune','免疫']]){const c=s.cycles?.[key];$('cycle-'+key).textContent=c?label+' · G0 '+c.G0+' · G1 '+c.G1+' · S '+c.S+' · G2 '+c.G2+' · M '+c.M+' · 周期阻滞 '+c.arrested:'';}
+      for(const [key,label]of [['normal','正常'],['tumor','肿瘤'],['immune','免疫']]){const c=s.cycles?.[key];$('cycle-'+key).textContent=c?label+' · G0 '+c.G0+' · G1 '+c.G1+' · S '+c.S+' · G2 '+c.G2+' · M '+c.M+' · 周期阻滞 '+c.arrested:'';}
     }
     $('rate').textContent=s.playing?(Math.round(s.rate)||'—'):'0';
     $('performance').textContent=`目标 ${s.targetRate} MCS / 秒 · ${s.limited?'算力不足，实际推进较慢；生长与分裂继续计算':'固定模型步长'}`;
@@ -15939,10 +16162,13 @@ Arena ＋ 右侧栏|Arena + sidebar
       lines.push(`子代 P${cell.generation} · 沿谱系分裂 ${cell.generation} 次`);
       const family=s.observation?.rootBirth===observedBirth?s.observation:null,member=family?.cells.find(c=>c.id===cell.id);
       if(member)lines.push(`观察谱系：相对第 ${member.generation} 代 · 标记 ${family.cells.length} 颗`);
-      if(cell.kind===2||cell.kind===3){
-        const c=cell.cycle,reasons={'':'周期推进',disabled:'生长参数关闭',nutrients:'氧糖或代谢不足',acid:'酸负荷过高',injury:'累积损伤待恢复',lineage:'谱系分裂上限',exhaustion:'慢性刺激耗竭',suppression:'免疫抑制／再激活等待',antigen:'抗原记忆不足',il2:'IL-2 支持不足',space:'实际空间不足',growth:'等待胞体生长',geometry:'分裂几何受限'};
+      if(cell.state!=='abnormal'){
+        const c=cell.cycle,reasons={'':'周期推进',disabled:'生长参数关闭',nutrients:'氧糖或代谢不足',acid:'酸负荷过高',injury:'累积损伤待恢复',lineage:'谱系分裂上限',exhaustion:'慢性刺激耗竭',suppression:'免疫抑制／再激活等待',antigen:'抗原记忆不足',il2:'IL-2 支持不足',space:'实际空间不足',growth:'等待胞体生长',geometry:'分裂几何受限',reserve:'营养储备不足',dna:'DNA 损伤检查点',contact:'接触抑制：缺少空隙'};
         lines.push(`细胞周期 ${c.phase} · 阶段进度 ${Math.round(c.progress*100)}%`,c.phase==='G0'&&!c.arrest?'整合增殖信号':reasons[c.arrest]);
       }
+      if(cell.resources)lines.push(`能量储备 ${Math.round(cell.resources.energy*100)}% · 合成储备 ${Math.round(cell.resources.precursor*100)}% · DNA 损伤 ${Math.round(cell.resources.dnaDamage*100)}%`);
+      if(cell.kind===1&&cell.state==='normal')lines.push(`剩余修复分裂 ${cell.divisionsLeft} 次 · 空隙接触 ${Math.round(cell.freeFraction*100)}%`);
+      if(cell.kind===2)lines.push(cell.isStem?'肿瘤干性：自我更新／分化':'分化肿瘤 · 剩余分裂 '+(cell.tumorDivisionsLeft===null?'无限制':cell.tumorDivisionsLeft+' 次'),`干性生态位记忆 ${Math.round(cell.stemNiche*100)}% · 性状资源代价 ${cell.traitEconomy.demand.toFixed(2)}×`);
       if(cell.state==='abnormal')lines.push(`癌前已持续 ${Math.floor(cell.abnormalAge)} MCS · 尚未获得肿瘤增殖／侵袭表型`,`抗原 ${cell.antigenLevel.toFixed(2)} · ${cell.antigen?'可被接触识别':'低于识别阈值'} · 杀伤损伤 ${(cell.damage*100).toFixed(0)}%`);
       if(cell.kind===1)lines.push(`局部炎性信号 ${(100*(cell.inflammatorySignal||0)).toFixed(0)}% · 累积暴露 ${(100*(cell.inflammatoryExposure||0)).toFixed(0)}%`);
       if(cell.kind!==3){
@@ -16102,7 +16328,7 @@ Arena ＋ 右侧栏|Arena + sidebar
     }ctx.restore();
     if(showCycle){
       ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';ctx.lineWidth=2.5*pixelRatio;ctx.strokeStyle='#fff8eb';ctx.fillStyle='#243c49';
-      for(const m of s.cells){const text=CellLabDisplay.cycleText(m);if(!text)continue;
+      for(const m of s.cells){const text=CellLabDisplay.cycleText(m);if(!text)continue;ctx.fillStyle=CellLabDisplay.cycleColor(m);
         const size=Math.max(8,Math.min(12,Math.sqrt(m.area)*scale/pixelRatio*.65));ctx.font=`bold ${size*pixelRatio}px Consolas, monospace`;
         for(const dx of wrap?[-w,0,w]:[0])for(const dy of wrap?[-h,0,h]:[0]){const x=((m.hasNucleus?m.nucleusX:m.x)+dx+.5)*scale,y=((m.hasNucleus?m.nucleusY:m.y)+dy+.5)*scale,pad=size*pixelRatio*1.5;if(x<-pad||y<-pad||x>canvas.width+pad||y>canvas.height+pad)continue;ctx.strokeText(text,x,y);ctx.fillText(text,x,y);}
       }ctx.restore();
@@ -16239,7 +16465,7 @@ Arena ＋ 右侧栏|Arena + sidebar
     if(preset||shuffle||scene==='empty'){signalLayers.clear();$('field-view').value=tumorPreset?'adversity':'none';if(tumorPreset||scene==='maze')signalLayers.add('trail');if(scene==='maze'){$('edge-activity').checked=true;$('immune-activity').checked=true;$('show-tracks').checked=true;$('track-duration').value='1200';syncTracks();view.x=0;view.y=0;$('zoom').value='100';$('view-fit').value='contain';}updateOverlayButtons();dirty=true;await rpc('speed',{value:tumorPreset||scene==='network'?3:1});await rpc('playing',{value:scene!=='empty'});}
     else if(scene==='stress'||scene==='surveillance'){$('field-view').value='adversity';dirty=true;}
     if(scene==='empty'){view.x=0;view.y=0;$('zoom').value='100';$('seed-kind').value='1';setTool('seed');if(mobileUI.isMobile)mobileUI.focus('mobile-tools');dirty=true;}
-    }finally{setupBusy--;autoRandom.reset(performance.now());autoRandom.observe(snapshot,performance.now());renderAutoNotice();if(snapshot&&!journal.active)journal.begin(snapshot,performance.now(),undefined,parameterLocks.toJSON());}
+    }finally{setupBusy--;autoRandom.reset(performance.now());autoRandom.observe(snapshot,performance.now());renderAutoNotice();if(snapshot&&!journal.active)journal.begin(snapshot,performance.now(),undefined,parameterLocks.toJSON(),displaySettings());}
   }
   function syncTracks(){trajectories.configure($('show-tracks').checked,Number($('track-duration').value));$('track-duration-out').textContent=$('track-duration').value+' MCS';if(snapshot)trajectories.sample(snapshot);dirty=true;}
   $('show-tracks').addEventListener('change',syncTracks);$('track-duration').addEventListener('input',syncTracks);
@@ -16255,7 +16481,23 @@ Arena ＋ 右侧栏|Arena + sidebar
   $('render-resolution').addEventListener('change',()=>{performanceContext();dirty=true;forceFrame=true;});
   $('tumor-morphology').addEventListener('change',e=>rpc('set',{name:'tumorMorphology',value:Number(e.target.value)}).then(()=>toast('肿瘤形态偏好已更新，胞体将逐步重塑')).catch(fail));
   $('network-demo').addEventListener('click',()=>start('network',{preset:true}).catch(fail));
-  $('fullscreen').addEventListener('click',()=>{const viewport=document.querySelector('.viewport');(document.fullscreenElement?document.exitFullscreen():viewport.requestFullscreen()).catch(fail);});
+  let arenaFullscreen=false,fullscreenHadNative=false,fullscreenFocus=null;
+  function fullscreenLayout(value){
+    arenaFullscreen=value;document.body.classList.toggle('arena-fullscreen',value);$('exit-arena-fullscreen').hidden=!value;$('arena-fullscreen').setAttribute('aria-pressed',String(value));dirty=true;
+  }
+  async function exitArenaFullscreen(){
+    fullscreenLayout(false);if(document.fullscreenElement)try{await document.exitFullscreen();}catch{}fullscreenHadNative=false;fullscreenFocus?.focus({preventScroll:true});
+  }
+  async function toggleArenaFullscreen(){
+    if(arenaFullscreen||document.fullscreenElement)return exitArenaFullscreen();
+    fullscreenFocus=document.activeElement;
+    try{const request=viewport.requestFullscreen?.();fullscreenLayout(true);if(request)await request;fullscreenHadNative=!!document.fullscreenElement;}catch(error){viewport.dataset.fullscreenFallback=error.name+": "+error.message;fullscreenLayout(true);}
+    $('exit-arena-fullscreen').focus({preventScroll:true});
+  }
+  for(const id of ['arena-fullscreen','fullscreen'])$(id).addEventListener('click',toggleArenaFullscreen);
+  $('exit-arena-fullscreen').addEventListener('click',exitArenaFullscreen);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&arenaFullscreen){e.preventDefault();exitArenaFullscreen();}});
+  document.addEventListener('fullscreenchange',()=>{if(document.fullscreenElement)fullscreenHadNative=true;else if(fullscreenHadNative){fullscreenLayout(false);fullscreenHadNative=false;fullscreenFocus?.focus({preventScroll:true});}});
   $('reset').addEventListener('click',()=>start(undefined,{preserve:true}).catch(fail));$('shuffle').addEventListener('click',()=>start('random',{shuffle:true}).catch(fail));
   $('play').addEventListener('click',()=>rpc('playing',{value:!snapshot?.playing}).catch(fail));
   $('speed').addEventListener('input',e=>{$('speed-out').textContent=e.target.value+'×';rpc('speed',{value:Number(e.target.value)}).catch(fail);});
@@ -16322,10 +16564,14 @@ Arena ＋ 右侧栏|Arena + sidebar
   async function exportData(){return {...await rpc('export'),display:displaySettings()};}
   $('export-data').addEventListener('click',async()=>{try{const data=await exportData(),url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));download(url,`cell-arena-experiment-${data.time}.json`);setTimeout(()=>URL.revokeObjectURL(url),5000);}catch(e){fail(e);}});
   let pendingImport=null,importSerial=0;
-  async function importData(data){
+  async function replayRound(record){
+    const data=CellLabRounds.replayExperiment(record);await importData(data,{reason:'history-replay',kernel:record.initialKernel,computeMode:record.initialCompute,replayOf:record.id});
+    await rpc('playing',{value:true});toast('已按原种子和初始参数开始新一局');
+  }
+  async function importData(data,options={}){
     setupBusy++;autoRandom.suspend(performance.now());try{
     await endStroke();
-    const profile=CellLabExperiment.parse(data);if(snapshot){await rpc('playing',{value:false});journal.observe(snapshot,performance.now(),false);}await rpc('import',{data});archiveRound('import');
+    const profile=CellLabExperiment.parse(data);if(snapshot){await rpc('playing',{value:false});journal.observe(snapshot,performance.now(),false);}await rpc('import',{data,kernel:options.kernel,computeMode:options.computeMode});archiveRound(options.reason||'import');
     const config=profile.config,select=$('world-size');let option=[...select.options].find(o=>o.value===String(config.worldWidth));if(!option){option=new Option('',String(config.worldWidth));select.append(option);}option.textContent=`${config.worldWidth} × ${config.worldHeight}`;option.dataset.height=config.worldHeight;select.value=String(config.worldWidth);$('refinement').value=String(config.refinement);gridPreview();
     const d=profile.display;if(d.parameterLocks){parameterLocks.restore(d.parameterLocks);persistLocks();}if(d.cellColors)applyColors(d.cellColors);if(d.edgeFade!==undefined){$('body-feather').value=d.edgeFade;syncAppearance();}if(d.fieldView!==undefined)$('field-view').value=d.fieldView;if(d.signalLayers){signalLayers.clear();for(const key of d.signalLayers)signalLayers.add(key);}Object.assign(opacity,d.opacity||{});
     $('auto-random-minutes').value=d.autoRandomMinutes??0;configureAutoRandom();
@@ -16336,7 +16582,7 @@ Arena ＋ 右侧栏|Arena + sidebar
     if(d.trackDuration!==undefined)$('track-duration').value=d.trackDuration;syncTracks();
     if(d.zoom)$('zoom').value=d.zoom;if(d.fit)$('view-fit').value=d.fit;if(d.renderResolution)$('render-resolution').value=d.renderResolution;
     view.x=0;view.y=0;selected=0;observedBirth=0;hover=null;probeDirty=true;syncOpacity();updateOverlayButtons();setTool(config.scene==='empty'?'seed':'move');dirty=true;return profile;
-    }finally{setupBusy--;autoRandom.reset(performance.now());autoRandom.observe(snapshot,performance.now());renderAutoNotice();if(snapshot&&!journal.active)journal.begin(snapshot,performance.now(),undefined,parameterLocks.toJSON());}
+    }finally{setupBusy--;autoRandom.reset(performance.now());autoRandom.observe(snapshot,performance.now());renderAutoNotice();if(snapshot&&!journal.active)journal.begin(snapshot,performance.now(),undefined,parameterLocks.toJSON(),displaySettings(),options.replayOf||null);}
   }
   $('import-data').addEventListener('click',()=>$('import-file').click());
   $('import-file').addEventListener('change',async()=>{
@@ -16359,7 +16605,7 @@ Arena ＋ 右侧栏|Arena + sidebar
     if(dirty&&(!pendingFrame||forceFrame||now-lastRender>=1000/performancePlan.fps))render();
     if(probeDirty)updateProbe();requestAnimationFrame(frame);
   }requestAnimationFrame(frame);applyPerformance();
-  window.artistooLab={rpc,ready,get snapshot(){return snapshot;},get roundHistory(){return {completed:completedRounds.map(r=>structuredClone(r)),current:journal.current()};},get parameterLocks(){return parameterLocks.toJSON();},get autoRandom(){return {...autoRandom.status(),busy:autoRandomBusy};},get performance(){return {...adaptive.status(),visiblePanels:[...visiblePanels]};},get errors(){return errors;},get selected(){return selected;},get recording(){return video.status;},get colors(){return CellLabDisplay.normalizeColors(cellColors);},get renderer(){return {gpu:!!gpuRenderer&&!gpuRenderer.lost,device:gpuRenderer?.device,error:rendererFailure,ms:gpuRenderer?.lastMs,fps:snapshot?.playing?frameStats.fps:0,renderMs:frameStats.renderMs,snapshotMs:frameStats.snapshotMs};},setTool,render,exportData,importData};
+  window.artistooLab={rpc,ready,get snapshot(){return snapshot;},get roundHistory(){return {completed:CellLabRounds.numbered(completedRounds).map(r=>structuredClone(r)),current:journal.current()};},get parameterLocks(){return parameterLocks.toJSON();},get autoRandom(){return {...autoRandom.status(),busy:autoRandomBusy};},get performance(){return {...adaptive.status(),visiblePanels:[...visiblePanels]};},get errors(){return errors;},get selected(){return selected;},get recording(){return video.status;},get colors(){return CellLabDisplay.normalizeColors(cellColors);},get renderer(){return {gpu:!!gpuRenderer&&!gpuRenderer.lost,device:gpuRenderer?.device,error:rendererFailure,ms:gpuRenderer?.lastMs,fps:snapshot?.playing?frameStats.fps:0,renderMs:frameStats.renderMs,snapshotMs:frameStats.snapshotMs};},setTool,render,exportData,importData,replayRound};
   const language=CellLabI18n.mount($('language'));
   window.addEventListener('pagehide',()=>{if(snapshot)journal.observe(snapshot,performance.now(),false);checkpointRound(performance.now(),true);});
   historyReady.then(()=>start('oncogenesis',{preset:true})).then(()=>rpc('visible',{value:!document.hidden})).then(resolveReady).catch(fail);

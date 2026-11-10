@@ -1,7 +1,7 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
 for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/insertion.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm'));
-const quiet={growth:2,metabolism:0,apoptosis:0,immuneGrowth:0,normalMotility:0,cohesion:0,stressMutation:0};
+const quiet={stemFraction:0,stemPlasticity:0,normalRepair:0,growth:2,metabolism:0,apoptosis:0,immuneGrowth:0,normalMotility:0,cohesion:0,stressMutation:0};
 function forty(capacity,kind=2){
   const s=new CellLab.Simulation({width:192,height:144,scene:'empty',warmup:0,seed:17,settings:{...quiet,capacity}}),id=s.seed(kind,110,95,7);
   for(let i=0;i<39;i++)assert.ok(s.seed(1,10+(i%13)*12,10+Math.floor(i/13)*12,3));return {s,id};
@@ -9,7 +9,7 @@ function forty(capacity,kind=2){
 
 test('old population budgets do not alter tumor growth, division, random trajectory or environmental state',async()=>{
   const a=forty(40),b=forty(800);await CellLabWasm.install(a.s,module);await CellLabWasm.install(b.s,module);
-  a.s.set('capacity',40);a.s.advance(160);b.s.advance(160);
+  a.s.set('capacity',40);a.s.advance(400);b.s.advance(400);
   assert.ok(a.s.counters.divisions>0,'tumor must divide beyond the previous 40-cell budget');assert.ok(a.s.live().length>40);
   assert.deepEqual(a.s.C.grid._pixels,b.s.C.grid._pixels);assert.deepEqual(a.s.snapshot().cells,b.s.snapshot().cells);assert.deepEqual(a.s.C.mt.mt,b.s.C.mt.mt);
   for(const name of Object.keys(a.s.fields))assert.deepEqual(a.s.fields[name].values,b.s.fields[name].values);

@@ -18,12 +18,12 @@ static u32 visited[MAX],goals[MAX],queue[MAX],logdata[MAX*2+2],mt[625];
 static double cells[65536*STRIDE],params[64];
 static u32 bond_keys[BONDS];static double bond_strength[BONDS];
 static float segments[SEGMENTS*6];
-static u8 contact_present[65536];static int contact_table[32768],contact_data[16384*5],contact_count;
+static u8 contact_present[65536];static int free_membrane[65536];static int contact_table[32768],contact_data[16384*5],contact_count;
 static u8 raster_kind[65536],raster_visited[MAX],raster_activity[MAX],raster_walls[MAX];static u16 raster_grid[MAX];static u32 raster_counts[3];
 static u32 stamp=0;static int width,height,wrap,ybits,nraw,count,logcount,section;
 __attribute__((import_module("math"),import_name("exp"))) extern double js_exp(double);
 __attribute__((import_module("math"),import_name("pow"))) extern double js_pow(double,double);
-__attribute__((export_name("pointer"))) u32 pointer(int k){switch(k){case 0:return(u32)grid;case 1:return(u32)activity;case 2:return(u32)degree;case 3:return(u32)nc;case 4:return(u32)neighbors;case 5:return(u32)rings;case 6:return(u32)pool;case 7:return(u32)mt;case 8:return(u32)cells;case 9:return(u32)params;case 10:return(u32)connected;case 12:return(u32)contact_data;case 13:return(u32)contact_present;case 14:return(u32)bond_keys;case 15:return(u32)bond_strength;case 16:return(u32)segments;case 17:return(u32)raster_kind;case 18:return(u32)raster_visited;case 19:return(u32)raster_grid;case 20:return(u32)raster_activity;case 21:return(u32)raster_walls;case 22:return(u32)raster_counts;default:return(u32)logdata;}}
+__attribute__((export_name("pointer"))) u32 pointer(int k){switch(k){case 0:return(u32)grid;case 1:return(u32)activity;case 2:return(u32)degree;case 3:return(u32)nc;case 4:return(u32)neighbors;case 5:return(u32)rings;case 6:return(u32)pool;case 7:return(u32)mt;case 8:return(u32)cells;case 9:return(u32)params;case 10:return(u32)connected;case 12:return(u32)contact_data;case 13:return(u32)contact_present;case 14:return(u32)bond_keys;case 15:return(u32)bond_strength;case 16:return(u32)segments;case 17:return(u32)raster_kind;case 18:return(u32)raster_visited;case 19:return(u32)raster_grid;case 20:return(u32)raster_activity;case 21:return(u32)raster_walls;case 22:return(u32)raster_counts;case 23:return(u32)free_membrane;default:return(u32)logdata;}}
 __attribute__((export_name("init"))) void init(int w,int h,int wr,int bits,int n,int sec){width=w;height=h;wrap=wr;ybits=bits;nraw=n;section=sec;stamp=0;int step=1<<bits;
   int ro[8]={-step-1,-1,step-1,step,step+1,1,1-step,-step},no[8]={-step-1,-step,1-step,-1,1,step-1,step,step+1};for(int k=0;k<8;k++){ring_offsets[k]=ro[k];neighbor_offsets[k]=no[k];}
   for(int i=0;i<n;i++){visited[i]=0;goals[i]=0;int x=i>>bits,y=i&(step-1);interior[i]=x>0&&x<w-1&&y>0&&y<h-1;}}
@@ -136,10 +136,11 @@ static int add_contact(int a,int b,int dx,int dy){
   if(contact_count>=16384)return 0;int at=contact_count*5;contact_table[slot]=++contact_count;contact_data[at]=a;contact_data[at+1]=b;contact_data[at+2]=1;contact_data[at+3]=dx;contact_data[at+4]=dy;return 1;
 }
 __attribute__((export_name("contacts"))) int contacts(int length){
-  for(int i=0;i<32768;i++)contact_table[i]=0;contact_count=0;
+  for(int i=0;i<32768;i++)contact_table[i]=0;contact_count=0;for(int i=0;i<65536;i++)free_membrane[i]=0;
   // Same border traversal and first-insertion order as the reference Map path.
   for(int p=0;p<length;p++){int i=pool[p],a=grid[i];if(!contact_present[a])continue;int right=ring_at(i,3),down=ring_at(i,5);
-    int b=right<0?0:grid[right];if(a!=b&&contact_present[b]&&(contact_present[a]==1||contact_present[b]==1))if(!add_contact(a,b,1,0)||!add_contact(b,a,-1,0))return -1;
-    b=down<0?0:grid[down];if(a!=b&&contact_present[b]&&(contact_present[a]==1||contact_present[b]==1))if(!add_contact(a,b,0,1)||!add_contact(b,a,0,-1))return -1;
+    if(contact_present[a]==3){const int faces[4]={1,3,5,7};for(int f=0;f<4;f++){int j=ring_at(i,faces[f]);if(j>=0&&!grid[j])free_membrane[a]++;}}
+    int b=right<0?0:grid[right];if(a!=b&&contact_present[b]&&(contact_present[a]!=2||contact_present[b]!=2))if(!add_contact(a,b,1,0)||!add_contact(b,a,-1,0))return -1;
+    b=down<0?0:grid[down];if(a!=b&&contact_present[b]&&(contact_present[a]!=2||contact_present[b]!=2))if(!add_contact(a,b,0,1)||!add_contact(b,a,0,-1))return -1;
   }return contact_count;
 }

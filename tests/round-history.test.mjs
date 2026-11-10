@@ -40,3 +40,19 @@ test('lock import validates booleans and all model parameters survive a fixed ra
   const locks=new CellLabRounds.Locks(Object.keys(CellLabExperiment.ranges));locks.all(true);const original=new CellLab.Simulation({scene:'hot',width:240,height:180,warmup:0});
   const next=new CellLab.Simulation({scene:'random',width:240,height:180,warmup:0,seed:999,settings:locks.pick(original.settings)});assert.deepEqual(next.settings,original.settings);
 });
+
+
+test('round numbering is chronological and stable across pagination, legacy records and CSV',()=>{
+ const a={id:'a',startedAt:'2026-01-01'},b={id:'b',startedAt:'2026-01-02'};
+ assert.deepEqual(CellLabRounds.numbered([b,a]).map(r=>[r.id,r.roundNumber]),[['a',1],['b',2]]);assert.equal(a.roundNumber,undefined);
+});
+test('re-simulation uses initial seed, sources and parameters, never the final state',()=>{
+ const j=new CellLabRounds.Journal(),s=snapshot();s.warmup=0;s.modelRevision='test';s.kernel='fast';s.compute={active:'cpu'};s.sources=[{type:'trail',x:30,y:15,radius:9}];
+ j.begin(s,0,undefined,{}, {flags:{nuclei:true}});s.settings.growth=2;s.sources.push({type:'acid',x:60,y:30,radius:12});j.observe(s,1);const r=j.finish('manual-random',1);
+ const data=CellLabRounds.replayExperiment(r);assert.equal(data.seed,4294967295);assert.equal(data.settings.growth,1);assert.equal(data.warmup,0);assert.equal(data.display.autoRandomMinutes,0);
+ assert.deepEqual(data.sources,[{type:'trail',x:20,y:10,radius:6}]);assert.equal(data.display.flags.nuclei,true);data.settings.growth=0;assert.equal(r.initialSettings.growth,1);
+ const csv=CellLabRounds.csv([r]);for(const k of ['round_number','model_revision','initial_sources','tumorStem'])assert.ok(csv.includes(k));
+});
+test('legacy replay never silently treats final intervention sources as initial sources',()=>{
+ const old={...snapshot(),initialSettings:{growth:1},sources:[{type:'acid',x:3,y:3,radius:4}]};const data=CellLabRounds.replayExperiment(old);assert.equal(data.sources,undefined);assert.equal(data.warmup,undefined);
+});

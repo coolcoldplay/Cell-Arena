@@ -18,7 +18,7 @@
       this.grid=view(Uint16Array,0,n);this.activity=view(Uint8Array,1,n);this.degree=view(Uint8Array,2,n);this.nc=view(Uint8Array,3,n);this.neighbors=view(Int32Array,4,n*8);this.rings=view(Int32Array,5,n*8);this.pool=view(Int32Array,6,n);this.mt=view(Uint32Array,7,625);this.cells=view(Float64Array,8,65536*stride);this.params=view(Float64Array,9,64);this.connected=view(Uint8Array,10,256);this.log=view(Uint32Array,11,n*2+2);this.previous=[];
       if(!s.section)throw Error('The WASM kernel requires cross-section mechanics');
       this.connected.set(s.connected4);
-      this.contactData=view(Int32Array,12,16384*5);this.contactPresent=view(Uint8Array,13,65536);
+      this.contactData=view(Int32Array,12,16384*5);this.contactPresent=view(Uint8Array,13,65536);this.freeMembrane=view(Int32Array,23,65536);
       this.bondKeys=view(Uint32Array,14,BONDS);this.bondStrength=view(Float64Array,15,BONDS);this.bondSlots=[];
       this.segments=view(Float32Array,16,SEGMENTS*6);
       if(e.raster){const size=s.width*s.height;this.rasterKind=view(Uint8Array,17,65536);this.rasterVisited=view(Uint8Array,18,n);this.rasterGrid=view(Uint16Array,19,size);this.rasterActivity=view(Uint8Array,20,size);this.rasterWalls=view(Uint8Array,21,size);this.rasterCounts=view(Uint32Array,22,3);}
@@ -60,12 +60,12 @@
       C.time++;C.stat_values={};for(const listener of C.post_mcs_listeners)listener();
     }
     contacts(){
-      const s=this.s,C=s.C,live=s.live();this.grid.set(C.grid._pixels.subarray(0,this.length));this.pool.set(C.borderpixels.elements);this.contactPresent.fill(0);for(const m of live)this.contactPresent[m.id]=1;
+      const s=this.s,C=s.C,live=s.live();this.grid.set(C.grid._pixels.subarray(0,this.length));this.pool.set(C.borderpixels.elements);this.contactPresent.fill(0);for(const m of live)this.contactPresent[m.id]=m.kind===1?3:1;
       for(const [id,kind]of Object.entries(C.t2k))if(kind===4)this.contactPresent[Number(id)]=2;
       const count=this.e.contacts(C.borderpixels.length);if(count<0)return this.originalContacts();
       for(const m of live){let map=s.contacts.get(m.id);if(!map){map=new Map();s.contacts.set(m.id,map);}map.clear();}
       for(let n=0;n<count;n++){const i=n*5,d=this.contactData;if(s.cells[d[i]])s.contacts.get(d[i]).set(d[i+1],{id:d[i+1],length:d[i+2],nx:d[i+3],ny:d[i+4]});}
-      for(const m of live){let length=0;for(const e of s.contacts.get(m.id).values())length+=e.length;m.confinement=Math.max(0,Math.min(1,length/Math.max(1,4*Math.sqrt(C.getVolume(m.id)))));}
+      for(const m of live){let length=0;for(const e of s.contacts.get(m.id).values())length+=e.length;m.confinement=Math.max(0,Math.min(1,length/Math.max(1,4*Math.sqrt(C.getVolume(m.id)))));m.freeMembrane=this.freeMembrane[m.id];m.freeFraction=m.freeMembrane/Math.max(1,m.freeMembrane+length);}
       return s.contacts;
     }
     raster(){
