@@ -19,6 +19,8 @@ for (const [slot, text] of Object.entries({ STYLE: css, WORKER: `globalThis.CELL
   const safe = slot.endsWith('LICENSE') ? source.replaceAll('&','&amp;').replaceAll('<','&lt;') : source.replace(/<\/script/gi, '<\\/script');
   html = html.replace(`/* INLINE_${slot} */`, () => safe);
 }
+// Windows checkouts and Linux Pages builds must produce the same bytes/hash.
+html = html.replace(/\r\n/g, '\n');
 await mkdir(path.join(root,'dist'), { recursive: true });
 await writeFile(path.join(root,'dist/index.html'), html);
 await writeFile(path.join(root,'dist/artistoo-playground.html'), html);
