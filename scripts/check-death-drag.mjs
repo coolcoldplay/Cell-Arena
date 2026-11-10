@@ -8,7 +8,7 @@ const shot=async name=>{const image=await call('Page.captureScreenshot',{format:
 const pointer=async(type,x,y)=>{const p=await evaluate(`(()=>{const c=document.getElementById('world'),r=c.getBoundingClientRect(),s=artistooLab.snapshot;return{x:r.x+(${x}+.5)*r.width/s.width,y:r.y+(${y}+.5)*r.height/s.height};})()`);await call('Input.dispatchMouseEvent',{type,...p,button:'left',buttons:type==='mouseReleased'?0:1,clickCount:1});};
 const advance=steps=>evaluate(`artistooLab.rpc('advance',{steps:${steps}})`);
 try{
-  await wait('!!window.artistooLab?.snapshot&&artistooLab.snapshot.speed===4');await evaluate(`artistooLab.rpc('playing',{value:false})`);
+  await wait('!!window.artistooLab?.snapshot&&artistooLab.snapshot.speed===3');await evaluate(`artistooLab.rpc('playing',{value:false})`);
   await evaluate(`(async()=>{await artistooLab.rpc('start',{scene:'empty',width:96,height:72,warmup:0,seed:17,settings:{growth:0,immuneGrowth:0,metabolism:0,apoptosis:0,kill:0,normalMotility:0,tumorMotility:0,immuneMotility:0}});window.dragID=await artistooLab.rpc('seed',{kind:3,x:12,y:36});for(const x of [30,45,60])await artistooLab.rpc('seed',{kind:1,x,y:36});await artistooLab.rpc('advance',{steps:40});artistooLab.setTool('move');document.getElementById('world').scrollIntoView({block:'center'});})()`);
   const cell=await evaluate('artistooLab.snapshot.cells.find(c=>c.id===dragID)');
   await evaluate(`artistooLab.rpc('playing',{value:true})`);await pointer('mousePressed',cell.nucleusX,cell.nucleusY);await wait('!artistooLab.snapshot.playing');

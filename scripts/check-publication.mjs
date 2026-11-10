@@ -9,7 +9,7 @@ const waitFor=async expression=>{for(let n=0;n<200;n++){if(await evaluate(expres
 const click=async selector=>{const p=await evaluate(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});e.scrollIntoView({block:'center'});const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);for(const type of ['mousePressed','mouseReleased'])await call('Input.dispatchMouseEvent',{type,...p,button:'left',buttons:type==='mousePressed'?1:0,clickCount:1});await delay(100);};
 const shot=async name=>{const png=await call('Page.captureScreenshot',{format:'png'});await writeFile(out+'/'+name+'.png',Buffer.from(png.data,'base64'));};
 try{
-  await waitFor('!!window.artistooLab?.snapshot&&artistooLab.snapshot.speed===4');
+  await waitFor('!!window.artistooLab?.snapshot&&artistooLab.snapshot.speed===3');
   await evaluate(`artistooLab.rpc('playing',{value:false})`);
   const initial=await evaluate(`({title:document.title,brand:document.querySelector('.brand b').textContent,scene:artistooLab.snapshot.scene,kernel:artistooLab.snapshot.kernel,secure:isSecureContext,renderer:artistooLab.renderer,networkScripts:document.querySelectorAll('script[src]').length})`);
   check(initial.title.startsWith('Cell-Arena')&&initial.brand==='Cell-Arena','Published title and branding are Cell-Arena',initial);

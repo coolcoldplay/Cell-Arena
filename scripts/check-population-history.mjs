@@ -8,7 +8,7 @@ const check=(ok,name,details={})=>{checks.push({name,passed:!!ok,...details});if
 const capture=()=>evaluate(`(()=>{artistooLab.render();const s=artistooLab.snapshot;return {time:s.time,playing:s.playing,history:s.history,samples:s.historySamples,cells:s.cells.map(c=>({id:c.id,kind:c.kind,state:c.state})),label:document.getElementById('history-range').textContent,aria:document.getElementById('history').getAttribute('aria-label'),trace:historyTrace};})()`);
 const shoot=async name=>{await evaluate(`document.querySelector('.chart-panel').scrollIntoView({block:'center'});artistooLab.render();`);await delay(80);const png=await call('Page.captureScreenshot',{format:'png'});await writeFile(out+'/'+name+'.png',Buffer.from(png.data,'base64'));};
 try{
-  for(let n=0;n<150;n++){if(await evaluate('!!window.artistooLab?.snapshot&&artistooLab.snapshot.speed===4'))break;await delay(100);}
+  for(let n=0;n<150;n++){if(await evaluate('!!window.artistooLab?.snapshot&&artistooLab.snapshot.speed===3'))break;await delay(100);}
   await evaluate(`artistooLab.rpc('playing',{value:false})`);
   const initial=await capture();
   check(initial.history[0].time===0&&initial.history[0].normal===48&&initial.history[0].tumor===0,'Initial populations are recorded at time zero, before settling');

@@ -7,7 +7,7 @@ const wait=async expression=>{for(let i=0;i<200;i++){if(await evaluate(expressio
 const click=async selector=>{const point=await evaluate(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});for(let a=e?.parentElement;a;a=a.parentElement)if(a.tagName==='DETAILS'&&a.querySelector(':scope>summary')!==e)a.open=true;e.scrollIntoView({block:'center'});const r=e.getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2};})()`);for(const type of ['mousePressed','mouseReleased'])await call('Input.dispatchMouseEvent',{type,...point,button:'left',buttons:type==='mousePressed'?1:0,clickCount:1});await delay(80);};
 const shot=async name=>{const image=await call('Page.captureScreenshot',{format:'png'});await writeFile(out+'/'+name+'.png',Buffer.from(image.data,'base64'));};
 try{
-  await wait('!!window.artistooLab?.snapshot&&artistooLab.snapshot.speed===4');await evaluate(`artistooLab.rpc('playing',{value:false})`);
+  await wait('!!window.artistooLab?.snapshot&&artistooLab.snapshot.speed===3');await evaluate(`artistooLab.rpc('playing',{value:false})`);
   await click('#module-colors > summary');await click('#reset-colors');
   check(await evaluate(`document.querySelectorAll('#color-controls input[type=color]').length===10&&document.getElementById('color-tumor-nucleus').checkVisibility()`),'All five states have visible body and nucleus color controls');
   await click('#clear-overlays');
@@ -15,7 +15,7 @@ try{
   const color=await evaluate(`({pixel:pixel(...normalSite),unchanged:JSON.stringify({time:artistooLab.snapshot.time,grid:[...artistooLab.snapshot.grid]})===frozen,renderer:artistooLab.renderer})`);
   check(color.unchanged&&color.pixel.every((v,k)=>Math.abs(v-[54,148,181][k])<=1)&&color.renderer.gpu,'Changing color while paused immediately updates GPU pixels without restarting or moving cells',color);
   const exported=await evaluate('artistooLab.exportData()');check(exported.display.cellColors.normal.nucleus==='#240d58'&&exported.history[0].time===0,'Export includes custom display colors and the complete population history');
-  await call('Page.reload');await wait('!!window.artistooLab?.snapshot&&artistooLab.snapshot.speed===4');await evaluate(`artistooLab.rpc('playing',{value:false})`);
+  await call('Page.reload');await wait('!!window.artistooLab?.snapshot&&artistooLab.snapshot.speed===3');await evaluate(`artistooLab.rpc('playing',{value:false})`);
   check(await evaluate(`artistooLab.colors.normal.body==='#3694b5'&&document.getElementById('color-normal-nucleus').value==='#240d58'`),'Color choices survive a page reload');
   await click('#module-colors > summary');await click('#reset-colors');
   check(await evaluate(`artistooLab.colors.normal.body==='#cccccc'&&artistooLab.colors.immune.body==='#e99a9a'`),'Restore-default button restores the original state palette');

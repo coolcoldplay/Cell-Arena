@@ -6,7 +6,7 @@ if(response.status!==200||hash(served)!==hash(local)||hash(local)!==manifest.htm
 const b=await openBrowser(url,9387,{gpu:true});
 try{
   await b.call('Emulation.setDeviceMetricsOverride',{width:1440,height:1250,deviceScaleFactor:1,mobile:false});
-  for(let i=0;i<200;i++){if(await b.evaluate('!!window.artistooLab?.snapshot&&artistooLab.snapshot.speed===4'))break;await delay(100);}
+  for(let i=0;i<200;i++){if(await b.evaluate('!!window.artistooLab?.snapshot&&artistooLab.snapshot.speed===3'))break;await delay(100);}
   await b.evaluate('artistooLab.rpc("playing",{value:false})');
   const initial=await b.evaluate('({scene:artistooLab.snapshot.scene,nuclei:document.getElementById("nuclei").checked,kernel:artistooLab.snapshot.kernel,renderer:artistooLab.renderer})');
   if(initial.scene!=='oncogenesis'||!initial.nuclei||initial.kernel!=='wasm'||!initial.renderer.gpu)throw Error('Served startup smoke check failed');

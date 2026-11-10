@@ -149,3 +149,20 @@ aside.statistics-focused #record-options>summary{padding:4px 0}
 @media(max-width:850px){.statistics-actions button{min-height:40px}.statistics-actions{padding:6px 0}}
 
 @media(max-width:850px){.record-scope-hint{display:none}}
+
+/* Keep complementary actions in the same column at every screen size. */
+.tools.paired-tools{grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch;--tool-height:27px}
+.tools.paired-tools>[data-tool=signal]{align-self:start}
+.tools.paired-tools button{height:var(--tool-height);min-height:var(--tool-height);white-space:nowrap}
+.tool-pair{display:grid;grid-template-rows:repeat(2,1fr);gap:5px;min-width:0}
+.tool-pair button{min-width:0}
+.signal-help{font-size:11px;line-height:1.5;margin:5px 0 0;color:var(--muted)}
+#signal-options .slider{display:block;margin:6px 0}
+#signal-options .slider>span{width:100%}
+.quick-tools:has([data-tool=signal].selected)>.compact-hint{display:none}
+@media(max-width:850px){
+  .tools.paired-tools{--tool-height:44px}
+  .tools.paired-tools button,html[lang=en] .tools.paired-tools button{font-size:clamp(10px,3vw,12px);padding-inline:1px}
+  .tool-pair{gap:6px}
+  .signal-help{font-size:12px}
+}

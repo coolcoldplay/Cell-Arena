@@ -541,18 +541,30 @@
       this.addSource(cx*r,cy*r,'trail',4*r);
     }
     addSource(x,y,type,radius=10*this.scale){
-      if(![...SIGNALS,'nutrient','hostile'].includes(type)||![x,y,radius].every(Number.isFinite)||radius<=0)return 0;
+      if(![...SIGNALS,'oxygen','glucose','acid','nutrient','hostile'].includes(type)||![x,y,radius].every(Number.isFinite)||radius<=0)return 0;
       x=clamp(x,0,this.width-1);y=clamp(y,0,this.height-1);radius=clamp(radius,2*this.scale,40*this.scale);
-      const existing=this.sources.find(s=>s.type===type&&Math.hypot(s.x-x,s.y-y)<Math.max(2*this.scale,radius*.5));if(existing)return existing.id;
+      const existing=this.sources.find(s=>s.type===type&&this.sourceDistance(s,x,y)<Math.max(2*this.scale,radius*.5));if(existing)return existing.id;
       const source={id:++this.sourceSerial,x,y,type,radius};this.sources.push(source);this.applySources();this.version++;return source.id;
     }
-    removeSources(x,y,radius=10*this.scale){const n=this.sources.length;this.sources=this.sources.filter(s=>Math.hypot(s.x-x,s.y-y)>radius+s.radius);this.version++;return n-this.sources.length;}
-    sourceBins(source){const f=this.fields.oxygen,result=[],step=this.fieldScale;for(let y=Math.max(0,Math.floor((source.y-source.radius)/step));y<Math.min(f.height,(source.y+source.radius)/step+1);y++)for(let x=Math.max(0,Math.floor((source.x-source.radius)/step));x<Math.min(f.width,(source.x+source.radius)/step+1);x++){const i=y*f.width+x;if(!f.blocked[i]&&Math.hypot((x+.5)*step-source.x,(y+.5)*step-source.y)<=source.radius)result.push(i);}return result;}
+    sourceDistance(source,x,y){let dx=Math.abs(source.x-x),dy=Math.abs(source.y-y);if(this.wrap){dx=Math.min(dx,this.width-dx);dy=Math.min(dy,this.height-dy);}return Math.hypot(dx,dy);}
+    removeSources(x,y,radius=10*this.scale){const n=this.sources.length;this.sources=this.sources.filter(s=>this.sourceDistance(s,x,y)>radius+s.radius);this.version++;return n-this.sources.length;}
+    sourceBins(source){
+      const f=this.fields.oxygen,result=new Set(),step=this.fieldScale;
+      // Clip each periodic image's bounding box, rather than scanning the whole dish.
+      for(const dx of this.wrap?[-this.width,0,this.width]:[0])for(const dy of this.wrap?[-this.height,0,this.height]:[0]){
+        const cx=source.x+dx,cy=source.y+dy;
+        for(let y=Math.max(0,Math.floor((cy-source.radius)/step));y<Math.min(f.height,(cy+source.radius)/step+1);y++)for(let x=Math.max(0,Math.floor((cx-source.radius)/step));x<Math.min(f.width,(cx+source.radius)/step+1);x++){
+          const i=y*f.width+x;if(!f.blocked[i]&&Math.hypot((x+.5)*step-cx,(y+.5)*step-cy)<=source.radius)result.add(i);
+        }
+      }
+      return result;
+    }
     applySources(channel=null){
       for(const source of this.sources){if(channel&&source.type!==channel&&!(source.type==='normalDamage'&&channel==='danger'))continue;for(const i of this.sourceBins(source)){
         if(SIGNALS.includes(source.type))this.fields[source.type].values[i]=30;
         else if(source.type==='nutrient'){this.fields.oxygen.values[i]=1;this.fields.glucose.values[i]=1;}
-        else{this.fields.oxygen.values[i]=.06;this.fields.acid.values[i]=.95;}
+        else if(source.type==='hostile'){this.fields.oxygen.values[i]=.06;this.fields.acid.values[i]=.95;}
+        else this.fields[source.type].values[i]=1;
         if(source.type==='normalDamage')this.fields.danger.values[i]=30;
       }}
       if(this.maze&&(!channel||channel==='trail')){const f=this.fields.trail,m=this.maze;for(let i=0;i<f.values.length;i++)if(Math.hypot((i%f.width+.5)*this.fieldScale-m.cx,(Math.floor(i/f.width)+.5)*this.fieldScale-m.cy)>m.radius+2*this.scale)f.values[i]=0;}
@@ -798,6 +810,10 @@
         const o=gradient('oxygen'),g=gradient('glucose'),a=gradient('acid');
         let ex=o[0]+g[0]-a[0],ey=o[1]+g[1]-a[1],en=Math.hypot(ex,ey);
         if(en){const gain=Math.min(1,en/.025)*m.adversity*s.escape;ex=ex/en*gain;ey=ey/en*gain;}
+        // Tumors also bias migration toward local nutrients before stress develops.
+        // This phenomenological taxis uses only the gradients at the actual body;
+        // it neither reveals distant sources nor overrides mechanical constraints.
+        if(m.kind===TUMOR){const tx=o[0]+g[0],ty=o[1]+g[1],tn=Math.hypot(tx,ty);if(tn){const gain=.8*s.chemotaxis*Math.min(1,tn/.025);ex+=tx/tn*gain;ey+=ty/tn*gain;}}
         const angle=(this.C.random()-.5)*s.noise*.36*Math.sqrt(Math.max(0,dt));
         const patrol=m.kind===IMMUNE&&dt>0?this.patrolDirection(m,dt,angle):null;
         const px=patrol?patrol.px:m.px*Math.cos(angle)-m.py*Math.sin(angle),py=patrol?patrol.py:m.px*Math.sin(angle)+m.py*Math.cos(angle);
@@ -1245,7 +1261,17 @@
       if(displaced.size)this.prepareEnvironment();this.version++;
       return {steps,blocked,displaced:displaced.size,x:cell.x,y:cell.y};
     }
-    pulse(x,y,channel='danger'){if(SIGNALS.includes(channel)){this.fields[channel].deposit(x/this.fieldScale,y/this.fieldScale,8);if(channel==='normalDamage')this.fields.danger.deposit(x/this.fieldScale,y/this.fieldScale,8);}}
+    pulse(x,y,channel='danger',radius){
+      if(![...SIGNALS,'oxygen','glucose','acid','nutrient','hostile'].includes(channel)||![x,y].every(Number.isFinite)||x<0||y<0||x>=this.width||y>=this.height)return;
+      if(radius!==undefined&&(!Number.isFinite(radius)||radius<=0))return;
+      const bins=radius===undefined?[this.fieldIndex(x,y)]:this.sourceBins({x,y,radius:clamp(radius,2*this.scale,40*this.scale)});
+      for(const i of bins){if(this.fields.oxygen.blocked[i])continue;
+        if(SIGNALS.includes(channel)){this.fields[channel].values[i]=Math.min(30,this.fields[channel].values[i]+8);if(channel==='normalDamage')this.fields.danger.values[i]=Math.min(30,this.fields.danger.values[i]+8);}
+        else if(channel==='nutrient'){for(const key of ['oxygen','glucose'])this.fields[key].values[i]=clamp(this.fields[key].values[i]+.35);}
+        else if(channel==='hostile'){this.fields.oxygen.values[i]=clamp(this.fields.oxygen.values[i]-.35);this.fields.acid.values[i]=clamp(this.fields.acid.values[i]+.35);}
+        else this.fields[channel].values[i]=clamp(this.fields[channel].values[i]+.35);
+      }
+    }
     mechanicalStep(){
       if(this.patrol.needsSeed){for(const i of this.positions){const m=this.cells[this.C.pixti(i)];if(m?.kind===IMMUNE&&!m.dying)this.patrol.visited[i]=1;}this.patrol.needsSeed=false;}
       this.trackPatrol=true;try{if(this.C.borderpixels.length)this.C.timeStep();else this.C.time++;}finally{this.trackPatrol=false;}

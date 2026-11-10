@@ -68,8 +68,16 @@ test('reporting is read-only and preset restoration has no parameter leakage',as
   const hot=await make('hot');assert.equal(hot.settings.growth,.75);assert.equal(hot.settings.stressMutation,0);assert.equal(hot.scenarioReport().customized,false);
 });
 
-test('hot preset can select an antigen-loss lineage after early clearance without planting negative founders',async()=>{
+test('acquired antigen loss in a hot tumor can survive early clearance and be inherited by an expanding lineage',async()=>{
   const s=await make('hot',{}, {seed:77});assert.equal(s.scenarioReport().initial.antigenPositive,37);
+  // A changed migration law changes the stochastic trajectory, so seed 77 no
+  // longer guarantees a rare escape. Condition one draw after real immune
+  // exposure; this tests subsequent selection/inheritance, not its prevalence.
+  let survivor=null;
+  for(let t=0;t<1500&&!survivor;t+=10){s.advance(10);if(s.counters.kills>=20)survivor=s.live().find(m=>m.kind===2&&!m.dying&&m.antigen&&m.damage<.5&&m.recruitmentExposure>.01);}
+  assert.ok(survivor,'a living antigen-positive cell must actually experience recruitment during clearance');
+  const random=s.C.random;try{s.C.random=()=>0;s.evolutionStep(survivor,4);}finally{s.C.random=random;}
+  assert.equal(survivor.antigen,false);
   let nadir=37;
   for(let t=0;t<2500;t+=250){s.advance(250);nadir=Math.min(nadir,s.scenarioReport().tumor);}
   const remaining=s.live().filter(m=>m.kind===2&&!m.dying);

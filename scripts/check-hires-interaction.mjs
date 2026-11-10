@@ -11,7 +11,7 @@ const point=async(x,y)=>evaluate(`(()=>{const c=document.getElementById('world')
 const siteClick=async(x,y)=>{const p=await point(x,y);await mouse(p.x,p.y,'mousePressed');await mouse(p.x,p.y,'mouseReleased');await delay(120);};
 const shot=async name=>{await evaluate(`artistooLab.render();window.scrollTo(0,0);document.querySelector('.viewport').scrollTop=0;document.querySelector('.viewport').scrollLeft=0;`);await delay(70);const result=await call('Page.captureScreenshot',{format:'png'});await writeFile(out+'/'+name+'.png',Buffer.from(result.data,'base64'));};
 try{
-  for(let i=0;i<200;i++){if(await evaluate('!!window.artistooLab?.snapshot&&artistooLab.snapshot.speed===4'))break;await delay(100);}
+  for(let i=0;i<200;i++){if(await evaluate('!!window.artistooLab?.snapshot&&artistooLab.snapshot.speed===3'))break;await delay(100);}
   await evaluate('artistooLab.rpc("playing",{value:false})');await click('#clear-overlays');
   check(await evaluate('artistooLab.renderer.gpu&&!artistooLab.renderer.error&&artistooLab.snapshot.kernel==="wasm"'),'WebGL2 shader and WASM start without fallback',await evaluate('artistooLab.renderer'));
   check(await evaluate('document.querySelectorAll("aside details[open]").length===0'),'Parameter modules still start folded');

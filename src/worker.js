@@ -66,7 +66,7 @@ async function handle(event){
       value=0;for(const p of payload.points||[])value+=sim.paint(p[0],p[1],(payload.erase?5:2)*sim.scale,!!payload.erase,false);sim.rebuildMask();
     }else if(command==='eraseCells')value=sim.eraseCells(payload.points,(Number(payload.radius)||12)*sim.scale);
     else if(command==='move')value=payload.token&&dragSession?.token!==payload.token?{steps:0,blocked:true,stale:true}:sim.moveCell(payload.id,payload.x,payload.y,{elastic:!!payload.elastic,reference:dragSession?.reference});
-    else if(command==='pulse')sim.pulse(payload.x,payload.y,payload.channel);
+    else if(command==='pulse')sim.pulse(payload.x,payload.y,payload.channel,payload.radius===undefined?undefined:payload.radius*sim.scale);
     else if(command==='source')value=payload.erase?sim.removeSources(payload.x,payload.y,payload.radius*sim.scale):sim.addSource(payload.x,payload.y,payload.type,payload.radius*sim.scale);
     else if(command==='clearWalls')sim.clearWalls();
     else if(command==='mazeSignal'){value=sim.setMazeSignalMode(payload.throughWalls);resetClock();}

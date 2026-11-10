@@ -796,6 +796,15 @@ Arena ＋ 右侧栏|Arena + sidebar
 勾选图例显示细胞|Select populations in the legend
 勾选类型自动缩放；单类显示状态堆叠。悬停／触摸查看采样时刻，方向键逐点查看。全程记录，导出保留全部采样。|Selected populations set the scale; one type shows stacked states. Hover or touch to inspect a sample, or use arrow keys. Export retains the complete sampled history.
 `);
+  add(`
+氧气补给|Oxygen supply
+葡萄糖补给|Glucose supply
+实际|Actual
+恢复情境参数、推荐种子及默认显示，保留区域与精细度|Restore scenario parameters, recommended seed and display defaults; keep area and refinement
+释放 / 建源|Release / source
+单击瞬释 · 长按连释 · 双击建源|Tap: pulse · Hold: release · Double tap: source
+局部信号影响运动方向；肿瘤也趋向高氧、高糖|Local signals steer motion; tumors also move toward higher oxygen and glucose.
+`);
   function mount(control){
     let language='zh';try{if(localStorage.getItem('cell-arena-language')==='en')language='en';}catch{}
     const texts=new WeakMap(),attributes=new WeakMap(),names=['title','aria-label','placeholder'];

@@ -23,11 +23,12 @@ try{
  await click('#about');check('English model notes are shown',await b.evaluate('!document.querySelector("[data-language=en]").hidden&&document.querySelector("[data-language=zh]").hidden'));await click('#close-about');
  await set('language','zh');check('Chinese switch restores original labels',await b.evaluate('document.querySelector("#shuffle").textContent==="随机生成"'));
  await set('language','en');
- await click('#shuffle');await waitFor('artistooLab.snapshot.scene==="random"');await b.evaluate('artistooLab.rpc("playing",{value:false})');
+ await click('#shuffle');await waitFor('artistooLab.snapshot.scene==="random"&&artistooLab.snapshot.speed===3&&artistooLab.snapshot.playing');await b.evaluate('artistooLab.rpc("playing",{value:false})');
  const random=await b.evaluate('artistooLab.exportData()');
- check('randomize changes configuration and founders',random.scene==='random'&&random.seed!==baseline.seed&&random.settings.growth!==undefined&&random.cells.some(m=>m.kind===2));
+ check('randomize changes configuration and starts with healthy tissue',random.scene==='random'&&random.seed!==baseline.seed&&random.settings.growth!==undefined&&!random.cells.some(m=>m.kind===2)&&random.cells.some(m=>m.kind===3));
  const randomGrid=await b.evaluate('Array.from(artistooLab.snapshot.grid)');
  const beforeReset=await b.evaluate('artistooLab.snapshot.revision');await click('#reset');await waitFor('artistooLab.snapshot.time===35&&artistooLab.snapshot.revision>'+beforeReset);
+ if(random.time>35)await b.evaluate(`artistooLab.rpc('advance',{steps:${random.time-35}})`);
  check('reset reproduces generated founders and parameters',JSON.stringify(randomGrid)===JSON.stringify(await b.evaluate('Array.from(artistooLab.snapshot.grid)')));
  // An invalid imported file cannot replace or reset the current experiment.
  const invalid=path.join(output,'invalid.json');await writeFile(invalid,'{"scene":"hot","settings":{"growth":999}}');
@@ -47,9 +48,9 @@ try{
  await b.call('Input.dispatchMouseEvent',{type:'mousePressed',...pos,button:'left',clickCount:1});await b.call('Input.dispatchMouseEvent',{type:'mouseReleased',...pos,button:'left',clickCount:1});await delay(150);
  check('English inspector shows the selected tumor',await b.evaluate('artistooLab.snapshot.cells.find(m=>m.id===artistooLab.selected)?.kind===2&&document.querySelector("#inspection").textContent.includes("Clone")'));
  await b.call('Input.dispatchMouseEvent',{type:'mouseMoved',...pos});await delay(150);check('inspection hover shows local readings',await b.evaluate('!document.querySelector("#field-probe").hidden'));
- await click('[data-tool=signal]');await b.call('Input.dispatchMouseEvent',{type:'mouseMoved',...pos});await delay(200);
+ await click('[data-tool=signal]');await set('signal-kind','danger');await b.call('Input.dispatchMouseEvent',{type:'mouseMoved',...pos});await delay(200);
  check('signal tool suppresses both custom and native hover popups',await b.evaluate('document.querySelector("#field-probe").hidden&&!document.querySelector("#world").title'));
- await b.call('Input.dispatchMouseEvent',{type:'mousePressed',...pos,button:'left',clickCount:1});await b.call('Input.dispatchMouseEvent',{type:'mouseReleased',...pos,button:'left',clickCount:1});await delay(200);
+ await b.call('Input.dispatchMouseEvent',{type:'mousePressed',...pos,button:'left',clickCount:1});await b.call('Input.dispatchMouseEvent',{type:'mouseReleased',...pos,button:'left',clickCount:1});await delay(450);
  check('signal painting still deposits factor',await b.evaluate('artistooLab.snapshot.fields.danger.values.some(v=>v>0)'));
  missing=await b.evaluate(untranslated);await writeFile(path.join(output,'untranslated-after.json'),JSON.stringify(missing,null,2));console.log('Untranslated after interaction:',JSON.stringify(missing));
  // Capture the actual browser-produced file, not a mock recorder.

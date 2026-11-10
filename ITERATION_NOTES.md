@@ -2,6 +2,13 @@
 
 ## Scope completed in this iteration
 
+- Four fresh tumor presets (onset/cold/hot/random): periodic boundary, 3× speed, nuclei/antigen/cycle visible, adversity + recruitment overlays, no Act/tracks. Ordinary reset/import keeps user preferences. Maze retains solid boundaries, immune Act, tracks and 1×.
+- Tools occupy two rows. Three vertically paired columns (move/inspect, seed/remove, wall/erase), with one ordinary-size signal button in the first row's fourth column; no pan button. Middle-button/Alt-drag still pans.
+- `src/signal-gesture.js`: finite single-click pulse, held/dragged continuous pulses, double-click persistent source. Cancels deferred writes on tool/scene/import/focus changes; browser timer callbacks use bound-safe wrappers. Repeated RPCs coalesce under load.
+- Oxygen/glucose/acid are independent pulse/source categories; existing nutrient/hostile combinations stay import-compatible. Periodic source footprints and erasure work across seams. Worker and parameter validation recognize new channels.
+- Tumors bias direction toward local oxygen/glucose gradients even before adversity. Existing chemotaxis control sets strength; no distant target coordinates, wall or contact bypass. This changes stochastic trajectories, not prescribed preset outcomes.
+- Regression detail: old hot seed 77 no longer naturally escapes with the new taxis. The selection/inheritance test now explicitly conditions one rare-event draw after real recruitment exposure; it does not estimate default escape frequency. No biological preset settings were changed to preserve an old seed's ending.
+
 - Adaptive presentation controller with device-local preferences, measured overload and recovery, mobile preview, hidden-panel culling and recording/manual-quality protection.
 - Larger visible tumor nuclei and gradual G2/M enlargement, constrained to the owning body's occupancy; protected mechanical nuclear radius unchanged.
 - Narrow mechanical fix for the reproducible staggered extracellular pore lock; mirrored in sequential JS and WASM, compiled artifact updated.
