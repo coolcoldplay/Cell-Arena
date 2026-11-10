@@ -62,7 +62,11 @@ static inline int local_body(int j,int tgt,int a,int b){
 static int section_allowed(int tgt,int a,int b){
   double *sa=cell(a),*tb=cell(b);
   if(tb[PRESENT]&&!tb[DYING]){if(tb[VOLUME]<=tb[MIN_AREA])return 0;if(tb[HAS_NUCLEUS]&&distance2(tgt,tb)<=tb[NR]*tb[NR])return 0;}
-  if(sa[PRESENT]&&!sa[DYING]){if(sa[HAS_NUCLEUS]&&distance2(tgt,sa)>sa[REACH]*sa[REACH])return 0;int anchored=0;for(int k=1;k<8;k+=2){int j=ring_at(tgt,k);if(j>=0&&grid[j]==a&&thick(j,a,tgt,a)){anchored=1;break;}}if(!anchored)return 0;if(!local_body(tgt,tgt,a,b))return 0;}
+  if(sa[PRESENT]&&!sa[DYING]){if(sa[HAS_NUCLEUS]&&distance2(tgt,sa)>sa[REACH]*sa[REACH])return 0;int anchored=0;for(int k=1;k<8;k+=2){int j=ring_at(tgt,k);if(j>=0&&grid[j]==a&&thick(j,a,tgt,a)){anchored=1;break;}}if(!anchored)return 0;}
+  // Same four-face extracellular pore repair as the JS reference. No force
+  // fill: the unchanged Metropolis energy test still decides acceptance.
+  if(sa[PRESENT]&&!b){int enclosed=1;for(int k=1;k<8;k+=2){int j=ring_at(tgt,k);if(j<0||grid[j]!=a){enclosed=0;break;}}if(enclosed)return 1;}
+  if(sa[PRESENT]&&!sa[DYING]&&!local_body(tgt,tgt,a,b))return 0;
   for(int k=1;k<8;k+=2){int j=ring_at(tgt,k);if(j>=0&&!local_body(j,tgt,a,b))return 0;}return 1;
 }
 static int topology(int tgt,int b){

@@ -540,6 +540,7 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
 。通讯、代谢、遗传、切面约束和交互为本网页的模型扩展；详细机制参考见模型文档。|. Communication, metabolism, inheritance, section constraints and interaction are extensions in this page; detailed mechanism references are in the model documentation.
 `);
   const templates=[
+    [/^正常保留 (\d+)%（(\d+)\/(\d+)） · 供给／清除 (\d+)%( · 尚未建立正常细胞基准)?$/,(_,p,n,b,f,empty)=>`Normal retained ${p}% (${n}/${b}) · Supply / clearance ${f}%${empty?' · No normal-cell reference yet':''}`],
     [/^当前存活已检查 (\d+) \/ (\d+)$/,(_,n,total)=>`Living cells inspected: ${n} / ${total}`],
     [/^本细胞已检查 (\d+) 颗不同组织细胞$/,(_,n)=>`This cell inspected ${n} distinct tissue cells`],
     [/^子代 P(\d+) · 沿谱系分裂 (\d+) 次$/,(_,p,n)=>`Generation P${p} · ${n} divisions along lineage`],
@@ -736,6 +737,26 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
 恢复当前情境的参数和推荐种子，保留区域、精细度与边界选择|Restore scenario parameters and its recommended seed; keep area, refinement and boundary
 手机端仅录制 Arena，组合录像已结束|Mobile records the Arena only; combined recording has ended
 画面更新|Arena updates
+性能模式|Performance mode
+自动平衡|Automatic balance
+省电|Power saving
+流畅优先|Prefer smoothness
+高清优先|Prefer detail
+重新测量|Recalibrate
+按实际耗时调整自动画质和刷新频率，保留物理格点与全部生物机制。手动分辨率和录像质量保持所选设置。|Adapts automatic display quality and refresh rate to measured load, preserving the lattice and all biology. Manual resolution and recording quality stay as selected.
+预热测量|Warming up
+绘图负荷|Rendering load
+数据打包负荷|Snapshot load
+交互负荷|Interaction load
+模拟计算受限|Simulation limited
+运行平稳|Stable
+后台暂停|Paused in background
+录像质量锁定|Recording quality locked
+显示上限|Display cap
+显示比例|Display scale
+手动画质|Manual resolution
+小窗预览|Compact preview
+每步计算|Computation per step
 绘制|Rendering
 数据打包|Snapshot packing
 占满侧栏|Fill sidebar
@@ -751,6 +772,29 @@ Arena ＋ 右侧栏|Arena + sidebar
 随机肿瘤演化|Random tumor development
 密铺正常组织与 12 颗分散免疫细胞，从零肿瘤开始。三处供给较弱的区域与健康边缘形成差异；异常、癌变、免疫清除、抑制与恢复相互竞争，逃逸克隆可能再次扩增。没有定时转变或预设结局。|Confluent normal tissue and 12 dispersed immune cells, starting without tumors. Three low-supply niches contrast with healthy edges. Abnormal change, malignancy, clearance, suppression and recovery compete; escape clones may expand again. No scheduled transitions or predetermined outcome.
 随机化的密铺正常组织、12–16 颗内部免疫细胞与三处弱供给区域。参数在发生发展附近抽样，肿瘤必须由局部异常产生；相同种子和参数可重现开局，结局由局部相互作用产生。|Randomized confluent normal tissue, 12–16 internal immune cells and three low-supply niches. Parameters are sampled near the development preset; tumors must arise from local abnormal cells. Seed and parameters reproduce the start; local interactions determine the course.
+`);
+  add(`
+历史曲线显示类型|History plot populations
+正常细胞供给联动|Normal-cell support coupling
+按本局健康正常细胞存活数的历史峰值计算保留比例；0% 无联动，100% 等比例影响全局氧糖补给和酸清除|Retention uses the peak living healthy-normal count in this run. 0% disables coupling; 100% scales global oxygen/glucose supply and acid clearance proportionally.
+数量与巡逻统计|Population and patrol metrics
+细胞数量历史曲线|Cell population history
+细胞数量|Cell counts
+百分比|Percent
+正常状态|Normal states
+异常状态|Abnormal states
+肿瘤状态|Tumor states
+免疫状态|Immune states
+存活|Living
+静息|Resting
+激活|Active
+抑制|Suppressive
+清除中|Clearing
+抗原阳性|Antigen positive
+抗原阴性|Antigen negative
+未记录状态|Unrecorded state
+勾选图例显示细胞|Select populations in the legend
+勾选类型自动缩放；单类显示状态堆叠。悬停／触摸查看采样时刻，方向键逐点查看。全程记录，导出保留全部采样。|Selected populations set the scale; one type shows stacked states. Hover or touch to inspect a sample, or use arrow keys. Export retains the complete sampled history.
 `);
   function mount(control){
     let language='zh';try{if(localStorage.getItem('cell-arena-language')==='en')language='en';}catch{}

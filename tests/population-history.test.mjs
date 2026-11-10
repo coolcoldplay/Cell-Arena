@@ -32,3 +32,21 @@ test('display reduction covers the full time axis and retains the extrema of all
   for(const index of [21,9000,14766,20123,22000])assert.ok(display.includes(rows[index]),`peak/trough ${index} survives`);
   assert.ok(display.every((r,i)=>!i||r.time>=display[i-1].time));assert.deepEqual(rows,copy);
 });
+
+test('state histories partition each population and keep deaths separate from live immune phenotypes',()=>{
+  const s=make({width:96,height:72});
+  const n=s.seed(1,12,12,5),a=s.seed(1,30,12,5),t=s.seed(2,50,12,5),dead=s.seed(2,68,12,5);
+  s.beginAbnormal(a);s.cells[t].antigen=true;s.beginDeath(dead,'spontaneous');
+  const ctl=[12,30,48,66].map(x=>s.seed(3,x,42,4));s.cells[ctl[1]].activation=200;s.cells[ctl[2]].immunePhenotype='suppressive';s.beginDeath(ctl[3],'environment');
+  const row=s.populationRow();assert.equal(row.normal,1);assert.equal(row.abnormal,1);assert.equal(row.tumorPositive,1);assert.equal(row.tumorDying,1);
+  for(const [total,states] of Object.entries({normal:['normalLiving','normalDying'],abnormal:['abnormalPositive','abnormalNegative','abnormalDying'],tumor:['tumorPositive','tumorNegative','tumorDying'],immune:['immuneResting','immuneActive','immuneSuppressive','immuneDying']}))assert.equal(states.reduce((v,k)=>v+row[k],0),row[total]);
+  assert.deepEqual([row.immuneResting,row.immuneActive,row.immuneSuppressive,row.immuneDying],[1,1,1,1]);
+  s.record();const before=s.history.length;s.cells[ctl[0]].activation=100;s.record();assert.equal(s.history.length,before+1,'same-time state changes are archived even without a count change');
+  assert.equal(s.populationHistory().at(-1).immuneActive,2);assert.ok(s.cells[n]);
+});
+
+test('long-history reduction retains a brief immune state transition even at constant total population',()=>{
+  const rows=Array.from({length:12000},(_,i)=>({time:i*30,normal:0,abnormal:0,tumor:0,immune:20,immuneResting:20,immuneActive:0,immuneSuppressive:0,immuneDying:0}));
+  rows[941].immuneResting=0;rows[941].immuneActive=20;rows[10947].immuneResting=0;rows[10947].immuneSuppressive=20;
+  const display=CellLab.sampleHistory(rows);assert.ok(display.includes(rows[941]));assert.ok(display.includes(rows[10947]));assert.ok(display.length<=2050);assert.equal(display[0],rows[0]);assert.equal(display.at(-1),rows.at(-1));
+});

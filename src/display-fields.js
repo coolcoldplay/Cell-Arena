@@ -51,13 +51,31 @@
   const nucleusStyles={normal:{stroke:'#243b53',fill:'#243b531a'},patrol:{stroke:'#8f3548',fill:'#8f35481a'},dark:{stroke:'#f2d38a',fill:'#f2d38a1a'}};
   const nucleusStyle=(m,palette)=>{if(palette||immuneSuppressive(m)){const stroke=(palette||COLOR_DEFAULTS)[colorKey(m)].nucleus;return {stroke,fill:stroke+'1a'};}return m.kind===1?nucleusStyles.normal:m.kind===3&&!immuneActive(m)?nucleusStyles.patrol:nucleusStyles.dark;};
   const nuclearAngles=Array.from({length:32},(_,i)=>{const a=i*Math.PI/16;return [Math.cos(a),Math.sin(a),Math.cos(3*a),Math.sin(3*a),Math.cos(4*a),Math.sin(4*a)];});
-  function nucleusContour(m){
+  function nucleusContour(m,snapshot){
     const phase=2*Math.PI*(((m.birth||m.id||1)*.61803398875+(m.kind||1)*.137)%1),rest=.10+.08*(.5+.5*Math.sin(phase*1.7));
     const recovery=m.dying?1-clamp(m.deathProgress||0):1,qx=((m.nucleusStrainX||0)+rest*Math.cos(2*phase))*recovery,qy=((m.nucleusStrainY||0)+rest*Math.sin(2*phase))*recovery;
     const angle=.5*Math.atan2(qy,qx),ratio=1+1.12*Math.min(.34,Math.hypot(qx,qy)),a=.82*m.nucleusRadius*Math.sqrt(ratio),b=.82*m.nucleusRadius/Math.sqrt(ratio),c=Math.cos(angle),s=Math.sin(angle),cp=Math.cos(phase),sp=Math.sin(phase);
     // A small, static per-cell asymmetry; no wall-clock noise or simulation RNG.
-    // Even the largest contour stays inside the protected circular envelope.
-    return nuclearAngles.map(([ux,uy,c3,s3,c4,s4])=>{const r=1+recovery*(.015*(c3*cp-s3*sp)+.009*(s4*cp-c4*sp)),x=a*ux*r,y=b*uy*r;return [x*c-y*s,x*s+y*c];});
+    const points=nuclearAngles.map(([ux,uy,c3,s3,c4,s4])=>{const r=1+recovery*(.015*(c3*cp-s3*sp)+.009*(s4*cp-c4*sp)),x=a*ux*r,y=b*uy*r;return [x*c-y*s,x*s+y*c];});
+    // This is a visible phenotype, not a change to the mechanical nuclear core.
+    // Without occupancy data, retain the conservative protected-envelope view.
+    if(!snapshot?.grid)return points;
+    const phaseGrowth=m.dying?0:m.cycle?.phase==='M'?1:m.cycle?.phase==='G2'?clamp(m.cycle.progress||0):0;
+    let gain=(m.kind===2?1.38:1)*(1+.12*phaseGrowth);
+    if(gain===1)return points;
+    const {width,height,grid,boundary}=snapshot,wrap=boundary==='wrap';
+    const inside=(dx,dy)=>{let x=Math.floor(m.nucleusX+.5+dx),y=Math.floor(m.nucleusY+.5+dy);if(wrap){x=(x%width+width)%width;y=(y%height+height)%height;}return x>=0&&y>=0&&x<width&&y<height&&grid[y*width+x]===m.id;};
+    // Check radial spokes and edge midpoints, including a membrane margin.
+    // Uniformly limiting the expansion preserves a smooth deformed contour.
+    const fits=factor=>{
+      for(let i=0;i<points.length;i++)for(const mid of [false,true]){
+        const p=points[i],q=points[(i+1)%points.length],x=(mid?(p[0]+q[0])*.5:p[0])*factor,y=(mid?(p[1]+q[1])*.5:p[1])*factor,r=Math.hypot(x,y);
+        for(let d=.5;d<r+.35;d+=.5)if(!inside(x*d/r,y*d/r))return false;
+        if(!inside(x*(r+.35)/r,y*(r+.35)/r))return false;
+      }return true;
+    };
+    while(gain>1&&!fits(gain))gain=Math.max(1,gain-.06);
+    return points.map(([x,y])=>[x*gain,y*gain]);
   }
   function cycleText(m){
     if(m.dying)return '';
@@ -122,6 +140,22 @@
     return {width:f.width,height:f.height,rgba};
   }
   class Cache {
+    nuclei(s){
+      if(this.nuclearSnapshot!==s){this.nuclearSnapshot=s;this.nuclearContours=new Map();for(const m of s.cells)if(m.hasNucleus&&(!m.dying||m.deathIntact))this.nuclearContours.set(m.id,nucleusContour(m,s));}
+      return this.nuclearContours;
+    }
+    nucleusBatches(s,palette){
+      if(this.nuclearPathSnapshot===s&&this.nuclearPalette===palette)return this.nuclearPaths;
+      const contours=this.nuclei(s),groups=new Map(),wrap=s.boundary==='wrap';
+      for(const m of s.cells){const contour=contours.get(m.id);if(!contour)continue;
+        const style=m.dying?{stroke:'#89531a',fill:'#ffe6a640'}:nucleusStyle(m,palette),key=style.stroke+style.fill;
+        if(!groups.has(key))groups.set(key,{...style,path:new Path2D()});const path=groups.get(key).path;
+        const cx=m.nucleusX+.5,cy=m.nucleusY+.5,r=Math.max(...contour.map(p=>Math.max(Math.abs(p[0]),Math.abs(p[1]))))+1;
+        const xs=[0],ys=[0];if(wrap){if(cx-r<0)xs.push(s.width);if(cx+r>s.width)xs.push(-s.width);if(cy-r<0)ys.push(s.height);if(cy+r>s.height)ys.push(-s.height);}
+        for(const dx of xs)for(const dy of ys){contour.forEach(([x,y],i)=>{i?path.lineTo(cx+dx+x,cy+dy+y):path.moveTo(cx+dx+x,cy+dy+y);});path.closePath();}
+      }
+      this.nuclearPathSnapshot=s;this.nuclearPalette=palette;return this.nuclearPaths=[...groups.values()];
+    }
     selections(s,ids){
       const key=ids.join(',');if(this.boxSnapshot!==s||this.boxKey!==key){this.boxSnapshot=s;this.boxKey=key;this.boxes=selectionBoxes(s,ids);}return this.boxes;
     }

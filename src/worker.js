@@ -4,6 +4,7 @@ let sim=null,playing=true,visible=true,speed=1,clock=new CellLab.StepClock(30),p
 let previous=performance.now(),lastSnapshot=0,lastMeasure=previous,measuredSteps=0,rate=0,limited=false,revision=0;
 let dragSession=null;
 let frameSerial=0,presentedFrame=0,lastPublishedTime=-1;
+let presentation={fps:60,workMs:8,idleMs:0},stepMs=0;
 let backend=new CellLabGPU.ComputeBackend();const commands=[];let busy=false,wasmModule=null,kernelNote='';
 const turnQueue=new MessageChannel();turnQueue.port1.onmessage=()=>tick();
 try{wasmModule=CellLabWasm.load(Uint8Array.from(atob(globalThis.CELL_LAB_WASM),c=>c.charCodeAt(0))).catch(e=>{kernelNote=String(e);return null;});}catch(e){kernelNote=String(e);}
@@ -16,10 +17,11 @@ function sendSnapshot(interactive=false){
   const data=sim.snapshot();data.playing=playing;data.speed=speed;data.rate=rate;data.targetRate=30*speed;data.limited=limited;data.revision=revision;
   data.compute=backend.info();data.kernelNote=sim.kernelNote||kernelNote;
   data.snapshotMs=performance.now()-begin;
+  data.stepMs=stepMs;data.presentation={...presentation};
   const transfers=[data.grid.buffer,data.activity.buffer,data.walls.buffer,data.fieldMask.buffer,...Object.values(data.fields).map(f=>f.values.buffer)];
   postMessage({type:'snapshot',frame:++frameSerial,interactive,data},transfers);lastSnapshot=performance.now();lastPublishedTime=sim.C.time;
 }
-function resetClock(){clock.reset();pendingSteps=0;previous=performance.now();lastMeasure=previous;measuredSteps=0;rate=0;limited=false;}
+function resetClock(){clock.reset();pendingSteps=0;previous=performance.now();lastMeasure=previous;measuredSteps=0;rate=0;limited=false;stepMs=0;}
 function respond(id,value){if(id)postMessage({type:'response',id,value});}
 async function handle(event){
   const {id,command,payload={}}=event.data;
@@ -70,7 +72,7 @@ async function handle(event){
     else if(command==='mazeSignal'){value=sim.setMazeSignalMode(payload.throughWalls);resetClock();}
     else if(command==='divide'){
       const target=payload.id||sim.live().filter(c=>!c.dying).sort((a,b)=>sim.C.getVolume(b.id)-sim.C.getVolume(a.id))[0]?.id;value=sim.divide(target);
-    }else if(command==='export')value={format:'cell-arena-experiment',schemaVersion:1,version:'4.0.0',speed,kernel:sim.kernel,compute:backend.info(),scene:sim.scene,scenario:sim.scenarioReport(),cycles:sim.cycleReport(),patrol:{...sim.patrolReport(),checkedBirths:[...sim.patrol.checked]},maze:sim.maze?structuredClone(sim.maze):null,sources:sim.sources.map(s=>({type:s.type,x:s.x/sim.scale,y:s.y/sim.scale,radius:s.radius/sim.scale})),supplyMap:Array.from(sim.supplyMap),boundary:sim.boundary,seed:sim.seedValue,worldWidth:sim.worldWidth,worldHeight:sim.worldHeight,refinement:sim.scale,settings:sim.settings,time:sim.C.time,history:sim.populationHistory(),events:sim.events,counters:sim.counters,manualDeathRemovals:sim.manualDeathRemovals,deaths:sim.deathSummary(),deathHistory:sim.deathHistory,lineage:sim.lineage,cells:sim.snapshot().cells};
+    }else if(command==='export')value={format:'cell-arena-experiment',schemaVersion:1,version:'4.0.0',speed,kernel:sim.kernel,compute:backend.info(),scene:sim.scene,scenario:sim.scenarioReport(),normalSupport:sim.normalSupportReport(),cycles:sim.cycleReport(),patrol:{...sim.patrolReport(),checkedBirths:[...sim.patrol.checked]},maze:sim.maze?structuredClone(sim.maze):null,sources:sim.sources.map(s=>({type:s.type,x:s.x/sim.scale,y:s.y/sim.scale,radius:s.radius/sim.scale})),supplyMap:Array.from(sim.supplyMap),boundary:sim.boundary,seed:sim.seedValue,worldWidth:sim.worldWidth,worldHeight:sim.worldHeight,refinement:sim.scale,settings:sim.settings,time:sim.C.time,history:sim.populationHistory(),events:sim.events,counters:sim.counters,manualDeathRemovals:sim.manualDeathRemovals,deaths:sim.deathSummary(),deathHistory:sim.deathHistory,lineage:sim.lineage,cells:sim.snapshot().cells};
     else if(command==='snapshot')value={time:sim.C.time,cells:sim.live().length};
     else throw Error('Unknown command: '+command);
     if(['seed','sprinkle','divide'].includes(command))sim.record();
@@ -78,7 +80,16 @@ async function handle(event){
   }catch(error){postMessage({type:'error',id,message:String(error),stack:error?.stack});}
 }
 async function drain(){if(busy)return;busy=true;try{while(commands.length)await handle(commands.shift());}finally{busy=false;}}
-onmessage=event=>{if(event.data.command==='framePresented'){presentedFrame=Math.max(presentedFrame,Math.min(frameSerial,event.data.frame||0));return;}commands.push(event);drain();};
+onmessage=event=>{
+  if(event.data.command==='framePresented'){presentedFrame=Math.max(presentedFrame,Math.min(frameSerial,event.data.frame||0));return;}
+  if(event.data.command==='presentation'){
+    const p=event.data.payload||{},number=(v,lo,hi,old)=>Number.isFinite(v)?Math.max(lo,Math.min(hi,v)):old;
+    presentation={fps:number(p.fps,10,60,presentation.fps),workMs:number(p.workMs,2,8,presentation.workMs),idleMs:number(p.idleMs,0,8,presentation.idleMs)};
+    // No model mutation, RNG draw, time reset or forced full snapshot.
+    respond(event.data.id,{...presentation});return;
+  }
+  commands.push(event);drain();
+};
 async function tick(){
   if(busy){setTimeout(tick,4);return;}busy=true;
   try{
@@ -86,20 +97,21 @@ async function tick(){
     if(sim&&playing&&visible){
       pendingSteps+=clock.add(elapsed);
       const begin=performance.now();let performed=0;
-      while(pendingSteps>0&&performance.now()-begin<8){if(backend.active==='gpu')await sim.advanceAsync(1,backend);else sim.advance(1);pendingSteps--;performed++;}
+      while(pendingSteps>0&&performance.now()-begin<presentation.workMs){if(backend.active==='gpu')await sim.advanceAsync(1,backend);else sim.advance(1);pendingSteps--;performed++;}
+      if(performed){const measured=(performance.now()-begin)/performed;stepMs=stepMs?stepMs*.8+measured*.2:measured;}
       measuredSteps+=performed;
       // Bound backlog instead of silently speeding up biology after a long stall.
       limited=pendingSteps>clock.rate*.4;
       pendingSteps=Math.min(pendingSteps,Math.ceil(clock.rate*2));
       const end=performance.now();
       if(end-lastMeasure>=700){rate=measuredSteps*1000/(end-lastMeasure);lastMeasure=end;measuredSteps=0;}
-      if(end-lastSnapshot>=1000/60)sendSnapshot();
+      if(end-lastSnapshot>=1000/presentation.fps)sendSnapshot();
     }
   }catch(error){playing=false;postMessage({type:'error',message:String(error),stack:error?.stack});}
   finally{busy=false;drain();}
   // A queued macrotask yields to commands without the nested setTimeout 4 ms
   // tax on every saturated chunk. Model time and attempt count are unchanged.
-  if(sim&&playing&&visible&&pendingSteps>0&&!busy)turnQueue.port2.postMessage(0);
+  if(sim&&playing&&visible&&pendingSteps>0&&!busy){if(presentation.idleMs)setTimeout(tick,presentation.idleMs);else turnQueue.port2.postMessage(0);}
   else setTimeout(tick,playing&&visible?4:40);
 }
 tick();

@@ -1,0 +1,33 @@
+import {openBrowser,delay} from './browser-session.mjs';import {mkdir,writeFile} from 'node:fs/promises';import assert from 'node:assert/strict';
+const out=process.argv[3]||'output/history-chart';await mkdir(out,{recursive:true});
+const b=await openBrowser(process.argv[2]||'dist/index.html',9452,{gpu:true}),checks=[];
+const check=(name,ok,details={})=>{checks.push({name,passed:!!ok,...details});assert.ok(ok,name+': '+JSON.stringify(details));};
+const wait=async code=>{for(let i=0;i<200;i++){if(await b.evaluate(code))return;await delay(100);}throw Error('Timed out: '+code);};
+const shot=async name=>{const r=await b.call('Page.captureScreenshot',{format:'png'});await writeFile(out+'/'+name+'.png',Buffer.from(r.data,'base64'));};
+const select=async keys=>{await b.evaluate(`for(const input of document.querySelectorAll('#history-legend input')){input.checked=${JSON.stringify(keys)}.includes(input.dataset.population);input.dispatchEvent(new Event('change'));}`);await delay(100);};
+try{
+ await wait('!!window.artistooLab?.snapshot');await b.evaluate('artistooLab.ready');await b.evaluate(`artistooLab.rpc('playing',{value:false}).then(()=>artistooLab.rpc('backend',{mode:'cpu'}))`);
+ await b.evaluate(`window.hchart=document.getElementById('history');document.getElementById('language').value='zh';document.getElementById('language').dispatchEvent(new Event('change'));document.getElementById('statistics-expand').click()`);await delay(250);
+ check('Four accessible checked legend controls appear in the statistics view',await b.evaluate(`document.querySelectorAll('#history-legend input:checked').length===4`));
+ await b.evaluate(`artistooLab.rpc('start',{scene:'empty',worldWidth:160,worldHeight:120,refinement:1,warmup:0,settings:{growth:0,metabolism:0,apoptosis:0}}).then(()=>artistooLab.rpc('sprinkle',{kind:3,count:6})).then(()=>artistooLab.rpc('advance',{steps:90}))`);await delay(300);
+ check('A real immune-only experiment automatically displays its recorded resting state',await b.evaluate(`hchart.dataset.type==='immune'&&hchart.dataset.mode==='stack'&&document.getElementById('history-readout').textContent.includes('静息 6')`));
+ const exported=await b.evaluate(`artistooLab.rpc('export')`);check('Export retains states from time zero through the current sample',exported.history[0].time===0&&exported.history.at(-1).time===90&&exported.history.at(-1).immuneResting===6);
+ // Deterministic display fixture, supplied only to this paused test view. The
+ // real Worker remains unchanged; state collection is separately tested above.
+ await b.evaluate(`window.originalHistory=artistooLab.snapshot.history;window.originalTime=artistooLab.snapshot.time;artistooLab.snapshot.time=1200;artistooLab.snapshot.history=Array.from({length:81},(_,i)=>{const immune=Math.round(i*.8),active=Math.round(immune*.3*Math.sin(i/80*Math.PI/2)),suppressive=Math.round(immune*.2),dying=i>70?2:0;return {time:i*15,normal:900-i*5,abnormal:i<50?2:0,tumor:Math.round(i*.6),immune,immuneResting:immune-active-suppressive-dying,immuneActive:active,immuneSuppressive:suppressive,immuneDying:dying,order:.2};});artistooLab.render()`);await delay(100);
+ const all=await b.evaluate(`Number(hchart.dataset.max)`);await select(['tumor','immune']);const filtered=await b.evaluate(`Number(hchart.dataset.max)`);
+ check('Unchecking abundant normal cells immediately rescales the remaining curves',all>=900&&filtered<100&&filtered>=64,{all,filtered});
+ await select(['immune']);check('Single selected type shows four distinct state areas with count scale',await b.evaluate(`hchart.dataset.mode==='stack'&&document.querySelectorAll('#history-states>span').length===4&&Number(hchart.dataset.max)<100`));await shot('desktop-immune-counts');
+ await b.evaluate(`document.getElementById('history-percent').click()`);check('Percent mode fixes the scale at 100 and preserves the full time range',await b.evaluate(`hchart.dataset.max==='100'&&document.getElementById('history-range').textContent.includes('1,200')`));
+ await b.evaluate(`hchart.focus();hchart.dispatchEvent(new KeyboardEvent('keydown',{key:'Home',bubbles:true}))`);check('Keyboard inspection reaches the initial sample with finite zero-population percentages',await b.evaluate(`document.getElementById('history-readout').textContent.startsWith('0 MCS')&&!/NaN|Infinity/.test(document.getElementById('history-readout').textContent)`));
+ await b.evaluate(`hchart.dispatchEvent(new KeyboardEvent('keydown',{key:'End',bubbles:true}))`);check('Keyboard inspection reaches the latest composition',await b.evaluate(`document.getElementById('history-readout').textContent.startsWith('1200 MCS')`));
+ await select([]);check('All series can be hidden without inventing a selected population',await b.evaluate(`hchart.dataset.mode==='empty'&&document.getElementById('history-readout').textContent==='勾选图例显示细胞'`));
+ await select(['immune']);await b.evaluate(`hchart.blur();document.getElementById('language').value='en';document.getElementById('language').dispatchEvent(new Event('change'))`);await delay(150);
+ check('Chart controls, states and sample readout translate to English',await b.evaluate(`!/[\u4e00-\u9fff]/.test(document.querySelector('.chart-panel').textContent)&&document.getElementById('history-readout').textContent.includes('Resting')`));
+ await b.call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:3,mobile:true});await delay(300);await b.evaluate(`document.querySelector('#history-legend').scrollIntoView({block:'center'});artistooLab.render()`);await delay(150);await shot('mobile-immune-percent');
+ check('Phone chart and touch-sized legends stay within the sidebar',await b.evaluate(`document.documentElement.scrollWidth<=innerWidth+1&&[...document.querySelectorAll('#history-legend label')].every(e=>e.getBoundingClientRect().height>=24)&&hchart.getBoundingClientRect().right<=innerWidth`));
+ await b.evaluate(`artistooLab.snapshot.history=originalHistory;artistooLab.snapshot.time=originalTime`);
+ const after=await b.evaluate(`artistooLab.rpc('export')`);check('Filtering, resizing and inspecting history do not change paused biology',JSON.stringify(after.history)===JSON.stringify(exported.history)&&JSON.stringify(after.cells)===JSON.stringify(exported.cells));
+ check('No application or browser errors',b.errors.length===0&&await b.evaluate(`artistooLab.errors.length===0`),{errors:b.errors});
+}catch(error){console.error(error);checks.push({passed:false,error:String(error)});process.exitCode=1;await shot('failure');}
+finally{await writeFile(out+'/checks.json',JSON.stringify(checks,null,2));console.log(JSON.stringify(checks,null,2));await b.close();}

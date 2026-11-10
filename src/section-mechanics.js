@@ -231,6 +231,12 @@
       const own=(j,id)=>j>=0&&(j===tgt?a:grid[j])===id;
       const thick=(j,id)=>{const r=s.rings[j];for(const [p,q,k] of [[0,1,7],[2,1,3],[4,3,5],[6,5,7]])if(own(r[p],id)&&own(r[q],id)&&own(r[k],id))return true;return false;};
       if(source&&(!source.dying||source.deathIntact)){let anchored=false;for(const j of s.faces[tgt])if(grid[j]===a&&thick(j,a)){anchored=true;break;}if(!anchored)return false;}
+      // Filling a one-site extracellular pore surrounded on all four faces by
+      // this cell cannot thin a neck, sever cytoplasm or displace another cell.
+      // Staggered diagonal pores otherwise fail the 3x3 thickness test forever:
+      // the upper/lower cortex is connected outside that local stencil.
+      // Keep ordinary CPM energy/volume acceptance, reach and nuclear rules.
+      if(source&&!b&&s.faces[tgt].length===4&&s.faces[tgt].every(j=>grid[j]===a))return true;
       const check=j=>{const id=j===tgt?a:grid[j],m=s.cells[id];if(!m||(m.dying&&!m.deathIntact)||(id!==a&&id!==b))return true;
         let mask=0,faces=0;const ring=s.rings[j];for(let k=0;k<8;k++){const n=ring[k];if(n>=0&&(n===tgt?a:grid[n])===id){mask|=1<<k;if(k&1)faces++;}}
         if(faces<2||s.connected4[mask]===1)return true;

@@ -8,7 +8,29 @@
   const opacity={adversity:.35,oxygen:.35,glucose:.35,acid:.35,density:.35,cohesion:.45,danger:.45,trail:.45,il2:.45,normalDamage:.45,inhibition:.45};
   let hover=null,probeDirty=false,panGesture=null,recordingScale=0,eraseSource=false;
   const trajectories=new CellLabTrajectories();
+  const historyChart=CellLabHistory.mount();
   const viewport=canvas.parentElement,view={x:0,y:0};
+  let performancePreferences;try{performancePreferences=JSON.parse(localStorage.getItem('cell-arena-performance-v1'));}catch{}
+  const adaptive=new CellLabPerformance.Controller({preferences:performancePreferences,now:performance.now()});
+  const mobileQuery=matchMedia('(max-width:850px)');
+  let performancePlan=adaptive.status(),presentationKey='',lastHeartbeat=0,lastAnimation=0,lastRender=0,latestInput=0,forceFrame=false;
+  const visiblePanels=new Set(),visibilityTargets=['statistics-panel','cell-inspector','history','scenario-guide'];
+  const panelObserver=typeof IntersectionObserver==='function'?new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting)visiblePanels.add(entry.target.id);else visiblePanels.delete(entry.target.id);}uiPending=true;dirty=true;},{root:document.getElementById('sidebar-scroll')}):null;
+  for(const id of visibilityTargets)panelObserver?.observe($(id));
+  function panelVisible(id){const node=$(id);return (!node.matches('details')||node.open)&&(!panelObserver||visiblePanels.has(id));}
+  function applyPerformance(){
+    performancePlan=adaptive.status();const {fps,workMs,idleMs}=performancePlan,key=JSON.stringify([fps,workMs,idleMs]);
+    if(key!==presentationKey){presentationKey=key;worker.postMessage({command:'presentation',payload:{fps,workMs,idleMs}});}
+  }
+  function performanceContext(){
+    const changed=adaptive.context({mobile:mobileQuery.matches,preview:mobileQuery.matches&&document.body.classList.contains('panel-expanded'),recording:recordingScale>0,hidden:document.hidden,playing:snapshot?.playing??false,manual:$('render-resolution').value!=='auto'},performance.now());
+    if(changed)applyPerformance();return changed;
+  }
+  function performanceReadout(){
+    const p=performancePlan,reasons={warming:'预热测量',render:'绘图负荷',snapshot:'数据打包负荷',interaction:'交互负荷',simulation:'模拟计算受限',balanced:'运行平稳',paused:'已暂停',hidden:'后台暂停',recording:'录像质量锁定'};
+    $('adaptive-status').textContent=`${reasons[p.bottleneck]} · 显示上限 ${p.fps} FPS · 显示比例 ${Math.round(p.scale*100)}%${p.manual?' · 手动画质':''}${p.preview?' · 小窗预览':''}`;
+    $('adaptive-timing').textContent=`每步计算 ${(snapshot?.stepMs||0).toFixed(1)} ms · 实际 ${(snapshot?.rate||0).toFixed(1)} / 目标 ${snapshot?.targetRate||0} MCS/s`;
+  }
   // The probe must remain in the fullscreen element's subtree as well.
   canvas.parentElement.append($('field-probe'));
   let gpuRenderer=null,rendererFailure='';try{gpuRenderer=new CellLabRenderer();}catch(e){rendererFailure=String(e);}
@@ -31,6 +53,7 @@
     ['kill','接触杀伤强度',0,2,.1,'只对已识别且仍接触的靶细胞递送损伤',''],
     ['temperature','膜形变波动',2,30,1,'CPM 温度，影响随机复制尝试的接受率',''],
     ['supply','氧糖补给与酸清除',0,3,.05,'培养液储库补给；调低后密集区域更容易恶化',''],
+    ['normalSupport','正常细胞供给联动',0,100,1,'按本局健康正常细胞存活数的历史峰值计算保留比例；0% 无联动，100% 等比例影响全局氧糖补给和酸清除','%'],
     ['metabolism','消耗与产酸强度',0,2,.05,'按实际细胞占据面积与邻域密度持续计算',''],
     ['escape','恶劣环境逃逸',0,5,.1,'沿局部氧糖上升、酸负荷下降的方向重新极化',''],
     ['recruitment','识别后招募信号',0,3,.1,'实际接触识别异常或肿瘤后分泌；仅被吸引者不自动接力',''],
@@ -69,7 +92,7 @@
   ];
   const modules={
     'branch-sliders':['branchLength','branchStrength','branching','networkAdhesion'],
-    'environment-sliders':['supply','metabolism','halfLife','chemotaxis','escape','inflammation'],
+    'environment-sliders':['supply','normalSupport','metabolism','halfLife','chemotaxis','escape','inflammation'],
     'evolution-sliders':['mutationBias','evolutionMemory'],
     'normal-sliders':['normalMotility','cohesion','stressMutation','progression','normalMutationGain'],
     'tumor-sliders':['tumorMotility','growth','apoptosis','antigen'],
@@ -91,6 +114,7 @@
     $(name+'-number')?.addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur();});
     $(name+'-number')?.addEventListener('focus',e=>requestAnimationFrame(()=>{if(document.activeElement===e.target)e.target.select();}));
   }
+  const normalSupportStatus=document.createElement('p');normalSupportStatus.id='normal-support-status';normalSupportStatus.className='hint';$('normalSupport').closest('.slider').after(normalSupportStatus);
   function syncParameterInput(name){
     const slider=$(name),number=$(name+'-number'),value=Number(slider.value);
     if(number){if(document.activeElement!==number)number.value=slider.value;number.disabled=slider.disabled;}
@@ -146,10 +170,12 @@
       const family=m.data.observation?.rootBirth===observedBirth?m.data.observation:null;
       if(family){if(!family.cells.some(c=>c.id===selected))selected=family.cells[0]?.id||0;}
       else if(previous&&next&&previous.birth!==next.birth)selected=0;
-      snapshot=m.data;if(snapshot.revision!==lastRevision){lastRevision=snapshot.revision;selected=0;observedBirth=0;}
+      snapshot=m.data;if(snapshot.revision!==lastRevision){lastRevision=snapshot.revision;selected=0;observedBirth=0;adaptive.reset(performance.now());}
+      performanceContext();
       if(raster.width!==snapshot.width||raster.height!==snapshot.height){raster.width=snapshot.width;raster.height=snapshot.height;image=rctx.createImageData(snapshot.width,snapshot.height);}
       pendingFrame=m.frame||0;trajectories.sample(snapshot);dirty=true;uiPending=true;
-      if(m.interactive||performance.now()-lastUISync>=100){sync();lastUISync=performance.now();uiPending=false;}
+      if(m.interactive)forceFrame=true;
+      if(m.interactive||performance.now()-lastUISync>=performancePlan.uiMs){sync(!!m.interactive);lastUISync=performance.now();uiPending=false;}
     }else if(m.type==='response'){
       const p=pending.get(m.id);if(p){clearTimeout(p.timeout);pending.delete(m.id);p.resolve(m.value);}
     }else if(m.type==='error'){
@@ -161,7 +187,7 @@
   // 2019). Source revision and full notice: ../THIRD_PARTY_NOTICES.md. Zero is body color.
   const activityPalette=Array.from({length:256},(_,a)=>[Math.min(255,a*2),Math.min(255,(255-a)*2),0]);
   function updateOverlayButtons(){for(const button of document.querySelectorAll('[data-layer]')){const key=button.dataset.layer,on=key==='adversity'?$('field-view').value==='adversity':signalLayers.has(key);button.setAttribute('aria-pressed',on);button.classList.toggle('selected',on);}}
-  function sync(){
+  function sync(force=false){
     const s=snapshot;if(!s)return;
     $('play').textContent=s.playing?'Ⅱ 暂停':s.time===0?'▶ 开始':'▶ 继续';$('run-state').textContent=s.playing?'运行中':'已暂停';$('status-dot').style.background=s.playing?'var(--accent)':'#7b8d84';
     $('clock').textContent=s.time.toLocaleString();$('scene-title').textContent=s.scenario?.label||titles[s.scene]||s.scene;
@@ -170,7 +196,7 @@
     if(s.maze){$('maze-diffusion').textContent=s.maze.signalThroughWalls?'招募扩散：穿墙':'招募扩散：沿通道';$('maze-diffusion').setAttribute('aria-pressed',!!s.maze.signalThroughWalls);}
     if(s.maze){const leader=s.maze.arrivals[0],parts=[leader?`首达 #${s.maze.arrivals.filter(a=>a.time===leader.time).map(a=>a.number).join("/")} · ${leader.time} MCS`:'向圆心出发'];$('maze-score').replaceChildren(...parts.map(text=>{const e=document.createElement('b');e.textContent=text;return e;}),...s.maze.racers.map(r=>{const e=document.createElement('span');e.textContent=`#${r.number} ${r.arrivedAt!==null?r.arrivedAt+' MCS':r.alive?'探索中':'已移除'}`;return e;}));}
     const scenario=s.scenario;$('scenario-guide').hidden=!scenario;
-    if(scenario){
+    if(scenario&&(force||panelVisible('scenario-guide'))){
       $('scenario-phase').textContent=scenario.phase;$('scenario-phase').classList.toggle('achieved',scenario.achieved);
       $('scenario-description').textContent=scenario.description;
       $('scenario-configuration').textContent=scenario.customized?'参数已调整':'预设参数';
@@ -187,17 +213,19 @@
     }
     if(document.activeElement!==$('speed')&&!$('speed').dataset.touchEditing)$('speed').value=s.speed;$('speed-out').textContent=s.speed+'×';
     $('boundary').value=s.boundary;
+    if(s.normalSupport){const n=s.normalSupport;$('normal-support-status').textContent=`正常保留 ${Math.round(n.retained*100)}%（${n.living}/${n.reference}） · 供给／清除 ${Math.round(n.factor*100)}%`+(n.reference?'':' · 尚未建立正常细胞基准');}
     $('tumor-morphology').value=s.settings.tumorMorphology;$('branch-sliders').hidden=!s.settings.tumorMorphology;
     $('networkAdhesion').disabled=s.settings.tumorMorphology!==2;
     $('branching').disabled=s.settings.tumorMorphology!==2;
     syncParameterInput('networkAdhesion');syncParameterInput('branching');
     $('network-status').textContent=s.settings.tumorMorphology===2?`当前稳定接触 ${s.cells.reduce((n,m)=>n+(m.networkDegree||0),0)/2} 对；各细胞保持独立胞体。`:'示例会重新播种一片肿瘤细胞，观察突起逐渐形成与连接。';
+    $('seed-status').textContent=`当前 ${s.cells.length} 颗 · 按局部空间尝试加入`;
+    if(force||panelVisible('statistics-panel')){
     const counts=[0,0,0,0];let abnormal=0,activated=0,suppressive=0;for(const m of s.cells){counts[m.kind]++;if(m.state==='abnormal')abnormal++;if(CellLabDisplay.immuneActive(m))activated++;if(CellLabDisplay.immuneSuppressive(m))suppressive++;}
     $('normal-count').textContent=counts[1]-abnormal;$('abnormal-count').textContent=abnormal;$('tumor-count').textContent=counts[2];$('immune-count').textContent=counts[3];
     $('activated-immune-count').textContent=activated;
     $('suppressive-immune-count').textContent=suppressive;
     $('immune-regulation-events').textContent=`转抑制态 ${s.counters.suppressiveTransitions} · 恢复静息态 ${s.counters.suppressiveRecoveries} · 损伤退激活 ${s.counters.injuryDeactivations} · 信号退激活 ${s.counters.signalDeactivations}`;
-    $('seed-status').textContent=`当前 ${s.cells.length} 颗 · 按局部空间尝试加入`;
     $('division-count').textContent=s.counters.divisions;$('recognition-count').textContent=s.counters.recognitions;
     const patrol=s.patrol;$('patrol-coverage').textContent=(100*patrol.coverage).toFixed(1)+'%';$('patrol-checked').textContent=patrol.checkedCells;
     $('patrol-current').textContent=`当前存活已检查 ${patrol.currentChecked} / ${patrol.currentTargets}`;
@@ -229,6 +257,7 @@
     $('evolution-events').textContent=`正常耐受变异 ${s.counters.normalTraitMutations} · 肿瘤间期变异 ${s.counters.stressMutations} · 压力抗原暴露 ${s.counters.antigenExposures} · 选择性抗原丢失 ${s.counters.antigenEscapes}`;
     $('grid-info').textContent=`${s.width} × ${s.height} 格点 · ${s.refinement}× 精细度`;
     for(const [key,label]of [['tumor','肿瘤'],['immune','免疫']]){const c=s.cycles?.[key];$('cycle-'+key).textContent=c?`${label} · G0 ${c.G0} · G1 ${c.G1} · S ${c.S} · G2 ${c.G2} · M ${c.M} · 周期阻滞 ${c.arrested}`:'';}
+    }
     $('rate').textContent=s.playing?(Math.round(s.rate)||'—'):'0';
     $('performance').textContent=`目标 ${s.targetRate} MCS / 秒 · ${s.limited?'算力不足，实际推进较慢；生长与分裂继续计算':'固定模型步长'}`;
     $('performance').classList.toggle('limited',s.limited);
@@ -236,6 +265,8 @@
     $('backend-status').textContent=`绘图：${gpuRenderer&&!gpuRenderer.lost?(gpuRenderer.hardware===false?'WebGL2 软件':gpuRenderer.hardware===true?'WebGL2 GPU':'WebGL2'):'Canvas2D'} · 形变：${s.kernel==='wasm'?'WebAssembly CPU':s.kernel==='fast'?'优化 JS CPU':'参考 JS CPU'} · 微环境：${s.compute?.active==='gpu'?'WebGPU':'CPU'}`;
     $('render-performance').textContent=`画面更新 ${(s.playing?frameStats.fps:0).toFixed(1)} FPS · 绘制 ${frameStats.renderMs.toFixed(1)} ms · 数据打包 ${frameStats.snapshotMs.toFixed(1)} ms`;
     $('compute-note').textContent=(s.compute?.reason||'初始化计算后端…')+(s.kernelNote?' '+s.kernelNote:'');
+    performanceReadout();
+    if(!force&&!panelVisible('cell-inspector'))return;
     const cell=s.cells.find(c=>c.id===selected),phases={search:cell?.kind===3?(cell.patrolTurning?'巡逻转向':cell.immuneCue>.05?'局部趋化':cell.patrolScanning?'巡逻接触扫描':'持续巡逻'):'探索',scan:'接触扫描',kill:'识别后递送损伤',dying:CellLabDisplay.deathPhaseLabel(cell)};
     $('selection-label').textContent=cell?'#'+cell.id+' '+CellLabDisplay.cellName(cell):'未选中';
     $('divide').disabled=!cell||cell.dying||cell.state==='abnormal';
@@ -279,9 +310,7 @@
   function resizeDisplay(){
     fitCanvas();
     const cssWidth=Math.max(1,canvas.getBoundingClientRect().width),choice=$('render-resolution').value;
-    let width=choice==='auto'?Math.min(3840,Math.ceil(Math.max(960,snapshot.width,cssWidth*(devicePixelRatio||1))/4)*4):Number(choice);
-    if(recordingScale>0)width=Math.min(Math.floor(Math.min(8192,8192*snapshot.width/snapshot.height)/4)*4,Math.max(width,Math.ceil(cssWidth*recordingScale/4)*4));
-    const height=Math.round(width*snapshot.height/snapshot.width);
+    const {width,height}=adaptive.display({cssWidth,ratio:snapshot.width/snapshot.height,dpr:devicePixelRatio||1,manualWidth:choice==='auto'?0:Number(choice),recordingScale});
     if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}
     const description=`当前显示／PNG：${width} × ${height} 像素；物理格点 ${snapshot.width} × ${snapshot.height}`;
     if($('render-info').dataset.source!==description){$('render-info').dataset.source=description;$('render-info').textContent=description;}
@@ -342,6 +371,7 @@
   }
   function render(){
     if(!snapshot||!image)return;const renderStart=performance.now(),s=snapshot,w=s.width,h=s.height,grid=s.grid,data=image.data,meta=[];
+    lastRender=renderStart;forceFrame=false;
     const pixelRatio=resizeDisplay(),bodies=[];for(const c of s.cells){meta[c.id]=c;bodies[c.id]=CellLabDisplay.bodyColor(c,cellColors);}
     const view=$('field-view').value,wrap=s.boundary==='wrap',seams=$('cell-seams').checked,showNuclei=$('nuclei').checked,showAntigen=$('antigen-marks').checked,showCycle=$('cycle-marks').checked;
     const protect=$('protect-bodies').checked,{field,info,signal,bodySignal}=displayCache.get(s,view,signalLayers,opacity,protect),environmentOpacity=opacity[view]??0,bodyEnvironmentOpacity=CellLabDisplay.bodyOpacity(environmentOpacity,protect);
@@ -391,7 +421,7 @@
       ctx.strokeStyle='#803d46e6';ctx.stroke(paths[2]);ctx.strokeStyle='#1a456be6';ctx.stroke(paths[3]);
     }
     if(showAntigen&&!gpu)drawAntigenOutlines(s,scale,pixelRatio);
-    if(showNuclei){ctx.lineWidth=1.5*pixelRatio;for(const m of s.cells)if(m.hasNucleus&&(!m.dying||m.deathIntact)){const style=m.dying?{stroke:'#89531a',fill:'#ffe6a640'}:CellLabDisplay.nucleusStyle(m,cellColors);ctx.strokeStyle=style.stroke;ctx.fillStyle=style.fill;const contour=CellLabDisplay.nucleusContour(m),offsetsX=wrap?[-w,0,w]:[0],offsetsY=wrap?[-h,0,h]:[0];for(const dx of offsetsX)for(const dy of offsetsY){const x=(m.nucleusX+dx+.5)*scale,y=(m.nucleusY+dy+.5)*scale;ctx.beginPath();contour.forEach(([dx,dy],i)=>{const xx=x+dx*scale,yy=y+dy*scale;i?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy);});ctx.closePath();ctx.fill();ctx.stroke();}}}
+    if(showNuclei){ctx.save();ctx.scale(scale,scale);ctx.lineWidth=1.5*pixelRatio/scale;for(const batch of displayCache.nucleusBatches(s,cellColors)){ctx.fillStyle=batch.fill;ctx.strokeStyle=batch.stroke;ctx.fill(batch.path);ctx.stroke(batch.path);}ctx.restore();}
     // Post-clearance membrane fragments are cosmetic, never extra cells.
     // Their age uses model time, so pausing also freezes the rupture effect.
     ctx.save();ctx.lineWidth=Math.max(1,pixelRatio);
@@ -415,24 +445,16 @@
     if(selected&&meta[selected])drawSelection(s,scale,pixelRatio);
     // The full population history remains in the model/export. Its small plot
     // follows the 10 Hz sidebar cadence, independently of membrane rendering.
-    if(performance.now()-lastHistoryDraw>=100||!s.playing){drawHistory();lastHistoryDraw=performance.now();}
+    if(performance.now()-lastHistoryDraw>=performancePlan.uiMs||!s.playing){drawHistory();lastHistoryDraw=performance.now();}
     dirty=false;probeDirty=true;
     frameStats.renderMs=performance.now()-renderStart;frameStats.snapshotMs=s.snapshotMs||0;
-    if(frameStats.time!==s.time||frameStats.revision!==s.revision){frameStats.count++;frameStats.time=s.time;frameStats.revision=s.revision;}
+    if(frameStats.time!==s.time||frameStats.revision!==s.revision){frameStats.count++;frameStats.time=s.time;frameStats.revision=s.revision;adaptive.sample({renderMs:frameStats.renderMs,snapshotMs:frameStats.snapshotMs,stepMs:s.stepMs,rate:s.rate,targetRate:s.targetRate});}
     const elapsed=performance.now()-frameStats.since;if(elapsed>=1000){frameStats.fps=frameStats.count*1000/elapsed;frameStats.count=0;frameStats.since=performance.now();}
     if(pendingFrame){worker.postMessage({command:'framePresented',frame:pendingFrame});pendingFrame=0;}
   }
   function drawHistory(){
-    const chart=$('history'),c=chart.getContext('2d'),rows=snapshot.history,w=Math.max(260,chart.clientWidth||320),h=110,dpr=Math.max(devicePixelRatio||1,recordingScale);
-    if(chart.width!==Math.round(w*dpr)||chart.height!==Math.round(h*dpr)){chart.width=Math.round(w*dpr);chart.height=Math.round(h*dpr);}c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,w,h);if(!rows.length)return;
-    let max=10;for(const row of rows)for(const key of ['normal','abnormal','tumor','immune'])max=Math.max(max,row[key]||0);
-    const last=rows.at(-1),end=snapshot.time,span=Math.max(1,end);
-    c.strokeStyle='#bcaa88';c.lineWidth=1;c.beginPath();c.moveTo(28,88);c.lineTo(w-6,88);c.stroke();
-    for(const [key,color] of [['normal','#707c78'],['abnormal','#947743'],['tumor','#36302b'],['immune','#b95263']]){c.beginPath();c.lineWidth=1.5;c.strokeStyle=color;rows.forEach((r,i)=>{const x=28+r.time/span*(w-34),y=85-(r[key]||0)/max*70;i?c.lineTo(x,y):c.moveTo(x,y);});c.stroke();}
-    c.fillStyle='#766953';c.font='10px Consolas';c.fillText(String(max),2,17);c.fillText('0 MCS',28,104);c.textAlign='right';c.fillText(end+' MCS',w-6,104);c.textAlign='left';
-    $('history-range').textContent=`全程 0 — ${end.toLocaleString()} MCS`;
-    chart.setAttribute('aria-label',`正常、异常、肿瘤和免疫细胞数量：从 0 到 ${end} MCS 的完整过程`);
-    $('order').textContent='极性一致度 '+last.order.toFixed(2);
+    if(!panelVisible('history'))return;
+    historyChart.update(snapshot,recordingScale);
   }
   const hints={source:'放置或擦除持续场源 · 不改变细胞位置',move:'拖动时暂停 · 邻居让位 · 松手恢复',seed:'单击加入一颗 · 可尝试挤入已有细胞区域',signal:'单击释放因子 · 拖动画出信号带',wall:'在空白处拖动画墙',erase:'拖动擦除实体障碍',remove:'擦除触及的整颗细胞 · 单独记账',pan:'按住拖动平移视野 · 不改变细胞位置',inspect:'点击细胞查看状态与局部环境'};
   function setTool(value){
@@ -533,7 +555,7 @@
   $('apply-grid').addEventListener('click',async()=>{const b=$('apply-grid');b.disabled=true;b.textContent='正在创建格点与细胞…';try{await start(undefined,{preserve:true});toast('计算区域与真实格点精细度已更新');}catch(e){fail(e);}finally{b.disabled=false;b.textContent='应用区域与精细度 · 重新开始';}});
   $('zoom').addEventListener('change',()=>{view.x=0;view.y=0;dirty=true;});
   $('view-fit').addEventListener('change',()=>{view.x=0;view.y=0;dirty=true;});
-  $('render-resolution').addEventListener('change',()=>dirty=true);
+  $('render-resolution').addEventListener('change',()=>{performanceContext();dirty=true;forceFrame=true;});
   $('tumor-morphology').addEventListener('change',e=>rpc('set',{name:'tumorMorphology',value:Number(e.target.value)}).then(()=>toast('肿瘤形态偏好已更新，胞体将逐步重塑')).catch(fail));
   $('network-demo').addEventListener('click',()=>start('network',{preset:true}).catch(fail));
   $('fullscreen').addEventListener('click',()=>{const viewport=document.querySelector('.viewport');(document.fullscreenElement?document.exitFullscreen():viewport.requestFullscreen()).catch(fail);});
@@ -554,6 +576,15 @@
   const sections=[...document.querySelectorAll('aside details.section')];
   const mobileUI=CellLabMobile.mount();
   const statisticsUI=CellLabStatistics.mount(mobileUI,()=>{dirty=true;});
+  $('performance-mode').value=adaptive.mode;
+  $('performance-mode').addEventListener('change',()=>{
+    adaptive.setMode($('performance-mode').value,performance.now());applyPerformance();performanceContext();
+    try{localStorage.setItem('cell-arena-performance-v1',JSON.stringify(adaptive.preferences()));}catch{}
+    dirty=true;forceFrame=true;uiPending=true;
+  });
+  $('recheck-performance').addEventListener('click',()=>{adaptive.setMode(adaptive.mode,performance.now());applyPerformance();dirty=true;uiPending=true;});
+  document.querySelector('aside').addEventListener('toggle',()=>{uiPending=true;forceFrame=true;dirty=true;performanceContext();},true);
+  for(const name of ['pointerdown','input'])document.addEventListener(name,event=>{const now=performance.now();latestInput=event.timeStamp>0&&event.timeStamp<=now&&now-event.timeStamp<2000?event.timeStamp:now;},{capture:true,passive:true});
   for(const section of sections)section.addEventListener('toggle',()=>{if(section.open)for(const other of sections)if(other!==section)other.open=false;});
   $('collapse-modules').addEventListener('click',()=>sections.forEach(section=>section.open=false));
   document.querySelectorAll('[data-panel]').forEach(button=>button.addEventListener('click',()=>{statisticsUI.set(false);mobileUI.focus(button.dataset.panel);}));
@@ -577,7 +608,7 @@
     onChange:state=>{const time=Math.floor(state.elapsed||0),stamp=String(Math.floor(time/60)).padStart(2,'0')+':'+String(time%60).padStart(2,'0');$('record-video').textContent=state.preparing?'准备录制…':state.stopping?'正在生成视频…':state.active?'■ 停止并下载':'● 录制 '+($('record-format').value==='mp4'?'MP4':'WebM');$('record-video').disabled=!!(state.stopping||state.preparing);$('record-indicator').hidden=!state.active;$('record-indicator').textContent='■ '+stamp;$('record-indicator').disabled=!!state.stopping;if(state.active)$('record-status').textContent=`录制中 ${stamp} · ${state.format==='mp4'?'MP4':'WebM'} · ${state.width} × ${state.height} · ${state.fps} FPS`;refreshRecordingOptions();},
     onReady:(blob,state)=>{const url=URL.createObjectURL(blob),extension=blob.type.includes('mp4')?'mp4':'webm';download(url,`cell-arena-${snapshot.scene}-${state.width}x${state.height}-${Date.now()}.${extension}`);setTimeout(()=>URL.revokeObjectURL(url),60000);$('record-status').textContent=`视频已导出 · ${extension==='mp4'?'MP4':'WebM'} · ${state.width} × ${state.height} · ${Math.round(state.elapsed)} 秒 · ${(blob.size/1024/1024).toFixed(1)} MB`;},
     onError:error=>{$('record-status').textContent=String(error.message||error);},
-    onResolution:scale=>{if(Math.abs(recordingScale-scale)>.001){recordingScale=scale;if(scale>0)render();else dirty=true;}}
+    onResolution:scale=>{if(Math.abs(recordingScale-scale)>.001){recordingScale=scale;performanceContext();if(scale>0)render();else dirty=true;}}
   });
   $('maze-diffusion').addEventListener('click',async()=>{if(!snapshot?.maze)return;const button=$('maze-diffusion');button.disabled=true;try{await rpc('mazeSignal',{throughWalls:!snapshot.maze.signalThroughWalls});}catch(e){fail(e);}finally{button.disabled=false;}});
   $('record-video').addEventListener('click',async()=>{try{if(video.status.active||video.status.preparing)await video.stop();else{render();await video.start({quality:$('record-quality').value,format:$('record-format').value,scope:mobileUI.isMobile?'arena':$('record-scope').value});}}catch(error){refreshRecordingOptions();$('record-status').textContent=String(error.message||error);toast('录像未能开始：'+String(error.message||error));}});$('record-indicator').addEventListener('click',()=>void video.stop());
@@ -613,10 +644,17 @@
   $('cancel-import').addEventListener('click',()=>$('import-dialog').close());$('import-dialog').addEventListener('close',()=>{pendingImport=null;importSerial++;$('import-file').value='';});
   $('confirm-import').addEventListener('click',async()=>{if(!pendingImport)return;$('confirm-import').disabled=true;try{await importData(pendingImport);$('import-dialog').close();toast('参数已加载，已暂停重新开局');}catch(error){$('import-status').textContent=String(error.message||error);$('confirm-import').disabled=false;}});
   $('about').addEventListener('click',()=>$('about-dialog').showModal());$('close-about').addEventListener('click',()=>$('about-dialog').close());
-  document.addEventListener('visibilitychange',()=>rpc('visible',{value:!document.hidden}).catch(fail));
+  document.addEventListener('visibilitychange',()=>{lastAnimation=0;performanceContext();rpc('visible',{value:!document.hidden}).catch(fail);});
   document.addEventListener('keydown',e=>{if(e.code==='Space'&&!['INPUT','SELECT','BUTTON','SUMMARY'].includes(document.activeElement.tagName)&&!document.querySelector('dialog[open]')){e.preventDefault();rpc('playing',{value:!snapshot?.playing}).catch(fail);}});
-  function frame(){if(uiPending&&performance.now()-lastUISync>=100){sync();lastUISync=performance.now();uiPending=false;}if(dirty)render();if(probeDirty)updateProbe();requestAnimationFrame(frame);}requestAnimationFrame(frame);
-  window.artistooLab={rpc,ready,get snapshot(){return snapshot;},get errors(){return errors;},get selected(){return selected;},get recording(){return video.status;},get colors(){return CellLabDisplay.normalizeColors(cellColors);},get renderer(){return {gpu:!!gpuRenderer&&!gpuRenderer.lost,device:gpuRenderer?.device,error:rendererFailure,ms:gpuRenderer?.lastMs,fps:snapshot?.playing?frameStats.fps:0,renderMs:frameStats.renderMs,snapshotMs:frameStats.snapshotMs};},setTool,render,exportData,importData};
+  function frame(){
+    const now=performance.now();if(lastAnimation)adaptive.frameGap(now-lastAnimation);lastAnimation=now;
+    if(latestInput){adaptive.inputDelay(now-latestInput);latestInput=0;}
+    if(now-lastHeartbeat>=500){performanceContext();if(adaptive.tick(now)){dirty=true;applyPerformance();}performancePlan=adaptive.status();lastHeartbeat=now;}
+    if(uiPending&&now-lastUISync>=performancePlan.uiMs){sync();lastUISync=now;uiPending=false;}
+    if(dirty&&(!pendingFrame||forceFrame||now-lastRender>=1000/performancePlan.fps))render();
+    if(probeDirty)updateProbe();requestAnimationFrame(frame);
+  }requestAnimationFrame(frame);applyPerformance();
+  window.artistooLab={rpc,ready,get snapshot(){return snapshot;},get performance(){return {...adaptive.status(),visiblePanels:[...visiblePanels]};},get errors(){return errors;},get selected(){return selected;},get recording(){return video.status;},get colors(){return CellLabDisplay.normalizeColors(cellColors);},get renderer(){return {gpu:!!gpuRenderer&&!gpuRenderer.lost,device:gpuRenderer?.device,error:rendererFailure,ms:gpuRenderer?.lastMs,fps:snapshot?.playing?frameStats.fps:0,renderMs:frameStats.renderMs,snapshotMs:frameStats.snapshotMs};},setTool,render,exportData,importData};
   const language=CellLabI18n.mount($('language'));
   start('oncogenesis',{preset:true}).then(()=>rpc('visible',{value:!document.hidden})).then(resolveReady).catch(fail);
 })();

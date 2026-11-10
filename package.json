@@ -34,6 +34,10 @@
     "test:hires": "node scripts/check-hires-interaction.mjs",
     "benchmark": "node scripts/benchmark-v4.mjs",
     "test:performance": "node scripts/check-performance.mjs",
+    "test:adaptive": "node scripts/check-adaptive.mjs",
+    "test:history": "node scripts/check-history.mjs",
+    "test:support-nuclei": "node scripts/check-support-nuclei.mjs",
+    "benchmark:adaptive": "node scripts/benchmark-adaptive.mjs",
     "benchmark:performance": "node scripts/benchmark-performance.mjs",
     "benchmark:browser": "node scripts/benchmark-browser-performance.mjs"
   }

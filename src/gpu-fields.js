@@ -48,7 +48,7 @@
       if(!Number.isInteger(dt)||dt<1)throw Error('GPU field step requires positive integral MCS');
       const {oxygen,glucose,acid}=s.fields,n=this.n,d=this.device;
       for(let i=0;i<n;i++){this.state[i*4]=oxygen.values[i];this.state[i*4+1]=glucose.values[i];this.state[i*4+2]=acid.values[i];this.mass[i*4]=s.loads[1][i];this.mass[i*4+1]=s.loads[2][i];this.mass[i*4+2]=s.loads[3][i];this.mass[i*4+3]=s.supplyMap[i];this.mask[i]=oxygen.blocked[i];}
-      const u=new Uint32Array(this.uniform),f=new Float32Array(this.uniform);u[0]=this.width;u[1]=this.height;u[2]=s.wrap?1:0;f[4]=s.settings.supply;f[5]=s.settings.metabolism;
+      const u=new Uint32Array(this.uniform),f=new Float32Array(this.uniform);u[0]=this.width;u[1]=this.height;u[2]=s.wrap?1:0;f[4]=s.normalSupportReport().effectiveSupply;f[5]=s.settings.metabolism;
       d.queue.writeBuffer(this.buffers[0],0,this.state);d.queue.writeBuffer(this.loads,0,this.mass);d.queue.writeBuffer(this.blocked,0,this.mask);d.queue.writeBuffer(this.params,0,this.uniform);
       const e=d.createCommandEncoder();for(let j=0;j<dt;j++){const pass=e.beginComputePass();pass.setPipeline(this.pipeline);pass.setBindGroup(0,this.groups[j%2]);pass.dispatchWorkgroups(Math.ceil(n/64));pass.end();}
       e.copyBufferToBuffer(this.buffers[dt%2],0,this.readback,0,n*16);d.queue.submit([e.finish()]);
