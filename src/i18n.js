@@ -735,6 +735,9 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
   add(`
 恢复当前情境的参数和推荐种子，保留区域、精细度与边界选择|Restore scenario parameters and its recommended seed; keep area, refinement and boundary
 手机端仅录制 Arena，组合录像已结束|Mobile records the Arena only; combined recording has ended
+画面更新|Arena updates
+绘制|Rendering
+数据打包|Snapshot packing
 占满侧栏|Fill sidebar
 返回控制|Back to controls
 录制范围|Capture area

@@ -6,7 +6,7 @@
 
 右上角支持 **中文 / English**，语言选择保存在当前浏览器，切换不重置模拟。Switch between Chinese and English in the top-right selector; all simulation work stays in your browser.
 
-- **三个独立标记**：「显示调整 → 细胞与热图」分别开关胞核、抗原轮廓和周期文字，可同时显示。关闭胞核只隐藏胞核轮廓；抗原阳性的肿瘤／异常细胞沿真实膜边显示红色细线，周期以 G0／G1／S／G2／M 标出。选中细胞有跟随形变和移动的四角框。设置随参数文件保存，兼容旧显示选项。
+- **三个独立标记**：「显示调整 → 细胞与热图」分别开关胞核、抗原轮廓和周期文字，可同时显示。首次打开默认开启胞核；所有情境默认开启抗原轮廓，均可手动关闭。关闭胞核只隐藏胞核轮廓；抗原阳性的肿瘤／异常细胞沿真实膜边显示红色细线，周期以 G0／G1／S／G2／M 标出。选中细胞有跟随形变和移动的四角框。设置随参数文件保存，兼容旧显示选项。
 - **细胞周期与 IL-2**：肿瘤有可逆 G0 静息及资源、压缩和损伤检查点。CTL 由真实抗原接触积累刺激记忆，配合独立 IL-2 信号、营养和有限谱系余量扩增；离开靶细胞后仍可完成支持允许的周期。慢性刺激可累积耗竭。IL-2 有独立图层与持续场源，不作为趋化信号。选中细胞可查看阶段、停滞原因和记忆／耗竭，统计页显示各阶段数量。模型时间未标定为小时。
 - **巡逻覆盖与实际检查**：短时方向记忆、渐进转向和局部接触扫描减少小范围徘徊；统计页显示实际经过面积比例及累计检查的不同组织细胞数。检查需要持续真实膜接触，不代表已识别抗原。没有排斥标记或全局导航。
 
@@ -187,3 +187,21 @@ npm run benchmark
 官方仓库 [ingewortel/artistoo](https://github.com/ingewortel/artistoo)，固定提交 `e997d81213a5dcdfc40ad976a18958f412f00cc9`。`vendor/artistoo.js` 未修改，SHA-256 `cf324da4b8a475853f02bcc842662ade65140132fe11d6db4e034ea17a5ca7e5`；其作者和完整 MIT 文本保留在 [vendor/LICENSE](vendor/LICENSE)。优化 JS 约束及 WASM 内核包含对上游代码的改写／移植，具体文件与范围见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
 随上游带入的 MT19937 随机数实现还保留 Matsumoto／Nishimura 的版权、Sean McCullough 的封装署名及 [BSD 三条款原文](vendor/MT19937-LICENSE.txt)。两个许可证均内嵌到网页“模型与来源 → 代码来源、版本与许可”，并输出到 `dist/licenses/`。构建清单按第三方组件列出许可，不将所有组件笼统写成 MIT。视觉参考与论文依据另列于来源说明和 [MODEL.md](MODEL.md)。旧 v2 单文件留存于本地 `output/artistoo-v2.html`。
+
+## 大画布性能与复测
+
+内部格点的邻接关系在 WASM 中直接计算，仅边界保留查表；成功复制仍按原顺序调用 Artistoo 记账，完整保留形变、核区、真实接触、微环境与细胞周期。高分辨率快照采用分块转置，WASM 额外加速栅格打包；JS 回退提供相同结果。绘图复用 GPU 纹理，抗原细线直接在 GPU 中沿膜边绘制。
+
+Arena 最多每秒推送 60 张新状态，自动帧最多两张在途；渲染忙时合并显示更新，模拟继续计算。侧栏和全程曲线以最多 10 Hz 更新，用户操作立即刷新；完整历史与实验导出不降采样。
+
+「其他 → 性能与计算」新增实际画面更新 FPS、绘制与打包耗时。FPS 只计展示过的新模型时刻，不计重复重绘；1× 仍是 30 MCS/秒，高倍率受实际计算能力限制，最大格点密铺不能保证 60 FPS。不会自动降低物理分辨率或冻结增殖。
+
+复测命令：
+
+```sh
+npm run benchmark:performance -- current 512 120
+npm run benchmark:browser -- current dist/index.html 512 2560
+npm run test:performance
+```
+
+前者输出固定种子的状态指纹和分项耗时；加 `--baseline=<commit>` 可从 Git 读取旧代码与 WASM 二进制对照，加 `--profile` 生成 CPU profile。后者在本机 Chrome 中以 2560×1920 显示真实培养层，分别测量 1× / 8× 的新画面更新率、MCS/秒和长帧。原始结果保存在忽略提交的 `output/performance/`，本次结论见 `CHECK_RESULTS.md`。

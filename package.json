@@ -32,6 +32,9 @@
     "test:cycle-gpu": "node scripts/check-cycle-gpu.mjs",
     "test:gpu": "node scripts/check-gpu-v4.mjs",
     "test:hires": "node scripts/check-hires-interaction.mjs",
-    "benchmark": "node scripts/benchmark-v4.mjs"
+    "benchmark": "node scripts/benchmark-v4.mjs",
+    "test:performance": "node scripts/check-performance.mjs",
+    "benchmark:performance": "node scripts/benchmark-performance.mjs",
+    "benchmark:browser": "node scripts/benchmark-browser-performance.mjs"
   }
 }

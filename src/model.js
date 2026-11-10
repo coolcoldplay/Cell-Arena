@@ -1289,9 +1289,28 @@
       if(!sameHistoryRow(result.at(-1),current))result.push(current);
       return result;
     }
+    snapshotRaster(){
+      if(this.kernel==='wasm'){const raster=this.wasm.raster();if(raster)return raster;}
+      const grid=new Uint16Array(this.width*this.height),activity=new Uint8Array(grid.length),walls=new Uint8Array(grid.length);let orphans=0,visitedPixels=0,freePixels=0;
+      // Artistoo stores columns; display textures store rows. Tiled transposition
+      // keeps both working sets in cache instead of striding across the entire
+      // high-resolution lattice. No cell or field sample is omitted.
+      const pixels=this.C.grid._pixels,act=this.act.cellpixelsact,visited=this.patrol.visited,bits=this.C.grid.Y_BITS,w=this.width,h=this.height;
+      const present=this.rasterPresent??=new Uint8Array(65536),maxAct=this.rasterMaxAct??=new Uint8Array(65536);present.fill(0);
+      for(const m of this.live()){present[m.id]=1;maxAct[m.id]=this.C.conf.MAX_ACT[m.kind];}
+      for(const id of Object.keys(this.C.t2k))if(this.C.t2k[id]===WALL)present[id]=2;
+      for(let by=0;by<h;by+=32)for(let bx=0;bx<w;bx+=32){const ey=Math.min(h,by+32),ex=Math.min(w,bx+32);
+        for(let x=bx;x<ex;x++){let i=(x<<bits)+by,q=by*w+x;for(let y=by;y<ey;y++,i++,q+=w){
+          const id=pixels[i],kind=present[id];grid[q]=id;
+          if(kind===1)activity[q]=Math.min(255,Math.round((act[i]||0)/maxAct[id]*255));
+          else if(kind===2)walls[q]=1;else if(id)orphans++;
+          if(kind!==2){freePixels++;visitedPixels+=visited[i];}
+        }}
+      }
+      return {grid,activity,walls,orphans,visitedPixels,freePixels};
+    }
     snapshot(){
-      this.refreshPositions();const grid=new Uint16Array(this.width*this.height),activity=new Uint8Array(grid.length),walls=new Uint8Array(grid.length);let orphans=0,visitedPixels=0,freePixels=0;
-      for(let q=0;q<grid.length;q++){const i=this.positions[q],id=this.C.grid.pixti(i);grid[q]=id;const m=this.cells[id];if(m)activity[q]=Math.min(255,Math.round(this.act.pxact(i)/this.C.conf.MAX_ACT[m.kind]*255));else if(id){if(this.C.cellKind(id)===WALL)walls[q]=1;else orphans++;}if(!walls[q]){freePixels++;visitedPixels+=this.patrol.visited[i];}}
+      this.refreshPositions();const {grid,activity,walls,orphans,visitedPixels,freePixels}=this.snapshotRaster();
       const cells=this.live().map(m=>({id:m.id,kind:m.kind,x:m.x,y:m.y,px:m.px,py:m.py,area:this.C.getVolume(m.id),target:m.target,antigen:m.antigen,antigenLevel:m.antigenLevel,damage:m.damage,dying:m.dying,deathCause:m.deathCause,phase:m.phase,targetID:m.targetID,age:m.age,genome:m.genome?{...m.genome}:null,clone:m.clone,generation:m.generation,divisionsLeft:m.divisionsLeft,activation:m.activation,recruitment:m.recruitment,oxygen:m.oxygen,glucose:m.glucose,acid:m.acid,stress:m.stress,fitness:m.fitness,confinement:m.confinement}));
       for(const c of cells){const m=this.cells[c.id];for(const key of ['sectionFraction','sectionPressure','planarTarget','offPlaneTarget','hasNucleus','nucleusX','nucleusY','nucleusRadius','birth','nucleusStrainX','nucleusStrainY','state','origin','abnormalSince','abnormalAge','transformedAt','adversity','immuneCue','inflammatorySignal','inflammatoryExposure','morphologyMode','branchCount','networkDegree','deathStartedAt','deathPhase','deathProgress','deathIntact'])c[key]=m[key];if(c.kind===IMMUNE){c.patrolChecked=m.patrolCheckedBirth===m.birth?m.patrolChecked||0:0;c.patrolScanning=!!m.patrolScanning;c.patrolTurning=!!m.patrolMotion?.turnTime;}}
       for(const c of cells){const m=this.cells[c.id];c.cycle={...m.cycle};for(const key of ['antigenMemory','il2','il2Response','il2Production','chronicStimulation','exhaustion','normalTolerance','mutationPressure','immuneEncounters','immuneContactMemory','recruitmentExposure','lastAntigenChange','immunePhenotype','normalDamageExposure','inhibition','immuneRefractory'])c[key]=m[key];}

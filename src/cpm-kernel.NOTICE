@@ -19,5 +19,5 @@ The complete BSD three-clause notice for the MT19937 portions is in
 This implementation additionally integrates Cell-Arena-specific constraints.
 The original notices are retained, supplied alongside source and binary,
 and embedded in both distributed HTML entry points. This sidecar supplements
-the unchanged C source and compiled binary; it is not a claim of upstream
+the C source and compiled binary; it is not a claim of upstream
 authorship or endorsement of Cell-Arena's extensions.

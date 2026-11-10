@@ -3,15 +3,21 @@
 let sim=null,playing=true,visible=true,speed=1,clock=new CellLab.StepClock(30),pendingSteps=0;
 let previous=performance.now(),lastSnapshot=0,lastMeasure=previous,measuredSteps=0,rate=0,limited=false,revision=0;
 let dragSession=null;
+let frameSerial=0,presentedFrame=0,lastPublishedTime=-1;
 let backend=new CellLabGPU.ComputeBackend();const commands=[];let busy=false,wasmModule=null,kernelNote='';
 const turnQueue=new MessageChannel();turnQueue.port1.onmessage=()=>tick();
 try{wasmModule=CellLabWasm.load(Uint8Array.from(atob(globalThis.CELL_LAB_WASM),c=>c.charCodeAt(0))).catch(e=>{kernelNote=String(e);return null;});}catch(e){kernelNote=String(e);}
-function sendSnapshot(){
+function sendSnapshot(interactive=false){
   if(!sim)return;
+  // Double buffering lets rendering overlap the next MCS. A busy main thread must not
+  // make the simulation serialize a queue of obsolete full-resolution images.
+  if(!interactive&&(frameSerial-presentedFrame>=2||sim.C.time===lastPublishedTime))return;
+  const begin=performance.now();
   const data=sim.snapshot();data.playing=playing;data.speed=speed;data.rate=rate;data.targetRate=30*speed;data.limited=limited;data.revision=revision;
   data.compute=backend.info();data.kernelNote=sim.kernelNote||kernelNote;
+  data.snapshotMs=performance.now()-begin;
   const transfers=[data.grid.buffer,data.activity.buffer,data.walls.buffer,data.fieldMask.buffer,...Object.values(data.fields).map(f=>f.values.buffer)];
-  postMessage({type:'snapshot',data},transfers);lastSnapshot=performance.now();
+  postMessage({type:'snapshot',frame:++frameSerial,interactive,data},transfers);lastSnapshot=performance.now();lastPublishedTime=sim.C.time;
 }
 function resetClock(){clock.reset();pendingSteps=0;previous=performance.now();lastMeasure=previous;measuredSteps=0;rate=0;limited=false;}
 function respond(id,value){if(id)postMessage({type:'response',id,value});}
@@ -68,11 +74,11 @@ async function handle(event){
     else if(command==='snapshot')value={time:sim.C.time,cells:sim.live().length};
     else throw Error('Unknown command: '+command);
     if(['seed','sprinkle','divide'].includes(command))sim.record();
-    sendSnapshot();respond(id,value);
+    sendSnapshot(true);respond(id,value);
   }catch(error){postMessage({type:'error',id,message:String(error),stack:error?.stack});}
 }
 async function drain(){if(busy)return;busy=true;try{while(commands.length)await handle(commands.shift());}finally{busy=false;}}
-onmessage=event=>{commands.push(event);drain();};
+onmessage=event=>{if(event.data.command==='framePresented'){presentedFrame=Math.max(presentedFrame,Math.min(frameSerial,event.data.frame||0));return;}commands.push(event);drain();};
 async function tick(){
   if(busy){setTimeout(tick,4);return;}busy=true;
   try{
@@ -80,14 +86,14 @@ async function tick(){
     if(sim&&playing&&visible){
       pendingSteps+=clock.add(elapsed);
       const begin=performance.now();let performed=0;
-      while(pendingSteps>0&&performance.now()-begin<18){if(backend.active==='gpu')await sim.advanceAsync(1,backend);else sim.advance(1);pendingSteps--;performed++;}
+      while(pendingSteps>0&&performance.now()-begin<8){if(backend.active==='gpu')await sim.advanceAsync(1,backend);else sim.advance(1);pendingSteps--;performed++;}
       measuredSteps+=performed;
       // Bound backlog instead of silently speeding up biology after a long stall.
       limited=pendingSteps>clock.rate*.4;
       pendingSteps=Math.min(pendingSteps,Math.ceil(clock.rate*2));
       const end=performance.now();
       if(end-lastMeasure>=700){rate=measuredSteps*1000/(end-lastMeasure);lastMeasure=end;measuredSteps=0;}
-      if(end-lastSnapshot>=40)sendSnapshot();
+      if(end-lastSnapshot>=1000/60)sendSnapshot();
     }
   }catch(error){playing=false;postMessage({type:'error',message:String(error),stack:error?.stack});}
   finally{busy=false;drain();}
