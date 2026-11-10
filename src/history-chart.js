@@ -2,7 +2,7 @@
  * population archive, model clock, RNG or the simulation's cell visibility. */
 (() => {
   'use strict';
-  const types=[['normal','正常','#707c78'],['abnormal','异常','#947743'],['tumor','肿瘤','#36302b'],['immune','免疫','#b95263']];
+  const types=[['normal','正常','#707c78'],['abnormal','癌前','#947743'],['tumor','肿瘤','#36302b'],['immune','免疫','#b95263']];
   const states={
     normal:[['normalLiving','存活','#899992'],['normalDying','清除中','#c4ae86']],
     abnormal:[['abnormalPositive','抗原阳性','#b97758'],['abnormalNegative','抗原阴性','#947743'],['abnormalDying','清除中','#c4ae86']],

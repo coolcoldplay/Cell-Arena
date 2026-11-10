@@ -38,7 +38,7 @@
     const base=hexRGB(palette[colorKey(m)].body),t=m.kind===2&&palette.proliferationShading?tumorShade(m)/255:0;
     return base.map(v=>Math.round(v+(255-v)*t));
   };
-  const cellName=m=>m?.state==='abnormal'?'异常中间态':m?.kind===3?(immuneSuppressive(m)?'免疫抑制样细胞':immuneActive(m)?'已激活免疫细胞':'未激活免疫细胞'):['培养液','正常细胞','肿瘤细胞','免疫细胞','实体障碍'][m?.kind||0];
+  const cellName=m=>m?.state==='abnormal'?'癌前细胞':m?.kind===3?(immuneSuppressive(m)?'免疫抑制样细胞':immuneActive(m)?'已激活免疫细胞':'未激活免疫细胞'):['培养液','正常细胞','肿瘤细胞','免疫细胞','实体障碍'][m?.kind||0];
   const deathCode=m=>m?.dying?({spontaneous:1,kill:2,environment:3}[m.deathCause]||1):0;
   function deathColor(rgb,m){
     if(!m?.dying)return rgb;
@@ -47,7 +47,7 @@
     const weight=code===2?.15+.85*p:code===3?.4+.45*p:.2+.65*p;
     return rgb.map((v,i)=>v+(tint[i]-v)*weight);
   }
-  const deathPhaseLabel=m=>({rounding:'免疫杀伤 · 圆化',swelling:'免疫杀伤 · 肿胀待裂解',rupture:'免疫杀伤 · 破裂',shrinking:'自发凋亡 · 皱缩',withering:'环境死亡 · 萎缩'}[m?.deathPhase]||'死亡清除中');
+  const deathPhaseLabel=m=>m?.deathCause==='lifespan'?'寿命凋亡 · 皱缩':({rounding:'免疫杀伤 · 圆化',swelling:'免疫杀伤 · 肿胀待裂解',rupture:'免疫杀伤 · 破裂',shrinking:'自发凋亡 · 皱缩',withering:'环境死亡 · 萎缩'}[m?.deathPhase]||'死亡清除中');
   const nucleusStyles={normal:{stroke:'#243b53',fill:'#243b531a'},patrol:{stroke:'#8f3548',fill:'#8f35481a'},dark:{stroke:'#f2d38a',fill:'#f2d38a1a'}};
   const nucleusStyle=(m,palette)=>{if(palette||immuneSuppressive(m)){const stroke=(palette||COLOR_DEFAULTS)[colorKey(m)].nucleus;return {stroke,fill:stroke+'1a'};}return m.kind===1?nucleusStyles.normal:m.kind===3&&!immuneActive(m)?nucleusStyles.patrol:nucleusStyles.dark;};
   const nuclearAngles=Array.from({length:32},(_,i)=>{const a=i*Math.PI/16;return [Math.cos(a),Math.sin(a),Math.cos(3*a),Math.sin(3*a),Math.cos(4*a),Math.sin(4*a)];});

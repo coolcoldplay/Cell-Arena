@@ -2,10 +2,10 @@
 (() => {
   'use strict';
   const NORMAL=1, TUMOR=2, IMMUNE=3, WALL=4, FIELD_SCALE=4;
-  const DEATH_COUNTERS={spontaneous:['apoptosisStarted','apoptosis'],kill:['killStarted','kills'],environment:['environmentStarted','environment']};
+  const DEATH_COUNTERS={spontaneous:['apoptosisStarted','apoptosis'],kill:['killStarted','kills'],environment:['environmentStarted','environment'],lifespan:['lifespanStarted','lifespan']};
   const DEFAULTS={normalMotility:.08,tumorMotility:.7,immuneMotility:1,chemotaxis:1.6,alignment:.8,cohesion:1,repulsion:.7,immuneSeparation:1,noise:.6,halfLife:140,growth:.8,apoptosis:8,antigen:65,kill:1,temperature:12,supply:1.8,metabolism:1,escape:2,recruitment:1,immuneGrowth:.35,immuneDivisions:3,mutation:6,mutationSize:.16,sectionYield:.35,stressMutation:1,inflammation:0,progression:1,tumorMorphology:0,branchLength:2.8,branchStrength:5,networkAdhesion:1,branching:1};
   const clamp=(v,lo=0,hi=1)=>Math.max(lo,Math.min(hi,v));
-  Object.assign(DEFAULTS,{normalSupport:0});
+  Object.assign(DEFAULTS,{normalSupport:0,immuneKillLimit:10});
   // Phenomenological MCS parameters; not hours or molecular concentrations.
   Object.assign(DEFAULTS,{tumorCycle:240,tumorQuiescence:1,immuneCycle:220,antigenMemory:900,il2Secretion:1,il2HalfLife:180,exhaustionRate:1});
   Object.assign(DEFAULTS,{normalMutationGain:2,tumorMutationGain:2,mutationBias:0,antigenStressGain:.5,contactEscape:.1,signalEscape:.05,evolutionMemory:800});
@@ -22,7 +22,7 @@
   // Random development experiments stay near competing, viable regimes rather
   // than combining unrelated extremes or pre-planting malignant cells.
   Object.assign(RANDOM_RANGES,{supply:[2.3,2.8,.05],metabolism:[1.05,1.3,.05],stressMutation:[3,6,.5],progression:[1.5,4,.5],inflammation:[.6,1.6,.1],normalMutationGain:[3,6,.5],tumorMutationGain:[3,7,.5],growth:[.8,1.35,.05],tumorMotility:[.6,1.2,.05],normalMotility:[.05,.15,.05],immuneMotility:[1,1.4,.05],kill:[1,1.8,.1],recruitment:[1,2,.1],immuneGrowth:[.3,.65,.05],immuneDivisions:[3,4,1],immuneCycle:[180,240,20],antigenMemory:[900,1500,100],tumorCycle:[180,280,20],chemotaxis:[1.5,2.5,.1],escape:[1.8,3,.1],mutation:[8,16,1],mutationSize:[.12,.24,.02],antigenStressGain:[.5,1.5,.1],contactEscape:[.2,.8,.1],signalEscape:[.1,.4,.05],damagePolarization:[2.5,4.5,.25],damageDeactivation:[.7,1.5,.1],suppressiveSecretion:[1,1.8,.1],suppressionStrength:[.8,1.6,.1],suppressionRecovery:[1,2.5,.25],immuneRegulationMemory:[150,350,50],tumorMorphology:[0,1,1]});
-  Object.assign(RANDOM_RANGES,{normalSupport:[20,50,5]});
+  Object.assign(RANDOM_RANGES,{normalSupport:[20,50,5],immuneKillLimit:[8,15,1]});
   function randomSettings(seed){
     let state=seed>>>0;
     const random=()=>{state=(state+0x6d2b79f5)>>>0;let n=Math.imul(state^(state>>>15),1|state);n^=n+Math.imul(n^(n>>>7),61|n);return ((n^(n>>>14))>>>0)/4294967296;};
@@ -60,8 +60,8 @@
   }
   const SIGNALS=['cohesion','danger','trail','il2','normalDamage','inhibition'];
   const PRESETS={
-    oncogenesis:{label:'肿瘤发生发展',environmentProfile:'mosaic',founderTolerance:2.3,description:'密铺正常组织与 12 颗分散免疫细胞，从零肿瘤开始。三处供给较弱的区域与健康边缘形成差异；异常、癌变、免疫清除、抑制与恢复相互竞争，逃逸克隆可能再次扩增。没有定时转变或预设结局。',settings:{supply:2.5,metabolism:1.2,inflammation:1.2,stressMutation:4,progression:2.5,normalMutationGain:5,tumorMutationGain:6,growth:1.05,tumorCycle:220,apoptosis:3,tumorMotility:.9,normalMotility:.1,cohesion:1.1,escape:2.4,immuneMotility:1.3,immuneGrowth:.5,immuneDivisions:3,immuneCycle:200,antigenMemory:1200,kill:1.4,recruitment:1.4,chemotaxis:1.8,mutation:12,mutationSize:.2,antigenStressGain:1.2,contactEscape:.6,signalEscape:.3,damagePolarization:3.5,damageDeactivation:1.2,suppressiveSecretion:1.5,suppressionStrength:1.3,suppressionRecovery:1.5,immuneRegulationMemory:200}},
-    random:{label:'随机肿瘤演化',environmentProfile:'mosaic',founderTolerance:2.3,description:'随机化的密铺正常组织、12–16 颗内部免疫细胞与三处弱供给区域。参数在发生发展附近抽样，肿瘤必须由局部异常产生；相同种子和参数可重现开局，结局由局部相互作用产生。',settings:{}},
+    oncogenesis:{label:'肿瘤发生发展',environmentProfile:'mosaic',founderTolerance:2.3,description:'密铺正常组织与 12 颗分散免疫细胞，从零肿瘤开始。三处供给较弱的区域与健康边缘形成差异；癌前、癌变、免疫清除、抑制与恢复相互竞争，逃逸克隆可能再次扩增。没有定时转变或预设结局。',settings:{supply:2.5,metabolism:1.2,inflammation:1.2,stressMutation:4,progression:2.5,normalMutationGain:5,tumorMutationGain:6,growth:1.05,tumorCycle:220,apoptosis:3,tumorMotility:.9,normalMotility:.1,cohesion:1.1,escape:2.4,immuneMotility:1.3,immuneGrowth:.5,immuneDivisions:3,immuneCycle:200,antigenMemory:1200,kill:1.4,recruitment:1.4,chemotaxis:1.8,mutation:12,mutationSize:.2,antigenStressGain:1.2,contactEscape:.6,signalEscape:.3,damagePolarization:3.5,damageDeactivation:1.2,suppressiveSecretion:1.5,suppressionStrength:1.3,suppressionRecovery:1.5,immuneRegulationMemory:200}},
+    random:{label:'随机肿瘤演化',environmentProfile:'mosaic',founderTolerance:2.3,description:'随机化的密铺正常组织、12–16 颗内部免疫细胞与三处弱供给区域。参数在发生发展附近抽样，肿瘤必须由局部癌前产生；相同种子和参数可重现开局，结局由局部相互作用产生。',settings:{}},
     cold:{label:'免疫冷肿瘤扩散转移',description:'正常细胞铺满背景，中央嵌入 19 颗低抗原肿瘤，外围仅 3 颗免疫细胞。梭形肿瘤侵袭扩增，压力提高性状变异，部分克隆可能暴露抗原；免疫招募较弱。这是二维局部播散，不含血管或跨器官转移。',settings:{supply:2.8,metabolism:.65,stressMutation:0,progression:1,growth:1.4,tumorCycle:180,apoptosis:2,tumorMotility:1.5,tumorMorphology:1,normalMotility:.25,cohesion:.4,sectionYield:.4,immuneMotility:.8,antigen:15,kill:1,chemotaxis:.6,recruitment:.35,immuneGrowth:.15,immuneDivisions:2,alignment:.2,noise:.85,mutation:8,normalMutationGain:1,tumorMutationGain:5,antigenStressGain:.3,contactEscape:.15,signalEscape:.1}},
     hot:{label:'免疫热肿瘤治愈',description:'正常细胞铺满背景，中央嵌入 37 颗高抗原肿瘤，18 颗免疫细胞分散在病灶周边的组织内。接触识别、招募及 IL-2 扩增支持早期清除；少数存活克隆可能丢失抗原并再次扩增。结局随种子改变，关闭杀伤可作对照。',settings:{supply:2.8,metabolism:.65,stressMutation:0,progression:1,growth:.75,tumorCycle:280,apoptosis:0,tumorMotility:.35,immuneMotility:1.2,antigen:100,kill:2,chemotaxis:2.5,recruitment:2.4,immuneGrowth:.65,immuneDivisions:3,immuneCycle:200,antigenMemory:1200,il2Secretion:1.2,noise:.45,halfLife:180,mutation:2,mutationSize:.05,antigenStressGain:.15,contactEscape:.35,signalEscape:.12}},
     ecosystem:{label:'免疫共培养',settings:{}},
@@ -70,7 +70,7 @@
     invasion:{label:'肿瘤扩张',settings:{growth:.7,tumorMotility:1,apoptosis:10}},
     maze:{label:'免疫细胞迷宫',description:'圆心持续释放最强招募信号，入口清除信号；开局已建立沿通道扩散的浓度场。6 颗免疫细胞从等距入口出发，仅凭局部梯度与随机探索前进，胞核进入中心终点区计时。',settings:{chemotaxis:3,halfLife:400,immuneMotility:1.4,noise:.5,immuneSeparation:.8,growth:0,immuneGrowth:0,apoptosis:0,metabolism:.3,supply:3,stressMutation:0,inflammation:0,escape:1}},
     stress:{label:'密度与逃逸',settings:{supply:.8,metabolism:1.15,growth:.6,tumorMotility:.9,apoptosis:0,escape:3}},
-    surveillance:{label:'异常监视',settings:{supply:.8,metabolism:1.2,stressMutation:3,progression:.7,kill:2,apoptosis:0}}
+    surveillance:{label:'癌前监视',settings:{supply:.8,metabolism:1.2,stressMutation:3,progression:.7,kill:2,apoptosis:0}}
   };
   const TYPE_NAMES=['培养液','正常细胞','肿瘤细胞','免疫细胞','实体障碍'];
   const BODY_COLORS=[[239,242,237],[174,184,181],[48,56,65],[190,65,78],[93,108,111]];
@@ -179,6 +179,7 @@
       this.normalSupplyReference=0;
       this.counters={manualRemoved:0,divisions:0,immuneDivisions:0,kills:0,apoptosis:0,environment:0,apoptosisStarted:0,killStarted:0,environmentStarted:0,recognitions:0,mutations:0,abnormalInitiations:0,malignantTransitions:0,abnormalKills:0,normalEnvironmentDeaths:0,abnormalEnvironmentDeaths:0};this.birthSerial=0;this.lineage=[];this.deathHistory=[];this.recentClearances=[];this.manualDeathRemovals={spontaneous:0,kill:0,environment:0};
       this.deathEffects=[];this.sources=[];this.sourceSerial=0;
+      this.counters.lifespan=0;this.counters.lifespanStarted=0;this.manualDeathRemovals.lifespan=0;
       Object.assign(this.counters,{normalTraitMutations:0,stressMutations:0,antigenExposures:0,antigenEscapes:0});
       Object.assign(this.counters,{suppressiveTransitions:0,suppressiveRecoveries:0,injuryDeactivations:0,signalDeactivations:0});
       const s=this.settings;
@@ -296,7 +297,7 @@
       m.state=kind===NORMAL?'normal':kind===TUMOR?'tumor':'immune';m.origin=m.state;m.abnormalAge=0;m.abnormalSince=null;m.transformedAt=null;m.immuneCue=0;m.inflammatorySignal=0;m.inflammatoryExposure=0;
       m.nucleusStrainX=0;m.nucleusStrainY=0;m.fieldBins=new Map();m.sectionFraction=1;m.sectionPressure=0;m.hasNucleus=false;if(genome)this.applyGenome(m);
       m.cycle=newCycle();m.antigenMemory=0;m.il2=0;m.il2Response=0;m.il2Production=0;m.chronicStimulation=0;m.exhaustion=0;
-      m.normalTolerance=1;m.mutationPressure=0;m.immuneEncounters=0;m.immuneContactMemory=0;m.recruitmentExposure=0;m.lastAntigenChange=null;
+      m.normalTolerance=1;m.mutationPressure=0;m.immuneEncounters=0;m.immuneContactMemory=0;m.recruitmentExposure=0;m.lastAntigenChange=null;m.tumorKills=0;
       m.immunePhenotype=kind===IMMUNE?'cytotoxic':null;m.normalDamageExposure=0;m.inhibition=0;m.immuneRefractory=0;m.recruitmentTargetID=0;m.recruitmentTargetBirth=0;
       this.cells[id]=m;this.contacts.set(id,new Map());this.updateMechanics(m);return m;
     }
@@ -306,7 +307,7 @@
       const m=this.cells[id];if(!m||m.dying||m.kind!==NORMAL||m.state!=='normal')return false;
       // A first stochastic alteration exposes a weak antigen, but retains normal
       // mechanics and metabolism. It does not grant a proliferative phenotype.
-      m.state='abnormal';m.name='异常中间态';m.abnormalSince=this.C.time;m.abnormalAge=0;
+      m.state='abnormal';m.name='癌前细胞';m.abnormalSince=this.C.time;m.abnormalAge=0;
       m.antigenLevel=.2+.35*this.C.random();m.antigen=m.antigenLevel>=.18;
       this.counters.abnormalInitiations++;this.log('abnormal',id,0,{antigen:m.antigenLevel,stress:m.stress,adversity:m.adversity,inflammatoryExposure:m.inflammatoryExposure,inflammation:this.settings.inflammation});return true;
     }
@@ -831,6 +832,7 @@
       const seen=new Set();
       for(const ctl of this.live()){
         if(ctl.kind!==IMMUNE||ctl.dying)continue;
+        if(dt>0&&this.checkImmuneLifespan(ctl))continue;
         let chosen=null;ctl.targetID=0;ctl.phase='search';
         if(ctl.immunePhenotype==='suppressive'||ctl.immuneRefractory>0){this.updateMechanics(ctl);continue;}
         for(const edge of this.contacts.get(ctl.id)?.values()||[]){
@@ -849,7 +851,12 @@
           if(chosen.h.recognized){
             ctl.targetID=chosen.target.id;ctl.activation=700;ctl.recruitment=200;ctl.recruitmentTargetID=chosen.target.id;ctl.recruitmentTargetBirth=chosen.target.birth;
             chosen.target.damage+=dt*.012*this.settings.kill*chosen.target.antigenLevel*Math.min(1,chosen.edge.length/(3*this.scale))*ctl.fitness*(1-.8*ctl.exhaustion);
-            if(chosen.target.damage>=1)this.beginDeath(chosen.target.id,'kill');
+            if(chosen.target.damage>=1&&this.beginDeath(chosen.target.id,'kill')){
+              // Credit the contact that commits irreversible death, once per
+              // target birth. Other contributors are not counted as extra kills.
+              Object.assign(chosen.target.deathRecord,{killerID:ctl.id,killerBirth:ctl.birth});
+              if(chosen.target.kind===TUMOR){ctl.tumorKills++;this.checkImmuneLifespan(ctl);}
+            }
           }
         }
         this.updateMechanics(ctl);
@@ -923,15 +930,19 @@
       return {coverage:freePixels?visitedPixels/freePixels:0,visitedPixels,freePixels,checkedCells:this.patrol.checked.size,currentChecked,currentTargets,scanThreshold:6};
     }
     log(type,id,target=0,detail={}){this.events.push({time:this.C.time,type,id,target,...detail});if(this.events.length>1000)this.events.shift();}
+    checkImmuneLifespan(m){
+      if(m.kind!==IMMUNE||m.dying||!this.settings.immuneKillLimit||m.tumorKills<this.settings.immuneKillLimit)return false;
+      return this.beginDeath(m.id,'lifespan');
+    }
     beginDeath(id,cause){
       const m=this.cells[id];if(!m||m.dying)return false;
       m.dying=true;m.deathCause=cause;m.deathStartedAt=this.C.time;m.targetID=0;m.phase='dying';m.recruitment=0;
       m.deathElapsed=0;m.deathProgress=0;m.deathArea=this.C.getVolume(id);m.deathIntact=cause==='kill';
-      m.deathPhase=cause==='kill'?'rounding':cause==='spontaneous'?'shrinking':'withering';
+      m.deathPhase=cause==='kill'?'rounding':cause==='spontaneous'||cause==='lifespan'?'shrinking':'withering';
       if(m.deathIntact)m.target=m.deathArea/(this.section?m.sectionFraction:1);
       // Keep a separate lifetime ledger: the rolling interaction log cannot
       // serve as a complete death history, and grid IDs may later be reused.
-      m.deathRecord={id,birth:m.birth,kind:m.kind,state:m.state,clone:m.clone,cause,effect:cause==='kill'?'lysis':cause==='spontaneous'?'apoptosis':'stress',startedAt:this.C.time,clearedAt:null};
+      m.deathRecord={id,birth:m.birth,kind:m.kind,state:m.state,clone:m.clone,cause,effect:cause==='kill'?'lysis':cause==='spontaneous'||cause==='lifespan'?'apoptosis':'stress',startedAt:this.C.time,clearedAt:null,...(cause==='lifespan'?{tumorKills:m.tumorKills,killLimit:this.settings.immuneKillLimit}:{})};
       this.deathHistory.push(m.deathRecord);const keys=DEATH_COUNTERS[cause];if(keys)this.counters[keys[0]]++;
       this.section?.forget(id);this.updateMechanics(m);this.log('death-start',id,0,{cause,birth:m.birth});
       for(const ctl of this.live())if(ctl.targetID===id){ctl.targetID=0;ctl.phase='search';this.updateMechanics(ctl);}return true;
@@ -966,6 +977,29 @@
       for(const [id,body]of occupied)this.eraseCell(id,{manual:true,points:body});
       if(ids.size){this.refreshPositions();this.scanContacts();this.prepareEnvironment();this.section?.updateJunctions(0);this.updateScenarioState();this.record();this.version++;}
       return {removed:ids.size};
+    }
+    eraseAll(points,radius){
+      const empty={removed:0,sources:0,wallPixels:0};
+      if(!Array.isArray(points)||!Number.isFinite(radius)||radius<=0)return empty;
+      const valid=points.filter(p=>Array.isArray(p)&&Number.isFinite(p[0])&&Number.isFinite(p[1])&&p[0]>=0&&p[1]>=0&&p[0]<this.width&&p[1]<this.height);
+      if(!valid.length)return empty;
+      const r=Math.min(radius,64*this.scale),result={...this.eraseCells(valid,r),sources:0,wallPixels:0},bins=new Set(),C=this.C;
+      for(const p of valid){
+        result.sources+=this.removeSources(p[0],p[1],r);let walls=0;
+        for(let dy=-Math.ceil(r);dy<=r;dy++)for(let dx=-Math.ceil(r);dx<=r;dx++)if(dx*dx+dy*dy<=r*r){
+          let x=Math.round(p[0])+dx,y=Math.round(p[1])+dy;if(this.wrap){x=(x%this.width+this.width)%this.width;y=(y%this.height+this.height)%this.height;}
+          if(x<0||y<0||x>=this.width||y>=this.height)continue;
+          const id=C.pixt([x,y]);if(id&&C.cellKind(id)===WALL){C.setpix([x,y],0);walls++;}
+          bins.add(this.fieldIndex(x,y));
+        }
+        result.wallPixels+=walls;
+        if(walls&&this.maze)this.maze.cutouts.push([Math.round(p[0])+.5,Math.round(p[1])+.5,r]);
+      }
+      if(result.wallPixels){C.stat_values={};this.rebuildMask();}
+      // Reset the touched extracellular field bins, not cell memories or history.
+      // Remaining neighboring cells and sources can subsequently replenish them.
+      for(const [name,f]of Object.entries(this.fields))for(const i of bins)f.values[i]=f.blocked[i]?0:(name==='oxygen'||name==='glucose'?1:0);
+      this.version++;return result;
     }
     cleanup(){for(const m of this.live())if(!this.C.getVolume(m.id))this.eraseCell(m.id);}
     countDeath(cause,m){
@@ -1095,6 +1129,7 @@
           }
           this.updateMechanics(m);if(this.C.getVolume(m.id)<=3*this.scale*this.scale)this.eraseCell(m.id);continue;
         }
+        if(dt>0&&this.checkImmuneLifespan(m))continue;
         this.evolutionStep(m,dt);this.transformation(m,dt,true);
         if(m.kind===TUMOR){
           const hazard=this.settings.apoptosis/100/1000;
@@ -1139,7 +1174,7 @@
       const parts=[];while(remaining.size){const seed=remaining.values().next().value,queue=[seed],part=[];remaining.delete(seed);while(queue.length){const i=queue.pop();part.push(i);for(const n of (this.section?this.faces[i]:this.neighbors[i]))if(remaining.delete(n))queue.push(n);}parts.push(part);}return parts;
     }
     divide(id){
-      const m=this.cells[id];if(!m||m.dying||m.state==='abnormal'||this.C.getVolume(id)<80*this.scale*this.scale||(m.kind===IMMUNE&&m.divisionsLeft<=0))return 0;
+      const m=this.cells[id];if(!m||m.dying||m.state==='abnormal'||this.C.getVolume(id)<80*this.scale*this.scale||(m.kind===IMMUNE&&(m.divisionsLeft<=0||(this.settings.immuneKillLimit>0&&m.tumorKills>=this.settings.immuneKillLimit))))return 0;
       // Relabelling existing cytoplasm is not a new protrusion. Preserve its Act
       // age instead of letting GridManipulator turn the whole daughter red.
       const activity=[];for(const [p,cid] of this.C.pixels())if(cid===id){const i=this.C.grid.p2i(p);activity.push([i,this.act.pxact(i)]);}
@@ -1156,7 +1191,7 @@
       const inherited={antigenMemory:m.antigenMemory*.72,exhaustion:m.exhaustion,chronicStimulation:m.chronicStimulation,il2Production:m.il2Production,il2:m.il2,il2Response:m.il2Response,normalTolerance:m.normalTolerance,mutationPressure:m.mutationPressure,immuneEncounters:0,immuneContactMemory:m.immuneContactMemory*.5,recruitmentExposure:m.recruitmentExposure*.5,lastAntigenChange:m.lastAntigenChange};
       Object.assign(inherited,{immunePhenotype:m.immunePhenotype,normalDamageExposure:m.normalDamageExposure*.5,inhibition:m.inhibition,immuneRefractory:m.immuneRefractory});
       for(const c of [m,daughter]){
-        c.cycle=newCycle();Object.assign(c,inherited);
+        c.cycle=newCycle();Object.assign(c,inherited);c.tumorKills=0;
         c.target=this.section?parentTarget*this.C.getVolume(c.id)/parentArea:this.C.getVolume(c.id);c.sectionFraction=parentFraction;c.age=0;c.damage=damage;c.targetID=0;c.phase='search';c.generation=generation;c.clone=m.clone;c.parentBirth=parentBirth;c.birth=++this.birthSerial;c.divisionsLeft=left;
         c.stress=m.stress;c.fitness=m.fitness;c.oxygen=m.oxygen;c.glucose=m.glucose;c.acid=m.acid;c.adversity=m.adversity;c.activation=m.activation;c.recruitment=c===m?m.recruitment:0;
         c.state=m.state;c.origin=m.origin;c.abnormalSince=m.abnormalSince;c.abnormalAge=m.abnormalAge;c.transformedAt=m.transformedAt;c.inflammatorySignal=m.inflammatorySignal;c.inflammatoryExposure=m.inflammatoryExposure;c.nucleusStrainX=m.nucleusStrainX;c.nucleusStrainY=m.nucleusStrainY;
@@ -1197,6 +1232,7 @@
     set(name,value){
       if(!(name in DEFAULTS)||!Number.isFinite(value))return;
       if(name==='normalSupport')value=clamp(value,0,100);
+      if(name==='immuneKillLimit')value=Math.round(clamp(value,0,100));
       if(name==='sectionYield')value=clamp(value,0,.5);
       if(name==='stressMutation'||name==='progression')value=clamp(value,0,20);
       if(name==='inflammation')value=clamp(value,0,10);
@@ -1308,7 +1344,7 @@
       let phase='',achieved=false;
       if(this.scene==='oncogenesis'||this.scene==='random'){
         achieved=active.length>0&&state.tumorDivisions>0;
-        phase=achieved?'新生肿瘤克隆扩增':active.length?'肿瘤已发生':c.malignantTransitions?'肿瘤已出现，当前无存活肿瘤':c.abnormalInitiations?'已发生异常中间态':maxAdversity>.08?'环境压力累积':'局部资源消耗';
+        phase=achieved?'新生肿瘤克隆扩增':active.length?'肿瘤已发生':c.malignantTransitions?'肿瘤已出现，当前无存活肿瘤':c.abnormalInitiations?'已发生癌前细胞':maxAdversity>.08?'环境压力累积':'局部资源消耗';
       }else if(this.scene==='cold'){
         achieved=far>0&&state.distalDivisions>0&&active.length>state.initial.tumor;
         phase=achieved?'原灶外播散并增殖':far?'肿瘤向原灶外扩散':state.tumorDivisions?'原发灶扩增':'低免疫浸润的原发灶';
@@ -1363,7 +1399,7 @@
       this.refreshPositions();const {grid,activity,walls,orphans,visitedPixels,freePixels}=this.snapshotRaster();
       const cells=this.live().map(m=>({id:m.id,kind:m.kind,x:m.x,y:m.y,px:m.px,py:m.py,area:this.C.getVolume(m.id),target:m.target,antigen:m.antigen,antigenLevel:m.antigenLevel,damage:m.damage,dying:m.dying,deathCause:m.deathCause,phase:m.phase,targetID:m.targetID,age:m.age,genome:m.genome?{...m.genome}:null,clone:m.clone,generation:m.generation,divisionsLeft:m.divisionsLeft,activation:m.activation,recruitment:m.recruitment,oxygen:m.oxygen,glucose:m.glucose,acid:m.acid,stress:m.stress,fitness:m.fitness,confinement:m.confinement}));
       for(const c of cells){const m=this.cells[c.id];for(const key of ['sectionFraction','sectionPressure','planarTarget','offPlaneTarget','hasNucleus','nucleusX','nucleusY','nucleusRadius','birth','nucleusStrainX','nucleusStrainY','state','origin','abnormalSince','abnormalAge','transformedAt','adversity','immuneCue','inflammatorySignal','inflammatoryExposure','morphologyMode','branchCount','networkDegree','deathStartedAt','deathPhase','deathProgress','deathIntact'])c[key]=m[key];if(c.kind===IMMUNE){c.patrolChecked=m.patrolCheckedBirth===m.birth?m.patrolChecked||0:0;c.patrolScanning=!!m.patrolScanning;c.patrolTurning=!!m.patrolMotion?.turnTime;}}
-      for(const c of cells){const m=this.cells[c.id];c.cycle={...m.cycle};for(const key of ['antigenMemory','il2','il2Response','il2Production','chronicStimulation','exhaustion','normalTolerance','mutationPressure','immuneEncounters','immuneContactMemory','recruitmentExposure','lastAntigenChange','immunePhenotype','normalDamageExposure','inhibition','immuneRefractory'])c[key]=m[key];}
+      for(const c of cells){const m=this.cells[c.id];c.cycle={...m.cycle};for(const key of ['antigenMemory','il2','il2Response','il2Production','chronicStimulation','exhaustion','normalTolerance','mutationPressure','immuneEncounters','immuneContactMemory','recruitmentExposure','lastAntigenChange','immunePhenotype','normalDamageExposure','inhibition','immuneRefractory','tumorKills'])c[key]=m[key];}
       const fields={};for(const [key,f] of Object.entries(this.fields))fields[key]={width:f.width,height:f.height,values:f.values.slice()};
       const history=this.populationHistory(true),historySamples=this.history.length+(history.at(-1)===this.history.at(-1)?0:1);
       const maze=this.maze?{...this.maze,racers:this.maze.racers.map(r=>({...r,alive:this.cells[r.id]?.birth===r.birth&&!this.cells[r.id].dying})),arrivals:this.maze.arrivals.map(a=>({...a}))}:null;

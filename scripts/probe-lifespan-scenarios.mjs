@@ -1,0 +1,14 @@
+// Descriptive preset validation; paired seeds never select or filter website starts.
+import vm from 'node:vm';import {readFile,writeFile,mkdir} from 'node:fs/promises';import {createHash} from 'node:crypto';
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+const args=Object.fromEntries(process.argv.slice(2).map(s=>s.replace(/^--/,'').split('='))),scene=args.scene||'oncogenesis',seeds=(args.seeds||'17,77,2026').split(',').map(Number),limits=(args.limits||'0,10').split(',').map(Number),steps=Number(args.steps||12000);
+const out='output/lifespan-presets';await mkdir(out,{recursive:true});const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm'));
+for(const seed of seeds)for(const limit of limits){
+ const config={scene,seed,worldWidth:240,worldHeight:180,refinement:1.5,boundary:'wrap',settings:{immuneKillLimit:limit}},sim=new CellLab.Simulation(config);await CellLabWasm.install(sim,module);
+ const result={config,settings:sim.settings,modelSHA256:createHash('sha256').update(await readFile('src/model.js')).digest('hex'),samples:[]},begin=performance.now();
+ const sample=()=>{const live=sim.live().filter(c=>!c.dying),immune=live.filter(c=>c.kind===3),tumor=live.filter(c=>c.kind===2),counts={normal:live.filter(c=>c.state==='normal').length,precancerous:live.filter(c=>c.state==='abnormal').length,tumor:tumor.length,immune:immune.length};return {time:sim.C.time,...counts,antigenPositive:tumor.filter(c=>c.antigen).length,immuneActive:immune.filter(c=>c.activation>0&&c.immunePhenotype!=='suppressive').length,immuneSuppressive:immune.filter(c=>c.immunePhenotype==='suppressive').length,maxLivingKills:Math.max(0,...immune.map(c=>c.tumorKills)),cycles:sim.cycleReport(),counters:{...sim.counters},scenario:sim.scenarioReport()};};
+ result.samples.push(sample());
+ for(let n=0;n<steps;n+=1000){sim.advance(Math.min(1000,steps-n));result.samples.push(sample());await writeFile(`${out}/${scene}-${seed}-limit${limit}.json`,JSON.stringify(result,null,2));}
+ result.elapsedMs=Math.round(performance.now()-begin);result.orphans=sim.snapshot().orphans;result.deaths=sim.deathHistory;await writeFile(`${out}/${scene}-${seed}-limit${limit}.json`,JSON.stringify(result,null,2));
+ const last=result.samples.at(-1);console.log(JSON.stringify({scene,seed,limit,ms:result.elapsedMs,end:{normal:last.normal,precancerous:last.precancerous,tumor:last.tumor,immune:last.immune,active:last.immuneActive,suppressive:last.immuneSuppressive},peakTumor:Math.max(...result.samples.map(s=>s.tumor)),farTumor:last.scenario.farTumor,tumorDivisions:last.scenario.tumorDivisions,kills:last.counters.kills,lifespan:last.counters.lifespan,transformed:last.counters.malignantTransitions,escape:last.counters.antigenEscapes,clearanceAt:last.scenario.clearanceAt,orphans:result.orphans}));
+}

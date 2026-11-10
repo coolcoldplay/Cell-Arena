@@ -49,7 +49,6 @@ dialog{max-width:700px;width:calc(100% - 32px);max-height:86dvh;overflow:auto;ov
   .dish-head{min-height:20px;padding:0 9px 3px;font-size:11px}
   .transport{padding:0 8px 4px;gap:6px;align-items:center;flex-wrap:nowrap}
   .transport #play{flex:0 0 76px;min-height:44px;font-size:13px;padding:4px}
-  .transport #step{flex:0 0 44px;min-height:44px;font-size:12px;padding:3px}
   .transport .speed-label{min-width:0;height:44px;gap:6px;flex:1;font-size:12px}
   .transport .speed-label input{width:0;min-width:0;flex:1}.transport .speed-label output{min-width:26px}
   .panel-nav{padding:0 8px;gap:0}.panel-nav button{min-height:44px;font-size:13px;padding:5px 3px}
@@ -153,7 +152,7 @@ aside.statistics-focused #record-options>summary{padding:4px 0}
 @media(max-width:850px){.record-scope-hint{display:none}}
 
 /* Keep complementary actions in the same column at every screen size. */
-.tools.paired-tools{grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch;--tool-height:27px}
+.tools.paired-tools{grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;--tool-height:27px}
 .tools.paired-tools>[data-tool=signal]{align-self:start}
 .tools.paired-tools button{height:var(--tool-height);min-height:var(--tool-height);white-space:nowrap}
 .tool-pair{display:grid;grid-template-rows:repeat(2,1fr);gap:5px;min-width:0}
@@ -170,38 +169,63 @@ aside.statistics-focused #record-options>summary{padding:4px 0}
 }
 .playback-row{display:flex;align-items:center;gap:7px;flex:0 0 100%;order:2;min-width:0}
 .playback-row .speed-label{width:auto;min-width:0;flex:1;order:0;margin:0}
-.shuffle-controls{display:flex;align-items:center;gap:4px;min-width:0}
-.transport .shuffle-controls button{flex:none;padding:3px;font-size:11px}
-.auto-random-control{display:flex;align-items:center;gap:3px;white-space:nowrap;font-size:10px;color:var(--muted)}
+.auto-random-control{display:flex;align-items:center;gap:6px;white-space:nowrap;font-size:12px;color:var(--ink);padding:8px 0}.auto-random-control>span:first-child{margin-right:auto}
 .auto-random-control input{width:43px;min-width:0;height:27px;min-height:27px;border:1px solid var(--line);border-radius:0;background:var(--paper);color:var(--ink);padding:3px;text-align:right;font:12px Consolas,monospace}
 .auto-random-control input:invalid{border-color:#b13b36}
+.auto-round-notice{position:fixed;left:clamp(12px,25vw,calc(100vw - 340px));bottom:24px;z-index:30;width:310px;max-width:calc(100vw - 24px);padding:13px 15px;background:var(--paper);border:2px solid #927349;box-shadow:4px 4px 0 #594a3340;font-size:13px}
+.auto-round-notice>div{display:flex;justify-content:space-between;align-items:center;gap:12px}.auto-round-notice strong{font:26px Consolas,monospace;color:#a14829}.auto-round-notice p{margin:8px 0}.auto-round-notice small{display:block;margin-bottom:7px}.auto-round-notice button{width:100%;font-size:12px}
+.parameter-lock{display:inline-flex;align-items:center;justify-content:center;flex:0 0 24px;width:24px;min-height:24px;height:24px;padding:2px!important;border:1px solid transparent;background:transparent;color:#b09b79;box-shadow:none}
+.parameter-lock svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:square}.parameter-lock[aria-pressed=true]{color:#70502b;background:#ddcba5;border-color:#b29462}
+#parameter-module-nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;position:sticky;top:0;z-index:8;background:var(--bg);padding:4px 0 7px;border-bottom:1px solid var(--line)}
+#parameter-module-nav button{min-width:0;padding:6px 2px;min-height:32px;font-size:12px;box-shadow:none}#parameter-module-nav button[aria-pressed=true]{background:#dcca9f;border-color:#8a653c}
+#parameter-groups>.section,#display-panel>#module-display{margin:6px 0 0;border:0;background:transparent}
+#parameter-groups>.section>summary,#display-panel>#module-display>summary{display:none}
+#parameter-groups>.section>.section-body,#display-panel>#module-display>.section-body{padding:7px 1px 2px}
+@media(max-width:850px){#parameter-module-nav button{min-height:40px;font-size:12px}.parameter-heading b{display:block}.parameter-heading button{margin-left:auto}.panel-nav button{flex:1}}
+.model-slider>span>label{flex:1}.model-slider>span{gap:5px}.parameter-heading{gap:10px}.parameter-heading b{margin-right:auto}.select-row:has(.parameter-lock) select{min-width:0}
+.stats-heading{display:flex;align-items:baseline;gap:7px;margin:8px 0 7px;font-size:12px}.stats-heading>b{font:19px Consolas,monospace}.stats-heading #scenario-phase{margin-left:auto;font-size:11px;color:#8b6c3a;text-align:right}
+.population-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.population-cards>div{background:#f7f0e3;border-top:3px solid var(--population-color,#a79677);padding:7px 8px;min-width:0}.population-cards span{font-size:12px;color:var(--muted);display:block}.population-cards b{display:block;font:28px/1.15 Consolas,monospace;font-variant-numeric:tabular-nums}
+.immune-state-line{display:flex;flex-wrap:wrap;gap:5px 12px;font-size:11px;padding:7px 0;color:var(--muted)}.immune-state-line b{font:13px Consolas,monospace;color:var(--ink)}.immune-state-line>span:not(:first-child)::before{content:"";display:inline-block;width:6px;height:6px;background:#e99a9a;margin-right:4px}.immune-state-line .active-text::before{background:#990000!important}.immune-state-line .suppressive-text::before{background:#6398d2!important}
+.history-tabs{display:flex;border-bottom:1px solid var(--line);margin-top:6px;gap:5px}.history-tabs button{font-size:12px;flex:1;padding:5px 8px;border:0;box-shadow:none;background:transparent}.history-tabs button[aria-pressed=true]{background:#e2d2b4;border-bottom:2px solid #8b623b}.history-tabs b{font:12px Consolas,monospace}
+#statistics-panel #history{height:150px;margin-top:3px}.stats-section-label{font-size:12px;font-weight:600;margin:9px 0 4px}
+#statistics-panel .outcome-metrics{grid-template-columns:repeat(3,minmax(0,1fr));padding:0;border:0;gap:5px}#statistics-panel .outcome-metrics>div{padding:6px 8px}#statistics-panel .outcome-metrics b{font-size:23px}#statistics-panel .outcome-metrics span{font-size:11px}#statistics-panel .outcome-metrics small{font-size:10px;color:var(--muted)}
+.death-heading{display:flex;align-items:baseline;gap:8px;margin:5px 0 7px;font-size:12px}.death-heading b{font:20px Consolas,monospace}.death-heading small{margin-left:auto;color:var(--muted)}#statistics-panel #total-death-progress{display:inline}
+#statistics-panel .death-causes{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}#statistics-panel .death-causes>div{padding-left:6px;border-color:#bba886}#statistics-panel .death-causes>div:first-child{border-color:#d69939}#statistics-panel .death-causes span{font-size:11px}#statistics-panel .death-causes b{font-size:20px;margin:1px 0}#statistics-panel .death-overview{padding:4px 0 10px}
+.stats-detail{border-top:1px solid var(--line);margin:0!important;font-size:12px}.stats-detail>summary{padding:8px 0!important;cursor:pointer;font-size:12px;color:#796448}.stats-detail p{line-height:1.6;margin:5px 0}.stats-detail .cycle-summary{border:0}.patrol-summary{display:flex;gap:7px 12px;flex-wrap:wrap}.death-detail-rows p{display:flex;gap:8px;justify-content:space-between;color:var(--muted)}
+.round-toolbar{display:flex;align-items:center;justify-content:space-between;gap:5px;margin:7px 0;font-size:10px;color:var(--muted)}.round-toolbar button{font-size:12px;padding:4px 9px}
+.round-result{background:#f6eedf;border-bottom:1px solid #ccb994;padding:6px 8px;margin:4px 0;font-size:11px}.round-result summary{display:flex;justify-content:space-between;gap:8px;cursor:pointer}.round-result summary b{font-size:12px}.round-result summary span{white-space:nowrap;color:var(--muted)}.round-result p{margin:4px 0;line-height:1.6;white-space:pre-line}.round-result summary>div{min-width:0}.round-result summary p{font-size:11px;color:var(--ink);font-weight:400}.round-result small{font-size:10px;color:var(--muted)}.round-result pre{font:10px/1.5 Consolas,monospace;max-height:160px;overflow:auto}
+.round-pagination{display:flex;align-items:center;justify-content:space-between;font-size:11px;margin:7px 0}.round-pagination button{font-size:11px;padding:3px 9px}
+@media(max-width:850px){.parameter-lock{min-width:32px;min-height:32px;height:32px}.parameter-lock svg{width:18px;height:18px}.auto-round-notice{left:12px;bottom:12px}.population-cards b{font-size:25px}.history-tabs button,.round-toolbar button{min-height:36px}#statistics-panel #history{height:135px}}
 @media(max-width:850px){
   .playback-row{display:contents}
-  #mobile-session-actions .shuffle-controls{flex:1 1 100%;gap:8px}
-  #mobile-session-actions .shuffle-controls button{flex:1}
-  .auto-random-control{font-size:12px;gap:5px}
+  #mobile-session-actions   .auto-random-control{font-size:12px;gap:5px}
   .auto-random-control input{width:70px;min-height:44px;font-size:16px}
 }
+
+.panel-head{position:relative}.panel-head .header-icon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 28px;width:28px;min-height:28px;height:28px;padding:4px!important;box-shadow:none;background:transparent;border-color:transparent}.header-icon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}.header-icon .record-dot{fill:currentColor;stroke:none}.header-icon.recording{color:#b63c30;background:#ead3c4}.file-menu{position:absolute;right:8px;top:calc(100% + 4px);z-index:50;display:grid;width:230px;max-width:calc(100vw - 20px);padding:6px;gap:5px;border:1px solid var(--line);background:var(--paper);box-shadow:3px 3px 0 #594a3340}.file-menu button{text-align:left;min-height:34px}
+@media(max-width:850px){.panel-head{gap:4px}.panel-head .header-icon{flex-basis:34px;width:34px;min-height:40px;height:40px}.panel-head #language{min-width:38px;width:38px;font-size:13px;padding:3px}.panel-head #mobile-expand{min-width:30px;width:30px;padding:4px;font-size:19px}.file-menu button{min-height:44px}}
+
+#language,#language:hover,#language:active{border-color:transparent;background:transparent;box-shadow:none;translate:none}#language:hover{text-decoration:underline}#language:focus-visible{outline:1px dashed var(--accent);outline-offset:-2px}
 </style></head>
 <body>
 <main class="workspace">
   <section class="simulation" aria-label="Arena 培养皿">
-    <div class="viewport"><canvas id="world" title="中键或 Alt + 左键拖动平移视野" width="960" height="720" aria-label="可拖动细胞、点击播种、添加信号或绘制障碍的交互培养皿"></canvas><button id="maze-diffusion" class="maze-diffusion" hidden aria-pressed="false" title="仅切换招募因子扩散；细胞仍不能穿墙">招募扩散：沿通道</button><div id="brush-preview" hidden aria-hidden="true"></div><div id="toast" role="status" aria-live="polite"></div></div>
+    <div class="viewport"><canvas id="world" title="中键或 Alt + 左键拖动平移视野" width="960" height="720" aria-label="可拖动细胞、点击播种、添加信号或绘制障碍的交互培养皿"></canvas><button id="maze-diffusion" class="maze-diffusion" hidden aria-pressed="false" title="仅切换招募因子扩散；细胞仍不能穿墙">招募扩散：沿通道</button><div id="brush-preview" hidden aria-hidden="true"></div><section id="auto-round-notice" class="auto-round-notice" hidden aria-labelledby="auto-round-title"><div><b id="auto-round-title">即将随机换局</b><span><strong id="auto-round-seconds">10</strong> s</span></div><p id="auto-round-reason" role="status" aria-live="polite"></p><small id="auto-round-paused" hidden>已暂停倒计时</small><button id="auto-round-cancel">继续本局 · 关闭自动换局</button></section><div id="toast" role="status" aria-live="polite"></div></div>
   </section>
   <aside aria-label="模拟控制面板">
-    <div class="panel-head"><a class="brand" href="https://github.com/coolcoldplay/Cell-Arena" target="_blank" rel="noreferrer"><span class="mark" aria-hidden="true">C</span><b>Cell-Arena</b></a><select id="language" aria-label="Language / 语言" data-no-i18n><option value="zh">中文</option><option value="en">English</option></select><button id="mobile-expand" class="mobile-only" aria-expanded="false" aria-controls="sidebar-scroll">↑ 展开面板</button><button id="about" class="quiet">模型与来源</button></div>
+    <div class="panel-head"><a class="brand" href="https://github.com/coolcoldplay/Cell-Arena" target="_blank" rel="noreferrer"><span class="mark" aria-hidden="true">C</span><b>Cell-Arena</b></a><button id="language" type="button" value="zh" aria-label="Switch to English" title="Switch to English" data-no-i18n>Chi</button><button id="mobile-expand" class="mobile-only" aria-expanded="false" aria-controls="sidebar-scroll" aria-label="展开面板" title="展开面板">↑</button><button id="file-actions" class="header-icon" aria-label="导入与导出" title="导入与导出" aria-expanded="false" aria-controls="file-menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h9l5 5v13H5Z"/><path d="M14 3v6h5M8 13h8M8 17h6"/></svg></button><button id="record-video" class="header-icon" aria-label="录制视频" title="录制视频" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle class="record-dot" cx="12" cy="12" r="4"/></svg></button><button id="about" class="header-icon" aria-label="模型与来源" title="模型与来源"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 1 1 5 2c-1 1-2 1-2 3M12 17v1"/></svg></button><div id="file-menu" class="file-menu" role="group" aria-label="导入与导出" hidden><button id="snapshot">保存画面 ↓</button><button id="export-data">导出实验数据 ↓</button><button id="import-data">导入实验参数 ↑</button><button id="file-export-rounds">导出历局 CSV</button></div></div>
     <div class="dish-head"><div><span id="status-dot" class="status-dot"></span><b id="scene-title">肿瘤发生发展</b><span id="run-state">正在准备</span></div><button id="record-indicator" class="quiet" title="停止录制并下载" hidden>■ 00:00</button><div><span id="clock">0</span> <span class="unit">MCS</span></div></div>
     <nav class="scenes" aria-label="实验场景"><button data-scene="oncogenesis" class="active" title="肿瘤发生发展">发生发展</button><button data-scene="cold" title="免疫冷肿瘤扩散转移">冷肿瘤</button><button data-scene="hot" title="免疫热肿瘤治愈">热肿瘤</button><button data-scene="maze" title="免疫细胞迷宫">免疫迷宫</button><button data-scene="empty" title="空白自建：暂停摆放细胞，准备好后开始模拟">空白自建</button></nav>
-    <div class="transport"><button id="play" class="primary">Ⅱ 暂停</button><button id="step">单步</button><button id="reset">↺ 重来</button><div class="playback-row"><label class="speed-label">播放 <input id="speed" type="range" min="0.25" max="8" step="0.25" value="1"><output id="speed-out">1×</output></label><div class="shuffle-controls"><button id="shuffle" class="quiet" title="在合理模型范围内随机生成参数与细胞布局">随机生成</button><label class="auto-random-control" title="数量或生物状态持续不变时自动换局；0 关闭。全部细胞消失立即换局，暂停和后台不计时。"><span>无变化</span><input id="auto-random-minutes" type="number" min="0" max="1440" step="any" value="0" inputmode="decimal" aria-label="无变化自动随机换局的等待分钟数，0 关闭"><span>分</span></label></div></div></div>
-    <div id="maze-score" class="maze-score" hidden aria-live="polite"></div><div class="quick-tools"><div class="tools paired-tools" role="group" aria-label="鼠标工具"><div class="tool-pair"><button data-tool="move" class="selected">↔ 拖动细胞</button><button data-tool="inspect">⌾ 观察细胞</button></div><div class="tool-pair"><button data-tool="seed">＋ 新增细胞</button><button data-tool="remove">⌫ 擦除细胞</button></div><div class="tool-pair"><button data-tool="wall">▥ 绘制障碍</button><button data-tool="erase">⌫ 擦除障碍</button></div><button data-tool="signal">◉ 释放信号</button></div>
+    <div class="transport"><button id="play" class="primary">Ⅱ 暂停</button><button id="reset">↺ 重来</button><button id="shuffle" title="在合理模型范围内随机生成参数与细胞布局">随机</button><div class="playback-row"><label class="speed-label">速度 <input id="speed" type="range" min="0.25" max="8" step="0.25" value="1"><output id="speed-out">1×</output></label></div></div>
+    <div id="maze-score" class="maze-score" hidden aria-live="polite"></div><div class="quick-tools"><div class="tools paired-tools" role="group" aria-label="鼠标工具"><div class="tool-pair"><button data-tool="move" class="selected">↔ 拖动</button><button data-tool="inspect">⌾ 追踪</button></div><div class="tool-pair"><button data-tool="seed">＋ 新增</button><button data-tool="remove">⌫ 擦除</button></div><div class="tool-pair"><button data-tool="wall">▥ 障碍</button><button data-tool="signal">◉ 信号</button></div></div>
       <p id="tool-hint" class="hint compact-hint">拖动时暂停 · 邻居让位 · 实体墙阻挡</p>
       <div id="seed-options" class="tool-options" hidden><div class="seed-row"><label>新增类型<select id="seed-kind"><option value="1">正常细胞</option><option value="2">肿瘤细胞</option><option value="3" selected>免疫细胞</option></select></label><label>数量<input id="seed-count" type="number" min="1" step="1" value="5" inputmode="numeric" required></label><button id="sprinkle" title="在空隙中随机加入所选类型的细胞">＋ 加入</button></div><p id="seed-status" class="hint"></p><p class="hint">单击加入一颗，可挤入已有细胞区域；邻居变形、核区逐格让位，切面缩小不超过设定上限，总目标量保留。只检查局部空间，不按总数量拒绝新增；挤入失败不改动原有细胞。</p></div>
       <div id="signal-options" class="tool-options" hidden><label>信号种类<select id="signal-kind"><option value="trail">免疫招募因子</option><option value="danger">损伤因子</option><option value="cohesion">细胞凝聚因子</option><option value="il2">IL-2 扩增信号</option><option value="normalDamage">正常细胞损伤信号</option><option value="inhibition">免疫抑制信号</option><option value="oxygen">氧气补给</option><option value="glucose">葡萄糖补给</option><option value="acid">酸负荷</option><option value="nutrient">氧糖补给</option><option value="hostile">乏氧高酸</option></select></label><label class="slider"><span>区域半径<output id="source-radius-out">10</output></span><input id="source-radius" type="range" min="4" max="30" value="10" step="1"></label><div class="utility"><button id="source-place" class="selected" aria-pressed="true">释放 / 建源</button><button id="source-erase" aria-pressed="false">擦除场源</button></div><p class="signal-help">单击瞬释 · 长按连释 · 双击建源</p></div>
-      <div id="eraser-options" class="tool-options" hidden><label class="slider"><span>擦除半径<output id="eraser-radius-out" for="eraser-radius">12</output></span><input id="eraser-radius" type="range" min="4" max="32" value="12" step="1" title="笔刷触及的整颗细胞会被移除，不计入生物学死亡"></label></div><div id="wall-options" class="tool-options" hidden><button id="clear-walls">清除全部障碍</button></div></div>
-    <nav class="panel-nav" aria-label="面板导航"><button data-panel="parameter-groups" aria-pressed="true">参数</button><button data-panel="statistics-panel" aria-pressed="false">统计</button><button data-panel="cell-inspector" aria-pressed="false">选中细胞</button><button id="mobile-tools-tab" class="mobile-only" data-panel="mobile-tools" aria-pressed="false">工具</button></nav>
+      <div id="eraser-options" class="tool-options" hidden><label class="slider"><span>擦除半径<output id="eraser-radius-out" for="eraser-radius">12</output></span><input id="eraser-radius" type="range" min="4" max="32" value="12" step="1" title="擦除整颗细胞、触及的场源和局部障碍，并重置局部环境；手动移除不计入生物学死亡"></label></div><div id="wall-options" class="tool-options" hidden><button id="clear-walls">清除全部障碍</button></div></div>
+    <nav class="panel-nav" aria-label="面板导航"><button data-panel="display-panel" aria-pressed="false">显示</button><button data-panel="parameter-groups" aria-pressed="true">参数</button><button data-panel="statistics-panel" aria-pressed="false">统计</button><button data-panel="cell-inspector" aria-pressed="false">选中</button></nav>
     <div class="sidebar-scroll" id="sidebar-scroll" tabindex="0" aria-label="参数与统计滚动区">
-      <details class="subsection" id="cell-inspector"><summary>细胞详情与操作 <span id="selection-label">未选中</span></summary><div class="section-body"><div class="utility"><button id="divide" title="实验干预：绕过周期许可，仍受胞体、胞核和分裂几何限制" class="quiet">手动分裂（实验干预）</button></div><div id="inspection" class="inspection">点击细胞，查看抗原、受损程度与接触状态。</div></div></details>
-      <section id="parameter-groups" aria-label="六组参数"><nav id="mobile-module-nav" class="mobile-only" aria-label="参数分组快捷入口"><button data-module="module-display">显示</button><button data-module="module-environment">环境</button><button data-module="module-normal">正常</button><button data-module="module-tumor">肿瘤</button><button data-module="module-immune">免疫</button><button data-module="module-other">其他</button></nav><div class="parameter-heading"><b>参数</b><button id="collapse-modules" class="quiet">全部收起</button></div><details class="section" name="parameters" id="module-display"><summary><b>显示调整</b><span>视野 / 图层 / 配色</span></summary><div class="section-body"><details class="subsection" id="module-layers"><summary>观察图层</summary><div class="overlay-bar" role="group" aria-label="可视化图层">
+      <details class="subsection" id="cell-inspector" hidden><summary>细胞详情与操作 <span id="selection-label">未选中</span></summary><div class="section-body"><div class="utility"><button id="divide" title="实验干预：绕过周期许可，仍受胞体、胞核和分裂几何限制" class="quiet">手动分裂（实验干预）</button></div><div id="inspection" class="inspection">点击细胞，查看抗原、受损程度与接触状态。</div></div></details>
+      <section id="display-panel" hidden aria-label="显示设置"><details class="section" open id="module-display"><summary><b>显示调整</b><span>视野 / 图层 / 配色</span></summary><div class="section-body"><label class="auto-random-control" title="0 关闭。无变化超时、全部消失、仅剩肿瘤、免疫为 0 或正常为 0 时，提示 10 秒后换局；迷宫不检查正常细胞，暂停和后台不计时。"><span>换局等待时间</span><input id="auto-random-minutes" type="number" min="0" max="1440" step="any" value="0" inputmode="decimal" aria-label="无变化自动随机换局的等待分钟数，0 关闭"><span>分钟</span></label><details class="subsection" id="module-layers"><summary>观察图层</summary><div class="overlay-bar" role="group" aria-label="可视化图层">
         <span class="overlay-title">观察图层</span>
         <button data-layer="adversity" aria-pressed="false"><i class="adversity-key"></i>环境恶劣度</button>
         <button data-layer="cohesion" aria-pressed="false" title="正常细胞分泌的局部凝聚信号"><i style="--signal:#24ab84"></i>细胞凝聚因子</button>
@@ -223,50 +247,52 @@ aside.statistics-focused #record-options>summary{padding:4px 0}
         <label class="select-row">画面放大<select id="zoom"><option value="100">100%</option><option value="150">150%</option><option value="200">200%</option><option value="300">300%</option></select><button id="fullscreen" class="quiet">全屏 ↗</button></label>
       </div></details><details class="subsection" id="module-markings"><summary>细胞与热图 <span>Act · 标记 · 环境分量</span></summary><div class="section-body">
         <label class="select-row">环境热图<select id="field-view"><option value="none" selected>关闭</option><option value="adversity">综合恶劣度</option><option value="oxygen">氧可用量</option><option value="glucose">葡萄糖可用量</option><option value="acid">酸负荷</option><option value="density">局部细胞密度</option></select></label>
-        <div class="checks" role="group" aria-label="细胞标记"><label><input id="nuclei" type="checkbox" checked>显示细胞核</label><label title="红色细线标出可识别抗原的肿瘤和异常细胞"><input id="antigen-marks" type="checkbox" checked>抗原轮廓</label><label><input id="cycle-marks" type="checkbox">周期文字</label></div>
+        <div class="checks" role="group" aria-label="细胞标记"><label><input id="nuclei" type="checkbox" checked>显示细胞核</label><label title="红色细线标出可识别抗原的肿瘤和癌前细胞"><input id="antigen-marks" type="checkbox" checked>抗原轮廓</label><label><input id="cycle-marks" type="checkbox">周期文字</label></div>
         <div class="checks"><label><input id="show-tracks" type="checkbox">显示运动轨迹</label></div><label class="slider"><span>轨迹保留时长<output id="track-duration-out">400 MCS</output></span><input id="track-duration" type="range" min="20" max="2000" value="400" step="20"></label><p class="hint">开启后记录；按模拟时间保留，暂停时不消退。</p><div class="checks"><label><input id="edge-activity" type="checkbox" checked>启用所选类型的 Act 显示</label><label><input id="normal-activity" type="checkbox">正常细胞 Act</label><label><input id="tumor-activity" type="checkbox">肿瘤细胞 Act</label><label><input id="immune-activity" type="checkbox">免疫细胞 Act</label><label><input id="cell-seams" type="checkbox" checked>细分界线</label><label><input id="arrows" type="checkbox">极性箭头</label></div>
         <p class="hint">默认配色：免疫未激活淡红，实际识别后激活深红；肿瘤遗传增殖性状越高越黑，范围 0.25–3。核区默认用深蓝、深红或浅金。可在「细胞配色」分别修改；各类 Act 独立开启，开启后覆盖局部胞体色。</p>
       </div></details><details class="subsection" id="module-colors"><summary>细胞配色 <span>预设 · 胞体 · 胞核</span></summary><div class="section-body">
         <label class="slider"><span>边缘淡化<output id="body-feather-out">80%</output></span><input id="body-feather" type="range" min="0" max="100" step="5" value="80"></label><p class="hint">沿当前胞体轮廓由内向外渐透明；0% 为纯色。Act 和标记独立显示。</p>
-        <div class="color-presets" id="color-presets" role="group" aria-label="细胞配色方案"></div><p class="hint" id="palette-status">当前：原始配色</p><p class="hint palette-key">预览从左到右：正常 · 异常 · 肿瘤 · 免疫 · 激活</p><div class="color-grid" id="color-controls"><span>类型 / 状态</span><span>胞体</span><span>胞核</span></div><div class="checks"><label><input id="proliferation-shading" type="checkbox" checked>肿瘤保留增殖深浅变化</label></div><p class="hint">点击方案立即应用，也可继续自定义，颜色保存在当前浏览器；不会重启模拟。高增殖使用所选肿瘤色，低增殖逐渐变浅；关闭上方选项可使用统一纯色。Act 与高强度热图仍可覆盖胞体色，关闭图层可查看本色。</p><button id="reset-colors" class="quiet">恢复原始配色</button></div></details></div></details>
-<details class="section" name="parameters" id="module-environment"><summary><b>微环境</b><span>资源 / 信号 / 炎性促癌</span></summary><div class="section-body"><div id="environment-sliders"></div><details class="subsection" id="evolution-controls"><summary>演化实验</summary><div id="evolution-sliders"></div></details></div></details>
-<details class="section" name="parameters" id="module-normal"><summary><b>正常细胞</b><span>运动 / 聚集 / 癌变</span></summary><div class="section-body"><div id="normal-sliders"></div></div></details>
-<details class="section" name="parameters" id="module-tumor"><summary><b>肿瘤细胞</b><span>生长 / 侵袭 / 遗传</span></summary><div class="section-body"><div id="tumor-sliders"></div><details class="subsection" id="tumor-evolution-controls"><summary>突变与抗原演化</summary><div id="tumor-evolution-sliders"></div></details><details class="subsection" id="tumor-cycle-controls"><summary>细胞周期与静息</summary><div id="tumor-cycle-sliders"></div></details><details class="subsection" id="module-mechanics"><summary>形态与穿行 <span>分枝 · 成网 · 让位</span></summary><div class="section-body"><label class="select-row">肿瘤形态<select id="tumor-morphology"><option value="0">紧凑 / 阿米巴样</option><option value="1">间质样 · 梭形双极</option><option value="2">胶质瘤样 · 分枝成网</option></select></label><p class="hint">切换后，已有肿瘤逐渐重塑真实胞体。分枝接触持续 20 MCS 后开始稳定连接；分离或死亡即解除。U87 等胶质瘤形态研究启发，未经细胞系标定。</p><div id="branch-sliders"></div><button id="network-demo">重新开始分枝成网示例</button><p id="network-status" class="hint"></p></div></details></div></details>
-<details class="section" name="parameters" id="module-immune"><summary><b>免疫细胞</b><span>巡逻 / 杀伤 / 扩增</span></summary><div class="section-body"><div id="immune-sliders"></div><details class="subsection" id="immune-regulation-controls"><summary>损伤应答与免疫抑制</summary><div id="immune-regulation-sliders"></div></details><details class="subsection" id="immune-cycle-controls"><summary>细胞周期与扩增</summary><div id="immune-cycle-sliders"></div></details></div></details>
-<details class="section" name="parameters" id="module-other"><summary><b>其他</b><span>共用力学 / 计算</span></summary><div class="section-body"><div class="modes" role="group" aria-label="运动规则预设"><button data-mode="wander">分散探索</button><button data-mode="cluster">偏向凝聚</button><button data-mode="flock">偏向群迁</button></div><div id="other-sliders"></div><details class="subsection" id="module-performance"><summary>性能与计算 <span>后端 · 实际速度</span></summary><div class="section-body"><label class="select-row">性能模式<select id="performance-mode"><option value="auto">自动平衡</option><option value="power">省电</option><option value="smooth">流畅优先</option><option value="quality">高清优先</option></select></label><p id="adaptive-status" class="hint" role="status"></p><p id="adaptive-timing" class="hint"></p><button id="recheck-performance" type="button">重新测量</button><p class="hint">按实际耗时调整自动画质和刷新频率，保留物理格点与全部生物机制。手动分辨率和录像质量保持所选设置。</p><label class="select-row">微环境计算<select id="compute-backend"><option value="auto">自动 · 实测选择</option><option value="cpu">CPU</option><option value="gpu">WebGPU</option></select></label><p id="backend-status" class="hint"></p><p id="render-performance" class="hint"></p><p id="compute-note" class="hint"></p><p id="population-load" class="hint" role="status"></p><p class="hint">增殖由空间、营养、累积压力与细胞自身状态决定。算力不足时提示实际速度，继续完整计算形变、接触和微环境；可降低播放倍率或绘图分辨率。</p></div></details></div></details></section>
-      <details id="statistics-panel" class="panel-details"><summary>数量与事件统计</summary><div class="statistics-actions"><button id="statistics-expand" aria-pressed="false">占满侧栏</button><button id="statistics-play">Ⅱ 暂停</button><button id="statistics-record">● 录制 MP4</button></div><div id="statistics-record-settings"></div><div class="legend"><span><i class="medium"></i>培养液</span><span><i class="normal"></i>正常 <b id="normal-count">0</b></span><span><i class="abnormal"></i>异常 <b id="abnormal-count">0</b></span><span><i class="tumor"></i>肿瘤 <b id="tumor-count">0</b></span><span><i class="immune"></i>免疫 <b id="immune-count">0</b></span><span><i class="immune-active"></i>其中激活 <b id="activated-immune-count">0</b></span><span><i class="immune-suppressive" style="background:#6398d2"></i>其中抑制 <b id="suppressive-immune-count">0</b></span><span class="proliferation-key" title="可遗传的增殖性状，固定范围 0.25–3；实际增殖还受营养、压力与全局生长参数影响"><i></i>肿瘤：灰 → 黑，增殖能力低 → 高</span><span class="edge-key"><i></i>Act：绿＝衰减中 → 红＝新生突起</span><span class="antigen-key"><i></i>红色轮廓：抗原可识别</span><span class="cycle-key" hidden>G0 静息 · G1 生长 · S 复制 · G2 准备 · M 分裂</span></div><div class="metrics patrol-metrics" role="group" aria-label="数量与巡逻统计"><div><b id="rate">—</b><span>实际 MCS / 秒</span></div><div><b id="division-count">0</b><span>总分裂（含免疫）</span></div><div><b id="recognition-count">0</b><span>接触识别</span></div><div><b id="total-death-count">0</b><span>累计死亡清除</span><span id="total-death-progress">清除中 0 · 已触发 0</span></div>
-      <div><b id="patrol-coverage">0.0%</b><span>巡逻覆盖率</span></div><div><b id="patrol-checked">0</b><span>累计检查的不同细胞</span></div></div>
-      <div class="cycle-summary" role="group" aria-label="细胞周期统计"><b>细胞周期</b><p id="cycle-tumor"></p><p id="cycle-immune"></p></div>
-      <p id="patrol-current" class="patrol-current">当前存活已检查 0 / 0</p>
-      <details class="patrol-definition"><summary>巡逻统计口径</summary><p>覆盖率＝免疫胞体实际经过的面积／当前非障碍面积，封闭区域仍计入分母。拖动路径不计入自主巡逻。</p><p>检查需连续膜接触累积达到 6 个有效 MCS，按接触长度和代谢效能加权。正常、异常、肿瘤均可计入；按出生身份去重，分裂子代重新统计。已检查不等于已识别抗原。</p></details>
-      <section class="death-overview" aria-label="死亡清除原因">
-        <div class="death-causes">
-          <div><span>自发凋亡清除</span><b id="death-count">0</b><small id="death-progress">清除中 0 · 已触发 0</small></div>
-          <div><span>环境死亡清除</span><b id="environment-death-count">0</b><small id="environment-death-progress">清除中 0 · 已触发 0</small></div>
-          <div><span>免疫杀伤清除</span><b id="kill-count">0</b><small id="kill-progress">清除中 0 · 已触发 0</small></div>
+        <div class="color-presets" id="color-presets" role="group" aria-label="细胞配色方案"></div><p class="hint" id="palette-status">当前：原始配色</p><p class="hint palette-key">预览从左到右：正常 · 癌前 · 肿瘤 · 免疫 · 激活</p><div class="color-grid" id="color-controls"><span>类型 / 状态</span><span>胞体</span><span>胞核</span></div><div class="checks"><label><input id="proliferation-shading" type="checkbox" checked>肿瘤保留增殖深浅变化</label></div><p class="hint">点击方案立即应用，也可继续自定义，颜色保存在当前浏览器；不会重启模拟。高增殖使用所选肿瘤色，低增殖逐渐变浅；关闭上方选项可使用统一纯色。Act 与高强度热图仍可覆盖胞体色，关闭图层可查看本色。</p><button id="reset-colors" class="quiet">恢复原始配色</button></div></details></div></details>
+      <details id="record-options" class="subsection"><summary>录像设置 <span id="record-options-summary">MP4 · 1440p</span></summary><label class="select-row">录制范围<select id="record-scope"><option value="arena" selected>仅 Arena</option><option value="workspace">Arena ＋ 右侧栏</option></select></label><p class="hint record-scope-hint">组合录制包含侧栏当前可见的内容；统计可先占满侧栏。Arena 30 FPS，侧栏最多每秒刷新 5 次。</p><label class="select-row">视频格式<select id="record-format"><option value="mp4" selected>MP4 · 推荐</option><option value="webm">WebM · 兼容</option></select></label><label class="select-row">录像画质<select id="record-quality"><option value="standard">1080p · 标准</option><option value="high" selected>1440p · 高清</option><option value="ultra">4K · 超清</option></select></label><p id="record-options-info" class="hint"></p><p class="hint">保留画布比例，高清录制时提升绘制精度；4K 文件较大。</p><p id="record-status" class="hint" role="status"></p></details>
+</section>
+      <section id="parameter-groups" aria-label="五组演化参数"><div class="parameter-heading"><b>演化参数</b><button id="lock-all-parameters" class="quiet" aria-pressed="false" title="锁定参数在自动换局与随机生成时保持不变">全部锁定</button></div><nav id="parameter-module-nav" aria-label="参数分组快捷入口"><button data-module="module-environment" aria-pressed="true">微环境</button><button data-module="module-normal" aria-pressed="false">体细胞</button><button data-module="module-tumor" aria-pressed="false">肿瘤</button><button data-module="module-immune" aria-pressed="false">免疫</button><button data-module="module-other" aria-pressed="false">其他</button></nav><details class="section" open id="module-environment"><summary><b>微环境</b><span>资源 / 信号 / 炎性促癌</span></summary><div class="section-body"><div id="environment-sliders"></div><details class="subsection" id="evolution-controls"><summary>演化实验</summary><div id="evolution-sliders"></div></details></div></details>
+<details class="section" open hidden id="module-normal"><summary><b>正常细胞</b><span>运动 / 聚集 / 癌变</span></summary><div class="section-body"><div id="normal-sliders"></div></div></details>
+<details class="section" open hidden id="module-tumor"><summary><b>肿瘤细胞</b><span>生长 / 侵袭 / 遗传</span></summary><div class="section-body"><div id="tumor-sliders"></div><details class="subsection" id="tumor-evolution-controls"><summary>突变与抗原演化</summary><div id="tumor-evolution-sliders"></div></details><details class="subsection" id="tumor-cycle-controls"><summary>细胞周期与静息</summary><div id="tumor-cycle-sliders"></div></details><details class="subsection" id="module-mechanics"><summary>形态与穿行 <span>分枝 · 成网 · 让位</span></summary><div class="section-body"><label class="select-row">肿瘤形态<select id="tumor-morphology"><option value="0">紧凑 / 阿米巴样</option><option value="1">间质样 · 梭形双极</option><option value="2">胶质瘤样 · 分枝成网</option></select></label><p class="hint">切换后，已有肿瘤逐渐重塑真实胞体。分枝接触持续 20 MCS 后开始稳定连接；分离或死亡即解除。U87 等胶质瘤形态研究启发，未经细胞系标定。</p><div id="branch-sliders"></div><button id="network-demo">重新开始分枝成网示例</button><p id="network-status" class="hint"></p></div></details></div></details>
+<details class="section" open hidden id="module-immune"><summary><b>免疫细胞</b><span>巡逻 / 杀伤 / 扩增</span></summary><div class="section-body"><div id="immune-sliders"></div><details class="subsection" id="immune-regulation-controls"><summary>损伤应答与免疫抑制</summary><div id="immune-regulation-sliders"></div></details><details class="subsection" id="immune-cycle-controls"><summary>细胞周期与扩增</summary><div id="immune-cycle-sliders"></div></details></div></details>
+<details class="section" open hidden id="module-other"><summary><b>其他</b><span>共用力学 / 计算</span></summary><div class="section-body"><div class="modes" role="group" aria-label="运动规则预设"><button data-mode="wander">分散探索</button><button data-mode="cluster">偏向凝聚</button><button data-mode="flock">偏向群迁</button></div><div id="other-sliders"></div><details class="subsection" id="module-performance"><summary>性能与计算 <span>后端 · 实际速度</span></summary><div class="section-body"><label class="select-row">性能模式<select id="performance-mode"><option value="auto">自动平衡</option><option value="power">省电</option><option value="smooth">流畅优先</option><option value="quality">高清优先</option></select></label><p id="adaptive-status" class="hint" role="status"></p><p id="adaptive-timing" class="hint"></p><button id="recheck-performance" type="button">重新测量</button><p class="hint">按实际耗时调整自动画质和刷新频率，保留物理格点与全部生物机制。手动分辨率和录像质量保持所选设置。</p><label class="select-row">微环境计算<select id="compute-backend"><option value="auto">自动 · 实测选择</option><option value="cpu">CPU</option><option value="gpu">WebGPU</option></select></label><p id="backend-status" class="hint"></p><p id="render-performance" class="hint"></p><p id="compute-note" class="hint"></p><p id="population-load" class="hint" role="status"></p><p class="hint">增殖由空间、营养、累积压力与细胞自身状态决定。算力不足时提示实际速度，继续完整计算形变、接触和微环境；可降低播放倍率或绘图分辨率。</p></div></details></div></details></section>
+      <details id="statistics-panel" class="panel-details" hidden><summary>数量与事件统计</summary>
+        <div class="statistics-actions"><button id="statistics-expand" aria-pressed="false">占满侧栏</button><button id="statistics-play">Ⅱ 暂停</button><button id="statistics-record">● 录制 MP4</button></div><div id="statistics-record-settings"></div>
+        <div class="stats-heading"><span>当前存活</span><b id="alive-count">0</b><span id="scenario-phase">正在准备情境</span></div>
+        <div class="population-cards">
+          <div class="population-normal"><span>正常</span><b id="normal-count">0</b></div><div class="population-abnormal"><span>癌前</span><b id="abnormal-count">0</b></div>
+          <div class="population-tumor"><span>肿瘤</span><b id="tumor-count">0</b></div><div class="population-immune"><span>免疫</span><b id="immune-count">0</b></div>
         </div>
-        <p class="hint">胞体消失时计入清除。自发凋亡设为 0% 只阻止新的随机凋亡；环境死亡、免疫杀伤和此前已触发的死亡仍会继续。</p>
-        <p class="death-visual-key"><span><i style="background:#4b4e56"></i>自发：皱缩消失</span><span><i style="background:#9e9170"></i>环境：灰褐萎缩</span><span><i style="background:#f8b130"></i>免疫杀伤：变为橙黄色、圆化肿胀、破裂</span></p>
-        <p class="manual-removal">手动擦除 <b id="manual-removal-count">0</b> · 独立于死亡统计</p><p id="clearance-recent-summary">本局尚无死亡清除。</p>
-      </section>
-      <div class="performance-line"><span id="performance">目标 30 MCS / 秒 · 独立计算线程</span><span id="seed-label">种子 —</span></div>
-      <div class="ecology-line"><span id="environment-count">环境死亡 0</span><span id="immune-division-count">免疫分裂 0</span><span id="mutation-count">性状突变 0</span><span id="grid-info">正在准备格点</span></div>
-      <div class="ecology-line"><span id="evolution-events"></span><span id="immune-regulation-events"></span><span id="abnormal-events">异常发生 0 · 恶性转变 0 · 异常免疫清除 0</span><span>悬停画布查看局部资源与因子浓度</span></div>
-      <details class="death-ledger" id="death-ledger"><summary>死亡记录 <span id="death-ledger-count">已清除 0 · 清除中 0</span></summary><p class="hint">触发后进入相应死亡过程，胞体消失时记为清除；三种原因分别统计。下方按清除和触发分别显示最近 8 次，导出实验数据包含本局完整记录。</p><div id="death-summary"></div><h3>最近从画面清除</h3><ol id="recent-clearances"></ol><h3>最近触发死亡</h3><ol id="recent-deaths"></ol></details>
-      <div class="chart-panel"><div><span class="eyebrow">POPULATION HISTORY</span><span id="history-range">全程 0 — 0 MCS</span><span id="order">极性一致度 —</span></div>
-        <div id="history-legend" class="history-legend" role="group" aria-label="历史曲线显示类型"></div>
-        <div class="history-options"><span id="history-mode">细胞数量</span><label id="history-percent-option" hidden><input type="checkbox" id="history-percent">百分比</label><span id="history-states" class="history-states" hidden></span></div>
-        <canvas id="history" width="960" height="125" tabindex="0" aria-label="细胞数量历史曲线"></canvas><div id="history-readout" class="history-readout"></div>
-        <p class="hint">勾选类型自动缩放；单类显示状态堆叠。悬停／触摸查看采样时刻，方向键逐点查看。全程记录，导出保留全部采样。</p>
-      </div><details class="subsection" id="statistics-scenario"><summary>情境进度与开局</summary><section id="scenario-guide" class="scenario-guide" aria-label="情境设定与实际进度">
-    <div class="scenario-heading"><b id="scenario-phase">正在准备情境</b><span id="scenario-configuration">预设参数</span><button id="restore-scenario" class="quiet" title="恢复情境参数、本次开局种子及默认显示，保留区域与精细度">恢复情境设定 ↺</button></div>
-    <p id="scenario-description"></p><div id="scenario-metrics" class="scenario-metrics"></div><small id="scenario-setup"></small>
-  </section>
-</details></details>
+        <div class="immune-state-line"><span>免疫状态</span><span class="resting-text">静息 <b id="resting-immune-count">0</b></span><span class="active-text">激活 <b id="activated-immune-count">0</b></span><span class="suppressive-text">抑制 <b id="suppressive-immune-count">0</b></span></div>
+        <div class="history-tabs" role="group" aria-label="历史视图"><button id="history-current-tab" aria-pressed="true">本局走势</button><button id="history-rounds-tab" aria-pressed="false">历局结果 <b id="round-total">0</b></button></div>
+        <div id="current-history" class="chart-panel"><div><span class="eyebrow">POPULATION HISTORY</span><span id="history-range">全程 0 — 0 MCS</span></div>
+          <div id="history-legend" class="history-legend" role="group" aria-label="历史曲线显示类型"></div>
+          <div class="history-options"><span id="history-mode">细胞数量</span><label id="history-percent-option" hidden><input type="checkbox" id="history-percent">百分比</label><span id="history-states" class="history-states" hidden></span></div>
+          <canvas id="history" width="960" height="125" tabindex="0" aria-label="细胞数量历史曲线"></canvas><div id="history-readout" class="history-readout"></div>
+        </div>
+        <section id="round-results" hidden><div class="round-toolbar"><span>历局记录保存在本机</span><button id="export-rounds">导出 CSV</button></div><div id="round-list"></div><div class="round-pagination"><button id="round-newer">较新</button><span id="round-page"></span><button id="round-older">较早</button></div></section>
+        <div class="stats-section-label">本局累计</div>
+        <div class="metrics outcome-metrics"><div><b id="division-count">0</b><span>细胞分裂</span><small id="immune-division-count">免疫分裂 0</small></div><div><b id="malignant-count">0</b><span>恶性转变</span></div><div><b id="escape-count">0</b><span>抗原逃逸</span></div></div>
+        <section class="death-overview" aria-label="死亡清除原因"><div class="death-heading"><span>死亡清除</span><b id="total-death-count">0</b><small id="total-death-progress">清除中 0</small></div>
+          <div class="death-causes"><div><span>免疫杀伤</span><b id="kill-count">0</b></div><div><span>环境死亡</span><b id="environment-death-count">0</b></div><div><span>自发凋亡</span><b id="death-count">0</b></div><div><span>寿命凋亡</span><b id="lifespan-death-count">0</b></div></div>
+        </section>
+        <details class="stats-detail" id="immune-statistics"><summary>免疫巡逻与细胞周期</summary><div class="patrol-summary"><span>巡逻覆盖率 <b id="patrol-coverage">0.0%</b></span><span>已检查 <b id="patrol-checked">0</b></span><span>接触识别 <b id="recognition-count">0</b></span></div><p id="patrol-current"></p><div class="cycle-summary"><p id="cycle-tumor"></p><p id="cycle-immune"></p></div>
+          <details class="patrol-definition"><summary>巡逻统计口径</summary><p>覆盖率＝免疫胞体实际经过的面积／当前非障碍面积，封闭区域仍计入分母。拖动路径不计入自主巡逻。</p><p>检查需连续膜接触累积达到 6 个有效 MCS，按接触长度和代谢效能加权。正常、癌前、肿瘤均可计入；按出生身份去重，分裂子代重新统计。已检查不等于已识别抗原。</p></details>
+        </details>
+        <details class="stats-detail" id="evolution-statistics"><summary>演化事件</summary><p id="mutation-count"></p><p id="abnormal-events"></p><p id="evolution-events"></p><p id="immune-regulation-events"></p></details>
+        <details class="stats-detail death-ledger" id="death-ledger"><summary>死亡明细</summary><div class="death-detail-rows"><p>免疫杀伤 <span id="kill-progress"></span></p><p>环境死亡 <span id="environment-death-progress"></span></p><p>自发凋亡 <span id="death-progress"></span></p><p>寿命凋亡 <span id="lifespan-death-progress"></span></p></div><p id="environment-count"></p><p>手动擦除 <b id="manual-removal-count">0</b></p><p class="hint">存活数不含死亡过程中的胞体；死亡清除在胞体消失时计数。寿命凋亡独立于肿瘤自发凋亡。</p><h3>最近从画面清除</h3><ol id="recent-clearances"></ol><details><summary>最近触发死亡</summary><ol id="recent-deaths"></ol></details></details>
+        <details class="stats-detail" id="statistics-scenario"><summary>运行与开局</summary><div class="performance-line"><span>实际 MCS / 秒 <b id="rate">—</b></span><span id="performance"></span><span id="seed-label"></span><span id="grid-info"></span><span id="order"></span></div>
+          <section id="scenario-guide" class="scenario-guide" aria-label="情境设定与实际进度"><div class="scenario-heading"><span id="scenario-configuration"></span><button id="restore-scenario" class="quiet" title="恢复情境参数、本次开局种子及默认显示，保留区域与精细度">恢复情境设定 ↺</button></div><p id="scenario-description"></p><div id="scenario-metrics"></div><small id="scenario-setup"></small></section>
+          <div class="legend stats-key"><span><i class="medium"></i>培养液</span><span class="proliferation-key"><i></i>肿瘤：灰 → 黑，增殖能力低 → 高</span><span class="edge-key"><i></i>Act：绿＝衰减中 → 红＝新生突起</span><span class="antigen-key"><i></i>红色轮廓：抗原可识别</span><span class="cycle-key" hidden>G0 静息 · G1 生长 · S 复制 · G2 准备 · M 分裂</span></div>
+        </details>
+      </details>
       <details id="mobile-tools" class="panel-details mobile-only"><summary>画布工具</summary><div id="mobile-tools-host"></div></details><details id="mobile-session" class="panel-details mobile-only"><summary>场景与开局</summary><div id="mobile-scenes-host"></div><div id="mobile-session-actions"></div></details>
-      <details id="record-options" class="subsection"><summary>录像设置 <span id="record-options-summary">MP4 · 1440p</span></summary><label class="select-row">录制范围<select id="record-scope"><option value="arena" selected>仅 Arena</option><option value="workspace">Arena ＋ 右侧栏</option></select></label><p class="hint record-scope-hint">组合录制包含侧栏当前可见的内容；统计可先占满侧栏。Arena 30 FPS，侧栏最多每秒刷新 5 次。</p><label class="select-row">视频格式<select id="record-format"><option value="mp4" selected>MP4 · 推荐</option><option value="webm">WebM · 兼容</option></select></label><label class="select-row">录像画质<select id="record-quality"><option value="standard">1080p · 标准</option><option value="high" selected>1440p · 高清</option><option value="ultra">4K · 超清</option></select></label><p id="record-options-info" class="hint"></p><p class="hint">保留画布比例，高清录制时提升绘制精度；4K 文件较大。</p></details>
-      <div class="exports"><button id="snapshot">保存画面 ↓</button><button id="export-data">导出实验数据 ↓</button><button id="import-data">导入实验参数 ↑</button><button id="record-video">● 录制 MP4</button></div>
-      <input id="import-file" type="file" accept=".json,application/json" hidden><p id="record-status" class="hint" role="status"></p><footer><a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/THIRD_PARTY_NOTICES.md" target="_blank" rel="noreferrer">Artistoo · 来源与许可</a><span>二维模型 · MCS 非真实时间</span></footer>
+
+      <input id="import-file" type="file" accept=".json,application/json" hidden><footer><a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/THIRD_PARTY_NOTICES.md" target="_blank" rel="noreferrer">Artistoo · 来源与许可</a><span>二维模型 · MCS 非真实时间</span></footer>
     </div>
   </aside>
 </main>
@@ -278,38 +304,38 @@ aside.statistics-focused #record-options>summary{padding:4px 0}
   <h3>本网页的主要扩展</h3>
   <ul>
     <li><strong>微环境与通讯：</strong>局部氧、糖、酸负荷，以及凝聚、损伤和免疫招募信号共同影响细胞运动、生长与存活。</li>
-    <li><strong>免疫监视：</strong>分散巡逻、局部趋化、抗原接触识别、累积杀伤、识别后招募与有限克隆扩增。</li>
-    <li><strong>肿瘤演化：</strong>正常 → 异常中间态 → 肿瘤；增殖、侵袭、耐受和抗原表达可遗传、突变，并区分不同死亡过程。</li>
+    <li><strong>免疫监视：</strong>分散巡逻、局部趋化、抗原接触识别、累积杀伤、识别后招募、有限克隆扩增与可调杀伤寿命。</li>
+    <li><strong>肿瘤演化：</strong>正常 → 癌前细胞 → 肿瘤；增殖、侵袭、耐受和抗原表达可遗传、突变，并区分不同死亡过程。</li>
     <li><strong>细胞周期：</strong>G0 静息与 G1／S／G2／M 推进；营养、压缩和损伤控制周期。CTL 使用独立 IL-2 与抗原刺激记忆扩增，慢性刺激可累积耗竭。</li>
     <li><strong>形态与穿行：</strong>有限切面让位、核区约束、可变形胞核，以及可选的间质样分枝与接触成网。</li>
   </ul>
   <h3>怎么使用</h3>
   <ol>
-    <li>选择内置情境直接运行，或在「空白自建」中摆放细胞后开始；「随机生成」可探索不同开局。</li>
-    <li>用画布工具添加、拖动或擦除细胞，绘制障碍、释放信号；「观察细胞」查看选中细胞和局部环境。</li>
-    <li>按六个参数分组调整细胞和环境。手机点「参数」展开面板，可直接输入数值或用 ＋／− 微调，点「返回画布」继续观察。</li>
+    <li>选择内置情境直接运行，或在「空白自建」中摆放细胞后开始；「随机」可探索不同开局。</li>
+    <li>用画布工具添加、拖动或擦除细胞，绘制障碍、释放信号；「追踪」查看选中细胞和局部环境。</li>
+    <li>「显示」调整外观；「参数」用五个快捷按钮切换分组，锁图标保留随机换局时的固定参数。手机用顶部箭头展开或返回画布。</li>
   </ol>
-  <p>「统计」查看全程数量变化；面板底部可导出／导入实验参数、保存画面和录制视频。导入参数会重新开局，不恢复中途状态。</p>
-  <p>「肿瘤细胞／免疫细胞 → 细胞周期」调整周期参数；「观察细胞」查看阶段及阻滞原因。「持续场源」可添加 IL-2，并在「显示调整 → 观察图层」查看其分布。</p>
+  <p>「统计」查看全程曲线和历局结果；顶部文件图标导出／导入参数、保存画面或导出历局 CSV，录制图标开始／停止视频。导入参数会重新开局，不恢复中途状态。</p>
+  <p>「肿瘤细胞／免疫细胞 → 细胞周期」调整周期参数；「追踪」查看阶段及阻滞原因。双击「信号」可添加持续 IL-2 场源，并在「显示 → 观察图层」查看其分布。</p>
   <p class="hint">这是未经实验标定的二维切面演示，MCS 为模拟步数，不等同于真实时间或完整三维肿瘤。<a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MODEL.md" target="_blank" rel="noreferrer">详细模型与机制参考</a> · <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MORPHOLOGY.md" target="_blank" rel="noreferrer">形态模型</a></p>
   </div><div data-language="en" hidden><h2>Model &amp; sources</h2>
 <p>Cell-Arena is built on <a href="https://doi.org/10.7554/eLife.61288" target="_blank" rel="noreferrer"><strong>Artistoo</strong> (Wortel &amp; Textor, eLife, 2021)</a>, an open-source JavaScript library for simulating cells and tissues in the browser. This page uses its Cellular Potts Model (CPM) for cell deformation and interactions, and its Act activity colors. The <a href="https://artistoo.net/examples/CancerInvasion.html" target="_blank" rel="noreferrer">Cancer Invasion example</a> informed the visualization. Artistoo uses the MIT license; code credits and full licenses are preserved below.</p>
 <h3>Main additions</h3>
 <ul>
   <li><strong>Environment and communication:</strong> local oxygen, glucose, acid load, cohesion, damage and immune recruitment signals influence movement, growth and survival.</li>
-  <li><strong>Immune surveillance:</strong> dispersed patrol, local chemotaxis, contact-based antigen recognition, cumulative killing, recruitment after recognition and limited clonal expansion.</li>
-  <li><strong>Tumor evolution:</strong> normal → abnormal → tumor transitions; inherited and mutable growth, invasion, tolerance and antigen traits, with distinct death processes.</li>
+  <li><strong>Immune surveillance:</strong> dispersed patrol, local chemotaxis, contact-based antigen recognition, cumulative killing, recruitment after recognition, limited clonal expansion and a configurable tumor-kill lifespan.</li>
+  <li><strong>Tumor evolution:</strong> normal → precancerous → tumor transitions; inherited and mutable growth, invasion, tolerance and antigen traits, with distinct death processes.</li>
   <li><strong>Cell cycles:</strong> G0 quiescence and G1/S/G2/M progression, gated by nutrients, compression and injury. CTLs expand using separate IL-2 support and antigen memory; chronic stimulation can accumulate exhaustion.</li>
   <li><strong>Shape and passage:</strong> limited section-area yielding, nuclear constraints, deformable nuclei, and optional mesenchymal branching and contact networks.</li>
 </ul>
 <h3>Getting started</h3>
 <ol>
-  <li>Choose a preset to run, or place cells in a Blank setup before starting. Randomize explores different starting conditions.</li>
-  <li>Use arena tools to add, drag or erase cells, draw barriers and release signals. Inspect cell shows the selected cell and local environment.</li>
-  <li>Adjust cells and their environment in six parameter groups. On phones, tap Parameters to expand the editor, type a value or use + / −, then tap Back to arena.</li>
+  <li>Choose a preset to run, or place cells in a Blank setup before starting. Random explores different starting conditions.</li>
+  <li>Use arena tools to add, drag or erase cells, draw barriers and release signals. Track shows the selected cell and local environment.</li>
+  <li>Display contains appearance controls; Parameters has five quick-switch groups. Lock icons preserve chosen settings across random rounds. On phones, use the top arrow to expand the panel or return to the arena.</li>
 </ol>
-<p>Statistics shows the full population history. At the bottom of the panel, export or import parameters, save an image or record a video. Importing parameters starts a fresh run; it does not restore a checkpoint.</p>
-<p>Open Tumor or Immune → Cell cycle to adjust cycle parameters. Inspect a cell for its phase and arrest reason. Field sources can supply IL-2; Display → Observation layers shows its distribution.</p>
+<p>Statistics shows the full population history and past-round results. The top file icon offers image, parameter and round-CSV export plus parameter import; the recording icon starts or stops video. Importing parameters starts a fresh run; it does not restore a checkpoint.</p>
+<p>Open Tumor or Immune → Cell cycle to adjust cycle parameters. Track a cell for its phase and arrest reason. Double-tapping Signal creates a persistent IL-2 source; Display → Observation layers shows its distribution.</p>
 <p class="hint">This is an uncalibrated 2D section demo. MCS counts simulation steps, not real time or full 3D tumor dynamics. <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MODEL.md" target="_blank" rel="noreferrer">Detailed model and references</a> · <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MORPHOLOGY.md" target="_blank" rel="noreferrer">Morphology model</a></p>
 </div>
   <details id="code-credits"><summary>代码来源、版本与许可</summary><p>Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定提交 e997d81213a5dcdfc40ad976a18958f412f00cc9 的官方文件原样内嵌。优化 JS 约束与 WebAssembly 内核包含对 Artistoo 顺序 CPM 与约束代码的专门化／移植，Act 配色沿用其 Canvas.drawActivityValues。</p><p>随 Artistoo 带入的 MT19937 随机数实现由 Makoto Matsumoto 与 Takuji Nishimura 编写，包内另保留 Sean McCullough 的 JavaScript 封装署名，采用 BSD 三条款许可；WASM 随机数部分移植同一实现。两个完整许可证均保留在本页面。</p><p>逐文件范围见 <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/THIRD_PARTY_NOTICES.md" target="_blank" rel="noreferrer">代码来源与第三方声明</a>。通讯、代谢、遗传、切面约束和交互为本网页的模型扩展；详细机制参考见模型文档。</p><details><summary>Artistoo · MIT 完整许可证</summary><pre id="license-artistoo">MIT License
@@ -12023,10 +12049,10 @@ var CPM = (function (exports, module$1) {
 (() => {
   'use strict';
   const NORMAL=1, TUMOR=2, IMMUNE=3, WALL=4, FIELD_SCALE=4;
-  const DEATH_COUNTERS={spontaneous:['apoptosisStarted','apoptosis'],kill:['killStarted','kills'],environment:['environmentStarted','environment']};
+  const DEATH_COUNTERS={spontaneous:['apoptosisStarted','apoptosis'],kill:['killStarted','kills'],environment:['environmentStarted','environment'],lifespan:['lifespanStarted','lifespan']};
   const DEFAULTS={normalMotility:.08,tumorMotility:.7,immuneMotility:1,chemotaxis:1.6,alignment:.8,cohesion:1,repulsion:.7,immuneSeparation:1,noise:.6,halfLife:140,growth:.8,apoptosis:8,antigen:65,kill:1,temperature:12,supply:1.8,metabolism:1,escape:2,recruitment:1,immuneGrowth:.35,immuneDivisions:3,mutation:6,mutationSize:.16,sectionYield:.35,stressMutation:1,inflammation:0,progression:1,tumorMorphology:0,branchLength:2.8,branchStrength:5,networkAdhesion:1,branching:1};
   const clamp=(v,lo=0,hi=1)=>Math.max(lo,Math.min(hi,v));
-  Object.assign(DEFAULTS,{normalSupport:0});
+  Object.assign(DEFAULTS,{normalSupport:0,immuneKillLimit:10});
   // Phenomenological MCS parameters; not hours or molecular concentrations.
   Object.assign(DEFAULTS,{tumorCycle:240,tumorQuiescence:1,immuneCycle:220,antigenMemory:900,il2Secretion:1,il2HalfLife:180,exhaustionRate:1});
   Object.assign(DEFAULTS,{normalMutationGain:2,tumorMutationGain:2,mutationBias:0,antigenStressGain:.5,contactEscape:.1,signalEscape:.05,evolutionMemory:800});
@@ -12043,7 +12069,7 @@ var CPM = (function (exports, module$1) {
   // Random development experiments stay near competing, viable regimes rather
   // than combining unrelated extremes or pre-planting malignant cells.
   Object.assign(RANDOM_RANGES,{supply:[2.3,2.8,.05],metabolism:[1.05,1.3,.05],stressMutation:[3,6,.5],progression:[1.5,4,.5],inflammation:[.6,1.6,.1],normalMutationGain:[3,6,.5],tumorMutationGain:[3,7,.5],growth:[.8,1.35,.05],tumorMotility:[.6,1.2,.05],normalMotility:[.05,.15,.05],immuneMotility:[1,1.4,.05],kill:[1,1.8,.1],recruitment:[1,2,.1],immuneGrowth:[.3,.65,.05],immuneDivisions:[3,4,1],immuneCycle:[180,240,20],antigenMemory:[900,1500,100],tumorCycle:[180,280,20],chemotaxis:[1.5,2.5,.1],escape:[1.8,3,.1],mutation:[8,16,1],mutationSize:[.12,.24,.02],antigenStressGain:[.5,1.5,.1],contactEscape:[.2,.8,.1],signalEscape:[.1,.4,.05],damagePolarization:[2.5,4.5,.25],damageDeactivation:[.7,1.5,.1],suppressiveSecretion:[1,1.8,.1],suppressionStrength:[.8,1.6,.1],suppressionRecovery:[1,2.5,.25],immuneRegulationMemory:[150,350,50],tumorMorphology:[0,1,1]});
-  Object.assign(RANDOM_RANGES,{normalSupport:[20,50,5]});
+  Object.assign(RANDOM_RANGES,{normalSupport:[20,50,5],immuneKillLimit:[8,15,1]});
   function randomSettings(seed){
     let state=seed>>>0;
     const random=()=>{state=(state+0x6d2b79f5)>>>0;let n=Math.imul(state^(state>>>15),1|state);n^=n+Math.imul(n^(n>>>7),61|n);return ((n^(n>>>14))>>>0)/4294967296;};
@@ -12081,8 +12107,8 @@ var CPM = (function (exports, module$1) {
   }
   const SIGNALS=['cohesion','danger','trail','il2','normalDamage','inhibition'];
   const PRESETS={
-    oncogenesis:{label:'肿瘤发生发展',environmentProfile:'mosaic',founderTolerance:2.3,description:'密铺正常组织与 12 颗分散免疫细胞，从零肿瘤开始。三处供给较弱的区域与健康边缘形成差异；异常、癌变、免疫清除、抑制与恢复相互竞争，逃逸克隆可能再次扩增。没有定时转变或预设结局。',settings:{supply:2.5,metabolism:1.2,inflammation:1.2,stressMutation:4,progression:2.5,normalMutationGain:5,tumorMutationGain:6,growth:1.05,tumorCycle:220,apoptosis:3,tumorMotility:.9,normalMotility:.1,cohesion:1.1,escape:2.4,immuneMotility:1.3,immuneGrowth:.5,immuneDivisions:3,immuneCycle:200,antigenMemory:1200,kill:1.4,recruitment:1.4,chemotaxis:1.8,mutation:12,mutationSize:.2,antigenStressGain:1.2,contactEscape:.6,signalEscape:.3,damagePolarization:3.5,damageDeactivation:1.2,suppressiveSecretion:1.5,suppressionStrength:1.3,suppressionRecovery:1.5,immuneRegulationMemory:200}},
-    random:{label:'随机肿瘤演化',environmentProfile:'mosaic',founderTolerance:2.3,description:'随机化的密铺正常组织、12–16 颗内部免疫细胞与三处弱供给区域。参数在发生发展附近抽样，肿瘤必须由局部异常产生；相同种子和参数可重现开局，结局由局部相互作用产生。',settings:{}},
+    oncogenesis:{label:'肿瘤发生发展',environmentProfile:'mosaic',founderTolerance:2.3,description:'密铺正常组织与 12 颗分散免疫细胞，从零肿瘤开始。三处供给较弱的区域与健康边缘形成差异；癌前、癌变、免疫清除、抑制与恢复相互竞争，逃逸克隆可能再次扩增。没有定时转变或预设结局。',settings:{supply:2.5,metabolism:1.2,inflammation:1.2,stressMutation:4,progression:2.5,normalMutationGain:5,tumorMutationGain:6,growth:1.05,tumorCycle:220,apoptosis:3,tumorMotility:.9,normalMotility:.1,cohesion:1.1,escape:2.4,immuneMotility:1.3,immuneGrowth:.5,immuneDivisions:3,immuneCycle:200,antigenMemory:1200,kill:1.4,recruitment:1.4,chemotaxis:1.8,mutation:12,mutationSize:.2,antigenStressGain:1.2,contactEscape:.6,signalEscape:.3,damagePolarization:3.5,damageDeactivation:1.2,suppressiveSecretion:1.5,suppressionStrength:1.3,suppressionRecovery:1.5,immuneRegulationMemory:200}},
+    random:{label:'随机肿瘤演化',environmentProfile:'mosaic',founderTolerance:2.3,description:'随机化的密铺正常组织、12–16 颗内部免疫细胞与三处弱供给区域。参数在发生发展附近抽样，肿瘤必须由局部癌前产生；相同种子和参数可重现开局，结局由局部相互作用产生。',settings:{}},
     cold:{label:'免疫冷肿瘤扩散转移',description:'正常细胞铺满背景，中央嵌入 19 颗低抗原肿瘤，外围仅 3 颗免疫细胞。梭形肿瘤侵袭扩增，压力提高性状变异，部分克隆可能暴露抗原；免疫招募较弱。这是二维局部播散，不含血管或跨器官转移。',settings:{supply:2.8,metabolism:.65,stressMutation:0,progression:1,growth:1.4,tumorCycle:180,apoptosis:2,tumorMotility:1.5,tumorMorphology:1,normalMotility:.25,cohesion:.4,sectionYield:.4,immuneMotility:.8,antigen:15,kill:1,chemotaxis:.6,recruitment:.35,immuneGrowth:.15,immuneDivisions:2,alignment:.2,noise:.85,mutation:8,normalMutationGain:1,tumorMutationGain:5,antigenStressGain:.3,contactEscape:.15,signalEscape:.1}},
     hot:{label:'免疫热肿瘤治愈',description:'正常细胞铺满背景，中央嵌入 37 颗高抗原肿瘤，18 颗免疫细胞分散在病灶周边的组织内。接触识别、招募及 IL-2 扩增支持早期清除；少数存活克隆可能丢失抗原并再次扩增。结局随种子改变，关闭杀伤可作对照。',settings:{supply:2.8,metabolism:.65,stressMutation:0,progression:1,growth:.75,tumorCycle:280,apoptosis:0,tumorMotility:.35,immuneMotility:1.2,antigen:100,kill:2,chemotaxis:2.5,recruitment:2.4,immuneGrowth:.65,immuneDivisions:3,immuneCycle:200,antigenMemory:1200,il2Secretion:1.2,noise:.45,halfLife:180,mutation:2,mutationSize:.05,antigenStressGain:.15,contactEscape:.35,signalEscape:.12}},
     ecosystem:{label:'免疫共培养',settings:{}},
@@ -12091,7 +12117,7 @@ var CPM = (function (exports, module$1) {
     invasion:{label:'肿瘤扩张',settings:{growth:.7,tumorMotility:1,apoptosis:10}},
     maze:{label:'免疫细胞迷宫',description:'圆心持续释放最强招募信号，入口清除信号；开局已建立沿通道扩散的浓度场。6 颗免疫细胞从等距入口出发，仅凭局部梯度与随机探索前进，胞核进入中心终点区计时。',settings:{chemotaxis:3,halfLife:400,immuneMotility:1.4,noise:.5,immuneSeparation:.8,growth:0,immuneGrowth:0,apoptosis:0,metabolism:.3,supply:3,stressMutation:0,inflammation:0,escape:1}},
     stress:{label:'密度与逃逸',settings:{supply:.8,metabolism:1.15,growth:.6,tumorMotility:.9,apoptosis:0,escape:3}},
-    surveillance:{label:'异常监视',settings:{supply:.8,metabolism:1.2,stressMutation:3,progression:.7,kill:2,apoptosis:0}}
+    surveillance:{label:'癌前监视',settings:{supply:.8,metabolism:1.2,stressMutation:3,progression:.7,kill:2,apoptosis:0}}
   };
   const TYPE_NAMES=['培养液','正常细胞','肿瘤细胞','免疫细胞','实体障碍'];
   const BODY_COLORS=[[239,242,237],[174,184,181],[48,56,65],[190,65,78],[93,108,111]];
@@ -12200,6 +12226,7 @@ var CPM = (function (exports, module$1) {
       this.normalSupplyReference=0;
       this.counters={manualRemoved:0,divisions:0,immuneDivisions:0,kills:0,apoptosis:0,environment:0,apoptosisStarted:0,killStarted:0,environmentStarted:0,recognitions:0,mutations:0,abnormalInitiations:0,malignantTransitions:0,abnormalKills:0,normalEnvironmentDeaths:0,abnormalEnvironmentDeaths:0};this.birthSerial=0;this.lineage=[];this.deathHistory=[];this.recentClearances=[];this.manualDeathRemovals={spontaneous:0,kill:0,environment:0};
       this.deathEffects=[];this.sources=[];this.sourceSerial=0;
+      this.counters.lifespan=0;this.counters.lifespanStarted=0;this.manualDeathRemovals.lifespan=0;
       Object.assign(this.counters,{normalTraitMutations:0,stressMutations:0,antigenExposures:0,antigenEscapes:0});
       Object.assign(this.counters,{suppressiveTransitions:0,suppressiveRecoveries:0,injuryDeactivations:0,signalDeactivations:0});
       const s=this.settings;
@@ -12317,7 +12344,7 @@ var CPM = (function (exports, module$1) {
       m.state=kind===NORMAL?'normal':kind===TUMOR?'tumor':'immune';m.origin=m.state;m.abnormalAge=0;m.abnormalSince=null;m.transformedAt=null;m.immuneCue=0;m.inflammatorySignal=0;m.inflammatoryExposure=0;
       m.nucleusStrainX=0;m.nucleusStrainY=0;m.fieldBins=new Map();m.sectionFraction=1;m.sectionPressure=0;m.hasNucleus=false;if(genome)this.applyGenome(m);
       m.cycle=newCycle();m.antigenMemory=0;m.il2=0;m.il2Response=0;m.il2Production=0;m.chronicStimulation=0;m.exhaustion=0;
-      m.normalTolerance=1;m.mutationPressure=0;m.immuneEncounters=0;m.immuneContactMemory=0;m.recruitmentExposure=0;m.lastAntigenChange=null;
+      m.normalTolerance=1;m.mutationPressure=0;m.immuneEncounters=0;m.immuneContactMemory=0;m.recruitmentExposure=0;m.lastAntigenChange=null;m.tumorKills=0;
       m.immunePhenotype=kind===IMMUNE?'cytotoxic':null;m.normalDamageExposure=0;m.inhibition=0;m.immuneRefractory=0;m.recruitmentTargetID=0;m.recruitmentTargetBirth=0;
       this.cells[id]=m;this.contacts.set(id,new Map());this.updateMechanics(m);return m;
     }
@@ -12327,7 +12354,7 @@ var CPM = (function (exports, module$1) {
       const m=this.cells[id];if(!m||m.dying||m.kind!==NORMAL||m.state!=='normal')return false;
       // A first stochastic alteration exposes a weak antigen, but retains normal
       // mechanics and metabolism. It does not grant a proliferative phenotype.
-      m.state='abnormal';m.name='异常中间态';m.abnormalSince=this.C.time;m.abnormalAge=0;
+      m.state='abnormal';m.name='癌前细胞';m.abnormalSince=this.C.time;m.abnormalAge=0;
       m.antigenLevel=.2+.35*this.C.random();m.antigen=m.antigenLevel>=.18;
       this.counters.abnormalInitiations++;this.log('abnormal',id,0,{antigen:m.antigenLevel,stress:m.stress,adversity:m.adversity,inflammatoryExposure:m.inflammatoryExposure,inflammation:this.settings.inflammation});return true;
     }
@@ -12852,6 +12879,7 @@ var CPM = (function (exports, module$1) {
       const seen=new Set();
       for(const ctl of this.live()){
         if(ctl.kind!==IMMUNE||ctl.dying)continue;
+        if(dt>0&&this.checkImmuneLifespan(ctl))continue;
         let chosen=null;ctl.targetID=0;ctl.phase='search';
         if(ctl.immunePhenotype==='suppressive'||ctl.immuneRefractory>0){this.updateMechanics(ctl);continue;}
         for(const edge of this.contacts.get(ctl.id)?.values()||[]){
@@ -12870,7 +12898,12 @@ var CPM = (function (exports, module$1) {
           if(chosen.h.recognized){
             ctl.targetID=chosen.target.id;ctl.activation=700;ctl.recruitment=200;ctl.recruitmentTargetID=chosen.target.id;ctl.recruitmentTargetBirth=chosen.target.birth;
             chosen.target.damage+=dt*.012*this.settings.kill*chosen.target.antigenLevel*Math.min(1,chosen.edge.length/(3*this.scale))*ctl.fitness*(1-.8*ctl.exhaustion);
-            if(chosen.target.damage>=1)this.beginDeath(chosen.target.id,'kill');
+            if(chosen.target.damage>=1&&this.beginDeath(chosen.target.id,'kill')){
+              // Credit the contact that commits irreversible death, once per
+              // target birth. Other contributors are not counted as extra kills.
+              Object.assign(chosen.target.deathRecord,{killerID:ctl.id,killerBirth:ctl.birth});
+              if(chosen.target.kind===TUMOR){ctl.tumorKills++;this.checkImmuneLifespan(ctl);}
+            }
           }
         }
         this.updateMechanics(ctl);
@@ -12944,15 +12977,19 @@ var CPM = (function (exports, module$1) {
       return {coverage:freePixels?visitedPixels/freePixels:0,visitedPixels,freePixels,checkedCells:this.patrol.checked.size,currentChecked,currentTargets,scanThreshold:6};
     }
     log(type,id,target=0,detail={}){this.events.push({time:this.C.time,type,id,target,...detail});if(this.events.length>1000)this.events.shift();}
+    checkImmuneLifespan(m){
+      if(m.kind!==IMMUNE||m.dying||!this.settings.immuneKillLimit||m.tumorKills<this.settings.immuneKillLimit)return false;
+      return this.beginDeath(m.id,'lifespan');
+    }
     beginDeath(id,cause){
       const m=this.cells[id];if(!m||m.dying)return false;
       m.dying=true;m.deathCause=cause;m.deathStartedAt=this.C.time;m.targetID=0;m.phase='dying';m.recruitment=0;
       m.deathElapsed=0;m.deathProgress=0;m.deathArea=this.C.getVolume(id);m.deathIntact=cause==='kill';
-      m.deathPhase=cause==='kill'?'rounding':cause==='spontaneous'?'shrinking':'withering';
+      m.deathPhase=cause==='kill'?'rounding':cause==='spontaneous'||cause==='lifespan'?'shrinking':'withering';
       if(m.deathIntact)m.target=m.deathArea/(this.section?m.sectionFraction:1);
       // Keep a separate lifetime ledger: the rolling interaction log cannot
       // serve as a complete death history, and grid IDs may later be reused.
-      m.deathRecord={id,birth:m.birth,kind:m.kind,state:m.state,clone:m.clone,cause,effect:cause==='kill'?'lysis':cause==='spontaneous'?'apoptosis':'stress',startedAt:this.C.time,clearedAt:null};
+      m.deathRecord={id,birth:m.birth,kind:m.kind,state:m.state,clone:m.clone,cause,effect:cause==='kill'?'lysis':cause==='spontaneous'||cause==='lifespan'?'apoptosis':'stress',startedAt:this.C.time,clearedAt:null,...(cause==='lifespan'?{tumorKills:m.tumorKills,killLimit:this.settings.immuneKillLimit}:{})};
       this.deathHistory.push(m.deathRecord);const keys=DEATH_COUNTERS[cause];if(keys)this.counters[keys[0]]++;
       this.section?.forget(id);this.updateMechanics(m);this.log('death-start',id,0,{cause,birth:m.birth});
       for(const ctl of this.live())if(ctl.targetID===id){ctl.targetID=0;ctl.phase='search';this.updateMechanics(ctl);}return true;
@@ -12987,6 +13024,29 @@ var CPM = (function (exports, module$1) {
       for(const [id,body]of occupied)this.eraseCell(id,{manual:true,points:body});
       if(ids.size){this.refreshPositions();this.scanContacts();this.prepareEnvironment();this.section?.updateJunctions(0);this.updateScenarioState();this.record();this.version++;}
       return {removed:ids.size};
+    }
+    eraseAll(points,radius){
+      const empty={removed:0,sources:0,wallPixels:0};
+      if(!Array.isArray(points)||!Number.isFinite(radius)||radius<=0)return empty;
+      const valid=points.filter(p=>Array.isArray(p)&&Number.isFinite(p[0])&&Number.isFinite(p[1])&&p[0]>=0&&p[1]>=0&&p[0]<this.width&&p[1]<this.height);
+      if(!valid.length)return empty;
+      const r=Math.min(radius,64*this.scale),result={...this.eraseCells(valid,r),sources:0,wallPixels:0},bins=new Set(),C=this.C;
+      for(const p of valid){
+        result.sources+=this.removeSources(p[0],p[1],r);let walls=0;
+        for(let dy=-Math.ceil(r);dy<=r;dy++)for(let dx=-Math.ceil(r);dx<=r;dx++)if(dx*dx+dy*dy<=r*r){
+          let x=Math.round(p[0])+dx,y=Math.round(p[1])+dy;if(this.wrap){x=(x%this.width+this.width)%this.width;y=(y%this.height+this.height)%this.height;}
+          if(x<0||y<0||x>=this.width||y>=this.height)continue;
+          const id=C.pixt([x,y]);if(id&&C.cellKind(id)===WALL){C.setpix([x,y],0);walls++;}
+          bins.add(this.fieldIndex(x,y));
+        }
+        result.wallPixels+=walls;
+        if(walls&&this.maze)this.maze.cutouts.push([Math.round(p[0])+.5,Math.round(p[1])+.5,r]);
+      }
+      if(result.wallPixels){C.stat_values={};this.rebuildMask();}
+      // Reset the touched extracellular field bins, not cell memories or history.
+      // Remaining neighboring cells and sources can subsequently replenish them.
+      for(const [name,f]of Object.entries(this.fields))for(const i of bins)f.values[i]=f.blocked[i]?0:(name==='oxygen'||name==='glucose'?1:0);
+      this.version++;return result;
     }
     cleanup(){for(const m of this.live())if(!this.C.getVolume(m.id))this.eraseCell(m.id);}
     countDeath(cause,m){
@@ -13116,6 +13176,7 @@ var CPM = (function (exports, module$1) {
           }
           this.updateMechanics(m);if(this.C.getVolume(m.id)<=3*this.scale*this.scale)this.eraseCell(m.id);continue;
         }
+        if(dt>0&&this.checkImmuneLifespan(m))continue;
         this.evolutionStep(m,dt);this.transformation(m,dt,true);
         if(m.kind===TUMOR){
           const hazard=this.settings.apoptosis/100/1000;
@@ -13160,7 +13221,7 @@ var CPM = (function (exports, module$1) {
       const parts=[];while(remaining.size){const seed=remaining.values().next().value,queue=[seed],part=[];remaining.delete(seed);while(queue.length){const i=queue.pop();part.push(i);for(const n of (this.section?this.faces[i]:this.neighbors[i]))if(remaining.delete(n))queue.push(n);}parts.push(part);}return parts;
     }
     divide(id){
-      const m=this.cells[id];if(!m||m.dying||m.state==='abnormal'||this.C.getVolume(id)<80*this.scale*this.scale||(m.kind===IMMUNE&&m.divisionsLeft<=0))return 0;
+      const m=this.cells[id];if(!m||m.dying||m.state==='abnormal'||this.C.getVolume(id)<80*this.scale*this.scale||(m.kind===IMMUNE&&(m.divisionsLeft<=0||(this.settings.immuneKillLimit>0&&m.tumorKills>=this.settings.immuneKillLimit))))return 0;
       // Relabelling existing cytoplasm is not a new protrusion. Preserve its Act
       // age instead of letting GridManipulator turn the whole daughter red.
       const activity=[];for(const [p,cid] of this.C.pixels())if(cid===id){const i=this.C.grid.p2i(p);activity.push([i,this.act.pxact(i)]);}
@@ -13177,7 +13238,7 @@ var CPM = (function (exports, module$1) {
       const inherited={antigenMemory:m.antigenMemory*.72,exhaustion:m.exhaustion,chronicStimulation:m.chronicStimulation,il2Production:m.il2Production,il2:m.il2,il2Response:m.il2Response,normalTolerance:m.normalTolerance,mutationPressure:m.mutationPressure,immuneEncounters:0,immuneContactMemory:m.immuneContactMemory*.5,recruitmentExposure:m.recruitmentExposure*.5,lastAntigenChange:m.lastAntigenChange};
       Object.assign(inherited,{immunePhenotype:m.immunePhenotype,normalDamageExposure:m.normalDamageExposure*.5,inhibition:m.inhibition,immuneRefractory:m.immuneRefractory});
       for(const c of [m,daughter]){
-        c.cycle=newCycle();Object.assign(c,inherited);
+        c.cycle=newCycle();Object.assign(c,inherited);c.tumorKills=0;
         c.target=this.section?parentTarget*this.C.getVolume(c.id)/parentArea:this.C.getVolume(c.id);c.sectionFraction=parentFraction;c.age=0;c.damage=damage;c.targetID=0;c.phase='search';c.generation=generation;c.clone=m.clone;c.parentBirth=parentBirth;c.birth=++this.birthSerial;c.divisionsLeft=left;
         c.stress=m.stress;c.fitness=m.fitness;c.oxygen=m.oxygen;c.glucose=m.glucose;c.acid=m.acid;c.adversity=m.adversity;c.activation=m.activation;c.recruitment=c===m?m.recruitment:0;
         c.state=m.state;c.origin=m.origin;c.abnormalSince=m.abnormalSince;c.abnormalAge=m.abnormalAge;c.transformedAt=m.transformedAt;c.inflammatorySignal=m.inflammatorySignal;c.inflammatoryExposure=m.inflammatoryExposure;c.nucleusStrainX=m.nucleusStrainX;c.nucleusStrainY=m.nucleusStrainY;
@@ -13218,6 +13279,7 @@ var CPM = (function (exports, module$1) {
     set(name,value){
       if(!(name in DEFAULTS)||!Number.isFinite(value))return;
       if(name==='normalSupport')value=clamp(value,0,100);
+      if(name==='immuneKillLimit')value=Math.round(clamp(value,0,100));
       if(name==='sectionYield')value=clamp(value,0,.5);
       if(name==='stressMutation'||name==='progression')value=clamp(value,0,20);
       if(name==='inflammation')value=clamp(value,0,10);
@@ -13329,7 +13391,7 @@ var CPM = (function (exports, module$1) {
       let phase='',achieved=false;
       if(this.scene==='oncogenesis'||this.scene==='random'){
         achieved=active.length>0&&state.tumorDivisions>0;
-        phase=achieved?'新生肿瘤克隆扩增':active.length?'肿瘤已发生':c.malignantTransitions?'肿瘤已出现，当前无存活肿瘤':c.abnormalInitiations?'已发生异常中间态':maxAdversity>.08?'环境压力累积':'局部资源消耗';
+        phase=achieved?'新生肿瘤克隆扩增':active.length?'肿瘤已发生':c.malignantTransitions?'肿瘤已出现，当前无存活肿瘤':c.abnormalInitiations?'已发生癌前细胞':maxAdversity>.08?'环境压力累积':'局部资源消耗';
       }else if(this.scene==='cold'){
         achieved=far>0&&state.distalDivisions>0&&active.length>state.initial.tumor;
         phase=achieved?'原灶外播散并增殖':far?'肿瘤向原灶外扩散':state.tumorDivisions?'原发灶扩增':'低免疫浸润的原发灶';
@@ -13384,7 +13446,7 @@ var CPM = (function (exports, module$1) {
       this.refreshPositions();const {grid,activity,walls,orphans,visitedPixels,freePixels}=this.snapshotRaster();
       const cells=this.live().map(m=>({id:m.id,kind:m.kind,x:m.x,y:m.y,px:m.px,py:m.py,area:this.C.getVolume(m.id),target:m.target,antigen:m.antigen,antigenLevel:m.antigenLevel,damage:m.damage,dying:m.dying,deathCause:m.deathCause,phase:m.phase,targetID:m.targetID,age:m.age,genome:m.genome?{...m.genome}:null,clone:m.clone,generation:m.generation,divisionsLeft:m.divisionsLeft,activation:m.activation,recruitment:m.recruitment,oxygen:m.oxygen,glucose:m.glucose,acid:m.acid,stress:m.stress,fitness:m.fitness,confinement:m.confinement}));
       for(const c of cells){const m=this.cells[c.id];for(const key of ['sectionFraction','sectionPressure','planarTarget','offPlaneTarget','hasNucleus','nucleusX','nucleusY','nucleusRadius','birth','nucleusStrainX','nucleusStrainY','state','origin','abnormalSince','abnormalAge','transformedAt','adversity','immuneCue','inflammatorySignal','inflammatoryExposure','morphologyMode','branchCount','networkDegree','deathStartedAt','deathPhase','deathProgress','deathIntact'])c[key]=m[key];if(c.kind===IMMUNE){c.patrolChecked=m.patrolCheckedBirth===m.birth?m.patrolChecked||0:0;c.patrolScanning=!!m.patrolScanning;c.patrolTurning=!!m.patrolMotion?.turnTime;}}
-      for(const c of cells){const m=this.cells[c.id];c.cycle={...m.cycle};for(const key of ['antigenMemory','il2','il2Response','il2Production','chronicStimulation','exhaustion','normalTolerance','mutationPressure','immuneEncounters','immuneContactMemory','recruitmentExposure','lastAntigenChange','immunePhenotype','normalDamageExposure','inhibition','immuneRefractory'])c[key]=m[key];}
+      for(const c of cells){const m=this.cells[c.id];c.cycle={...m.cycle};for(const key of ['antigenMemory','il2','il2Response','il2Production','chronicStimulation','exhaustion','normalTolerance','mutationPressure','immuneEncounters','immuneContactMemory','recruitmentExposure','lastAntigenChange','immunePhenotype','normalDamageExposure','inhibition','immuneRefractory','tumorKills'])c[key]=m[key];}
       const fields={};for(const [key,f] of Object.entries(this.fields))fields[key]={width:f.width,height:f.height,values:f.values.slice()};
       const history=this.populationHistory(true),historySamples=this.history.length+(history.at(-1)===this.history.at(-1)?0:1);
       const maze=this.maze?{...this.maze,racers:this.maze.racers.map(r=>({...r,alive:this.cells[r.id]?.birth===r.birth&&!this.cells[r.id].dying})),arrivals:this.maze.arrivals.map(a=>({...a}))}:null;
@@ -13400,7 +13462,7 @@ var CPM = (function (exports, module$1) {
   'use strict';
   const ranges={normalMotility:[0,1.5],tumorMotility:[0,1.5],immuneMotility:[0,1.5],chemotaxis:[0,3],alignment:[0,3],cohesion:[0,3],repulsion:[0,3],immuneSeparation:[0,3],noise:[0,2],halfLife:[20,400],growth:[0,2],apoptosis:[0,30],antigen:[0,100],kill:[0,2],temperature:[2,30],supply:[0,3],metabolism:[0,2],escape:[0,5],recruitment:[0,3],immuneGrowth:[0,1.5],immuneDivisions:[0,6],mutation:[0,100],mutationSize:[0,.5],sectionYield:[0,.5],stressMutation:[0,20],inflammation:[0,10],progression:[0,20],tumorMorphology:[0,2],branchLength:[1.6,4],branchStrength:[0,12],networkAdhesion:[0,2],branching:[0,3]};
   Object.assign(ranges,{tumorCycle:[80,1200],tumorQuiescence:[0,3],immuneCycle:[80,1200],antigenMemory:[100,6000],il2Secretion:[0,3],il2HalfLife:[20,800],exhaustionRate:[0,3]});
-  Object.assign(ranges,{normalSupport:[0,100]});
+  Object.assign(ranges,{normalSupport:[0,100],immuneKillLimit:[0,100]});
   Object.assign(ranges,{normalMutationGain:[0,12],tumorMutationGain:[0,12],mutationBias:[-100,100],antigenStressGain:[0,5],contactEscape:[0,5],signalEscape:[0,5],evolutionMemory:[100,4000]});
   Object.assign(ranges,{damagePolarization:[0,5],damageDeactivation:[0,5],suppressiveSecretion:[0,5],suppressionStrength:[0,5],immuneRegulationMemory:[100,2000],suppressionRecovery:[0,5]});
   const signals=['cohesion','danger','trail','il2','normalDamage','inhibition'];
@@ -13420,13 +13482,14 @@ var CPM = (function (exports, module$1) {
     const worldWidth=number(data.worldWidth,1,1024,'worldWidth'),worldHeight=number(data.worldHeight,1,768,'worldHeight');
     const w=Math.round(worldWidth*refinement),h=Math.round(worldHeight*refinement);if(w<32||w>1024||h<24||h>768)invalid('grid dimensions');
     const settings={},ignored=[];
-    for(const [key,value]of Object.entries(data.settings)){if(!Object.hasOwn(ranges,key)){ignored.push(key);continue;}settings[key]=number(value,...ranges[key],key);if(['immuneDivisions','tumorMorphology'].includes(key)&&!Number.isInteger(value))invalid(key);}
+    for(const [key,value]of Object.entries(data.settings)){if(!Object.hasOwn(ranges,key)){ignored.push(key);continue;}settings[key]=number(value,...ranges[key],key);if(['immuneDivisions','immuneKillLimit','tumorMorphology'].includes(key)&&!Number.isInteger(value))invalid(key);}
     const sources=data.sources===undefined?undefined:data.sources;if(sources!==undefined){if(!Array.isArray(sources)||sources.length>4096)invalid('sources');for(const v of sources){if(!object(v))invalid('source');choice(v.type,[...signals,'oxygen','glucose','acid','nutrient','hostile'],'source.type');number(v.x,0,worldWidth,'source.x');number(v.y,0,worldHeight,'source.y');number(v.radius,2,40,'source.radius');}}
     if(data.maze?.signalThroughWalls!==undefined&&typeof data.maze.signalThroughWalls!=='boolean')invalid('maze.signalThroughWalls');
     const display={},input=data.display??{};if(!object(input))invalid('display');
     if(input.cellColors!==undefined){if(!object(input.cellColors))invalid('cellColors');const colors={};for(const kind of ['normal','abnormal','tumor','immune','activated','suppressive'])if(input.cellColors[kind]!==undefined){if(!object(input.cellColors[kind]))invalid(kind);colors[kind]={};for(const part of ['body','nucleus'])if(input.cellColors[kind][part]!==undefined){const c=input.cellColors[kind][part];if(typeof c!=='string'||!/^#[0-9a-f]{6}$/i.test(c))invalid(kind+'.'+part);colors[kind][part]=c.toLowerCase();}}if(input.cellColors.proliferationShading!==undefined){if(typeof input.cellColors.proliferationShading!=='boolean')invalid('proliferationShading');colors.proliferationShading=input.cellColors.proliferationShading;}display.cellColors=colors;}
     if(input.edgeFade!==undefined)display.edgeFade=number(input.edgeFade,0,100,'edgeFade');
     if(input.autoRandomMinutes!==undefined)display.autoRandomMinutes=number(input.autoRandomMinutes,0,1440,'autoRandomMinutes');
+    if(input.parameterLocks!==undefined){if(!object(input.parameterLocks))invalid('parameterLocks');display.parameterLocks={};for(const [key,value]of Object.entries(input.parameterLocks)){if(!(key in ranges)&&!['boundary','world-size','refinement'].includes(key))continue;if(typeof value!=='boolean')invalid('parameterLocks.'+key);display.parameterLocks[key]=value;}}
     if(input.trackDuration!==undefined)display.trackDuration=number(input.trackDuration,20,2000,'trackDuration');
     if(input.cellMarker!==undefined)display.cellMarker=choice(input.cellMarker,['none','nucleus','antigen','cycle'],'cellMarker');
     if(input.fieldView!==undefined)display.fieldView=choice(input.fieldView,['none','adversity','oxygen','glucose','acid','density'],'fieldView');
@@ -13506,6 +13569,7 @@ async function handle(event){
     }else if(command==='stroke'){
       value=0;for(const p of payload.points||[])value+=sim.paint(p[0],p[1],(payload.erase?5:2)*sim.scale,!!payload.erase,false);sim.rebuildMask();
     }else if(command==='eraseCells')value=sim.eraseCells(payload.points,(Number(payload.radius)||12)*sim.scale);
+    else if(command==='eraseAll')value=sim.eraseAll(payload.points,(Number(payload.radius)||12)*sim.scale);
     else if(command==='move')value=payload.token&&dragSession?.token!==payload.token?{steps:0,blocked:true,stale:true}:sim.moveCell(payload.id,payload.x,payload.y,{elastic:!!payload.elastic,reference:dragSession?.reference});
     else if(command==='pulse')sim.pulse(payload.x,payload.y,payload.channel,payload.radius===undefined?undefined:payload.radius*sim.scale);
     else if(command==='source')value=payload.erase?sim.removeSources(payload.x,payload.y,payload.radius*sim.scale):sim.addSource(payload.x,payload.y,payload.type,payload.radius*sim.scale);
@@ -13664,7 +13728,7 @@ tick();
  * population archive, model clock, RNG or the simulation's cell visibility. */
 (() => {
   'use strict';
-  const types=[['normal','正常','#707c78'],['abnormal','异常','#947743'],['tumor','肿瘤','#36302b'],['immune','免疫','#b95263']];
+  const types=[['normal','正常','#707c78'],['abnormal','癌前','#947743'],['tumor','肿瘤','#36302b'],['immune','免疫','#b95263']];
   const states={
     normal:[['normalLiving','存活','#899992'],['normalDying','清除中','#c4ae86']],
     abnormal:[['abnormalPositive','抗原阳性','#b97758'],['abnormalNegative','抗原阴性','#947743'],['abnormalDying','清除中','#c4ae86']],
@@ -13885,45 +13949,123 @@ globalThis.CellLabSignalGesture=class {
   globalThis.CellLabAppearance={Surface};
 })();
 
-/* Wall-clock exhibition control, outside the seeded simulation. Only discrete
- * biology and population events reset the idle timer; motion/shape, concentration
- * noise, numerical damage and cycle progress are deliberately not activity. */
+/* Wall-clock exhibition control, separate from the seeded biological model.
+ * Both stagnation and extinction announce a cancellable ten-second notice. */
 (() => {
   'use strict';
-  const phases={G0:0,G1:1,S:2,G2:3,M:4};
-  const events=['divisions','immuneDivisions','manualRemoved','kills','apoptosis','environment','apoptosisStarted','killStarted','environmentStarted','mutations','normalTraitMutations','abnormalInitiations','malignantTransitions','antigenExposures','antigenEscapes','suppressiveTransitions','suppressiveRecoveries','injuryDeactivations','signalDeactivations'];
-  function state(c){return (c.kind||0)|(c.state==='abnormal'?4:0)|(c.immunePhenotype==='suppressive'?8:0)|(c.activation>0?16:0)|(c.antigen?32:0)|(c.dying?64:0)|(({spontaneous:1,kill:2,environment:3}[c.deathCause]||0)<<7)|((phases[c.cycle?.phase]||0)<<9)|(c.cycle?.arrest?4096:0);}
+  const phases={G0:0,G1:1,S:2,G2:3,M:4},NOTICE_MS=10000;
+  const events=['divisions','immuneDivisions','manualRemoved','kills','apoptosis','environment','lifespan','apoptosisStarted','killStarted','environmentStarted','lifespanStarted','mutations','normalTraitMutations','abnormalInitiations','malignantTransitions','antigenExposures','antigenEscapes','suppressiveTransitions','suppressiveRecoveries','injuryDeactivations','signalDeactivations'];
+  function state(c){return (c.kind||0)|(c.state==='abnormal'?4:0)|(c.immunePhenotype==='suppressive'?8:0)|(c.activation>0?16:0)|(c.antigen?32:0)|(c.dying?64:0)|(({spontaneous:1,kill:2,environment:3,lifespan:4}[c.deathCause]||0)<<7)|((phases[c.cycle?.phase]||0)<<10)|(c.cycle?.arrest?16384:0);}
   class Controller {
     constructor(){this.minutes=0;this.reset();}
     configure(value,now=0){this.minutes=Number.isFinite(value)&&value>=0&&value<=1440?value:0;this.reset(now);}
-    reset(now=0){this.elapsed=0;this.lastTick=now;this.active=false;this.fired=false;this.observed=null;this.members=new Map();this.eventStamp='';this.epoch=null;this.count=0;}
+    reset(now=0){this.elapsed=0;this.lastTick=now;this.lastActivity=now;this.active=false;this.fired=false;this.observed=null;this.members=new Map();this.eventStamp='';this.epoch=null;this.count=0;this.population={normal:0,abnormal:0,tumor:0,immune:0};this.pendingReason=null;this.noticeElapsed=0;}
     observe(s,now){
       if(!s||s===this.observed)return;
-      const epoch=s.revision+':'+s.seed;
-      if(epoch!==this.epoch||s.time<this.time){this.reset(now);this.epoch=epoch;}
-      let changed=false,count=0;
+      const epoch=s.revision+':'+s.seed;if(epoch!==this.epoch||s.time<this.time){this.reset(now);this.epoch=epoch;}
+      let changed=false,count=0;const population={normal:0,abnormal:0,tumor:0,immune:0};
       for(const c of s.cells)if(c.kind>0&&c.kind<4){
         count++;const key=c.birth??c.id,code=state(c);if(this.members.get(key)!==code)changed=true;
+        if(!c.dying)population[c.kind===1?(c.state==='abnormal'?'abnormal':'normal'):c.kind===2?'tumor':'immune']++;
       }
-      const stamp=events.map(k=>s.counters?.[k]||0).join(',');
-      if(count!==this.count||stamp!==this.eventStamp)changed=true;
-      if(changed){this.elapsed=0;this.lastTick=now;this.members.clear();for(const c of s.cells)if(c.kind>0&&c.kind<4)this.members.set(c.birth??c.id,state(c));}
-      this.count=count;this.eventStamp=stamp;this.time=s.time;this.observed=s;
-      // Pause/resume messages arrive independently of animation frames. Never
-      // charge a paused interval when a frame was delayed or the tab was hidden.
-      if(!s.playing){this.active=false;this.lastTick=now;}
+      const stamp=events.map(k=>s.counters?.[k]||0).join(',');if(count!==this.count||stamp!==this.eventStamp)changed=true;
+      if(changed){this.elapsed=0;this.lastActivity=now;this.members.clear();for(const c of s.cells)if(c.kind>0&&c.kind<4)this.members.set(c.birth??c.id,state(c));if(this.pendingReason==='idle'){this.pendingReason=null;this.noticeElapsed=0;}}
+      this.count=count;this.population=population;this.eventStamp=stamp;this.time=s.time;this.observed=s;
+      if(!s.playing)this.suspend(now);
+    }
+    reason(s){
+      if(!this.count)return 'empty';
+      const p=this.population;
+      if(p.tumor&&!p.normal&&!p.abnormal&&!p.immune)return 'tumor-only';
+      if(!p.immune)return 'no-immune';
+      // Pure immune patrol is the explicit purpose of this preset.
+      if(!p.normal&&s.scene!=='maze')return 'no-normal';
+      return this.elapsed>=this.minutes*60000?'idle':null;
     }
     tick(s,now,allowed=true){
-      this.observe(s,now);const delta=Math.max(0,now-this.lastTick);this.lastTick=now;
+      this.observe(s,now);const previous=this.lastTick,delta=Math.max(0,now-previous);this.lastTick=now;
       if(!this.minutes||!s?.playing||!allowed||this.fired){this.active=false;return null;}
-      if(this.active)this.elapsed+=delta;this.active=true;
-      const reason=this.count===0?'empty':this.elapsed>=this.minutes*60000?'idle':null;
-      if(reason){this.fired=true;this.active=false;}return reason;
+      if(this.active)this.elapsed+=Math.max(0,now-Math.max(previous,this.lastActivity));
+      const reason=this.reason(s);
+      if(reason!==this.pendingReason){this.pendingReason=reason;this.noticeElapsed=0;}
+      else if(reason&&this.active)this.noticeElapsed+=delta;
+      this.active=true;
+      if(reason&&this.noticeElapsed>=NOTICE_MS){this.fired=true;this.active=false;return reason;}return null;
     }
     suspend(now){this.active=false;this.lastTick=now;}
-    status(){return {minutes:this.minutes,elapsedMs:this.elapsed,remainingMs:Math.max(0,this.minutes*60000-this.elapsed),count:this.count,fired:this.fired};}
+    status(){return {minutes:this.minutes,elapsedMs:this.elapsed,remainingMs:Math.max(0,this.minutes*60000-this.elapsed),count:this.count,fired:this.fired,pendingReason:this.pendingReason,countdownMs:this.pendingReason?Math.max(0,NOTICE_MS-this.noticeElapsed):0};}
   }
   globalThis.CellLabAutoRandom={Controller};
+})();
+
+/* Experiment controls and compact round records, never part of the model RNG. */
+(() => {
+  'use strict';
+  const copy=value=>JSON.parse(JSON.stringify(value));
+  class Locks {
+    constructor(keys,saved={}){this.keys=[...keys];this.values={};this.restore(saved);}
+    restore(saved={}){for(const key of this.keys)this.values[key]=saved?.[key]===true;}
+    toggle(key){if(this.keys.includes(key))this.values[key]=!this.values[key];}
+    all(value){for(const key of this.keys)this.values[key]=!!value;}
+    pick(settings){return Object.fromEntries(this.keys.filter(k=>this.values[k]&&settings[k]!==undefined).map(k=>[k,settings[k]]));}
+    toJSON(){return {...this.values};}
+  }
+  function randomGeometry(seed,current,locks){
+    // Setup-only sampling never consumes the simulation's biological RNG.
+    let n=seed>>>0;const pick=values=>{n=(Math.imul(n,1664525)+1013904223)>>>0;return values[Math.floor(n/4294967296*values.length)];};
+    const widths=[192,240,256,320,384].filter(w=>!locks.refinement||(w*current.refinement<=1024&&w*.75*current.refinement<=768));
+    const worldWidth=locks['world-size']?current.worldWidth:pick(widths),worldHeight=locks['world-size']?current.worldHeight:worldWidth*.75;
+    const refinements=[1,1.5,2].filter(r=>worldWidth*r<=1024&&worldHeight*r<=768);
+    return {worldWidth,worldHeight,refinement:locks.refinement?current.refinement:pick(refinements),boundary:locks.boundary?current.boundary:pick(['wrap','solid'])};
+  }
+  function population(s){
+    const p={total:0,normal:0,abnormal:0,tumor:0,immune:0,tumorAntigenPositive:0,tumorAntigenNegative:0,immuneResting:0,immuneActive:0,immuneSuppressive:0,clearing:0,spontaneousClearing:0,environmentClearing:0,killClearing:0,lifespanClearing:0};
+    for(const c of s.cells||[])if(c.kind>0&&c.kind<4){
+      if(c.dying){p.clearing++;const key=c.deathCause+'Clearing';if(key in p)p[key]++;continue;}
+      p.total++;if(c.kind===1)p[c.state==='abnormal'?'abnormal':'normal']++;
+      else if(c.kind===2){p.tumor++;p[c.antigen?'tumorAntigenPositive':'tumorAntigenNegative']++;}
+      else{p.immune++;p[c.immunePhenotype==='suppressive'?'immuneSuppressive':c.activation>0?'immuneActive':'immuneResting']++;}
+    }return p;
+  }
+  class Journal {
+    constructor(){this.active=null;this.serial=0;}
+    begin(s,now,iso=new Date().toISOString(),locks={}){
+      this.active={id:iso+'-'+s.seed+'-'+(++this.serial),scene:s.scene,seed:s.seed,startedAt:iso,endedAt:null,lastSeenAt:iso,reason:'running',worldWidth:s.worldWidth,worldHeight:s.worldHeight,refinement:s.refinement,boundary:s.boundary,initialMCS:s.time,simulatedMCS:s.time,runningMs:0,initialSettings:{...s.settings},finalSettings:{...s.settings},initialLocks:{...locks},finalLocks:{...locks},parameterChanges:[],population:population(s),initialPopulation:population(s),cycles:copy(s.cycles||{}),sources:copy(s.sources||[]),counters:{...s.counters}};
+      this.epoch=s.revision+':'+s.seed;this.lastTick=now;this.running=!!s.playing;return this.current();
+    }
+    observe(s,now,running=true){
+      const a=this.active;if(!a||s.revision+':'+s.seed!==this.epoch)return;
+      if(this.running&&running&&s.playing)a.runningMs+=Math.max(0,now-this.lastTick);this.lastTick=now;this.running=running&&!!s.playing;
+      for(const [key,value]of Object.entries(s.settings))if(a.finalSettings[key]!==value)a.parameterChanges.push({mcs:s.time,key,value});
+      a.finalSettings={...s.settings};a.simulatedMCS=s.time;a.population=population(s);a.counters={...s.counters};a.cycles=copy(s.cycles||{});a.sources=copy(s.sources||[]);a.lastSeenAt=new Date().toISOString();
+    }
+    finish(reason,now,iso=new Date().toISOString(),locks={},display={}){
+      if(!this.active)return null;const a=this.active;a.reason=reason;a.endedAt=iso;a.finalLocks={...locks};a.display=copy(display);this.active=null;this.running=false;return copy(a);
+    }
+    current(){return this.active?copy(this.active):null;}
+  }
+  const reasons={empty:'全部细胞消失','tumor-only':'仅剩肿瘤细胞','no-immune':'免疫细胞为 0','no-normal':'正常细胞为 0',idle:'数量与生物状态长时间不变','manual-random':'手动随机生成','manual-restart':'手动重来','scene-change':'切换情境','preset-reset':'恢复情境','import':'导入参数','external-reset':'重新开局',interrupted:'页面关闭／重新载入',running:'进行中'};
+  const reasonLabel=reason=>reasons[String(reason).replace(/^auto-/,'')]||reason;
+  function csv(records){
+    const params=[...new Set(records.flatMap(r=>[...Object.keys(r.initialSettings),...Object.keys(r.finalSettings)]))].sort();
+    const events=[...new Set(records.flatMap(r=>Object.keys(r.counters)))].sort(),states=Object.keys(population({cells:[]}));
+    const columns=['run_id','started_at','ended_at','reason','reason_label','scene','seed','simulated_MCS','running_seconds','world_width','world_height','refinement','boundary',...states.map(k=>'end.'+k),...params.map(k=>'initial.'+k),...params.map(k=>'final.'+k),...events.map(k=>'event.'+k),'initial_locks','final_locks','parameter_changes','display','cycle_states','field_sources'];
+    const quote=value=>'"'+String(value??'').replaceAll('"','""')+'"';
+    return '\uFEFF'+[columns,...records.map(r=>[r.id,r.startedAt,r.endedAt,r.reason,reasonLabel(r.reason),r.scene,r.seed,r.simulatedMCS,(r.runningMs/1000).toFixed(3),r.worldWidth,r.worldHeight,r.refinement,r.boundary,...states.map(k=>r.population[k]||0),...params.map(k=>r.initialSettings[k]),...params.map(k=>r.finalSettings[k]),...events.map(k=>r.counters[k]||0),JSON.stringify(r.initialLocks),JSON.stringify(r.finalLocks),JSON.stringify(r.parameterChanges),JSON.stringify(r.display||{}),JSON.stringify(r.cycles||{}),JSON.stringify(r.sources||[])])].map(row=>row.map(quote).join(',')).join('\r\n')+'\r\n';
+  }
+  // Store compact records, not grids or movies. Completed rounds are never
+  // truncated to a display buffer; pagination only limits rendered rows.
+  function openStore(){
+    let tabKey;try{tabKey=sessionStorage.getItem('cell-arena-round-tab');if(!tabKey){tabKey=crypto.randomUUID();sessionStorage.setItem('cell-arena-round-tab',tabKey);}}catch{tabKey='tab-'+Date.now()+'-'+Math.random();}
+    const database=new Promise((resolve,reject)=>{const request=indexedDB.open('cell-arena-rounds',1);request.onupgradeneeded=()=>{request.result.createObjectStore('rounds',{keyPath:'id'});request.result.createObjectStore('active');};request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});
+    async function transaction(action){const db=await database;return new Promise((resolve,reject)=>{const tx=db.transaction(['rounds','active'],'readwrite');let result;action(tx,value=>result=value);tx.oncomplete=()=>resolve(result);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);});}
+    return {
+      load:()=>transaction((tx,done)=>{const all=tx.objectStore('rounds').getAll();all.onsuccess=()=>{const active=tx.objectStore('active').get(tabKey);active.onsuccess=()=>{const records=all.result;if(active.result&&!records.some(r=>r.id===active.result.id)){const r={...active.result,reason:'interrupted',endedAt:active.result.lastSeenAt};tx.objectStore('rounds').put(r);records.push(r);}tx.objectStore('active').delete(tabKey);done(records);};};}),
+      checkpoint:r=>transaction(tx=>{if(r)tx.objectStore('active').put(r,tabKey);}),
+      archive:r=>transaction(tx=>{tx.objectStore('rounds').put(r);tx.objectStore('active').delete(tabKey);})
+    };
+  }
+  globalThis.CellLabRounds={Locks,Journal,randomGeometry,population,csv,reasonLabel,openStore};
 })();
 
 /* UI-only translation. No model state, random stream or simulation clock is read
@@ -13934,6 +14076,60 @@ globalThis.CellLabSignalGesture=class {
   function add(rows){for(const line of rows.trim().split('\n')){const at=line.indexOf('|');if(at>0)dictionary.set(line.slice(0,at),line.slice(at+1));}}
   add(`
 Cell-Arena · 细胞生态竞技场|Cell-Arena · Cell ecology playground
+免疫寿命：杀伤上限|Immune lifespan: kill limit
+累计致死指定数量的肿瘤后皱缩凋亡；0 关闭。只记实际致死接触，每颗肿瘤一次；分裂后两颗子代各自从 0 计数|Shrink and die after this many tumor kills; 0 disables. Each tumor is credited once to its lethal contact. Both newborn daughters start at zero.
+寿命凋亡|Lifespan apoptosis
+达到累计肿瘤杀伤上限|Tumor kill limit reached
+累计致死肿瘤|Tumors killed
+不限|Unlimited
+全部锁定|Lock all
+全部解锁|Unlock all
+已锁定：随机开局保持此参数|Locked: keep this parameter when randomizing
+未锁定：随机开局允许随机化|Unlocked: allow this parameter to randomize
+锁定参数在自动换局与随机生成时保持不变|Locked parameters stay fixed in automatic and manual random rounds
+当前存活|Living now
+选中|Selected
+体细胞|Somatic
+演化参数|Model parameters
+显示设置|Display settings
+五组演化参数|Five model parameter groups
+免疫状态|Immune states
+本局走势|This round
+历局结果|Past rounds
+历局记录保存在本机|Round history is saved on this device
+导出 CSV|Export CSV
+较新|Newer
+较早|Older
+换局后在这里比较历局结果；CSV 也包含当前进行中的一局。|Compare completed rounds here. CSV also includes the current round.
+本局累计|Cumulative events
+细胞分裂|Divisions
+抗原逃逸|Antigen escape
+死亡清除|Deaths cleared
+免疫巡逻与细胞周期|Patrol and cell cycle
+已检查|Checked
+演化事件|Evolution events
+死亡明细|Death details
+环境死亡其中|Environmental deaths by type
+存活数不含死亡过程中的胞体；死亡清除在胞体消失时计数。寿命凋亡独立于肿瘤自发凋亡。|Living counts exclude dying bodies. Clearance is counted when a body disappears. Lifespan apoptosis is separate from spontaneous tumor apoptosis.
+运行与开局|Runtime and setup
+即将随机换局|New random round soon
+已暂停倒计时|Countdown paused
+继续本局 · 关闭自动换局|Keep this round · Disable auto restart
+全部细胞消失|All cells disappeared
+仅剩肿瘤细胞|Only tumor cells remain
+免疫细胞为 0|No living immune cells
+正常细胞为 0|No living normal cells
+数量与生物状态长时间不变|Population and biological states stayed unchanged
+手动随机生成|Manual randomization
+手动重来|Manual restart
+切换情境|Scenario changed
+恢复情境|Preset restored
+重新开局|New setup
+页面关闭／重新载入|Page closed / reloaded
+进行中|In progress
+已按未锁定参数随机开启新一轮|Started a new round with unlocked parameters randomized
+历史记录暂时无法保存到本机，仍可导出本页 CSV|Local history storage is unavailable. You can still export this page's CSV.
+0 关闭。无变化超时、全部消失、仅剩肿瘤、免疫为 0 或正常为 0 时，提示 10 秒后换局；迷宫不检查正常细胞，暂停和后台不计时。|0 disables. Stagnation, no cells, tumor-only, no immune cells or no normal cells starts a 10-second notice. The maze skips normal-cell checks. Paused and hidden time is excluded.
 边缘淡化|Edge translucency
 沿当前胞体轮廓由内向外渐透明；0% 为纯色。Act 和标记独立显示。|Fade outward along the current cell shape; 0% restores solid color. Act and markers remain independent.
 无变化|Idle
@@ -13966,7 +14162,7 @@ Arena 培养皿|Arena culture dish
 ▶ 继续|▶ Resume
 单步|Step
 ↺ 重来|↺ Reset
-播放|Speed
+速度|Speed
 鼠标工具|Mouse tools
 ↑ 展开面板|↑ Expand panel
 ↓ 返回画布|↓ Back to arena
@@ -13977,13 +14173,13 @@ Arena 培养皿|Arena culture dish
 显示|Display
 环境|Environment
 次|times
-↔ 拖动细胞|↔ Move
-＋ 新增细胞|＋ Add cells
-◉ 释放信号|◉ Signals
-▥ 绘制障碍|▥ Walls
+↔ 拖动|↔ Drag
+＋ 新增|＋ Add
+◉ 信号|◉ Signal
+▥ 障碍|▥ Walls
 ⌫ 擦除障碍|⌫ Erase walls
-⌾ 观察细胞|⌾ Inspect
-⌫ 擦除细胞|⌫ Erase cells
+⌾ 追踪|⌾ Track
+⌫ 擦除|⌫ Erase
 ✥ 平移视野|✥ Pan
 拖动时暂停 · 邻居让位 · 实体墙阻挡|Drag pauses time; neighbors yield; walls block
 拖动时暂停 · 邻居让位 · 松手恢复|Drag pauses time; release to resume
@@ -13991,14 +14187,14 @@ Arena 培养皿|Arena culture dish
 单击释放因子 · 拖动画出信号带|Click to release a signal; drag to paint a trail
 在空白处拖动画墙|Drag across empty space to draw walls
 拖动擦除实体障碍|Drag to erase solid walls
-擦除触及的整颗细胞 · 单独记账|Erase whole cells touched by the brush; counted separately
+擦除细胞、场源与障碍 · 重置局部环境|Erase cells, sources and walls; reset local fields
 按住拖动平移视野 · 不改变细胞位置|Drag to pan the view without moving cells
 点击细胞查看状态与局部环境|Click a cell to inspect its state and environment
 新增类型|Cell type
 正常细胞|Normal cells
 肿瘤细胞|Tumor cells
 免疫细胞|Immune cells
-异常中间态|Abnormal cells
+癌前细胞|Precancerous cells
 未激活免疫细胞|Resting immune cell
 已激活免疫细胞|Activated immune cell
 未激活免疫|Resting immune
@@ -14096,7 +14292,7 @@ Act · 标记 · 环境分量|Act / markers / fields
 细胞配色方案|Cell color palettes
 原始配色|Original palette
 自定义配色|Custom palette
-预览从左到右：正常 · 异常 · 肿瘤 · 免疫 · 激活|Preview: normal / abnormal / tumor / immune / activated
+预览从左到右：正常 · 癌前 · 肿瘤 · 免疫 · 激活|Preview: normal / precancerous / tumor / immune / activated
 类型 / 状态|Type / state
 胞体|Body
 胞核|Nucleus
@@ -14119,7 +14315,7 @@ Act · 标记 · 环境分量|Act / markers / fields
 自动 · 实测选择|Auto · Benchmark
 数量与事件统计|Population & events
 正常|Normal
-异常|Abnormal
+癌前|Precancerous
 肿瘤|Tumor
 免疫|Immune
 其中激活|Activated
@@ -14200,7 +14396,7 @@ Artistoo · 来源与许可|Artistoo · Sources & licenses
 肿瘤扩张|Tumor expansion
 通道搜索|Channel search
 密度与逃逸|Density & escape
-异常监视|Abnormal cell surveillance
+癌前监视|Precancerous cell surveillance
 胶质瘤样分枝成网|Glioma-like branching network
 局部通讯如何改变行为|How local communication shapes behavior
 代码来源、版本与许可|Code sources, versions & licenses
@@ -14247,7 +14443,7 @@ CPM 温度，影响随机复制尝试的接受率|CPM temperature; controls acce
 恶劣环境逃逸|Escape from adverse conditions
 沿局部氧糖上升、酸负荷下降的方向重新极化|Repolarize toward higher local nutrients and lower acid load
 识别后招募信号|Recruitment after recognition
-实际接触识别异常或肿瘤后分泌；仅被吸引者不自动接力|Secreted after contact recognition; attracted cells do not automatically relay the signal
+实际接触识别癌前或肿瘤后分泌；仅被吸引者不自动接力|Secreted after contact recognition; attracted cells do not automatically relay the signal
 激活后免疫生长|Activated immune growth
 接触识别后才有自动克隆扩增，受代谢状态限制|Clonal expansion requires contact recognition and is limited by metabolism
 新免疫细胞分裂预算|New immune cell division limit
@@ -14256,12 +14452,12 @@ CPM 温度，影响随机复制尝试的接受率|CPM temperature; controls acce
 肿瘤分裂时分别抽样耐受、增殖、侵袭和抗原表达|Tolerance, proliferation, invasion and antigen expression mutate independently at division
 突变幅度|Mutation size
 随机双向变异；环境选择存活者，不定向创造突变|Random changes in either direction; the environment selects survivors without directing mutations
-环境损伤致异常|Stress-induced abnormality
-持续代谢损伤提高正常 → 异常风险；0 关闭此通路，炎性通路独立设置|Sustained metabolic damage raises normal → abnormal risk; 0 disables this pathway, independently of inflammation
+环境损伤致癌前|Stress-induced precancerous change
+持续代谢损伤提高正常 → 癌前风险；0 关闭此通路，炎性通路独立设置|Sustained metabolic damage raises normal → precancerous risk; 0 disables this pathway, independently of inflammation
 炎性信号促癌|Inflammation-associated transformation
-局部损伤／免疫招募信号持续累积后增加正常 → 异常风险；0 关闭，仍经过异常中间态。未标定的炎症代理|Sustained damage/recruitment signals increase normal → abnormal risk. 0 disables this uncalibrated inflammation proxy.
-异常 → 肿瘤风险倍率|Abnormal → tumor risk multiplier
-异常至少保留 160 MCS；倍率调整后仍是随机事件，0 保留中间态|Abnormal cells persist for at least 160 MCS; progression remains stochastic. 0 retains the intermediate state.
+局部损伤／免疫招募信号持续累积后增加正常 → 癌前风险；0 关闭，仍经过癌前细胞。未标定的炎症代理|Sustained damage/recruitment signals increase normal → precancerous risk. 0 disables this uncalibrated inflammation proxy.
+癌前 → 肿瘤风险倍率|Precancerous → tumor risk multiplier
+癌前至少保留 160 MCS；倍率调整后仍是随机事件，0 保留中间态|Precancerous cells persist for at least 160 MCS; progression remains stochastic. 0 retains the intermediate state.
 切面让位上限|Maximum section yielding
 受邻居推挤时减少可见目标面积，压力解除后逐步恢复；总生物量保留|Reduce visible target area under crowding, then recover gradually; total target biomass is retained
 突起延伸范围|Protrusion reach
@@ -14285,7 +14481,7 @@ CPM 温度，影响随机复制尝试的接受率|CPM temperature; controls acce
 从开局到当前时刻；每 30 MCS 采样，手动新增／分裂即时记入，当前数量实时补齐。长记录绘图保留峰谷，导出包含完整采样。|From the start to the present: sampled every 30 MCS, with manual additions/divisions recorded immediately and current counts appended. Long plots preserve extrema; exports retain all samples.
 情境进度与开局|Scenario progress & setup
 情境设定与实际进度|Scenario setup and observed progress
-正常、异常、肿瘤和免疫细胞数量随模型时间变化|Normal, abnormal, tumor and immune populations over model time
+正常、癌前、肿瘤和免疫细胞数量随模型时间变化|Normal, precancerous, tumor and immune populations over model time
 可拖动细胞、点击播种、添加信号或绘制障碍的交互培养皿|Interactive dish: drag or add cells, release signals and draw walls
 可遗传的增殖性状，固定范围 0.25–3；实际增殖还受营养、压力与全局生长参数影响|Inherited proliferation trait, fixed range 0.25–3. Actual growth also depends on nutrients, stress and the growth parameter.
 加载后按文件中的情境、种子和参数重新开局并暂停，不恢复导出时的细胞布置、障碍、浓度场或统计历史。|Load the saved scenario, seed and parameters as a new paused run. This does not restore the exported cell layout, walls, concentration fields or history.
@@ -14343,7 +14539,7 @@ Act：红＝新生突起 → 黄 → 绿＝活性衰减；零活性恢复胞体�
 代谢效能|Metabolic fitness
 累积压力|Accumulated stress
 邻接拥挤|Crowding
-异常已持续|Abnormal for
+癌前已持续|Precancerous for
 尚未获得肿瘤增殖／侵袭表型|No tumor growth or invasion phenotype yet
 可被接触识别|Recognizable by contact
 低于识别阈值|Below recognition threshold
@@ -14364,14 +14560,14 @@ Act：红＝新生突起 → 黄 → 绿＝活性衰减；零活性恢复胞体�
 个邻居| neighbors
 杀伤损伤|Cytotoxic damage
 抗原阳性|Antigen-positive
-异常发生|Abnormal transitions
+癌前发生|Precancerous transitions
 恶性转变|Malignant transitions
 肿瘤分裂|Tumor divisions
 存活肿瘤|Living tumors
 原灶外肿瘤|Tumors beyond origin
 远端分裂|Distal divisions
 残留肿瘤胞体|Remaining tumor bodies
-异常免疫清除|Abnormal cells killed
+癌前免疫清除|Precancerous cells killed
 免疫清除|Immune clearances
 清除后观察|Observation after clearance
 免疫分裂|Immune divisions
@@ -14448,7 +14644,7 @@ GPU（含传输）|GPU (including transfers)\u0020
 局部规则已更新；变化会逐步形成|Local rules updated; changes develop gradually
 情境：|Scenario:\u0020
 录制中|Recording
-纯正常上皮，中心酸清除弱、氧糖补给略低，外围环境较好。局部代谢压力经异常中间态推动随机癌变；新生肿瘤采用较高遗传耐受基线，观察存活克隆向外围扩增。|Normal epithelium with poor acid clearance and lower nutrient supply in the center. Local stress drives stochastic transformation through an abnormal state. New tumors have a higher tolerance baseline; surviving clones can expand outward.
+纯正常上皮，中心酸清除弱、氧糖补给略低，外围环境较好。局部代谢压力经癌前细胞推动随机癌变；新生肿瘤采用较高遗传耐受基线，观察存活克隆向外围扩增。|Normal epithelium with poor acid clearance and lower nutrient supply in the center. Local stress drives stochastic transformation through a precancerous state. New tumors have a higher tolerance baseline; surviving clones can expand outward.
 正常细胞铺满背景，中央嵌入 19 颗低抗原肿瘤，外围仅 3 颗免疫细胞。梭形肿瘤在有限组织让位下侵袭、扩增；招募与扩增支持较弱。这是二维局部播散代理，不含血管或跨器官转移。|A confluent normal sheet contains 19 central low-antigen tumors and only 3 peripheral immune cells. Spindle-shaped tumors invade and grow through bounded tissue yielding, with weak recruitment and expansion support. This is a 2D local-spread proxy, without vascular or cross-organ metastasis.
 正常细胞铺满背景，中央嵌入 37 颗高抗原肿瘤，18 颗免疫细胞分散在病灶周边的组织内。通过接触识别、局部招募及 IL-2 支持的有限扩增清除肿瘤；关闭杀伤可作对照。|A confluent normal sheet contains 37 central high-antigen tumors and 18 immune cells in the surrounding tissue. Contact recognition, local recruitment and IL-2-supported limited expansion support clearance; turn off killing for a control.
 `);
@@ -14456,7 +14652,7 @@ GPU（含传输）|GPU (including transfers)\u0020
 新生肿瘤克隆扩增|New tumor clone expansion
 肿瘤已发生|Tumor has emerged
 肿瘤已出现，当前无存活肿瘤|Tumors emerged; none currently alive
-已发生异常中间态|Abnormal intermediate state emerged
+已发生癌前细胞|Precancerous intermediate state emerged
 环境压力累积|Environmental stress accumulating
 局部资源消耗|Local resource consumption
 原灶外播散并增殖|Spread and proliferation beyond the origin
@@ -14483,7 +14679,7 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
     [/^观察谱系：相对第 (\d+) 代 · 标记 (\d+) 颗$/,(_,g,n)=>`Observed family: relative generation ${g} · ${n} cells marked`],
     [/^首达 #([\d/]+) · (\d+) MCS$/,(_,n,t)=>`First #${n} · ${t} MCS`],
     [/^(减小|增大)(.+)$/,(_,action,name)=>`${action==='减小'?'Decrease':'Increase'} ${translate(name)}`],
-    [/^(正常细胞|异常中间态|肿瘤细胞|未激活免疫|已激活免疫)(胞体|胞核)颜色$/,(_,type,part)=>`${dictionary.get(type)} ${dictionary.get(part).toLowerCase()} color`],
+    [/^(正常细胞|癌前细胞|肿瘤细胞|未激活免疫|已激活免疫)(胞体|胞核)颜色$/,(_,type,part)=>`${dictionary.get(type)} ${dictionary.get(part).toLowerCase()} color`],
     [/^应用(.+)配色$/,(_,name)=>`Apply ${translate(name)} palette`],
     [/^最近 (\d+) 颗清除：(.+)$/,(_,n,causes)=>`${n} recent clearances: ${translate(causes)}`],
     [/^(.+) MCS · #(\d+) · (自发凋亡|免疫杀伤|环境死亡) · 已清除（(.+) MCS 触发）$/,(_,t,id,cause,start)=>`${t} MCS · #${id} · ${translate(cause)} · Cleared (triggered at ${start} MCS)`],
@@ -14497,7 +14693,7 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
     [/^当前稳定接触 ([\d.]+) 对；各细胞保持独立胞体。$/,(_,n)=>`${n} stable contacts; cell bodies remain separate.`],
     [/^视频已导出 · (\d+) 秒 · ([\d.]+) MB$/,(_,s,mb)=>`Video saved · ${s} s · ${mb} MB`],
     [/^视频已导出 · (MP4|WebM) · (\d+) × (\d+) · (\d+) 秒 · ([\d.]+) MB$/,(_,format,w,h,s,mb)=>`Video saved · ${format} · ${w} × ${h} · ${s} s · ${mb} MB`],
-    [/^正常、异常、肿瘤和免疫细胞数量：从 0 到 (\d+) MCS 的完整过程$/,(_,t)=>`Normal, abnormal, tumor and immune populations from 0 to ${t} MCS`]
+    [/^正常、癌前、肿瘤和免疫细胞数量：从 0 到 (\d+) MCS 的完整过程$/,(_,t)=>`Normal, precancerous, tumor and immune populations from 0 to ${t} MCS`]
   ];
   add(`
 免疫巡逻统计|Immune patrol statistics
@@ -14505,7 +14701,7 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
 累计检查的不同细胞|Distinct cells inspected
 巡逻统计口径|How patrol is measured
 覆盖率＝免疫胞体实际经过的面积／当前非障碍面积，封闭区域仍计入分母。拖动路径不计入自主巡逻。|Coverage = area occupied by patrolling immune bodies / current non-wall area, including enclosed regions. Manual drag paths do not count.
-检查需连续膜接触累积达到 6 个有效 MCS，按接触长度和代谢效能加权。正常、异常、肿瘤均可计入；按出生身份去重，分裂子代重新统计。已检查不等于已识别抗原。|Inspection requires 6 effective MCS of uninterrupted membrane contact, weighted by contact length and metabolic fitness. Normal, abnormal and tumor cells count once per birth identity; daughters count separately. Inspection does not imply antigen recognition.
+检查需连续膜接触累积达到 6 个有效 MCS，按接触长度和代谢效能加权。正常、癌前、肿瘤均可计入；按出生身份去重，分裂子代重新统计。已检查不等于已识别抗原。|Inspection requires 6 effective MCS of uninterrupted membrane contact, weighted by contact length and metabolic fitness. Normal, precancerous and tumor cells count once per birth identity; daughters count separately. Inspection does not imply antigen recognition.
 巡逻转向|Patrol reorientation
 巡逻接触扫描|Patrol contact scanning
 持续巡逻|Persistent patrol
@@ -14531,7 +14727,7 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
 轨迹保留时长|Trail duration
 开启后记录；按模拟时间保留，暂停时不消退。|Recorded while enabled, retained in model time; trails do not fade while paused.
 免疫迷宫需要至少 144 的区域短边|The maze needs a world with its shorter side at least 144 units
-正常细胞铺满培养皿，4 颗免疫细胞分散在单层内部。中心酸清除弱、氧糖补给略低；局部代谢压力经异常中间态推动随机癌变，免疫细胞进行接触监视。|Normal cells fill the dish with 4 immune cells dispersed inside the monolayer. Reduced central acid clearance and nutrient supply allow local stress to drive stochastic transformation through an abnormal state, under contact-based immune surveillance.
+正常细胞铺满培养皿，4 颗免疫细胞分散在单层内部。中心酸清除弱、氧糖补给略低；局部代谢压力经癌前细胞推动随机癌变，免疫细胞进行接触监视。|Normal cells fill the dish with 4 immune cells dispersed inside the monolayer. Reduced central acid clearance and nutrient supply allow local stress to drive stochastic transformation through a precancerous state, under contact-based immune surveillance.
 圆心持续释放最强招募信号，入口清除信号；开局已建立沿通道扩散的浓度场。6 颗免疫细胞从等距入口出发，仅凭局部梯度与随机探索前进，胞核进入中心终点区计时。|The center maintains a maximal recruitment source and entrances drain the signal. Diffusion through the passages is equilibrated before the race. Six immune cells start at evenly spaced entrances, using local gradients and random exploration. Arrival is recorded when the nucleus enters the central finish zone.
 `);
   add(`
@@ -14541,7 +14737,7 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
 抗原轮廓|Antigen outline
 周期文字|Cycle labels
 红色轮廓：抗原可识别|Red outline: recognizable antigen
-红色细线标出可识别抗原的肿瘤和异常细胞|Thin red outlines mark tumor and abnormal cells with recognizable antigen
+红色细线标出可识别抗原的肿瘤和癌前细胞|Thin red outlines mark tumor and precancerous cells with recognizable antigen
 不显示|None
 细胞核|Nuclei
 细胞周期阶段|Cell cycle phase
@@ -14619,7 +14815,7 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
 持续招募暴露|Sustained recruitment exposure
 `);
   add(`
-正常细胞铺满培养皿，4 颗免疫细胞分散在单层内部。中心酸清除弱、氧糖补给略低；代谢与炎症压力提高随机变异，经异常中间态产生肿瘤；耐受变异、细胞死亡与免疫监视共同筛选存活克隆。|Normal cells fill the dish with 4 dispersed immune cells. Reduced central acid clearance and nutrient supply cause local stress. Metabolic and inflammatory pressure increase variation through an abnormal intermediate; tolerance variation, death and immune surveillance select surviving clones.
+正常细胞铺满培养皿，4 颗免疫细胞分散在单层内部。中心酸清除弱、氧糖补给略低；代谢与炎症压力提高随机变异，经癌前细胞产生肿瘤；耐受变异、细胞死亡与免疫监视共同筛选存活克隆。|Normal cells fill the dish with 4 dispersed immune cells. Reduced central acid clearance and nutrient supply cause local stress. Metabolic and inflammatory pressure increase variation through a precancerous intermediate; tolerance variation, death and immune surveillance select surviving clones.
 正常细胞铺满背景，中央嵌入 19 颗低抗原肿瘤，外围仅 3 颗免疫细胞。梭形肿瘤侵袭扩增，压力提高性状变异，部分克隆可能暴露抗原；免疫招募较弱。这是二维局部播散，不含血管或跨器官转移。|A confluent normal sheet contains 19 central low-antigen tumors and 3 peripheral immune cells. Spindle tumors invade and expand; stress increases trait variation and may expose antigen, under weak recruitment. A 2D local-spread model, without vascular or cross-organ metastasis.
 正常细胞铺满背景，中央嵌入 37 颗高抗原肿瘤，18 颗免疫细胞分散在病灶周边的组织内。接触识别、招募及 IL-2 扩增支持早期清除；少数存活克隆可能丢失抗原并再次扩增。结局随种子改变，关闭杀伤可作对照。|A confluent normal sheet contains 37 central antigen-positive tumors and 18 surrounding immune cells. Contact recognition, recruitment and IL-2 support early clearance; occasional survivors may lose antigen and regrow. Outcomes vary by seed. Turn killing off for a control.
 `);
@@ -14706,8 +14902,8 @@ Arena ＋ 右侧栏|Arena + sidebar
 组合录制包含侧栏当前可见的内容；统计可先占满侧栏。Arena 30 FPS，侧栏最多每秒刷新 5 次。|Combined capture includes the currently visible sidebar. Expand statistics first for a dashboard view. Arena: 30 FPS; sidebar: up to 5 updates/second.
 用于本地绘制录像中的实时侧栏。|Renders the live sidebar locally for video capture.
 随机肿瘤演化|Random tumor development
-密铺正常组织与 12 颗分散免疫细胞，从零肿瘤开始。三处供给较弱的区域与健康边缘形成差异；异常、癌变、免疫清除、抑制与恢复相互竞争，逃逸克隆可能再次扩增。没有定时转变或预设结局。|Confluent normal tissue and 12 dispersed immune cells, starting without tumors. Three low-supply niches contrast with healthy edges. Abnormal change, malignancy, clearance, suppression and recovery compete; escape clones may expand again. No scheduled transitions or predetermined outcome.
-随机化的密铺正常组织、12–16 颗内部免疫细胞与三处弱供给区域。参数在发生发展附近抽样，肿瘤必须由局部异常产生；相同种子和参数可重现开局，结局由局部相互作用产生。|Randomized confluent normal tissue, 12–16 internal immune cells and three low-supply niches. Parameters are sampled near the development preset; tumors must arise from local abnormal cells. Seed and parameters reproduce the start; local interactions determine the course.
+密铺正常组织与 12 颗分散免疫细胞，从零肿瘤开始。三处供给较弱的区域与健康边缘形成差异；癌前、癌变、免疫清除、抑制与恢复相互竞争，逃逸克隆可能再次扩增。没有定时转变或预设结局。|Confluent normal tissue and 12 dispersed immune cells, starting without tumors. Three low-supply niches contrast with healthy edges. Precancerous change, malignancy, clearance, suppression and recovery compete; escape clones may expand again. No scheduled transitions or predetermined outcome.
+随机化的密铺正常组织、12–16 颗内部免疫细胞与三处弱供给区域。参数在发生发展附近抽样，肿瘤必须由局部癌前产生；相同种子和参数可重现开局，结局由局部相互作用产生。|Randomized confluent normal tissue, 12–16 internal immune cells and three low-supply niches. Parameters are sampled near the development preset; tumors must arise from local precancerous cells. Seed and parameters reproduce the start; local interactions determine the course.
 `);
   add(`
 历史曲线显示类型|History plot populations
@@ -14718,7 +14914,7 @@ Arena ＋ 右侧栏|Arena + sidebar
 细胞数量|Cell counts
 百分比|Percent
 正常状态|Normal states
-异常状态|Abnormal states
+癌前状态|Precancerous states
 肿瘤状态|Tumor states
 免疫状态|Immune states
 存活|Living
@@ -14741,6 +14937,20 @@ Arena ＋ 右侧栏|Arena + sidebar
 单击瞬释 · 长按连释 · 双击建源|Tap: pulse · Hold: release · Double tap: source
 局部信号影响运动方向；肿瘤也趋向高氧、高糖|Local signals steer motion; tumors also move toward higher oxygen and glucose.
 `);
+  add(`
+随机|Random
+换局等待时间|Round wait time
+颗|cells
+分钟|minutes
+擦除整颗细胞、触及的场源和局部障碍，并重置局部环境；手动移除不计入生物学死亡|Erase whole cells, touched sources and wall pixels; reset local fields. Manual removal is separate from biological deaths.
+`);
+  add(`
+导入与导出|Import and export
+导出历局 CSV|Export rounds CSV
+录制视频|Record video
+展开面板|Expand panel
+返回画布|Back to arena
+`);
   function mount(control){
     let language='zh';try{if(localStorage.getItem('cell-arena-language')==='en')language='en';}catch{}
     const texts=new WeakMap(),attributes=new WeakMap(),names=['title','aria-label','placeholder'];
@@ -14748,10 +14958,10 @@ Arena ＋ 右侧栏|Arena + sidebar
     function textNode(node){if(skip(node.parentElement))return;const value=node.nodeValue,previous=texts.get(node),source=previous&&previous.result===value?previous.source:value,result=translate(source,language);texts.set(node,{source,result});if(value!==result)node.nodeValue=result;}
     function attribute(element,name){if(skip(element)||!element.hasAttribute(name))return;let record=attributes.get(element);if(!record){record={};attributes.set(element,record);}const value=element.getAttribute(name),previous=record[name],source=previous&&previous.result===value?previous.source:value,result=translate(source,language);record[name]={source,result};if(value!==result)element.setAttribute(name,result);}
     function walk(root){if(root.nodeType===3){textNode(root);return;}if(root.nodeType!==1&&root.nodeType!==9)return;if(root.nodeType===1){if(skip(root))return;for(const name of names)attribute(root,name);}const walker=document.createTreeWalker(root,NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT);while(walker.nextNode()){const n=walker.currentNode;if(n.nodeType===3)textNode(n);else for(const name of names)attribute(n,name);}}
-    function set(value){language=value==='en'?'en':'zh';control.value=language;document.documentElement.lang=language==='en'?'en':'zh-CN';document.title=translate('Cell-Arena · 细胞生态竞技场',language);for(const block of document.querySelectorAll('[data-language]'))block.hidden=block.dataset.language!==language;walk(document.body);try{localStorage.setItem('cell-arena-language',language);}catch{}}
+    function set(value){language=value==='en'?'en':'zh';control.value=language;control.textContent=language==='en'?'Eng':'Chi';control.title=language==='en'?'切换为中文':'Switch to English';control.setAttribute('aria-label',control.title);document.documentElement.lang=language==='en'?'en':'zh-CN';document.title=translate('Cell-Arena · 细胞生态竞技场',language);for(const block of document.querySelectorAll('[data-language]'))block.hidden=block.dataset.language!==language;walk(document.body);try{localStorage.setItem('cell-arena-language',language);}catch{}}
     const observer=new MutationObserver(records=>{for(const m of records){if(m.type==='characterData')textNode(m.target);else if(m.type==='attributes')attribute(m.target,m.attributeName);else for(const node of m.addedNodes)walk(node);}});
     observer.observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:names});
-    control.addEventListener('change',()=>set(control.value));set(language);
+    control.addEventListener('change',()=>set(control.value));control.addEventListener('click',()=>set(language==='en'?'zh':'en'));set(language);
     return {set,get language(){return language;},refresh:()=>walk(document.body)};
   }
   globalThis.CellLabI18n={translate,mount,missing};
@@ -14797,7 +15007,7 @@ Arena ＋ 右侧栏|Arena + sidebar
     const base=hexRGB(palette[colorKey(m)].body),t=m.kind===2&&palette.proliferationShading?tumorShade(m)/255:0;
     return base.map(v=>Math.round(v+(255-v)*t));
   };
-  const cellName=m=>m?.state==='abnormal'?'异常中间态':m?.kind===3?(immuneSuppressive(m)?'免疫抑制样细胞':immuneActive(m)?'已激活免疫细胞':'未激活免疫细胞'):['培养液','正常细胞','肿瘤细胞','免疫细胞','实体障碍'][m?.kind||0];
+  const cellName=m=>m?.state==='abnormal'?'癌前细胞':m?.kind===3?(immuneSuppressive(m)?'免疫抑制样细胞':immuneActive(m)?'已激活免疫细胞':'未激活免疫细胞'):['培养液','正常细胞','肿瘤细胞','免疫细胞','实体障碍'][m?.kind||0];
   const deathCode=m=>m?.dying?({spontaneous:1,kill:2,environment:3}[m.deathCause]||1):0;
   function deathColor(rgb,m){
     if(!m?.dying)return rgb;
@@ -14806,7 +15016,7 @@ Arena ＋ 右侧栏|Arena + sidebar
     const weight=code===2?.15+.85*p:code===3?.4+.45*p:.2+.65*p;
     return rgb.map((v,i)=>v+(tint[i]-v)*weight);
   }
-  const deathPhaseLabel=m=>({rounding:'免疫杀伤 · 圆化',swelling:'免疫杀伤 · 肿胀待裂解',rupture:'免疫杀伤 · 破裂',shrinking:'自发凋亡 · 皱缩',withering:'环境死亡 · 萎缩'}[m?.deathPhase]||'死亡清除中');
+  const deathPhaseLabel=m=>m?.deathCause==='lifespan'?'寿命凋亡 · 皱缩':({rounding:'免疫杀伤 · 圆化',swelling:'免疫杀伤 · 肿胀待裂解',rupture:'免疫杀伤 · 破裂',shrinking:'自发凋亡 · 皱缩',withering:'环境死亡 · 萎缩'}[m?.deathPhase]||'死亡清除中');
   const nucleusStyles={normal:{stroke:'#243b53',fill:'#243b531a'},patrol:{stroke:'#8f3548',fill:'#8f35481a'},dark:{stroke:'#f2d38a',fill:'#f2d38a1a'}};
   const nucleusStyle=(m,palette)=>{if(palette||immuneSuppressive(m)){const stroke=(palette||COLOR_DEFAULTS)[colorKey(m)].nucleus;return {stroke,fill:stroke+'1a'};}return m.kind===1?nucleusStyles.normal:m.kind===3&&!immuneActive(m)?nucleusStyles.patrol:nucleusStyles.dark;};
   const nuclearAngles=Array.from({length:32},(_,i)=>{const a=i*Math.PI/16;return [Math.cos(a),Math.sin(a),Math.cos(3*a),Math.sin(3*a),Math.cos(4*a),Math.sin(4*a)];});
@@ -15030,7 +15240,7 @@ Arena ＋ 右侧栏|Arena + sidebar
   'use strict';
   const ranges={normalMotility:[0,1.5],tumorMotility:[0,1.5],immuneMotility:[0,1.5],chemotaxis:[0,3],alignment:[0,3],cohesion:[0,3],repulsion:[0,3],immuneSeparation:[0,3],noise:[0,2],halfLife:[20,400],growth:[0,2],apoptosis:[0,30],antigen:[0,100],kill:[0,2],temperature:[2,30],supply:[0,3],metabolism:[0,2],escape:[0,5],recruitment:[0,3],immuneGrowth:[0,1.5],immuneDivisions:[0,6],mutation:[0,100],mutationSize:[0,.5],sectionYield:[0,.5],stressMutation:[0,20],inflammation:[0,10],progression:[0,20],tumorMorphology:[0,2],branchLength:[1.6,4],branchStrength:[0,12],networkAdhesion:[0,2],branching:[0,3]};
   Object.assign(ranges,{tumorCycle:[80,1200],tumorQuiescence:[0,3],immuneCycle:[80,1200],antigenMemory:[100,6000],il2Secretion:[0,3],il2HalfLife:[20,800],exhaustionRate:[0,3]});
-  Object.assign(ranges,{normalSupport:[0,100]});
+  Object.assign(ranges,{normalSupport:[0,100],immuneKillLimit:[0,100]});
   Object.assign(ranges,{normalMutationGain:[0,12],tumorMutationGain:[0,12],mutationBias:[-100,100],antigenStressGain:[0,5],contactEscape:[0,5],signalEscape:[0,5],evolutionMemory:[100,4000]});
   Object.assign(ranges,{damagePolarization:[0,5],damageDeactivation:[0,5],suppressiveSecretion:[0,5],suppressionStrength:[0,5],immuneRegulationMemory:[100,2000],suppressionRecovery:[0,5]});
   const signals=['cohesion','danger','trail','il2','normalDamage','inhibition'];
@@ -15050,13 +15260,14 @@ Arena ＋ 右侧栏|Arena + sidebar
     const worldWidth=number(data.worldWidth,1,1024,'worldWidth'),worldHeight=number(data.worldHeight,1,768,'worldHeight');
     const w=Math.round(worldWidth*refinement),h=Math.round(worldHeight*refinement);if(w<32||w>1024||h<24||h>768)invalid('grid dimensions');
     const settings={},ignored=[];
-    for(const [key,value]of Object.entries(data.settings)){if(!Object.hasOwn(ranges,key)){ignored.push(key);continue;}settings[key]=number(value,...ranges[key],key);if(['immuneDivisions','tumorMorphology'].includes(key)&&!Number.isInteger(value))invalid(key);}
+    for(const [key,value]of Object.entries(data.settings)){if(!Object.hasOwn(ranges,key)){ignored.push(key);continue;}settings[key]=number(value,...ranges[key],key);if(['immuneDivisions','immuneKillLimit','tumorMorphology'].includes(key)&&!Number.isInteger(value))invalid(key);}
     const sources=data.sources===undefined?undefined:data.sources;if(sources!==undefined){if(!Array.isArray(sources)||sources.length>4096)invalid('sources');for(const v of sources){if(!object(v))invalid('source');choice(v.type,[...signals,'oxygen','glucose','acid','nutrient','hostile'],'source.type');number(v.x,0,worldWidth,'source.x');number(v.y,0,worldHeight,'source.y');number(v.radius,2,40,'source.radius');}}
     if(data.maze?.signalThroughWalls!==undefined&&typeof data.maze.signalThroughWalls!=='boolean')invalid('maze.signalThroughWalls');
     const display={},input=data.display??{};if(!object(input))invalid('display');
     if(input.cellColors!==undefined){if(!object(input.cellColors))invalid('cellColors');const colors={};for(const kind of ['normal','abnormal','tumor','immune','activated','suppressive'])if(input.cellColors[kind]!==undefined){if(!object(input.cellColors[kind]))invalid(kind);colors[kind]={};for(const part of ['body','nucleus'])if(input.cellColors[kind][part]!==undefined){const c=input.cellColors[kind][part];if(typeof c!=='string'||!/^#[0-9a-f]{6}$/i.test(c))invalid(kind+'.'+part);colors[kind][part]=c.toLowerCase();}}if(input.cellColors.proliferationShading!==undefined){if(typeof input.cellColors.proliferationShading!=='boolean')invalid('proliferationShading');colors.proliferationShading=input.cellColors.proliferationShading;}display.cellColors=colors;}
     if(input.edgeFade!==undefined)display.edgeFade=number(input.edgeFade,0,100,'edgeFade');
     if(input.autoRandomMinutes!==undefined)display.autoRandomMinutes=number(input.autoRandomMinutes,0,1440,'autoRandomMinutes');
+    if(input.parameterLocks!==undefined){if(!object(input.parameterLocks))invalid('parameterLocks');display.parameterLocks={};for(const [key,value]of Object.entries(input.parameterLocks)){if(!(key in ranges)&&!['boundary','world-size','refinement'].includes(key))continue;if(typeof value!=='boolean')invalid('parameterLocks.'+key);display.parameterLocks[key]=value;}}
     if(input.trackDuration!==undefined)display.trackDuration=number(input.trackDuration,20,2000,'trackDuration');
     if(input.cellMarker!==undefined)display.cellMarker=choice(input.cellMarker,['none','nucleus','antigen','cycle'],'cellMarker');
     if(input.fieldView!==undefined)display.fieldView=choice(input.fieldView,['none','adversity','oxygen','glucose','acid','density'],'fieldView');
@@ -15323,47 +15534,47 @@ Arena ＋ 右侧栏|Arena + sidebar
     const $=id=>document.getElementById(id),query=matchMedia('(max-width:850px)'),workspace=document.querySelector('.workspace');
     const moves=[
       [document.querySelector('.scenes'),$('mobile-scenes-host')],
-      [$('reset'),$('mobile-session-actions')],[document.querySelector('.shuffle-controls'),$('mobile-session-actions')],
-      [$('about'),$('mobile-session-actions')],[document.querySelector('.quick-tools'),$('mobile-tools-host')]
+      [$('reset'),$('mobile-session-actions')],[$('shuffle'),$('mobile-session-actions')],
+      [document.querySelector('.quick-tools'),$('mobile-tools-host')]
     ].map(([node,host])=>{const anchor=document.createComment('desktop control position');node.before(anchor);return{node,host,anchor};});
-    let expanded=false;
+    let expanded=false,activePanel='parameter-groups';
+    const panels=['display-panel','parameter-groups','statistics-panel','cell-inspector'];
     for(const range of document.querySelectorAll('input[type=range]'))protectRange(range);
     function expand(value){
       expanded=!!value&&query.matches;document.body.classList.toggle('panel-expanded',expanded);
       $('mobile-expand').setAttribute('aria-expanded',String(expanded));
-      $('mobile-expand').textContent=expanded?'↓ 返回画布':'↑ 展开面板';
+      $('mobile-expand').textContent=expanded?'↓':'↑';$('mobile-expand').title=expanded?'返回画布':'展开面板';$('mobile-expand').setAttribute('aria-label',$('mobile-expand').title);
     }
-    function selectTab(id){for(const button of document.querySelectorAll('[data-panel]'))button.setAttribute('aria-pressed',String(button.dataset.panel===id));}
+    function selectTab(id){if(!panels.includes(id))return;activePanel=id;for(const panel of panels)$(panel).hidden=panel!==id;for(const button of document.querySelectorAll('[data-panel]'))button.setAttribute('aria-pressed',String(button.dataset.panel===id));}
     function scrollTo(target){
-      requestAnimationFrame(()=>{const pane=$('sidebar-scroll'),offset=query.matches&&target.classList.contains('section')?$('mobile-module-nav').getBoundingClientRect().height:0;
+      requestAnimationFrame(()=>{const pane=$('sidebar-scroll'),offset=target.classList.contains('section')?$('parameter-module-nav').getBoundingClientRect().height:0;
         pane.scrollTo({top:pane.scrollTop+target.getBoundingClientRect().top-pane.getBoundingClientRect().top-offset-5,behavior:'auto'});
       });
     }
     function focus(id){
-      const target=$(id);if(!target)return;if(target.tagName==='DETAILS'&&!target.open)target.open=true;
-      if(query.matches)expand(id!=='mobile-tools');selectTab(id);scrollTo(target);
+      const target=$(id);if(!target)return;selectTab(id);if(target.tagName==='DETAILS'&&!target.open)target.open=true;
+      if(query.matches)expand(id!=='mobile-tools');scrollTo(target);
     }
     function focusModule(id){
-      const target=$(id);if(!target)return;if(!target.open)target.open=true;if(!query.matches)return;
-      expand(true);selectTab('parameter-groups');scrollTo(target);
+      if(id==='module-display'){focus('display-panel');return;}
+      const target=$(id);if(!target)return;selectTab('parameter-groups');
+      for(const section of document.querySelectorAll('#parameter-groups>details')){section.hidden=section.id!==id;section.open=true;}
+      for(const button of document.querySelectorAll('[data-module]'))button.setAttribute('aria-pressed',String(button.dataset.module===id));
+      if(query.matches)expand(true);$('sidebar-scroll').scrollTop=0;
     }
     function fitKeyboard(){
       const v=window.visualViewport;workspace.style.height=query.matches&&v&&v.scale===1?Math.round(v.height)+'px':'';
     }
     function layout(){
       for(const {node,host,anchor}of moves)if(query.matches)host.append(node);else anchor.after(node);
-      if(!query.matches){expand(false);if($('mobile-tools-tab').getAttribute('aria-pressed')==='true')selectTab('parameter-groups');}
+      if(!query.matches)expand(false);selectTab(activePanel);
       fitKeyboard();
     }
     $('mobile-expand').addEventListener('click',()=>expand(!expanded));
     for(const button of document.querySelectorAll('[data-module]'))button.addEventListener('click',()=>focusModule(button.dataset.module));
-    for(const section of document.querySelectorAll('#parameter-groups>details'))section.addEventListener('toggle',()=>{
-      for(const button of document.querySelectorAll('[data-module]'))button.setAttribute('aria-pressed',String($(button.dataset.module).open));
-      if(query.matches&&section.open)focusModule(section.id);
-    });
     query.addEventListener('change',layout);window.visualViewport?.addEventListener('resize',fitKeyboard);
     layout();expand(false);
-    return {focus,expand,get expanded(){return expanded;},get isMobile(){return query.matches;}};
+    return {focus,focusModule,expand,get expanded(){return expanded;},get isMobile(){return query.matches;}};
   }
   globalThis.CellLabMobile={mount};
 })();
@@ -15380,10 +15591,12 @@ Arena ＋ 右侧栏|Arena + sidebar
       active=value;aside.classList.toggle('statistics-focused',active);
       $('statistics-expand').setAttribute('aria-pressed',String(active));$('statistics-expand').textContent=active?'返回控制':'占满侧栏';
       if(active){
-        $('statistics-panel').open=true;$('statistics-scenario').open=true;
+        mobile.focus('statistics-panel');
+        $('statistics-panel').open=true;
         $('statistics-record-settings').append(record);mobile.expand(true);pane.scrollTop=0;
       }else{
         anchor.after(record);$('statistics-scenario').open=priorScenario;mobile.expand(priorMobile);pane.scrollTop=priorScroll;
+        mobile.focus('parameter-groups');
       }
       onLayout();
     }
@@ -15404,6 +15617,11 @@ Arena ＋ 右侧栏|Arena + sidebar
   let cellColors;try{cellColors=CellLabDisplay.normalizeColors(JSON.parse(localStorage.getItem('cell-arena-colors-v1')));}catch{cellColors=CellLabDisplay.normalizeColors();}
   const signalLayers=new Set(),displayCache=new CellLabDisplay.Cache(),surfaceCache=new CellLabAppearance.Surface();
   const autoRandom=new CellLabAutoRandom.Controller();let autoRandomBusy=false,setupBusy=0;
+  const setupLocks={'world-size':true,refinement:true,boundary:true};let savedLocks=setupLocks;try{savedLocks={...setupLocks,...JSON.parse(localStorage.getItem('cell-arena-parameter-locks-v1'))};}catch{}
+  const parameterLocks=new CellLabRounds.Locks([...Object.keys(CellLabExperiment.ranges),'boundary','world-size','refinement'],savedLocks);
+  const journal=new CellLabRounds.Journal(),completedRounds=[],roundStore=CellLabRounds.openStore();let historyPage=0,historyVersion=0,lastCheckpoint=0,storageWarning=false;
+  function storageError(){if(!storageWarning){storageWarning=true;toast('历史记录暂时无法保存到本机，仍可导出本页 CSV');}}
+  const historyReady=roundStore.load().then(records=>{completedRounds.push(...records);historyVersion++;renderRoundHistory();}).catch(storageError);
   const opacity={adversity:.35,oxygen:.35,glucose:.35,acid:.35,density:.35,cohesion:.45,danger:.45,trail:.45,il2:.45,normalDamage:.45,inhibition:.45};
   let hover=null,probeDirty=false,panGesture=null,recordingScale=0,eraseSource=false;
   const trajectories=new CellLabTrajectories();
@@ -15434,7 +15652,7 @@ Arena ＋ 右侧栏|Arena + sidebar
   canvas.parentElement.append($('field-probe'));
   let gpuRenderer=null,rendererFailure='';try{gpuRenderer=new CellLabRenderer();}catch(e){rendererFailure=String(e);}
   const labels=['培养液','正常细胞','肿瘤细胞','免疫细胞','实体障碍'];
-  const titles={random:'随机生成',empty:'空白自建',ecosystem:'免疫共培养',collective:'群体迁移',invasion:'肿瘤扩张',maze:'免疫细胞迷宫',stress:'密度与逃逸',surveillance:'异常监视',network:'胶质瘤样分枝成网'};
+  const titles={random:'随机生成',empty:'空白自建',ecosystem:'免疫共培养',collective:'群体迁移',invasion:'肿瘤扩张',maze:'免疫细胞迷宫',stress:'密度与逃逸',surveillance:'癌前监视',network:'胶质瘤样分枝成网'};
   const controls=[
     ['chemotaxis','趋化响应',0,3,.1,'局部信号影响运动方向；肿瘤也趋向高氧、高糖',''],
     ['alignment','正常／肿瘤方向协同',0,3,.1,'接触的同类细胞调整极性；免疫细胞不无条件跟随同类',''],
@@ -15455,9 +15673,10 @@ Arena ＋ 右侧栏|Arena + sidebar
     ['normalSupport','正常细胞供给联动',0,100,1,'按本局健康正常细胞存活数的历史峰值计算保留比例；0% 无联动，100% 等比例影响全局氧糖补给和酸清除','%'],
     ['metabolism','消耗与产酸强度',0,2,.05,'按实际细胞占据面积与邻域密度持续计算',''],
     ['escape','恶劣环境逃逸',0,5,.1,'沿局部氧糖上升、酸负荷下降的方向重新极化',''],
-    ['recruitment','识别后招募信号',0,3,.1,'实际接触识别异常或肿瘤后分泌；仅被吸引者不自动接力',''],
+    ['recruitment','识别后招募信号',0,3,.1,'实际接触识别癌前或肿瘤后分泌；仅被吸引者不自动接力',''],
     ['immuneGrowth','免疫扩增速度',0,1.5,.05,'抗原刺激记忆与 IL-2 共同支持；受营养、耗竭和实际空间限制',''],
     ['immuneDivisions','新免疫细胞谱系分裂上限',0,6,1,'实验性谱系上限；每次分裂，两颗子细胞均扣一次；只影响新播种',' 次'],
+    ['immuneKillLimit','免疫寿命：杀伤上限',0,100,1,'累计致死指定数量的肿瘤后皱缩凋亡；0 关闭。只记实际致死接触，每颗肿瘤一次；分裂后两颗子代各自从 0 计数',' 颗'],
     ['tumorCycle','肿瘤基础周期',80,1200,20,'G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环境调节',' MCS'],
     ['tumorQuiescence','肿瘤压缩静息敏感性',0,3,.1,'由实际面积相对切面目标的压缩触发；0 只关闭此生物学闸门，几何限制保留',''],
     ['immuneCycle','免疫基础周期',80,1200,20,'许可后的基础总时长；停止直接接触不会立即清空扩增记忆',' MCS'],
@@ -15480,9 +15699,9 @@ Arena ＋ 右侧栏|Arena + sidebar
     ['contactEscape','接触选择下的抗原丢失',0,5,.05,'存活靶细胞每次有效免疫接触积累选择压力；持续接触只记一次，分离后可重新计数','×'],
     ['signalEscape','持续招募下的抗原丢失',0,5,.05,'持续招募信号暴露提高存活抗原阳性细胞的表型丢失风险；不会直接治愈已受损细胞','×'],
     ['evolutionMemory','选择压力记忆时长',100,4000,100,'接触记忆的半衰期与招募暴露的积累时间尺度；离开后衰减，分裂后稀释',' MCS'],
-    ['stressMutation','环境损伤致异常',0,20,.1,'持续代谢损伤提高正常 → 异常风险；0 关闭此通路，炎性通路独立设置','×'],
-    ['inflammation','炎性信号促癌',0,10,.1,'局部损伤／免疫招募信号持续累积后增加正常 → 异常风险；0 关闭，仍经过异常中间态。未标定的炎症代理','×'],
-    ['progression','异常 → 肿瘤风险倍率',0,20,.1,'异常至少保留 160 MCS；倍率调整后仍是随机事件，0 保留中间态','×'],
+    ['stressMutation','环境损伤致癌前',0,20,.1,'持续代谢损伤提高正常 → 癌前风险；0 关闭此通路，炎性通路独立设置','×'],
+    ['inflammation','炎性信号促癌',0,10,.1,'局部损伤／免疫招募信号持续累积后增加正常 → 癌前风险；0 关闭，仍经过癌前细胞。未标定的炎症代理','×'],
+    ['progression','癌前 → 肿瘤风险倍率',0,20,.1,'癌前至少保留 160 MCS；倍率调整后仍是随机事件，0 保留中间态','×'],
     ['sectionYield','切面让位上限',0,.5,.01,'受邻居推挤时减少可见目标面积，压力解除后逐步恢复；总生物量保留',''],
     ['branchLength','突起延伸范围',1.6,4,.1,'相对胞体等效半径的可达范围；真实长度仍取决于空间和胞质量','×'],
     ['branchStrength','分枝形态保持',0,12,.5,'局部骨架形变偏好，越强越保持分枝；不会越墙或跳过核区约束',''],
@@ -15497,7 +15716,7 @@ Arena ＋ 右侧栏|Arena + sidebar
     'tumor-sliders':['tumorMotility','growth','apoptosis','antigen'],
     'tumor-evolution-sliders':['mutation','mutationSize','tumorMutationGain','antigenStressGain','contactEscape','signalEscape'],
     'tumor-cycle-sliders':['tumorCycle','tumorQuiescence'],
-    'immune-sliders':['immuneMotility','immuneSeparation','kill','recruitment'],
+    'immune-sliders':['immuneMotility','immuneSeparation','kill','immuneKillLimit','recruitment'],
     'immune-regulation-sliders':['damagePolarization','suppressionRecovery','damageDeactivation','suppressiveSecretion','suppressionStrength','immuneRegulationMemory'],
     'immune-cycle-sliders':['immuneGrowth','immuneDivisions','immuneCycle','antigenMemory','il2Secretion','il2HalfLife','exhaustionRate'],
     'other-sliders':['sectionYield','temperature','alignment','repulsion','noise']
@@ -15531,7 +15750,7 @@ Arena ＋ 右侧栏|Arena + sidebar
   let pendingFrame=0,lastUISync=0,uiPending=false,lastHistoryDraw=0;
   let settingsKey='',legendKey='';
   const frameStats={fps:0,renderMs:0,snapshotMs:0,count:0,since:performance.now(),time:null,revision:null};
-  const colorTypes=[['normal','正常细胞'],['abnormal','异常中间态'],['tumor','肿瘤细胞'],['immune','未激活免疫'],['activated','已激活免疫'],['suppressive','免疫抑制样']];
+  const colorTypes=[['normal','正常细胞'],['abnormal','癌前细胞'],['tumor','肿瘤细胞'],['immune','未激活免疫'],['activated','已激活免疫'],['suppressive','免疫抑制样']];
   for(const [id,preset] of Object.entries(CellLabDisplay.COLOR_PRESETS)){
     const button=document.createElement('button');button.type='button';button.className='color-preset';button.dataset.palette=id;button.setAttribute('aria-label','应用'+preset.name+'配色');
     const name=document.createElement('b');name.textContent=preset.name;button.append(name);
@@ -15547,7 +15766,7 @@ Arena ＋ 右侧栏|Arena + sidebar
     for(const button of $('color-presets').children){const active=button.dataset.palette===preset;button.classList.toggle('selected',active);button.setAttribute('aria-pressed',active);}
     for(const [key] of colorTypes)for(const part of ['body','nucleus'])$('color-'+key+'-'+part).value=cellColors[key][part];
     $('proliferation-shading').checked=cellColors.proliferationShading;
-    for(const [key,css] of [['normal','normal'],['abnormal','abnormal'],['tumor','tumor'],['immune','immune'],['activated','immune-active'],['suppressive','immune-suppressive']])document.querySelector('.legend .'+css).style.background=cellColors[key].body;
+    for(const [key,css] of [['normal','normal'],['abnormal','abnormal'],['tumor','tumor'],['immune','immune'],['activated','immune-active'],['suppressive','immune-suppressive']]){for(const node of document.querySelectorAll('.legend .'+css))node.style.background=cellColors[key].body;document.querySelector('.population-'+key)?.style.setProperty('--population-color',cellColors[key].body);}
     const ramp=document.querySelector('.proliferation-key'),low=CellLabDisplay.bodyColor({kind:2,genome:{proliferation:.25}},cellColors),high=cellColors.tumor.body;
     ramp.querySelector('i').style.background=`linear-gradient(90deg,rgb(${low.join(',')}),${high})`;
     ramp.lastChild.textContent=cellColors.proliferationShading?'肿瘤：浅 → 深，增殖能力低 → 高':'肿瘤：统一胞体色';
@@ -15559,19 +15778,62 @@ Arena ＋ 右侧栏|Arena + sidebar
   function syncAppearance(){ $('body-feather-out').textContent=$('body-feather').value+'%';dirty=true;forceFrame=true; }
   $('body-feather').addEventListener('input',()=>{syncAppearance();try{localStorage.setItem('cell-arena-edge-fade-v1',$('body-feather').value);}catch{}});syncAppearance();
   try{const saved=localStorage.getItem('cell-arena-auto-random-v1');if(saved!==null&&Number.isFinite(Number(saved))&&Number(saved)>=0&&Number(saved)<=1440)$('auto-random-minutes').value=saved;}catch{}
-  function configureAutoRandom(){const input=$('auto-random-minutes');autoRandom.configure(input.valueAsNumber,performance.now());try{localStorage.setItem('cell-arena-auto-random-v1',String(autoRandom.minutes));}catch{}}
+  function configureAutoRandom(){const input=$('auto-random-minutes');autoRandom.configure(input.valueAsNumber,performance.now());renderAutoNotice();try{localStorage.setItem('cell-arena-auto-random-v1',String(autoRandom.minutes));}catch{}}
   $('auto-random-minutes').addEventListener('input',configureAutoRandom);configureAutoRandom();
   function tickAutoRandom(now){
     const allowed=!document.hidden&&!autoRandomBusy&&!setupBusy&&!stroke&&!pending.size&&!document.querySelector('dialog[open]')&&document.activeElement!==$('auto-random-minutes');
-    const reason=autoRandom.tick(snapshot,now,allowed);if(!reason)return;
+    const reason=autoRandom.tick(snapshot,now,allowed);renderAutoNotice();if(!reason)return;
     autoRandomBusy=true;
-    start('random',{shuffle:true}).then(()=>toast(reason==='empty'?'全部细胞已消失，已随机开启新一轮':'长时间无状态变化，已随机开启新一轮')).catch(error=>{$('auto-random-minutes').value=0;configureAutoRandom();fail(error);}).finally(()=>{autoRandomBusy=false;});
+    start('random',{shuffle:true,reason:'auto-'+reason}).then(()=>toast('已按未锁定参数随机开启新一轮')).catch(error=>{$('auto-random-minutes').value=0;configureAutoRandom();fail(error);}).finally(()=>{autoRandomBusy=false;renderAutoNotice();});
   }
+  function renderAutoNotice(){const status=autoRandom.status();$('auto-round-notice').hidden=!status.pendingReason||status.fired||!status.minutes;$('auto-round-reason').textContent=status.pendingReason?CellLabRounds.reasonLabel(status.pendingReason):'';$('auto-round-seconds').textContent=Math.ceil(status.countdownMs/1000);$('auto-round-paused').hidden=!!snapshot?.playing&&!document.hidden;}
+  $('auto-round-cancel').addEventListener('click',()=>{$('auto-random-minutes').value=0;configureAutoRandom();});
   const pending=new Map(),errors=[];
   let resolveReady;const ready=new Promise(r=>resolveReady=r);
   function rpc(command,payload={}){
     return new Promise((resolve,reject)=>{const id=++sequence;const timeout=setTimeout(()=>{pending.delete(id);reject(Error('操作超时：'+command));},60000);pending.set(id,{resolve,reject,timeout});worker.postMessage({id,command,payload});});
   }
+  function persistLocks(){try{localStorage.setItem('cell-arena-parameter-locks-v1',JSON.stringify(parameterLocks));}catch{}syncLocks();}
+  function syncLocks(){
+    for(const button of document.querySelectorAll('[data-parameter-lock]')){const locked=!!parameterLocks.values[button.dataset.parameterLock];button.setAttribute('aria-pressed',String(locked));button.title=locked?'已锁定：随机开局保持此参数':'未锁定：随机开局允许随机化';button.setAttribute('aria-label',button.title);button.innerHTML='<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="9" width="12" height="9" rx="1"/><path d="'+(locked?'M6 9V6a4 4 0 0 1 8 0v3':'M6 9V6a4 4 0 0 1 8 0')+'"/><path d="M10 12v3"/></svg>';}
+    const all=parameterLocks.keys.every(k=>parameterLocks.values[k]);$('lock-all-parameters').textContent=all?'全部解锁':'全部锁定';$('lock-all-parameters').setAttribute('aria-pressed',String(all));
+  }
+  for(const key of parameterLocks.keys){
+    const input=$(key==='tumorMorphology'?'tumor-morphology':key);if(!input)continue;
+    const button=document.createElement('button');button.type='button';button.className='parameter-lock';button.dataset.parameterLock=key;
+    if(input.matches('input[type=range]'))input.closest('.model-slider').querySelector(':scope>span').append(button);
+    else input.after(button);
+    button.addEventListener('click',event=>{event.preventDefault();parameterLocks.toggle(key);persistLocks();});
+  }
+  $('lock-all-parameters').addEventListener('click',()=>{parameterLocks.all(!parameterLocks.keys.every(k=>parameterLocks.values[k]));persistLocks();});syncLocks();
+  function archiveRound(reason){
+    const record=journal.finish(reason,performance.now(),undefined,parameterLocks.toJSON(),displaySettings());if(!record)return;
+    completedRounds.push(record);historyVersion++;historyPage=0;roundStore.archive(record).catch(storageError);renderRoundHistory();
+  }
+  function checkpointRound(now,force=false){
+    if(!journal.active||(!force&&now-lastCheckpoint<5000))return;
+    journal.active.finalLocks=parameterLocks.toJSON();journal.active.display=displaySettings();lastCheckpoint=now;roundStore.checkpoint(journal.current()).catch(storageError);
+  }
+  function renderRoundHistory(){
+    const all=completedRounds.slice().sort((a,b)=>b.startedAt.localeCompare(a.startedAt)),pages=Math.max(1,Math.ceil(all.length/6));historyPage=Math.max(0,Math.min(pages-1,historyPage));
+    $('round-total').textContent=all.length;$('round-page').textContent=(historyPage+1)+' / '+pages;$('round-newer').disabled=!historyPage;$('round-older').disabled=historyPage>=pages-1;
+    const list=$('round-list'),stamp=historyVersion+':'+historyPage;if(list.dataset.version===stamp)return;list.dataset.version=stamp;list.replaceChildren();
+    if(!all.length){const p=document.createElement('p');p.className='hint';p.textContent='换局后在这里比较历局结果；CSV 也包含当前进行中的一局。';list.append(p);return;}
+    for(const record of all.slice(historyPage*6,historyPage*6+6)){
+      const row=document.createElement('details');row.className='round-result';
+      const head=document.createElement('summary'),reason=document.createElement('b'),time=document.createElement('span');reason.textContent=CellLabRounds.reasonLabel(record.reason);time.textContent=record.simulatedMCS.toLocaleString()+' MCS';const heading=document.createElement('div');heading.append(reason);head.append(heading,time);
+      const state=document.createElement('p');state.textContent='正常 '+record.population.normal+' · 癌前 '+record.population.abnormal+' · 肿瘤 '+record.population.tumor+' · 免疫 '+record.population.immune;
+      const info=document.createElement('small');info.textContent=new Date(record.startedAt).toLocaleString()+' · '+(record.runningMs/60000).toFixed(1)+' min · '+record.scene+' · '+record.seed;
+      const phenotypes=document.createElement('p');phenotypes.textContent='免疫：静息 '+record.population.immuneResting+' · 激活 '+record.population.immuneActive+' · 抑制 '+record.population.immuneSuppressive+'\n肿瘤：抗原阳性 '+record.population.tumorAntigenPositive+' · 阴性 '+record.population.tumorAntigenNegative;
+      const params=document.createElement('pre');params.textContent=JSON.stringify(record.finalSettings,null,2);heading.append(state);row.append(head,info,phenotypes,params);list.append(row);
+    }
+  }
+  for(const [id,results]of [['history-current-tab',false],['history-rounds-tab',true]])$(id).addEventListener('click',()=>{$('current-history').hidden=results;$('round-results').hidden=!results;$('history-current-tab').setAttribute('aria-pressed',String(!results));$('history-rounds-tab').setAttribute('aria-pressed',String(results));renderRoundHistory();dirty=true;});
+  $('round-newer').addEventListener('click',()=>{historyPage--;renderRoundHistory();});$('round-older').addEventListener('click',()=>{historyPage++;renderRoundHistory();});
+  $('export-rounds').addEventListener('click',()=>{
+    if(snapshot)journal.observe(snapshot,performance.now(),!document.hidden&&!stroke);const current=journal.current();if(current){current.finalLocks=parameterLocks.toJSON();current.display=displaySettings();}
+    const data=CellLabRounds.csv([...completedRounds,...(current?[current]:[])]),url=URL.createObjectURL(new Blob([data],{type:'text/csv;charset=utf-8'})),link=document.createElement('a');link.href=url;link.download='cell-arena-rounds-'+new Date().toISOString().slice(0,10)+'.csv';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  });
   function toast(message){$('toast').textContent=message;$('toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),2200);}
   function fail(error){const message=String(error?.message||error);errors.push(message);$('run-state').textContent='发生错误';toast(message);}
   worker.onmessage=event=>{
@@ -15583,12 +15845,13 @@ Arena ＋ 右侧栏|Arena + sidebar
       else if(previous&&next&&previous.birth!==next.birth)selected=0;
       snapshot=m.data;if(snapshot.revision!==lastRevision){lastRevision=snapshot.revision;selected=0;observedBirth=0;adaptive.reset(performance.now());}
       autoRandom.observe(snapshot,performance.now());
+      if(!setupBusy){if(journal.active&&journal.epoch!==snapshot.revision+':'+snapshot.seed)archiveRound('external-reset');if(!journal.active)journal.begin(snapshot,performance.now(),undefined,parameterLocks.toJSON());journal.observe(snapshot,performance.now(),!document.hidden&&!stroke);}
       performanceContext();
       if(raster.width!==snapshot.width||raster.height!==snapshot.height){raster.width=snapshot.width;raster.height=snapshot.height;image=rctx.createImageData(snapshot.width,snapshot.height);}
       pendingFrame=m.frame||0;trajectories.sample(snapshot);dirty=true;uiPending=true;
       if(m.interactive)forceFrame=true;
       if(m.interactive||performance.now()-lastUISync>=performancePlan.uiMs){sync(!!m.interactive);lastUISync=performance.now();uiPending=false;}
-      if(autoRandom.count===0)tickAutoRandom(performance.now());
+      tickAutoRandom(performance.now());
     }else if(m.type==='response'){
       const p=pending.get(m.id);if(p){clearTimeout(p.timeout);pending.delete(m.id);p.resolve(m.value);}
     }else if(m.type==='error'){
@@ -15615,7 +15878,7 @@ Arena ＋ 右侧栏|Arena + sidebar
       $('scenario-configuration').textContent=scenario.customized?'参数已调整':'预设参数';
       const initial=scenario.initial;
       $('scenario-setup').textContent=`开局：正常 ${initial.normal} · 肿瘤 ${initial.tumor} · 免疫 ${initial.immune}${initial.tumor?' · 抗原阳性 '+initial.antigenPositive+'/'+initial.tumor:''}。种子 ${s.seed}；区域、参数和手动操作会改变演化。`;
-      const values=['oncogenesis','random'].includes(s.scene)?[`异常发生 ${s.counters.abnormalInitiations}`,`恶性转变 ${s.counters.malignantTransitions}`,`肿瘤分裂 ${scenario.tumorDivisions}`]:s.scene==='cold'?[`存活肿瘤 ${scenario.tumor}`,`原灶外肿瘤 ${scenario.farTumor}`,`远端分裂 ${scenario.distalDivisions}`]:[`残留肿瘤胞体 ${scenario.tumorBodies}`,`免疫清除 ${s.counters.kills}`,`清除后观察 ${scenario.clearanceElapsed} MCS`];
+      const values=['oncogenesis','random'].includes(s.scene)?[`癌前发生 ${s.counters.abnormalInitiations}`,`恶性转变 ${s.counters.malignantTransitions}`,`肿瘤分裂 ${scenario.tumorDivisions}`]:s.scene==='cold'?[`存活肿瘤 ${scenario.tumor}`,`原灶外肿瘤 ${scenario.farTumor}`,`远端分裂 ${scenario.distalDivisions}`]:[`残留肿瘤胞体 ${scenario.tumorBodies}`,`免疫清除 ${s.counters.kills}`,`清除后观察 ${scenario.clearanceElapsed} MCS`];
       $('scenario-metrics').textContent=values.join('　·　');
     }
     $('seed-label').textContent='种子 '+s.seed;
@@ -15634,42 +15897,30 @@ Arena ＋ 右侧栏|Arena + sidebar
     $('network-status').textContent=s.settings.tumorMorphology===2?`当前稳定接触 ${s.cells.reduce((n,m)=>n+(m.networkDegree||0),0)/2} 对；各细胞保持独立胞体。`:'示例会重新播种一片肿瘤细胞，观察突起逐渐形成与连接。';
     $('seed-status').textContent=`当前 ${s.cells.length} 颗 · 按局部空间尝试加入`;
     if(force||panelVisible('statistics-panel')){
-    const counts=[0,0,0,0];let abnormal=0,activated=0,suppressive=0;for(const m of s.cells){counts[m.kind]++;if(m.state==='abnormal')abnormal++;if(CellLabDisplay.immuneActive(m))activated++;if(CellLabDisplay.immuneSuppressive(m))suppressive++;}
-    $('normal-count').textContent=counts[1]-abnormal;$('abnormal-count').textContent=abnormal;$('tumor-count').textContent=counts[2];$('immune-count').textContent=counts[3];
-    $('activated-immune-count').textContent=activated;
-    $('suppressive-immune-count').textContent=suppressive;
-    $('immune-regulation-events').textContent=`转抑制态 ${s.counters.suppressiveTransitions} · 恢复静息态 ${s.counters.suppressiveRecoveries} · 损伤退激活 ${s.counters.injuryDeactivations} · 信号退激活 ${s.counters.signalDeactivations}`;
-    $('division-count').textContent=s.counters.divisions;$('recognition-count').textContent=s.counters.recognitions;
-    const patrol=s.patrol;$('patrol-coverage').textContent=(100*patrol.coverage).toFixed(1)+'%';$('patrol-checked').textContent=patrol.checkedCells;
-    $('patrol-current').textContent=`当前存活已检查 ${patrol.currentChecked} / ${patrol.currentTargets}`;
-    const deathNames={spontaneous:'自发凋亡',kill:'免疫杀伤',environment:'环境死亡'},totals=Object.values(s.deaths);
-    const totalCleared=totals.reduce((n,d)=>n+d.cleared,0),totalClearing=totals.reduce((n,d)=>n+d.clearing,0);
-    $('total-death-count').textContent=totalCleared;
-    $('total-death-progress').textContent=`清除中 ${totalClearing} · 已触发 ${totals.reduce((n,d)=>n+d.started,0)}`;
-    $('manual-removal-count').textContent=s.counters.manualRemoved||0;
-    for(const [cause,prefix] of [['spontaneous','death'],['environment','environment-death'],['kill','kill']]){
-      const d=s.deaths[cause],interrupted=s.manualDeathRemovals?.[cause]||0;$(prefix+'-count').textContent=d.cleared;$(prefix+'-progress').textContent=`清除中 ${d.clearing} · 已触发 ${d.started}`+(interrupted?` · 手动中止 ${interrupted}`:'');
-    }
-    $('death-ledger-count').textContent=`已清除 ${totalCleared} · 清除中 ${totalClearing}`;
-    $('death-summary').textContent=Object.entries(s.deaths).map(([cause,d])=>`${deathNames[cause]}：触发 ${d.started} · 清除中 ${d.clearing} · 已清除 ${d.cleared} · 手动中止 ${s.manualDeathRemovals?.[cause]||0}`).join('\n');
-    const recent=s.recentClearances,clearanceText=JSON.stringify(recent);
-    if($('recent-clearances').dataset.records!==clearanceText){
-      $('recent-clearances').dataset.records=clearanceText;$('recent-clearances').replaceChildren();
-      $('clearance-recent-summary').textContent=recent.length?`最近 ${recent.length} 颗清除：`+Object.entries(deathNames).map(([cause,name])=>`${name} ${recent.filter(d=>d.cause===cause).length}`).join(' · '):'本局尚无死亡清除。';
-      for(const d of recent.slice().reverse()){const li=document.createElement('li');li.textContent=`${d.clearedAt} MCS · #${d.id} · ${deathNames[d.cause]} · 已清除（${d.startedAt} MCS 触发）`;$('recent-clearances').append(li);}
-      if(!recent.length){const li=document.createElement('li');li.textContent='尚无胞体完成死亡清除。';$('recent-clearances').append(li);}
-    }
-    const deathText=JSON.stringify(s.recentDeaths);
-    if($('recent-deaths').dataset.records!==deathText){
-      $('recent-deaths').dataset.records=deathText;$('recent-deaths').replaceChildren();
-      for(const death of s.recentDeaths.slice().reverse()){const li=document.createElement('li');li.textContent=`${death.startedAt} MCS · #${death.id} · ${deathNames[death.cause]||death.cause} · ${death.manuallyRemovedAt!=null?death.manuallyRemovedAt+' MCS 手动擦除':death.clearedAt===null?'清除中':death.clearedAt+' MCS 已清除'}`;$('recent-deaths').append(li);}
-      if(!s.recentDeaths.length){const li=document.createElement('li');li.textContent='本局尚无死亡事件。';$('recent-deaths').append(li);}
-    }
-    $('environment-count').textContent=`环境死亡 ${s.counters.environment}（正常 ${s.counters.normalEnvironmentDeaths} · 异常 ${s.counters.abnormalEnvironmentDeaths}）`;$('immune-division-count').textContent='免疫分裂 '+s.counters.immuneDivisions;$('mutation-count').textContent='性状突变 '+s.counters.mutations;
-    $('abnormal-events').textContent=`异常发生 ${s.counters.abnormalInitiations} · 恶性转变 ${s.counters.malignantTransitions} · 异常免疫清除 ${s.counters.abnormalKills}`;
-    $('evolution-events').textContent=`正常耐受变异 ${s.counters.normalTraitMutations} · 肿瘤间期变异 ${s.counters.stressMutations} · 压力抗原暴露 ${s.counters.antigenExposures} · 选择性抗原丢失 ${s.counters.antigenEscapes}`;
-    $('grid-info').textContent=`${s.width} × ${s.height} 格点 · ${s.refinement}× 精细度`;
-    for(const [key,label]of [['tumor','肿瘤'],['immune','免疫']]){const c=s.cycles?.[key];$('cycle-'+key).textContent=c?`${label} · G0 ${c.G0} · G1 ${c.G1} · S ${c.S} · G2 ${c.G2} · M ${c.M} · 周期阻滞 ${c.arrested}`:'';}
+      const p=CellLabRounds.population(s);
+      for(const kind of ['normal','abnormal','tumor','immune'])$(kind+'-count').textContent=p[kind];
+      $('alive-count').textContent=p.total;$('resting-immune-count').textContent=p.immuneResting;$('activated-immune-count').textContent=p.immuneActive;$('suppressive-immune-count').textContent=p.immuneSuppressive;
+      $('division-count').textContent=s.counters.divisions;$('malignant-count').textContent=s.counters.malignantTransitions;$('escape-count').textContent=s.counters.antigenEscapes;
+      $('immune-division-count').textContent='免疫分裂 '+s.counters.immuneDivisions;$('recognition-count').textContent=s.counters.recognitions;
+      const patrol=s.patrol;$('patrol-coverage').textContent=(100*patrol.coverage).toFixed(1)+'%';$('patrol-checked').textContent=patrol.checkedCells;
+      $('patrol-current').textContent='当前存活已检查 '+patrol.currentChecked+' / '+patrol.currentTargets;
+      const deathNames={spontaneous:'自发凋亡',kill:'免疫杀伤',environment:'环境死亡',lifespan:'寿命凋亡'},totals=Object.values(s.deaths);
+      $('total-death-count').textContent=totals.reduce((n,d)=>n+d.cleared,0);$('total-death-progress').textContent='清除中 '+totals.reduce((n,d)=>n+d.clearing,0);$('manual-removal-count').textContent=s.counters.manualRemoved||0;
+      for(const [cause,prefix]of [['spontaneous','death'],['environment','environment-death'],['kill','kill'],['lifespan','lifespan-death']]){
+        const d=s.deaths[cause]||{cleared:0,clearing:0,started:0},interrupted=s.manualDeathRemovals?.[cause]||0;$(prefix+'-count').textContent=d.cleared;$(prefix+'-progress').textContent='清除中 '+d.clearing+' · 已触发 '+d.started+(interrupted?' · 手动中止 '+interrupted:'');
+      }
+      for(const [list,records,clearance]of [['recent-clearances',s.recentClearances,true],['recent-deaths',s.recentDeaths,false]]){
+        const node=$(list),stamp=JSON.stringify(records);if(node.dataset.records===stamp)continue;node.dataset.records=stamp;node.replaceChildren();
+        for(const d of records.slice().reverse()){const li=document.createElement('li');li.textContent=(clearance?d.clearedAt:d.startedAt)+' MCS · #'+d.id+' · '+deathNames[d.cause]+' · '+(d.manuallyRemovedAt!=null?'手动擦除':d.clearedAt===null?'清除中':'已清除');node.append(li);}
+        if(!records.length){const li=document.createElement('li');li.textContent='本局尚无死亡事件。';node.append(li);}
+      }
+      $('environment-count').textContent='环境死亡其中：正常 '+s.counters.normalEnvironmentDeaths+' · 癌前 '+s.counters.abnormalEnvironmentDeaths;
+      $('mutation-count').textContent='性状突变 '+s.counters.mutations;
+      $('abnormal-events').textContent='癌前发生 '+s.counters.abnormalInitiations+' · 癌前免疫清除 '+s.counters.abnormalKills;
+      $('evolution-events').textContent='正常耐受变异 '+s.counters.normalTraitMutations+' · 肿瘤间期变异 '+s.counters.stressMutations+' · 压力抗原暴露 '+s.counters.antigenExposures;
+      $('immune-regulation-events').textContent='转抑制态 '+s.counters.suppressiveTransitions+' · 恢复静息态 '+s.counters.suppressiveRecoveries+' · 损伤退激活 '+s.counters.injuryDeactivations+' · 信号退激活 '+s.counters.signalDeactivations;
+      $('grid-info').textContent=s.width+' × '+s.height+' 格点 · '+s.refinement+'× 精细度';
+      for(const [key,label]of [['tumor','肿瘤'],['immune','免疫']]){const c=s.cycles?.[key];$('cycle-'+key).textContent=c?label+' · G0 '+c.G0+' · G1 '+c.G1+' · S '+c.S+' · G2 '+c.G2+' · M '+c.M+' · 周期阻滞 '+c.arrested:'';}
     }
     $('rate').textContent=s.playing?(Math.round(s.rate)||'—'):'0';
     $('performance').textContent=`目标 ${s.targetRate} MCS / 秒 · ${s.limited?'算力不足，实际推进较慢；生长与分裂继续计算':'固定模型步长'}`;
@@ -15692,7 +15943,7 @@ Arena ＋ 右侧栏|Arena + sidebar
         const c=cell.cycle,reasons={'':'周期推进',disabled:'生长参数关闭',nutrients:'氧糖或代谢不足',acid:'酸负荷过高',injury:'累积损伤待恢复',lineage:'谱系分裂上限',exhaustion:'慢性刺激耗竭',suppression:'免疫抑制／再激活等待',antigen:'抗原记忆不足',il2:'IL-2 支持不足',space:'实际空间不足',growth:'等待胞体生长',geometry:'分裂几何受限'};
         lines.push(`细胞周期 ${c.phase} · 阶段进度 ${Math.round(c.progress*100)}%`,c.phase==='G0'&&!c.arrest?'整合增殖信号':reasons[c.arrest]);
       }
-      if(cell.state==='abnormal')lines.push(`异常已持续 ${Math.floor(cell.abnormalAge)} MCS · 尚未获得肿瘤增殖／侵袭表型`,`抗原 ${cell.antigenLevel.toFixed(2)} · ${cell.antigen?'可被接触识别':'低于识别阈值'} · 杀伤损伤 ${(cell.damage*100).toFixed(0)}%`);
+      if(cell.state==='abnormal')lines.push(`癌前已持续 ${Math.floor(cell.abnormalAge)} MCS · 尚未获得肿瘤增殖／侵袭表型`,`抗原 ${cell.antigenLevel.toFixed(2)} · ${cell.antigen?'可被接触识别':'低于识别阈值'} · 杀伤损伤 ${(cell.damage*100).toFixed(0)}%`);
       if(cell.kind===1)lines.push(`局部炎性信号 ${(100*(cell.inflammatorySignal||0)).toFixed(0)}% · 累积暴露 ${(100*(cell.inflammatoryExposure||0)).toFixed(0)}%`);
       if(cell.kind!==3){
         lines.push(`环境致变压力 ${Math.round(cell.mutationPressure*100)}%`);
@@ -15705,10 +15956,11 @@ Arena ＋ 右侧栏|Arena + sidebar
       if(cell.kind===3)lines.push(`第 ${cell.generation} 代 · 剩余分裂 ${cell.divisionsLeft} 次`,`激活 ${Math.ceil(cell.activation)} MCS · 招募 ${Math.ceil(cell.recruitment)} MCS`);
       if(cell.kind===3)lines.push(`抗原刺激记忆 ${Math.round(cell.antigenMemory*100)}% · 慢性耗竭 ${Math.round(cell.exhaustion*100)}%`,`局部 IL-2 ${cell.il2.toFixed(3)} · 扩增响应 ${Math.round(cell.il2Response*100)}%`);
       if(cell.kind===3)lines.push(`正常损伤暴露 ${Math.round(cell.normalDamageExposure*100)}% · 局部抑制信号 ${cell.inhibition.toFixed(3)}`,cell.immunePhenotype==='suppressive'?'抑制样表型：趋向正常损伤，分泌抑制信号；暴露降低后可恢复粉色':`再激活等待 ${Math.ceil(cell.immuneRefractory)} MCS`);
+      if(cell.kind===3)lines.push('累计致死肿瘤 '+(cell.tumorKills||0)+' / '+(s.settings.immuneKillLimit||'不限')+' 颗');
       if(cell.kind===3)lines.push(`本细胞已检查 ${cell.patrolChecked} 颗不同组织细胞`);
       if(cell.kind===2&&cell.origin==='normal')lines.push(`源自正常细胞 · ${cell.transformedAt} MCS 恶性转变`);
       if(cell.kind===2&&cell.morphologyMode)lines.push(`${cell.morphologyMode===2?'动态分枝':'梭形双极'} · 伸展／回缩中的突起 ${cell.branchCount} 处 · 稳定接触 ${cell.networkDegree||0} 个邻居`);
-      if(cell.dying)lines.push('死亡原因：'+({environment:'持续代谢压力',kill:'免疫递送损伤',spontaneous:'自发凋亡'}[cell.deathCause]||cell.deathCause),`触发死亡：${cell.deathStartedAt} MCS · 清除中 ${s.time-cell.deathStartedAt} MCS`);
+      if(cell.dying)lines.push('死亡原因：'+({environment:'持续代谢压力',kill:'免疫递送损伤',spontaneous:'自发凋亡',lifespan:'达到累计肿瘤杀伤上限'}[cell.deathCause]||cell.deathCause),`触发死亡：${cell.deathStartedAt} MCS · 清除中 ${s.time-cell.deathStartedAt} MCS`);
       $('inspection').textContent=lines.join('\n');
     }else{selected=0;$('inspection').textContent='点击细胞，查看局部代谢、活性、抗原、遗传性状与剩余分裂次数。';}
   }
@@ -15872,13 +16124,13 @@ Arena ＋ 右侧栏|Arena + sidebar
     if(!panelVisible('history'))return;
     historyChart.update(snapshot,recordingScale);
   }
-  const hints={move:'拖动时暂停 · 邻居让位 · 松手恢复',seed:'单击加入一颗 · 可尝试挤入已有细胞区域',signal:'单击瞬释 · 长按连释 · 双击建源',wall:'在空白处拖动画墙',erase:'拖动擦除实体障碍',remove:'擦除触及的整颗细胞 · 单独记账',inspect:'点击细胞查看状态与局部环境'};
+  const hints={move:'拖动时暂停 · 邻居让位 · 松手恢复',seed:'单击加入一颗 · 可尝试挤入已有细胞区域',signal:'单击瞬释 · 长按连释 · 双击建源',wall:'在空白处拖动画墙',remove:'擦除细胞、场源与障碍 · 重置局部环境',inspect:'点击细胞查看状态与局部环境'};
   function setTool(value){
     signalGesture.cancel();
     if(stroke&&!stroke.ending)void endStroke();
     tool=value;canvas.title=tool==='signal'?'':'中键或 Alt + 左键拖动平移视野';for(const b of document.querySelectorAll('[data-tool]')){const on=b.dataset.tool===tool;b.classList.toggle('selected',on);b.setAttribute('aria-pressed',on);}
     $('tool-hint').textContent=hints[tool];
-    $('seed-options').hidden=tool!=='seed';$('signal-options').hidden=tool!=='signal';$('wall-options').hidden=!['wall','erase'].includes(tool);$('eraser-options').hidden=tool!=='remove';probeDirty=true;
+    $('seed-options').hidden=tool!=='seed';$('signal-options').hidden=tool!=='signal';$('wall-options').hidden=tool!=='wall';$('eraser-options').hidden=tool!=='remove';probeDirty=true;
     canvas.style.cursor=tool==='move'?'grab':tool==='inspect'?'pointer':'crosshair';
   }
   function point(e){const r=canvas.getBoundingClientRect();return [Math.max(0,Math.min(snapshot.width-1,Math.floor((e.clientX-r.left)/r.width*snapshot.width))),Math.max(0,Math.min(snapshot.height-1,Math.floor((e.clientY-r.top)/r.height*snapshot.height)))];}
@@ -15918,11 +16170,11 @@ Arena ＋ 右侧栏|Arena + sidebar
     }else if(tool==='remove'){
       const radius=Number($('eraser-radius').value),before=stroke.previous||p,n=Math.max(1,Math.ceil(Math.hypot(p[0]-before[0],p[1]-before[1])/Math.max(1,radius*snapshot.refinement*.5))),points=[],gesture=stroke;
       for(let i=0;i<=n;i++)points.push([before[0]+(p[0]-before[0])*i/n,before[1]+(p[1]-before[1])*i/n]);
-      lastAction=rpc('eraseCells',{points,radius}).then(r=>gesture.removed=(gesture.removed||0)+r.removed).catch(fail);
-    }else if(tool==='wall'||tool==='erase'){
+      lastAction=rpc('eraseAll',{points,radius}).then(r=>gesture.removed=(gesture.removed||0)+r.removed).catch(fail);
+    }else if(tool==='wall'){
       const before=stroke.previous||p,n=Math.max(Math.abs(p[0]-before[0]),Math.abs(p[1]-before[1]),1),points=[];
       for(let i=0;i<=n;i++)points.push([Math.round(before[0]+(p[0]-before[0])*i/n),Math.round(before[1]+(p[1]-before[1])*i/n)]);
-      lastAction=rpc('stroke',{points,erase:tool==='erase'}).catch(fail);
+      lastAction=rpc('stroke',{points,erase:false}).catch(fail);
     }else if(tool==='signal'&&eraseSource){
       lastAction=rpc('source',{x:p[0],y:p[1],radius:Number($('source-radius').value),erase:true}).catch(fail);
     }else if(tool==='seed'&&first){lastAction=rpc('seed',{kind:Number($('seed-kind').value),x:p[0],y:p[1],manual:true,push:true}).then(seedFeedback).catch(fail);}
@@ -15936,7 +16188,7 @@ Arena ＋ 右侧栏|Arena + sidebar
     canvas.setPointerCapture(e.pointerId);stroke={pointerId:e.pointerId,previous:p,id:m?.id||0,token:++dragSerial,offset:[0,0],warned:false,drag:tool==='move',signal:tool==='signal'&&!eraseSource};if(tool==='remove'){hover={clientX:e.clientX,clientY:e.clientY};probeDirty=true;}
     if(stroke.signal){signalGesture.down({point:p,screen:[e.clientX,e.clientY],type:$('signal-kind').value,radius:Number($('source-radius').value)});return;}
     if(tool==='move'||tool==='inspect'){selected=m?.id||0;observedBirth=m?.birth||0;rpc('observe',{id:selected,birth:observedBirth}).catch(fail);sync();dirty=true;}
-    if(tool==='inspect'){$('cell-inspector').open=true;if(mobileUI.isMobile)mobileUI.focus('cell-inspector');}
+    if(tool==='inspect'){$('cell-inspector').open=true;mobileUI.focus('cell-inspector');}
     if(tool==='move'){
       if(!m||m.dying){stroke=null;toast('请在一个存活的细胞上按住拖动');return;}
       stroke.offset=[m.x-p[0],m.y-p[1]];canvas.style.cursor='grabbing';lastAction=rpc('beginDrag',{id:m.id,token:stroke.token}).catch(fail);
@@ -15965,24 +16217,29 @@ Arena ＋ 右侧栏|Arena + sidebar
     const r=Number(refine.value);$('grid-preview').textContent=`应用后：${Math.round(width*r)} × ${Math.round(height*r)} 真实格点（${width} × ${height} 区域，${r}× 精细度）`;
   }
   for(const id of ['world-size','refinement'])$(id).addEventListener('change',gridPreview);gridPreview();
-  async function start(scene=snapshot?.scene||'oncogenesis',{preserve=false,shuffle=false,preset=false}={}){
+  async function start(scene=snapshot?.scene||'oncogenesis',{preserve=false,shuffle=false,preset=false,reason}={}){
+    if(setupBusy)return;
     setupBusy++;autoRandom.suspend(performance.now());try{
     await endStroke();panGesture=null;
+    if(snapshot){await rpc('playing',{value:false});journal.observe(snapshot,performance.now(),false);}
+    const priorScene=snapshot?.scene,lockedSettings=shuffle?parameterLocks.pick(snapshot?.settings||{}):{};
     if(preset&&scene==='maze'&&Number($('world-size').value)<384){$('world-size').value='384';if(Number($('refinement').value)>2)$('refinement').value='2';gridPreview();}
     selected=0;observedBirth=0;const resetDisplay=preset||shuffle||scene!==snapshot?.scene;
     const tumorPreset=['oncogenesis','cold','hot','random'].includes(scene);
-    if(preset||shuffle){if(tumorPreset)$('boundary').value='wrap';else if(scene==='maze')$('boundary').value='solid';}
+    if(preset||shuffle){if(tumorPreset&&!(shuffle&&parameterLocks.values.boundary))$('boundary').value='wrap';else if(scene==='maze')$('boundary').value='solid';}
     // Each page visit gets one new development experiment. Restart/import keep
     // their explicit seed; revisiting/restoring this preset replays this visit.
     const seed=preset?(scene==='oncogenesis'?openingSeed:17):shuffle?nextStartSeed():snapshot?.seed??openingSeed;
-    const worldWidth=Number($('world-size').value),worldHeight=Number($('world-size').selectedOptions[0]?.dataset.height)||worldWidth*.75,refinement=Number($('refinement').value),boundary=$('boundary').value;
+    let worldWidth=Number($('world-size').value),worldHeight=Number($('world-size').selectedOptions[0]?.dataset.height)||worldWidth*.75,refinement=Number($('refinement').value),boundary=$('boundary').value;
+    if(shuffle){({worldWidth,worldHeight,refinement,boundary}=CellLabRounds.randomGeometry(seed,{worldWidth,worldHeight,refinement,boundary},parameterLocks.values));$('world-size').value=worldWidth;$('refinement').value=refinement;$('boundary').value=boundary;gridPreview();}
     if(((preset||shuffle)&&snapshot)||scene==='empty')await rpc('playing',{value:false});
-    await rpc('start',{scene,seed,worldWidth,worldHeight,refinement,boundary,settings:preserve?snapshot?.settings||{}:{},...(scene==='empty'?{warmup:0}:{})});
+    await rpc('start',{scene,seed,worldWidth,worldHeight,refinement,boundary,settings:shuffle?lockedSettings:preserve?snapshot?.settings||{}:{},...(scene==='empty'?{warmup:0}:{})});
+    archiveRound(reason||(shuffle?'manual-random':priorScene!==scene?'scene-change':preset?'preset-reset':'manual-restart'));
     if(resetDisplay){$('antigen-marks').checked=true;$('edge-activity').checked=!tumorPreset;$('normal-activity').checked=false;$('tumor-activity').checked=false;$('immune-activity').checked=scene==='maze';if(tumorPreset){$('nuclei').checked=true;$('cycle-marks').checked=true;$('show-tracks').checked=false;syncTracks();}dirty=true;}
     if(preset||shuffle||scene==='empty'){signalLayers.clear();$('field-view').value=tumorPreset?'adversity':'none';if(tumorPreset||scene==='maze')signalLayers.add('trail');if(scene==='maze'){$('edge-activity').checked=true;$('immune-activity').checked=true;$('show-tracks').checked=true;$('track-duration').value='1200';syncTracks();view.x=0;view.y=0;$('zoom').value='100';$('view-fit').value='contain';}updateOverlayButtons();dirty=true;await rpc('speed',{value:tumorPreset||scene==='network'?3:1});await rpc('playing',{value:scene!=='empty'});}
     else if(scene==='stress'||scene==='surveillance'){$('field-view').value='adversity';dirty=true;}
     if(scene==='empty'){view.x=0;view.y=0;$('zoom').value='100';$('seed-kind').value='1';setTool('seed');if(mobileUI.isMobile)mobileUI.focus('mobile-tools');dirty=true;}
-    }finally{setupBusy--;autoRandom.reset(performance.now());autoRandom.observe(snapshot,performance.now());}
+    }finally{setupBusy--;autoRandom.reset(performance.now());autoRandom.observe(snapshot,performance.now());renderAutoNotice();if(snapshot&&!journal.active)journal.begin(snapshot,performance.now(),undefined,parameterLocks.toJSON());}
   }
   function syncTracks(){trajectories.configure($('show-tracks').checked,Number($('track-duration').value));$('track-duration-out').textContent=$('track-duration').value+' MCS';if(snapshot)trajectories.sample(snapshot);dirty=true;}
   $('show-tracks').addEventListener('change',syncTracks);$('track-duration').addEventListener('input',syncTracks);
@@ -16000,7 +16257,7 @@ Arena ＋ 右侧栏|Arena + sidebar
   $('network-demo').addEventListener('click',()=>start('network',{preset:true}).catch(fail));
   $('fullscreen').addEventListener('click',()=>{const viewport=document.querySelector('.viewport');(document.fullscreenElement?document.exitFullscreen():viewport.requestFullscreen()).catch(fail);});
   $('reset').addEventListener('click',()=>start(undefined,{preserve:true}).catch(fail));$('shuffle').addEventListener('click',()=>start('random',{shuffle:true}).catch(fail));
-  $('play').addEventListener('click',()=>rpc('playing',{value:!snapshot?.playing}).catch(fail));$('step').addEventListener('click',()=>rpc('advance',{steps:1}).catch(fail));
+  $('play').addEventListener('click',()=>rpc('playing',{value:!snapshot?.playing}).catch(fail));
   $('speed').addEventListener('input',e=>{$('speed-out').textContent=e.target.value+'×';rpc('speed',{value:Number(e.target.value)}).catch(fail);});
   $('sprinkle').addEventListener('click',async()=>{
     const count=$('seed-count').valueAsNumber,button=$('sprinkle');
@@ -16025,8 +16282,6 @@ Arena ＋ 右侧栏|Arena + sidebar
   $('recheck-performance').addEventListener('click',()=>{adaptive.setMode(adaptive.mode,performance.now());applyPerformance();dirty=true;uiPending=true;});
   document.querySelector('aside').addEventListener('toggle',()=>{uiPending=true;forceFrame=true;dirty=true;performanceContext();},true);
   for(const name of ['pointerdown','input'])document.addEventListener(name,event=>{const now=performance.now();latestInput=event.timeStamp>0&&event.timeStamp<=now&&now-event.timeStamp<2000?event.timeStamp:now;},{capture:true,passive:true});
-  for(const section of sections)section.addEventListener('toggle',()=>{if(section.open)for(const other of sections)if(other!==section)other.open=false;});
-  $('collapse-modules').addEventListener('click',()=>sections.forEach(section=>section.open=false));
   document.querySelectorAll('[data-panel]').forEach(button=>button.addEventListener('click',()=>{statisticsUI.set(false);mobileUI.focus(button.dataset.panel);}));
   $('compute-backend').addEventListener('change',()=>rpc('backend',{mode:$('compute-backend').value}).catch(fail));
   const modes={wander:{alignment:0,cohesion:0,repulsion:1.2,noise:1.2,normalMotility:.9},cluster:{alignment:.4,cohesion:2.6,repulsion:.3,noise:.4,normalMotility:.45},flock:{alignment:2.7,cohesion:1.1,repulsion:.5,noise:.25,normalMotility:1}};
@@ -16040,12 +16295,12 @@ Arena ＋ 右侧栏|Arena + sidebar
     const supported=CellLabVideo.ArenaRecorder.supported(format);
     $('record-options-info').textContent=supported?`${q.width} × ${q.height} · 30 FPS`:(format==='mp4'?'当前浏览器不支持 MP4，请使用新版 Chrome、Edge 或 Safari，或手动选择 WebM':'当前浏览器不支持所选视频格式');
     $('record-format').disabled=busy;$('record-quality').disabled=busy;$('record-scope').disabled=busy;
-    if(!busy){$('record-video').textContent='● 录制 '+label;$('record-video').disabled=!supported;if(!supported)$('record-status').textContent=$('record-options-info').textContent;else if(recordUnavailable)$('record-status').textContent='';recordUnavailable=!supported;}
-    $('statistics-record').textContent=$('record-video').textContent;$('statistics-record').disabled=$('record-video').disabled;
+    if(!busy){$('record-video').title='● 录制 '+label;$('record-video').setAttribute('aria-label',$('record-video').title);$('record-video').disabled=!supported;if(!supported)$('record-status').textContent=$('record-options-info').textContent;else if(recordUnavailable)$('record-status').textContent='';recordUnavailable=!supported;}
+    $('statistics-record').textContent=$('record-video').title;$('statistics-record').disabled=$('record-video').disabled;
   }
   const video=new CellLabVideo.ArenaRecorder(canvas,viewport,{
     sidebar:document.querySelector('aside'),captureSidebar:CellLabSidebarCapture.capture,
-    onChange:state=>{const time=Math.floor(state.elapsed||0),stamp=String(Math.floor(time/60)).padStart(2,'0')+':'+String(time%60).padStart(2,'0');$('record-video').textContent=state.preparing?'准备录制…':state.stopping?'正在生成视频…':state.active?'■ 停止并下载':'● 录制 '+($('record-format').value==='mp4'?'MP4':'WebM');$('record-video').disabled=!!(state.stopping||state.preparing);$('record-indicator').hidden=!state.active;$('record-indicator').textContent='■ '+stamp;$('record-indicator').disabled=!!state.stopping;if(state.active)$('record-status').textContent=`录制中 ${stamp} · ${state.format==='mp4'?'MP4':'WebM'} · ${state.width} × ${state.height} · ${state.fps} FPS`;refreshRecordingOptions();},
+    onChange:state=>{const time=Math.floor(state.elapsed||0),stamp=String(Math.floor(time/60)).padStart(2,'0')+':'+String(time%60).padStart(2,'0');const label=state.preparing?'准备录制…':state.stopping?'正在生成视频…':state.active?'■ 停止并下载':'● 录制 '+($('record-format').value==='mp4'?'MP4':'WebM');$('record-video').title=label;$('record-video').setAttribute('aria-label',label);$('record-video').setAttribute('aria-pressed',String(!!state.active));$('record-video').classList.toggle('recording',!!state.active);$('record-video').disabled=!!(state.stopping||state.preparing);$('record-indicator').hidden=!state.active;$('record-indicator').textContent='■ '+stamp;$('record-indicator').disabled=!!state.stopping;if(state.active)$('record-status').textContent=`录制中 ${stamp} · ${state.format==='mp4'?'MP4':'WebM'} · ${state.width} × ${state.height} · ${state.fps} FPS`;refreshRecordingOptions();},
     onReady:(blob,state)=>{const url=URL.createObjectURL(blob),extension=blob.type.includes('mp4')?'mp4':'webm';download(url,`cell-arena-${snapshot.scene}-${state.width}x${state.height}-${Date.now()}.${extension}`);setTimeout(()=>URL.revokeObjectURL(url),60000);$('record-status').textContent=`视频已导出 · ${extension==='mp4'?'MP4':'WebM'} · ${state.width} × ${state.height} · ${Math.round(state.elapsed)} 秒 · ${(blob.size/1024/1024).toFixed(1)} MB`;},
     onError:error=>{$('record-status').textContent=String(error.message||error);},
     onResolution:scale=>{if(Math.abs(recordingScale-scale)>.001){recordingScale=scale;performanceContext();if(scale>0)render();else dirty=true;}}
@@ -16056,17 +16311,23 @@ Arena ＋ 右侧栏|Arena + sidebar
   $('statistics-record').addEventListener('click',()=>$('record-video').click());
   $('statistics-play').addEventListener('click',()=>$('play').click());
   for(const id of ['record-format','record-quality','record-scope'])$(id).addEventListener('change',refreshRecordingOptions);refreshRecordingOptions();
+  function closeFileMenu(){ $('file-menu').hidden=true;$('file-actions').setAttribute('aria-expanded','false'); }
+  $('file-actions').addEventListener('click',()=>{const open=$('file-menu').hidden;$('file-menu').hidden=!open;$('file-actions').setAttribute('aria-expanded',String(open));});
+  $('file-menu').addEventListener('click',event=>{if(event.target.closest('button'))closeFileMenu();});
+  document.addEventListener('pointerdown',event=>{if(!event.target.closest('#file-menu,#file-actions'))closeFileMenu();});
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('file-menu').hidden){closeFileMenu();$('file-actions').focus();}});
+  $('file-export-rounds').addEventListener('click',()=>$('export-rounds').click());
   $('snapshot').addEventListener('click',()=>{render();download(canvas.toDataURL('image/png'),`cell-arena-${snapshot.scene}-${snapshot.time}.png`);});
-  function displaySettings(){return {cellColors:CellLabDisplay.normalizeColors(cellColors),edgeFade:Number($('body-feather').value),autoRandomMinutes:autoRandom.minutes,trackDuration:Number($('track-duration').value),fieldView:$('field-view').value,signalLayers:[...signalLayers],opacity:{...opacity},flags:Object.fromEntries(CellLabExperiment.flags.map(id=>[id,$(id).checked])),zoom:$('zoom').value,fit:$('view-fit').value,renderResolution:$('render-resolution').value};}
+  function displaySettings(){return {cellColors:CellLabDisplay.normalizeColors(cellColors),edgeFade:Number($('body-feather').value),autoRandomMinutes:autoRandom.minutes,parameterLocks:parameterLocks.toJSON(),trackDuration:Number($('track-duration').value),fieldView:$('field-view').value,signalLayers:[...signalLayers],opacity:{...opacity},flags:Object.fromEntries(CellLabExperiment.flags.map(id=>[id,$(id).checked])),zoom:$('zoom').value,fit:$('view-fit').value,renderResolution:$('render-resolution').value};}
   async function exportData(){return {...await rpc('export'),display:displaySettings()};}
   $('export-data').addEventListener('click',async()=>{try{const data=await exportData(),url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));download(url,`cell-arena-experiment-${data.time}.json`);setTimeout(()=>URL.revokeObjectURL(url),5000);}catch(e){fail(e);}});
   let pendingImport=null,importSerial=0;
   async function importData(data){
     setupBusy++;autoRandom.suspend(performance.now());try{
     await endStroke();
-    const profile=CellLabExperiment.parse(data);await endStroke();await rpc('import',{data});
+    const profile=CellLabExperiment.parse(data);if(snapshot){await rpc('playing',{value:false});journal.observe(snapshot,performance.now(),false);}await rpc('import',{data});archiveRound('import');
     const config=profile.config,select=$('world-size');let option=[...select.options].find(o=>o.value===String(config.worldWidth));if(!option){option=new Option('',String(config.worldWidth));select.append(option);}option.textContent=`${config.worldWidth} × ${config.worldHeight}`;option.dataset.height=config.worldHeight;select.value=String(config.worldWidth);$('refinement').value=String(config.refinement);gridPreview();
-    const d=profile.display;if(d.cellColors)applyColors(d.cellColors);if(d.edgeFade!==undefined){$('body-feather').value=d.edgeFade;syncAppearance();}if(d.fieldView!==undefined)$('field-view').value=d.fieldView;if(d.signalLayers){signalLayers.clear();for(const key of d.signalLayers)signalLayers.add(key);}Object.assign(opacity,d.opacity||{});
+    const d=profile.display;if(d.parameterLocks){parameterLocks.restore(d.parameterLocks);persistLocks();}if(d.cellColors)applyColors(d.cellColors);if(d.edgeFade!==undefined){$('body-feather').value=d.edgeFade;syncAppearance();}if(d.fieldView!==undefined)$('field-view').value=d.fieldView;if(d.signalLayers){signalLayers.clear();for(const key of d.signalLayers)signalLayers.add(key);}Object.assign(opacity,d.opacity||{});
     $('auto-random-minutes').value=d.autoRandomMinutes??0;configureAutoRandom();
     // Migrate the short-lived exclusive selector; current independent flags win.
     if(d.cellMarker!==undefined)for(const [id,mode]of [['nuclei','nucleus'],['antigen-marks','antigen'],['cycle-marks','cycle']])$(id).checked=d.cellMarker===mode;
@@ -16075,7 +16336,7 @@ Arena ＋ 右侧栏|Arena + sidebar
     if(d.trackDuration!==undefined)$('track-duration').value=d.trackDuration;syncTracks();
     if(d.zoom)$('zoom').value=d.zoom;if(d.fit)$('view-fit').value=d.fit;if(d.renderResolution)$('render-resolution').value=d.renderResolution;
     view.x=0;view.y=0;selected=0;observedBirth=0;hover=null;probeDirty=true;syncOpacity();updateOverlayButtons();setTool(config.scene==='empty'?'seed':'move');dirty=true;return profile;
-    }finally{setupBusy--;autoRandom.reset(performance.now());autoRandom.observe(snapshot,performance.now());}
+    }finally{setupBusy--;autoRandom.reset(performance.now());autoRandom.observe(snapshot,performance.now());renderAutoNotice();if(snapshot&&!journal.active)journal.begin(snapshot,performance.now(),undefined,parameterLocks.toJSON());}
   }
   $('import-data').addEventListener('click',()=>$('import-file').click());
   $('import-file').addEventListener('change',async()=>{
@@ -16088,19 +16349,20 @@ Arena ＋ 右侧栏|Arena + sidebar
   $('cancel-import').addEventListener('click',()=>$('import-dialog').close());$('import-dialog').addEventListener('close',()=>{pendingImport=null;importSerial++;$('import-file').value='';});
   $('confirm-import').addEventListener('click',async()=>{if(!pendingImport)return;$('confirm-import').disabled=true;try{await importData(pendingImport);$('import-dialog').close();toast('参数已加载，已暂停重新开局');}catch(error){$('import-status').textContent=String(error.message||error);$('confirm-import').disabled=false;}});
   $('about').addEventListener('click',()=>$('about-dialog').showModal());$('close-about').addEventListener('click',()=>$('about-dialog').close());
-  document.addEventListener('visibilitychange',()=>{autoRandom.suspend(performance.now());if(document.hidden)void endStroke();lastAnimation=0;performanceContext();rpc('visible',{value:!document.hidden}).catch(fail);});
+  document.addEventListener('visibilitychange',()=>{autoRandom.suspend(performance.now());if(snapshot){journal.observe(snapshot,performance.now(),false);checkpointRound(performance.now(),true);}if(document.hidden)void endStroke();lastAnimation=0;performanceContext();rpc('visible',{value:!document.hidden}).catch(fail);});
   document.addEventListener('keydown',e=>{if(e.code==='Space'&&!['INPUT','SELECT','BUTTON','SUMMARY'].includes(document.activeElement.tagName)&&!document.querySelector('dialog[open]')){e.preventDefault();rpc('playing',{value:!snapshot?.playing}).catch(fail);}});
   function frame(){
     const now=performance.now();if(lastAnimation)adaptive.frameGap(now-lastAnimation);lastAnimation=now;
     if(latestInput){adaptive.inputDelay(now-latestInput);latestInput=0;}
-    if(now-lastHeartbeat>=500){performanceContext();if(adaptive.tick(now)){dirty=true;applyPerformance();}performancePlan=adaptive.status();lastHeartbeat=now;tickAutoRandom(now);}
+    if(now-lastHeartbeat>=500){performanceContext();if(adaptive.tick(now)){dirty=true;applyPerformance();}performancePlan=adaptive.status();lastHeartbeat=now;tickAutoRandom(now);if(snapshot){journal.observe(snapshot,now,!document.hidden&&!stroke);checkpointRound(now);}}
     if(uiPending&&now-lastUISync>=performancePlan.uiMs){sync();lastUISync=now;uiPending=false;}
     if(dirty&&(!pendingFrame||forceFrame||now-lastRender>=1000/performancePlan.fps))render();
     if(probeDirty)updateProbe();requestAnimationFrame(frame);
   }requestAnimationFrame(frame);applyPerformance();
-  window.artistooLab={rpc,ready,get snapshot(){return snapshot;},get autoRandom(){return {...autoRandom.status(),busy:autoRandomBusy};},get performance(){return {...adaptive.status(),visiblePanels:[...visiblePanels]};},get errors(){return errors;},get selected(){return selected;},get recording(){return video.status;},get colors(){return CellLabDisplay.normalizeColors(cellColors);},get renderer(){return {gpu:!!gpuRenderer&&!gpuRenderer.lost,device:gpuRenderer?.device,error:rendererFailure,ms:gpuRenderer?.lastMs,fps:snapshot?.playing?frameStats.fps:0,renderMs:frameStats.renderMs,snapshotMs:frameStats.snapshotMs};},setTool,render,exportData,importData};
+  window.artistooLab={rpc,ready,get snapshot(){return snapshot;},get roundHistory(){return {completed:completedRounds.map(r=>structuredClone(r)),current:journal.current()};},get parameterLocks(){return parameterLocks.toJSON();},get autoRandom(){return {...autoRandom.status(),busy:autoRandomBusy};},get performance(){return {...adaptive.status(),visiblePanels:[...visiblePanels]};},get errors(){return errors;},get selected(){return selected;},get recording(){return video.status;},get colors(){return CellLabDisplay.normalizeColors(cellColors);},get renderer(){return {gpu:!!gpuRenderer&&!gpuRenderer.lost,device:gpuRenderer?.device,error:rendererFailure,ms:gpuRenderer?.lastMs,fps:snapshot?.playing?frameStats.fps:0,renderMs:frameStats.renderMs,snapshotMs:frameStats.snapshotMs};},setTool,render,exportData,importData};
   const language=CellLabI18n.mount($('language'));
-  start('oncogenesis',{preset:true}).then(()=>rpc('visible',{value:!document.hidden})).then(resolveReady).catch(fail);
+  window.addEventListener('pagehide',()=>{if(snapshot)journal.observe(snapshot,performance.now(),false);checkpointRound(performance.now(),true);});
+  historyReady.then(()=>start('oncogenesis',{preset:true})).then(()=>rpc('visible',{value:!document.hidden})).then(resolveReady).catch(fail);
 })();
 </script>
 <!-- Optional analytics for the published site; local/offline copies never load it. -->

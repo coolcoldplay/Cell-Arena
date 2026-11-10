@@ -2,7 +2,7 @@ import {openBrowser,delay} from './browser-session.mjs';
 import {mkdir,writeFile,readFile,readdir} from 'node:fs/promises';
 import {execFile} from 'node:child_process';import {promisify} from 'node:util';import path from 'node:path';import assert from 'node:assert/strict';
 const target=process.argv[2]||'dist/index.html',out=path.resolve('output/statistics-video/'+(target.startsWith('http')?'live':'local')),run=promisify(execFile);
-await mkdir(out,{recursive:true});const downloads=path.join(out,'downloads');await mkdir(downloads,{recursive:true});
+await mkdir(out,{recursive:true});const downloads=path.join(out,'downloads-'+Date.now());await mkdir(downloads,{recursive:true});
 const b=await openBrowser(target,9430,{gpu:true}),checks=[];
 const check=(name,passed,data={})=>{checks.push({name,passed:!!passed,...data});assert.ok(passed,name+': '+JSON.stringify(data));};
 const wait=async e=>{for(let i=0;i<250;i++){if(await b.evaluate(e))return;await delay(100);}throw Error('Timed out: '+e);};
@@ -27,7 +27,7 @@ try{
  const changed=await b.evaluate('artistooLab.recording.elapsed');
  check('Live immune counts and history remain visible during recording',await b.evaluate('Number(document.querySelector("#immune-count").textContent)===20&&document.querySelector("#history-range").textContent.includes("130")'));
  await shot('recording-statistics');
- await click('#statistics-expand');await click('[data-panel="parameter-groups"]');await click('#module-immune>summary');await delay(1000);
+ await click('#statistics-expand');await click('[data-panel="parameter-groups"]');await click('[data-module="module-immune"]');await delay(1000);
  await click('#record-indicator');await wait('!artistooLab.recording.active&&!artistooLab.recording.stopping&&artistooLab.recording.bytes>0');
  let name;for(let i=0;i<100;i++){name=(await readdir(downloads)).find(n=>!before.has(n)&&n.endsWith('.mp4'));if(name)break;await delay(100);}assert.ok(name);
  const file=path.join(downloads,name),probe=JSON.parse((await run('ffprobe.exe',['-v','error','-select_streams','v:0','-count_frames','-show_entries','format=format_name,duration:stream=codec_name,width,height,nb_read_frames','-of','json',file])).stdout);

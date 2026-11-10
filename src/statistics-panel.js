@@ -10,10 +10,12 @@
       active=value;aside.classList.toggle('statistics-focused',active);
       $('statistics-expand').setAttribute('aria-pressed',String(active));$('statistics-expand').textContent=active?'返回控制':'占满侧栏';
       if(active){
-        $('statistics-panel').open=true;$('statistics-scenario').open=true;
+        mobile.focus('statistics-panel');
+        $('statistics-panel').open=true;
         $('statistics-record-settings').append(record);mobile.expand(true);pane.scrollTop=0;
       }else{
         anchor.after(record);$('statistics-scenario').open=priorScenario;mobile.expand(priorMobile);pane.scrollTop=priorScroll;
+        mobile.focus('parameter-groups');
       }
       onLayout();
     }

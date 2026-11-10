@@ -6,6 +6,60 @@
   function add(rows){for(const line of rows.trim().split('\n')){const at=line.indexOf('|');if(at>0)dictionary.set(line.slice(0,at),line.slice(at+1));}}
   add(`
 Cell-Arena · 细胞生态竞技场|Cell-Arena · Cell ecology playground
+免疫寿命：杀伤上限|Immune lifespan: kill limit
+累计致死指定数量的肿瘤后皱缩凋亡；0 关闭。只记实际致死接触，每颗肿瘤一次；分裂后两颗子代各自从 0 计数|Shrink and die after this many tumor kills; 0 disables. Each tumor is credited once to its lethal contact. Both newborn daughters start at zero.
+寿命凋亡|Lifespan apoptosis
+达到累计肿瘤杀伤上限|Tumor kill limit reached
+累计致死肿瘤|Tumors killed
+不限|Unlimited
+全部锁定|Lock all
+全部解锁|Unlock all
+已锁定：随机开局保持此参数|Locked: keep this parameter when randomizing
+未锁定：随机开局允许随机化|Unlocked: allow this parameter to randomize
+锁定参数在自动换局与随机生成时保持不变|Locked parameters stay fixed in automatic and manual random rounds
+当前存活|Living now
+选中|Selected
+体细胞|Somatic
+演化参数|Model parameters
+显示设置|Display settings
+五组演化参数|Five model parameter groups
+免疫状态|Immune states
+本局走势|This round
+历局结果|Past rounds
+历局记录保存在本机|Round history is saved on this device
+导出 CSV|Export CSV
+较新|Newer
+较早|Older
+换局后在这里比较历局结果；CSV 也包含当前进行中的一局。|Compare completed rounds here. CSV also includes the current round.
+本局累计|Cumulative events
+细胞分裂|Divisions
+抗原逃逸|Antigen escape
+死亡清除|Deaths cleared
+免疫巡逻与细胞周期|Patrol and cell cycle
+已检查|Checked
+演化事件|Evolution events
+死亡明细|Death details
+环境死亡其中|Environmental deaths by type
+存活数不含死亡过程中的胞体；死亡清除在胞体消失时计数。寿命凋亡独立于肿瘤自发凋亡。|Living counts exclude dying bodies. Clearance is counted when a body disappears. Lifespan apoptosis is separate from spontaneous tumor apoptosis.
+运行与开局|Runtime and setup
+即将随机换局|New random round soon
+已暂停倒计时|Countdown paused
+继续本局 · 关闭自动换局|Keep this round · Disable auto restart
+全部细胞消失|All cells disappeared
+仅剩肿瘤细胞|Only tumor cells remain
+免疫细胞为 0|No living immune cells
+正常细胞为 0|No living normal cells
+数量与生物状态长时间不变|Population and biological states stayed unchanged
+手动随机生成|Manual randomization
+手动重来|Manual restart
+切换情境|Scenario changed
+恢复情境|Preset restored
+重新开局|New setup
+页面关闭／重新载入|Page closed / reloaded
+进行中|In progress
+已按未锁定参数随机开启新一轮|Started a new round with unlocked parameters randomized
+历史记录暂时无法保存到本机，仍可导出本页 CSV|Local history storage is unavailable. You can still export this page's CSV.
+0 关闭。无变化超时、全部消失、仅剩肿瘤、免疫为 0 或正常为 0 时，提示 10 秒后换局；迷宫不检查正常细胞，暂停和后台不计时。|0 disables. Stagnation, no cells, tumor-only, no immune cells or no normal cells starts a 10-second notice. The maze skips normal-cell checks. Paused and hidden time is excluded.
 边缘淡化|Edge translucency
 沿当前胞体轮廓由内向外渐透明；0% 为纯色。Act 和标记独立显示。|Fade outward along the current cell shape; 0% restores solid color. Act and markers remain independent.
 无变化|Idle
@@ -38,7 +92,7 @@ Arena 培养皿|Arena culture dish
 ▶ 继续|▶ Resume
 单步|Step
 ↺ 重来|↺ Reset
-播放|Speed
+速度|Speed
 鼠标工具|Mouse tools
 ↑ 展开面板|↑ Expand panel
 ↓ 返回画布|↓ Back to arena
@@ -49,13 +103,13 @@ Arena 培养皿|Arena culture dish
 显示|Display
 环境|Environment
 次|times
-↔ 拖动细胞|↔ Move
-＋ 新增细胞|＋ Add cells
-◉ 释放信号|◉ Signals
-▥ 绘制障碍|▥ Walls
+↔ 拖动|↔ Drag
+＋ 新增|＋ Add
+◉ 信号|◉ Signal
+▥ 障碍|▥ Walls
 ⌫ 擦除障碍|⌫ Erase walls
-⌾ 观察细胞|⌾ Inspect
-⌫ 擦除细胞|⌫ Erase cells
+⌾ 追踪|⌾ Track
+⌫ 擦除|⌫ Erase
 ✥ 平移视野|✥ Pan
 拖动时暂停 · 邻居让位 · 实体墙阻挡|Drag pauses time; neighbors yield; walls block
 拖动时暂停 · 邻居让位 · 松手恢复|Drag pauses time; release to resume
@@ -63,14 +117,14 @@ Arena 培养皿|Arena culture dish
 单击释放因子 · 拖动画出信号带|Click to release a signal; drag to paint a trail
 在空白处拖动画墙|Drag across empty space to draw walls
 拖动擦除实体障碍|Drag to erase solid walls
-擦除触及的整颗细胞 · 单独记账|Erase whole cells touched by the brush; counted separately
+擦除细胞、场源与障碍 · 重置局部环境|Erase cells, sources and walls; reset local fields
 按住拖动平移视野 · 不改变细胞位置|Drag to pan the view without moving cells
 点击细胞查看状态与局部环境|Click a cell to inspect its state and environment
 新增类型|Cell type
 正常细胞|Normal cells
 肿瘤细胞|Tumor cells
 免疫细胞|Immune cells
-异常中间态|Abnormal cells
+癌前细胞|Precancerous cells
 未激活免疫细胞|Resting immune cell
 已激活免疫细胞|Activated immune cell
 未激活免疫|Resting immune
@@ -168,7 +222,7 @@ Act · 标记 · 环境分量|Act / markers / fields
 细胞配色方案|Cell color palettes
 原始配色|Original palette
 自定义配色|Custom palette
-预览从左到右：正常 · 异常 · 肿瘤 · 免疫 · 激活|Preview: normal / abnormal / tumor / immune / activated
+预览从左到右：正常 · 癌前 · 肿瘤 · 免疫 · 激活|Preview: normal / precancerous / tumor / immune / activated
 类型 / 状态|Type / state
 胞体|Body
 胞核|Nucleus
@@ -191,7 +245,7 @@ Act · 标记 · 环境分量|Act / markers / fields
 自动 · 实测选择|Auto · Benchmark
 数量与事件统计|Population & events
 正常|Normal
-异常|Abnormal
+癌前|Precancerous
 肿瘤|Tumor
 免疫|Immune
 其中激活|Activated
@@ -272,7 +326,7 @@ Artistoo · 来源与许可|Artistoo · Sources & licenses
 肿瘤扩张|Tumor expansion
 通道搜索|Channel search
 密度与逃逸|Density & escape
-异常监视|Abnormal cell surveillance
+癌前监视|Precancerous cell surveillance
 胶质瘤样分枝成网|Glioma-like branching network
 局部通讯如何改变行为|How local communication shapes behavior
 代码来源、版本与许可|Code sources, versions & licenses
@@ -319,7 +373,7 @@ CPM 温度，影响随机复制尝试的接受率|CPM temperature; controls acce
 恶劣环境逃逸|Escape from adverse conditions
 沿局部氧糖上升、酸负荷下降的方向重新极化|Repolarize toward higher local nutrients and lower acid load
 识别后招募信号|Recruitment after recognition
-实际接触识别异常或肿瘤后分泌；仅被吸引者不自动接力|Secreted after contact recognition; attracted cells do not automatically relay the signal
+实际接触识别癌前或肿瘤后分泌；仅被吸引者不自动接力|Secreted after contact recognition; attracted cells do not automatically relay the signal
 激活后免疫生长|Activated immune growth
 接触识别后才有自动克隆扩增，受代谢状态限制|Clonal expansion requires contact recognition and is limited by metabolism
 新免疫细胞分裂预算|New immune cell division limit
@@ -328,12 +382,12 @@ CPM 温度，影响随机复制尝试的接受率|CPM temperature; controls acce
 肿瘤分裂时分别抽样耐受、增殖、侵袭和抗原表达|Tolerance, proliferation, invasion and antigen expression mutate independently at division
 突变幅度|Mutation size
 随机双向变异；环境选择存活者，不定向创造突变|Random changes in either direction; the environment selects survivors without directing mutations
-环境损伤致异常|Stress-induced abnormality
-持续代谢损伤提高正常 → 异常风险；0 关闭此通路，炎性通路独立设置|Sustained metabolic damage raises normal → abnormal risk; 0 disables this pathway, independently of inflammation
+环境损伤致癌前|Stress-induced precancerous change
+持续代谢损伤提高正常 → 癌前风险；0 关闭此通路，炎性通路独立设置|Sustained metabolic damage raises normal → precancerous risk; 0 disables this pathway, independently of inflammation
 炎性信号促癌|Inflammation-associated transformation
-局部损伤／免疫招募信号持续累积后增加正常 → 异常风险；0 关闭，仍经过异常中间态。未标定的炎症代理|Sustained damage/recruitment signals increase normal → abnormal risk. 0 disables this uncalibrated inflammation proxy.
-异常 → 肿瘤风险倍率|Abnormal → tumor risk multiplier
-异常至少保留 160 MCS；倍率调整后仍是随机事件，0 保留中间态|Abnormal cells persist for at least 160 MCS; progression remains stochastic. 0 retains the intermediate state.
+局部损伤／免疫招募信号持续累积后增加正常 → 癌前风险；0 关闭，仍经过癌前细胞。未标定的炎症代理|Sustained damage/recruitment signals increase normal → precancerous risk. 0 disables this uncalibrated inflammation proxy.
+癌前 → 肿瘤风险倍率|Precancerous → tumor risk multiplier
+癌前至少保留 160 MCS；倍率调整后仍是随机事件，0 保留中间态|Precancerous cells persist for at least 160 MCS; progression remains stochastic. 0 retains the intermediate state.
 切面让位上限|Maximum section yielding
 受邻居推挤时减少可见目标面积，压力解除后逐步恢复；总生物量保留|Reduce visible target area under crowding, then recover gradually; total target biomass is retained
 突起延伸范围|Protrusion reach
@@ -357,7 +411,7 @@ CPM 温度，影响随机复制尝试的接受率|CPM temperature; controls acce
 从开局到当前时刻；每 30 MCS 采样，手动新增／分裂即时记入，当前数量实时补齐。长记录绘图保留峰谷，导出包含完整采样。|From the start to the present: sampled every 30 MCS, with manual additions/divisions recorded immediately and current counts appended. Long plots preserve extrema; exports retain all samples.
 情境进度与开局|Scenario progress & setup
 情境设定与实际进度|Scenario setup and observed progress
-正常、异常、肿瘤和免疫细胞数量随模型时间变化|Normal, abnormal, tumor and immune populations over model time
+正常、癌前、肿瘤和免疫细胞数量随模型时间变化|Normal, precancerous, tumor and immune populations over model time
 可拖动细胞、点击播种、添加信号或绘制障碍的交互培养皿|Interactive dish: drag or add cells, release signals and draw walls
 可遗传的增殖性状，固定范围 0.25–3；实际增殖还受营养、压力与全局生长参数影响|Inherited proliferation trait, fixed range 0.25–3. Actual growth also depends on nutrients, stress and the growth parameter.
 加载后按文件中的情境、种子和参数重新开局并暂停，不恢复导出时的细胞布置、障碍、浓度场或统计历史。|Load the saved scenario, seed and parameters as a new paused run. This does not restore the exported cell layout, walls, concentration fields or history.
@@ -415,7 +469,7 @@ Act：红＝新生突起 → 黄 → 绿＝活性衰减；零活性恢复胞体�
 代谢效能|Metabolic fitness
 累积压力|Accumulated stress
 邻接拥挤|Crowding
-异常已持续|Abnormal for
+癌前已持续|Precancerous for
 尚未获得肿瘤增殖／侵袭表型|No tumor growth or invasion phenotype yet
 可被接触识别|Recognizable by contact
 低于识别阈值|Below recognition threshold
@@ -436,14 +490,14 @@ Act：红＝新生突起 → 黄 → 绿＝活性衰减；零活性恢复胞体�
 个邻居| neighbors
 杀伤损伤|Cytotoxic damage
 抗原阳性|Antigen-positive
-异常发生|Abnormal transitions
+癌前发生|Precancerous transitions
 恶性转变|Malignant transitions
 肿瘤分裂|Tumor divisions
 存活肿瘤|Living tumors
 原灶外肿瘤|Tumors beyond origin
 远端分裂|Distal divisions
 残留肿瘤胞体|Remaining tumor bodies
-异常免疫清除|Abnormal cells killed
+癌前免疫清除|Precancerous cells killed
 免疫清除|Immune clearances
 清除后观察|Observation after clearance
 免疫分裂|Immune divisions
@@ -520,7 +574,7 @@ GPU（含传输）|GPU (including transfers)\u0020
 局部规则已更新；变化会逐步形成|Local rules updated; changes develop gradually
 情境：|Scenario:\u0020
 录制中|Recording
-纯正常上皮，中心酸清除弱、氧糖补给略低，外围环境较好。局部代谢压力经异常中间态推动随机癌变；新生肿瘤采用较高遗传耐受基线，观察存活克隆向外围扩增。|Normal epithelium with poor acid clearance and lower nutrient supply in the center. Local stress drives stochastic transformation through an abnormal state. New tumors have a higher tolerance baseline; surviving clones can expand outward.
+纯正常上皮，中心酸清除弱、氧糖补给略低，外围环境较好。局部代谢压力经癌前细胞推动随机癌变；新生肿瘤采用较高遗传耐受基线，观察存活克隆向外围扩增。|Normal epithelium with poor acid clearance and lower nutrient supply in the center. Local stress drives stochastic transformation through a precancerous state. New tumors have a higher tolerance baseline; surviving clones can expand outward.
 正常细胞铺满背景，中央嵌入 19 颗低抗原肿瘤，外围仅 3 颗免疫细胞。梭形肿瘤在有限组织让位下侵袭、扩增；招募与扩增支持较弱。这是二维局部播散代理，不含血管或跨器官转移。|A confluent normal sheet contains 19 central low-antigen tumors and only 3 peripheral immune cells. Spindle-shaped tumors invade and grow through bounded tissue yielding, with weak recruitment and expansion support. This is a 2D local-spread proxy, without vascular or cross-organ metastasis.
 正常细胞铺满背景，中央嵌入 37 颗高抗原肿瘤，18 颗免疫细胞分散在病灶周边的组织内。通过接触识别、局部招募及 IL-2 支持的有限扩增清除肿瘤；关闭杀伤可作对照。|A confluent normal sheet contains 37 central high-antigen tumors and 18 immune cells in the surrounding tissue. Contact recognition, local recruitment and IL-2-supported limited expansion support clearance; turn off killing for a control.
 `);
@@ -528,7 +582,7 @@ GPU（含传输）|GPU (including transfers)\u0020
 新生肿瘤克隆扩增|New tumor clone expansion
 肿瘤已发生|Tumor has emerged
 肿瘤已出现，当前无存活肿瘤|Tumors emerged; none currently alive
-已发生异常中间态|Abnormal intermediate state emerged
+已发生癌前细胞|Precancerous intermediate state emerged
 环境压力累积|Environmental stress accumulating
 局部资源消耗|Local resource consumption
 原灶外播散并增殖|Spread and proliferation beyond the origin
@@ -555,7 +609,7 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
     [/^观察谱系：相对第 (\d+) 代 · 标记 (\d+) 颗$/,(_,g,n)=>`Observed family: relative generation ${g} · ${n} cells marked`],
     [/^首达 #([\d/]+) · (\d+) MCS$/,(_,n,t)=>`First #${n} · ${t} MCS`],
     [/^(减小|增大)(.+)$/,(_,action,name)=>`${action==='减小'?'Decrease':'Increase'} ${translate(name)}`],
-    [/^(正常细胞|异常中间态|肿瘤细胞|未激活免疫|已激活免疫)(胞体|胞核)颜色$/,(_,type,part)=>`${dictionary.get(type)} ${dictionary.get(part).toLowerCase()} color`],
+    [/^(正常细胞|癌前细胞|肿瘤细胞|未激活免疫|已激活免疫)(胞体|胞核)颜色$/,(_,type,part)=>`${dictionary.get(type)} ${dictionary.get(part).toLowerCase()} color`],
     [/^应用(.+)配色$/,(_,name)=>`Apply ${translate(name)} palette`],
     [/^最近 (\d+) 颗清除：(.+)$/,(_,n,causes)=>`${n} recent clearances: ${translate(causes)}`],
     [/^(.+) MCS · #(\d+) · (自发凋亡|免疫杀伤|环境死亡) · 已清除（(.+) MCS 触发）$/,(_,t,id,cause,start)=>`${t} MCS · #${id} · ${translate(cause)} · Cleared (triggered at ${start} MCS)`],
@@ -569,7 +623,7 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
     [/^当前稳定接触 ([\d.]+) 对；各细胞保持独立胞体。$/,(_,n)=>`${n} stable contacts; cell bodies remain separate.`],
     [/^视频已导出 · (\d+) 秒 · ([\d.]+) MB$/,(_,s,mb)=>`Video saved · ${s} s · ${mb} MB`],
     [/^视频已导出 · (MP4|WebM) · (\d+) × (\d+) · (\d+) 秒 · ([\d.]+) MB$/,(_,format,w,h,s,mb)=>`Video saved · ${format} · ${w} × ${h} · ${s} s · ${mb} MB`],
-    [/^正常、异常、肿瘤和免疫细胞数量：从 0 到 (\d+) MCS 的完整过程$/,(_,t)=>`Normal, abnormal, tumor and immune populations from 0 to ${t} MCS`]
+    [/^正常、癌前、肿瘤和免疫细胞数量：从 0 到 (\d+) MCS 的完整过程$/,(_,t)=>`Normal, precancerous, tumor and immune populations from 0 to ${t} MCS`]
   ];
   add(`
 免疫巡逻统计|Immune patrol statistics
@@ -577,7 +631,7 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
 累计检查的不同细胞|Distinct cells inspected
 巡逻统计口径|How patrol is measured
 覆盖率＝免疫胞体实际经过的面积／当前非障碍面积，封闭区域仍计入分母。拖动路径不计入自主巡逻。|Coverage = area occupied by patrolling immune bodies / current non-wall area, including enclosed regions. Manual drag paths do not count.
-检查需连续膜接触累积达到 6 个有效 MCS，按接触长度和代谢效能加权。正常、异常、肿瘤均可计入；按出生身份去重，分裂子代重新统计。已检查不等于已识别抗原。|Inspection requires 6 effective MCS of uninterrupted membrane contact, weighted by contact length and metabolic fitness. Normal, abnormal and tumor cells count once per birth identity; daughters count separately. Inspection does not imply antigen recognition.
+检查需连续膜接触累积达到 6 个有效 MCS，按接触长度和代谢效能加权。正常、癌前、肿瘤均可计入；按出生身份去重，分裂子代重新统计。已检查不等于已识别抗原。|Inspection requires 6 effective MCS of uninterrupted membrane contact, weighted by contact length and metabolic fitness. Normal, precancerous and tumor cells count once per birth identity; daughters count separately. Inspection does not imply antigen recognition.
 巡逻转向|Patrol reorientation
 巡逻接触扫描|Patrol contact scanning
 持续巡逻|Persistent patrol
@@ -603,7 +657,7 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
 轨迹保留时长|Trail duration
 开启后记录；按模拟时间保留，暂停时不消退。|Recorded while enabled, retained in model time; trails do not fade while paused.
 免疫迷宫需要至少 144 的区域短边|The maze needs a world with its shorter side at least 144 units
-正常细胞铺满培养皿，4 颗免疫细胞分散在单层内部。中心酸清除弱、氧糖补给略低；局部代谢压力经异常中间态推动随机癌变，免疫细胞进行接触监视。|Normal cells fill the dish with 4 immune cells dispersed inside the monolayer. Reduced central acid clearance and nutrient supply allow local stress to drive stochastic transformation through an abnormal state, under contact-based immune surveillance.
+正常细胞铺满培养皿，4 颗免疫细胞分散在单层内部。中心酸清除弱、氧糖补给略低；局部代谢压力经癌前细胞推动随机癌变，免疫细胞进行接触监视。|Normal cells fill the dish with 4 immune cells dispersed inside the monolayer. Reduced central acid clearance and nutrient supply allow local stress to drive stochastic transformation through a precancerous state, under contact-based immune surveillance.
 圆心持续释放最强招募信号，入口清除信号；开局已建立沿通道扩散的浓度场。6 颗免疫细胞从等距入口出发，仅凭局部梯度与随机探索前进，胞核进入中心终点区计时。|The center maintains a maximal recruitment source and entrances drain the signal. Diffusion through the passages is equilibrated before the race. Six immune cells start at evenly spaced entrances, using local gradients and random exploration. Arrival is recorded when the nucleus enters the central finish zone.
 `);
   add(`
@@ -613,7 +667,7 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
 抗原轮廓|Antigen outline
 周期文字|Cycle labels
 红色轮廓：抗原可识别|Red outline: recognizable antigen
-红色细线标出可识别抗原的肿瘤和异常细胞|Thin red outlines mark tumor and abnormal cells with recognizable antigen
+红色细线标出可识别抗原的肿瘤和癌前细胞|Thin red outlines mark tumor and precancerous cells with recognizable antigen
 不显示|None
 细胞核|Nuclei
 细胞周期阶段|Cell cycle phase
@@ -691,7 +745,7 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
 持续招募暴露|Sustained recruitment exposure
 `);
   add(`
-正常细胞铺满培养皿，4 颗免疫细胞分散在单层内部。中心酸清除弱、氧糖补给略低；代谢与炎症压力提高随机变异，经异常中间态产生肿瘤；耐受变异、细胞死亡与免疫监视共同筛选存活克隆。|Normal cells fill the dish with 4 dispersed immune cells. Reduced central acid clearance and nutrient supply cause local stress. Metabolic and inflammatory pressure increase variation through an abnormal intermediate; tolerance variation, death and immune surveillance select surviving clones.
+正常细胞铺满培养皿，4 颗免疫细胞分散在单层内部。中心酸清除弱、氧糖补给略低；代谢与炎症压力提高随机变异，经癌前细胞产生肿瘤；耐受变异、细胞死亡与免疫监视共同筛选存活克隆。|Normal cells fill the dish with 4 dispersed immune cells. Reduced central acid clearance and nutrient supply cause local stress. Metabolic and inflammatory pressure increase variation through a precancerous intermediate; tolerance variation, death and immune surveillance select surviving clones.
 正常细胞铺满背景，中央嵌入 19 颗低抗原肿瘤，外围仅 3 颗免疫细胞。梭形肿瘤侵袭扩增，压力提高性状变异，部分克隆可能暴露抗原；免疫招募较弱。这是二维局部播散，不含血管或跨器官转移。|A confluent normal sheet contains 19 central low-antigen tumors and 3 peripheral immune cells. Spindle tumors invade and expand; stress increases trait variation and may expose antigen, under weak recruitment. A 2D local-spread model, without vascular or cross-organ metastasis.
 正常细胞铺满背景，中央嵌入 37 颗高抗原肿瘤，18 颗免疫细胞分散在病灶周边的组织内。接触识别、招募及 IL-2 扩增支持早期清除；少数存活克隆可能丢失抗原并再次扩增。结局随种子改变，关闭杀伤可作对照。|A confluent normal sheet contains 37 central antigen-positive tumors and 18 surrounding immune cells. Contact recognition, recruitment and IL-2 support early clearance; occasional survivors may lose antigen and regrow. Outcomes vary by seed. Turn killing off for a control.
 `);
@@ -778,8 +832,8 @@ Arena ＋ 右侧栏|Arena + sidebar
 组合录制包含侧栏当前可见的内容；统计可先占满侧栏。Arena 30 FPS，侧栏最多每秒刷新 5 次。|Combined capture includes the currently visible sidebar. Expand statistics first for a dashboard view. Arena: 30 FPS; sidebar: up to 5 updates/second.
 用于本地绘制录像中的实时侧栏。|Renders the live sidebar locally for video capture.
 随机肿瘤演化|Random tumor development
-密铺正常组织与 12 颗分散免疫细胞，从零肿瘤开始。三处供给较弱的区域与健康边缘形成差异；异常、癌变、免疫清除、抑制与恢复相互竞争，逃逸克隆可能再次扩增。没有定时转变或预设结局。|Confluent normal tissue and 12 dispersed immune cells, starting without tumors. Three low-supply niches contrast with healthy edges. Abnormal change, malignancy, clearance, suppression and recovery compete; escape clones may expand again. No scheduled transitions or predetermined outcome.
-随机化的密铺正常组织、12–16 颗内部免疫细胞与三处弱供给区域。参数在发生发展附近抽样，肿瘤必须由局部异常产生；相同种子和参数可重现开局，结局由局部相互作用产生。|Randomized confluent normal tissue, 12–16 internal immune cells and three low-supply niches. Parameters are sampled near the development preset; tumors must arise from local abnormal cells. Seed and parameters reproduce the start; local interactions determine the course.
+密铺正常组织与 12 颗分散免疫细胞，从零肿瘤开始。三处供给较弱的区域与健康边缘形成差异；癌前、癌变、免疫清除、抑制与恢复相互竞争，逃逸克隆可能再次扩增。没有定时转变或预设结局。|Confluent normal tissue and 12 dispersed immune cells, starting without tumors. Three low-supply niches contrast with healthy edges. Precancerous change, malignancy, clearance, suppression and recovery compete; escape clones may expand again. No scheduled transitions or predetermined outcome.
+随机化的密铺正常组织、12–16 颗内部免疫细胞与三处弱供给区域。参数在发生发展附近抽样，肿瘤必须由局部癌前产生；相同种子和参数可重现开局，结局由局部相互作用产生。|Randomized confluent normal tissue, 12–16 internal immune cells and three low-supply niches. Parameters are sampled near the development preset; tumors must arise from local precancerous cells. Seed and parameters reproduce the start; local interactions determine the course.
 `);
   add(`
 历史曲线显示类型|History plot populations
@@ -790,7 +844,7 @@ Arena ＋ 右侧栏|Arena + sidebar
 细胞数量|Cell counts
 百分比|Percent
 正常状态|Normal states
-异常状态|Abnormal states
+癌前状态|Precancerous states
 肿瘤状态|Tumor states
 免疫状态|Immune states
 存活|Living
@@ -813,6 +867,20 @@ Arena ＋ 右侧栏|Arena + sidebar
 单击瞬释 · 长按连释 · 双击建源|Tap: pulse · Hold: release · Double tap: source
 局部信号影响运动方向；肿瘤也趋向高氧、高糖|Local signals steer motion; tumors also move toward higher oxygen and glucose.
 `);
+  add(`
+随机|Random
+换局等待时间|Round wait time
+颗|cells
+分钟|minutes
+擦除整颗细胞、触及的场源和局部障碍，并重置局部环境；手动移除不计入生物学死亡|Erase whole cells, touched sources and wall pixels; reset local fields. Manual removal is separate from biological deaths.
+`);
+  add(`
+导入与导出|Import and export
+导出历局 CSV|Export rounds CSV
+录制视频|Record video
+展开面板|Expand panel
+返回画布|Back to arena
+`);
   function mount(control){
     let language='zh';try{if(localStorage.getItem('cell-arena-language')==='en')language='en';}catch{}
     const texts=new WeakMap(),attributes=new WeakMap(),names=['title','aria-label','placeholder'];
@@ -820,10 +888,10 @@ Arena ＋ 右侧栏|Arena + sidebar
     function textNode(node){if(skip(node.parentElement))return;const value=node.nodeValue,previous=texts.get(node),source=previous&&previous.result===value?previous.source:value,result=translate(source,language);texts.set(node,{source,result});if(value!==result)node.nodeValue=result;}
     function attribute(element,name){if(skip(element)||!element.hasAttribute(name))return;let record=attributes.get(element);if(!record){record={};attributes.set(element,record);}const value=element.getAttribute(name),previous=record[name],source=previous&&previous.result===value?previous.source:value,result=translate(source,language);record[name]={source,result};if(value!==result)element.setAttribute(name,result);}
     function walk(root){if(root.nodeType===3){textNode(root);return;}if(root.nodeType!==1&&root.nodeType!==9)return;if(root.nodeType===1){if(skip(root))return;for(const name of names)attribute(root,name);}const walker=document.createTreeWalker(root,NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT);while(walker.nextNode()){const n=walker.currentNode;if(n.nodeType===3)textNode(n);else for(const name of names)attribute(n,name);}}
-    function set(value){language=value==='en'?'en':'zh';control.value=language;document.documentElement.lang=language==='en'?'en':'zh-CN';document.title=translate('Cell-Arena · 细胞生态竞技场',language);for(const block of document.querySelectorAll('[data-language]'))block.hidden=block.dataset.language!==language;walk(document.body);try{localStorage.setItem('cell-arena-language',language);}catch{}}
+    function set(value){language=value==='en'?'en':'zh';control.value=language;control.textContent=language==='en'?'Eng':'Chi';control.title=language==='en'?'切换为中文':'Switch to English';control.setAttribute('aria-label',control.title);document.documentElement.lang=language==='en'?'en':'zh-CN';document.title=translate('Cell-Arena · 细胞生态竞技场',language);for(const block of document.querySelectorAll('[data-language]'))block.hidden=block.dataset.language!==language;walk(document.body);try{localStorage.setItem('cell-arena-language',language);}catch{}}
     const observer=new MutationObserver(records=>{for(const m of records){if(m.type==='characterData')textNode(m.target);else if(m.type==='attributes')attribute(m.target,m.attributeName);else for(const node of m.addedNodes)walk(node);}});
     observer.observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:names});
-    control.addEventListener('change',()=>set(control.value));set(language);
+    control.addEventListener('change',()=>set(control.value));control.addEventListener('click',()=>set(language==='en'?'zh':'en'));set(language);
     return {set,get language(){return language;},refresh:()=>walk(document.body)};
   }
   globalThis.CellLabI18n={translate,mount,missing};
