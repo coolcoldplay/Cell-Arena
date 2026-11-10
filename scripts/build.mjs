@@ -15,7 +15,9 @@ const historyChart=await read('src/history-chart.js');
 const signalGesture=await read('src/signal-gesture.js');
 const startSeed=await read('src/start-seed.js'),appearance=await read('src/cell-appearance.js'),autoRandom=await read('src/auto-random.js'),rounds=await read('src/round-history.js');
 const wasmMeta=JSON.parse(await read('build/cpm-kernel.meta.json'));
-if(wasmMeta.sourceSHA256!==createHash('sha256').update(await read('src/cpm-kernel.c')).digest('hex')||wasmMeta.wasmSHA256!==createHash('sha256').update(binary).digest('hex'))throw Error('WASM source/binary mismatch. Run npm run build:wasm.');
+// Git stores LF while an editor may write CRLF; both are the same C source.
+const wasmSource=(await read('src/cpm-kernel.c')).replace(/\r\n/g,'\n');
+if(wasmMeta.sourceSHA256!==createHash('sha256').update(wasmSource).digest('hex')||wasmMeta.wasmSHA256!==createHash('sha256').update(binary).digest('hex'))throw Error('WASM source/binary mismatch. Run npm run build:wasm.');
 for (const [slot, text] of Object.entries({ STYLE: css, WORKER: `globalThis.CELL_LAB_WASM='${binary.toString('base64')}';\n`+[engine,fast,section,wasm,gpu,insertion,model,experiment,worker].join('\n'), ABOUT_EN:aboutEnglish, APP: [i18n,display,renderer,experiment,sidebarCapture,recorder,mobile,statistics,app].join('\n'), LICENSE: license, MT_LICENSE: mtLicense })) {
   const source=slot==='APP'?adaptive+'\n'+trajectories+'\n'+historyChart+'\n'+signalGesture+'\n'+startSeed+'\n'+appearance+'\n'+autoRandom+'\n'+rounds+'\n'+text:text;
   const safe = slot.endsWith('LICENSE') ? source.replaceAll('&','&amp;').replaceAll('<','&lt;') : source.replace(/<\/script/gi, '<\\/script');
