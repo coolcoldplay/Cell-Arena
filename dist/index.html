@@ -233,7 +233,7 @@ aside.statistics-focused #record-options>summary{padding:4px 0}
         <p class="death-visual-key"><span><i style="background:#4b4e56"></i>自发：皱缩消失</span><span><i style="background:#9e9170"></i>环境：灰褐萎缩</span><span><i style="background:#f8b130"></i>免疫杀伤：变为橙黄色、圆化肿胀、破裂</span></p>
         <p class="manual-removal">手动擦除 <b id="manual-removal-count">0</b> · 独立于死亡统计</p><p id="clearance-recent-summary">本局尚无死亡清除。</p>
       </section>
-      <div class="performance-line"><span id="performance">目标 30 MCS / 秒 · 独立计算线程</span><span id="seed-label">种子 17</span></div>
+      <div class="performance-line"><span id="performance">目标 30 MCS / 秒 · 独立计算线程</span><span id="seed-label">种子 —</span></div>
       <div class="ecology-line"><span id="environment-count">环境死亡 0</span><span id="immune-division-count">免疫分裂 0</span><span id="mutation-count">性状突变 0</span><span id="grid-info">正在准备格点</span></div>
       <div class="ecology-line"><span id="evolution-events"></span><span id="immune-regulation-events"></span><span id="abnormal-events">异常发生 0 · 恶性转变 0 · 异常免疫清除 0</span><span>悬停画布查看局部资源与因子浓度</span></div>
       <details class="death-ledger" id="death-ledger"><summary>死亡记录 <span id="death-ledger-count">已清除 0 · 清除中 0</span></summary><p class="hint">触发后进入相应死亡过程，胞体消失时记为清除；三种原因分别统计。下方按清除和触发分别显示最近 8 次，导出实验数据包含本局完整记录。</p><div id="death-summary"></div><h3>最近从画面清除</h3><ol id="recent-clearances"></ol><h3>最近触发死亡</h3><ol id="recent-deaths"></ol></details>
@@ -243,7 +243,7 @@ aside.statistics-focused #record-options>summary{padding:4px 0}
         <canvas id="history" width="960" height="125" tabindex="0" aria-label="细胞数量历史曲线"></canvas><div id="history-readout" class="history-readout"></div>
         <p class="hint">勾选类型自动缩放；单类显示状态堆叠。悬停／触摸查看采样时刻，方向键逐点查看。全程记录，导出保留全部采样。</p>
       </div><details class="subsection" id="statistics-scenario"><summary>情境进度与开局</summary><section id="scenario-guide" class="scenario-guide" aria-label="情境设定与实际进度">
-    <div class="scenario-heading"><b id="scenario-phase">正在准备情境</b><span id="scenario-configuration">预设参数</span><button id="restore-scenario" class="quiet" title="恢复情境参数、推荐种子及默认显示，保留区域与精细度">恢复情境设定 ↺</button></div>
+    <div class="scenario-heading"><b id="scenario-phase">正在准备情境</b><span id="scenario-configuration">预设参数</span><button id="restore-scenario" class="quiet" title="恢复情境参数、本次开局种子及默认显示，保留区域与精细度">恢复情境设定 ↺</button></div>
     <p id="scenario-description"></p><div id="scenario-metrics" class="scenario-metrics"></div><small id="scenario-setup"></small>
   </section>
 </details></details>
@@ -13757,6 +13757,34 @@ globalThis.CellLabSignalGesture=class {
   cancel(){for(const key of ['holdTimer','repeatTimer','tapTimer'])this.clear(key);this.pressed=null;this.pending=null;}
 };
 
+/* Entropy belongs at experiment creation, never in the seeded model loop. */
+(() => {
+  'use strict';
+  const UINT32=4294967296;
+  function mix(value){
+    value^=value>>>16;value=Math.imul(value,0x7feb352d);
+    value^=value>>>15;value=Math.imul(value,0x846ca68b);
+    return (value^(value>>>16))>>>0;
+  }
+  function entropy(){
+    try{if(globalThis.crypto?.getRandomValues)return globalThis.crypto.getRandomValues(new Uint32Array(1))[0];}catch{}
+    // Offline/restricted browsers still get time, sub-ms timing and a counter.
+    return Math.floor(Math.random()*UINT32)>>>0;
+  }
+  function createGenerator({now=()=>Date.now(),precise=()=>globalThis.performance?.now()||0,random=entropy}={}){
+    let serial=0;
+    const recent=new Set();
+    return ()=>{
+      const time=now(),base=mix(time>>>0)^mix(Math.floor(time/UINT32))^mix(Math.floor(precise()*1000))^mix(random());
+      let seed;
+      do{seed=mix(base+Math.imul(++serial,0x9e3779b9));}while(recent.has(seed));
+      recent.add(seed);if(recent.size>256)recent.delete(recent.values().next().value);
+      return seed;
+    };
+  }
+  globalThis.CellLabStartSeed={createGenerator};
+})();
+
 /* UI-only translation. No model state, random stream or simulation clock is read
  * or changed here. DOM sources are retained so switching back is lossless. */
 (() => {
@@ -14559,7 +14587,7 @@ Arena ＋ 右侧栏|Arena + sidebar
 氧气补给|Oxygen supply
 葡萄糖补给|Glucose supply
 实际|Actual
-恢复情境参数、推荐种子及默认显示，保留区域与精细度|Restore scenario parameters, recommended seed and display defaults; keep area and refinement
+恢复情境参数、本次开局种子及默认显示，保留区域与精细度|Restore scenario parameters, this visit's starting seed and display defaults; keep area and refinement
 释放 / 建源|Release / source
 单击瞬释 · 长按连释 · 双击建源|Tap: pulse · Hold: release · Double tap: source
 局部信号影响运动方向；肿瘤也趋向高氧、高糖|Local signals steer motion; tumors also move toward higher oxygen and glucose.
@@ -15211,6 +15239,7 @@ Arena ＋ 右侧栏|Arena + sidebar
 (() => {
   'use strict';
   const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d',{alpha:false});
+  const nextStartSeed=CellLabStartSeed.createGenerator(),openingSeed=nextStartSeed();
   const raster=document.createElement('canvas'),rctx=raster.getContext('2d',{alpha:false});
   const colors=CellLabDisplay.BODY_COLORS;
   let cellColors;try{cellColors=CellLabDisplay.normalizeColors(JSON.parse(localStorage.getItem('cell-arena-colors-v1')));}catch{cellColors=CellLabDisplay.normalizeColors();}
@@ -15765,7 +15794,9 @@ Arena ＋ 右侧栏|Arena + sidebar
     selected=0;observedBirth=0;const resetDisplay=preset||shuffle||scene!==snapshot?.scene;
     const tumorPreset=['oncogenesis','cold','hot','random'].includes(scene);
     if(preset||shuffle){if(tumorPreset)$('boundary').value='wrap';else if(scene==='maze')$('boundary').value='solid';}
-    const seed=preset?(scene==='oncogenesis'?29:17):shuffle?crypto.getRandomValues(new Uint32Array(1))[0]%1000000:snapshot?.seed??17;
+    // Each page visit gets one new development experiment. Restart/import keep
+    // their explicit seed; revisiting/restoring this preset replays this visit.
+    const seed=preset?(scene==='oncogenesis'?openingSeed:17):shuffle?nextStartSeed():snapshot?.seed??openingSeed;
     const worldWidth=Number($('world-size').value),worldHeight=Number($('world-size').selectedOptions[0]?.dataset.height)||worldWidth*.75,refinement=Number($('refinement').value),boundary=$('boundary').value;
     if(((preset||shuffle)&&snapshot)||scene==='empty')await rpc('playing',{value:false});
     await rpc('start',{scene,seed,worldWidth,worldHeight,refinement,boundary,settings:preserve?snapshot?.settings||{}:{},...(scene==='empty'?{warmup:0}:{})});

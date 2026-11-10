@@ -800,7 +800,7 @@ Arena ＋ 右侧栏|Arena + sidebar
 氧气补给|Oxygen supply
 葡萄糖补给|Glucose supply
 实际|Actual
-恢复情境参数、推荐种子及默认显示，保留区域与精细度|Restore scenario parameters, recommended seed and display defaults; keep area and refinement
+恢复情境参数、本次开局种子及默认显示，保留区域与精细度|Restore scenario parameters, this visit's starting seed and display defaults; keep area and refinement
 释放 / 建源|Release / source
 单击瞬释 · 长按连释 · 双击建源|Tap: pulse · Hold: release · Double tap: source
 局部信号影响运动方向；肿瘤也趋向高氧、高糖|Local signals steer motion; tumors also move toward higher oxygen and glucose.

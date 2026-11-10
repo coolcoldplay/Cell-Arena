@@ -1,6 +1,7 @@
 (() => {
   'use strict';
   const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d',{alpha:false});
+  const nextStartSeed=CellLabStartSeed.createGenerator(),openingSeed=nextStartSeed();
   const raster=document.createElement('canvas'),rctx=raster.getContext('2d',{alpha:false});
   const colors=CellLabDisplay.BODY_COLORS;
   let cellColors;try{cellColors=CellLabDisplay.normalizeColors(JSON.parse(localStorage.getItem('cell-arena-colors-v1')));}catch{cellColors=CellLabDisplay.normalizeColors();}
@@ -555,7 +556,9 @@
     selected=0;observedBirth=0;const resetDisplay=preset||shuffle||scene!==snapshot?.scene;
     const tumorPreset=['oncogenesis','cold','hot','random'].includes(scene);
     if(preset||shuffle){if(tumorPreset)$('boundary').value='wrap';else if(scene==='maze')$('boundary').value='solid';}
-    const seed=preset?(scene==='oncogenesis'?29:17):shuffle?crypto.getRandomValues(new Uint32Array(1))[0]%1000000:snapshot?.seed??17;
+    // Each page visit gets one new development experiment. Restart/import keep
+    // their explicit seed; revisiting/restoring this preset replays this visit.
+    const seed=preset?(scene==='oncogenesis'?openingSeed:17):shuffle?nextStartSeed():snapshot?.seed??openingSeed;
     const worldWidth=Number($('world-size').value),worldHeight=Number($('world-size').selectedOptions[0]?.dataset.height)||worldWidth*.75,refinement=Number($('refinement').value),boundary=$('boundary').value;
     if(((preset||shuffle)&&snapshot)||scene==='empty')await rpc('playing',{value:false});
     await rpc('start',{scene,seed,worldWidth,worldHeight,refinement,boundary,settings:preserve?snapshot?.settings||{}:{},...(scene==='empty'?{warmup:0}:{})});
