@@ -168,6 +168,20 @@ aside.statistics-focused #record-options>summary{padding:4px 0}
   .tool-pair{gap:6px}
   .signal-help{font-size:12px}
 }
+.playback-row{display:flex;align-items:center;gap:7px;flex:0 0 100%;order:2;min-width:0}
+.playback-row .speed-label{width:auto;min-width:0;flex:1;order:0;margin:0}
+.shuffle-controls{display:flex;align-items:center;gap:4px;min-width:0}
+.transport .shuffle-controls button{flex:none;padding:3px;font-size:11px}
+.auto-random-control{display:flex;align-items:center;gap:3px;white-space:nowrap;font-size:10px;color:var(--muted)}
+.auto-random-control input{width:43px;min-width:0;height:27px;min-height:27px;border:1px solid var(--line);border-radius:0;background:var(--paper);color:var(--ink);padding:3px;text-align:right;font:12px Consolas,monospace}
+.auto-random-control input:invalid{border-color:#b13b36}
+@media(max-width:850px){
+  .playback-row{display:contents}
+  #mobile-session-actions .shuffle-controls{flex:1 1 100%;gap:8px}
+  #mobile-session-actions .shuffle-controls button{flex:1}
+  .auto-random-control{font-size:12px;gap:5px}
+  .auto-random-control input{width:70px;min-height:44px;font-size:16px}
+}
 </style></head>
 <body>
 <main class="workspace">
@@ -178,7 +192,7 @@ aside.statistics-focused #record-options>summary{padding:4px 0}
     <div class="panel-head"><a class="brand" href="https://github.com/coolcoldplay/Cell-Arena" target="_blank" rel="noreferrer"><span class="mark" aria-hidden="true">C</span><b>Cell-Arena</b></a><select id="language" aria-label="Language / 语言" data-no-i18n><option value="zh">中文</option><option value="en">English</option></select><button id="mobile-expand" class="mobile-only" aria-expanded="false" aria-controls="sidebar-scroll">↑ 展开面板</button><button id="about" class="quiet">模型与来源</button></div>
     <div class="dish-head"><div><span id="status-dot" class="status-dot"></span><b id="scene-title">肿瘤发生发展</b><span id="run-state">正在准备</span></div><button id="record-indicator" class="quiet" title="停止录制并下载" hidden>■ 00:00</button><div><span id="clock">0</span> <span class="unit">MCS</span></div></div>
     <nav class="scenes" aria-label="实验场景"><button data-scene="oncogenesis" class="active" title="肿瘤发生发展">发生发展</button><button data-scene="cold" title="免疫冷肿瘤扩散转移">冷肿瘤</button><button data-scene="hot" title="免疫热肿瘤治愈">热肿瘤</button><button data-scene="maze" title="免疫细胞迷宫">免疫迷宫</button><button data-scene="empty" title="空白自建：暂停摆放细胞，准备好后开始模拟">空白自建</button></nav>
-    <div class="transport"><button id="play" class="primary">Ⅱ 暂停</button><button id="step">单步</button><button id="reset">↺ 重来</button><label class="speed-label">播放 <input id="speed" type="range" min="0.25" max="8" step="0.25" value="1"><output id="speed-out">1×</output></label><button id="shuffle" class="quiet" title="在合理模型范围内随机生成参数与细胞布局">随机生成</button></div>
+    <div class="transport"><button id="play" class="primary">Ⅱ 暂停</button><button id="step">单步</button><button id="reset">↺ 重来</button><div class="playback-row"><label class="speed-label">播放 <input id="speed" type="range" min="0.25" max="8" step="0.25" value="1"><output id="speed-out">1×</output></label><div class="shuffle-controls"><button id="shuffle" class="quiet" title="在合理模型范围内随机生成参数与细胞布局">随机生成</button><label class="auto-random-control" title="数量或生物状态持续不变时自动换局；0 关闭。全部细胞消失立即换局，暂停和后台不计时。"><span>无变化</span><input id="auto-random-minutes" type="number" min="0" max="1440" step="any" value="0" inputmode="decimal" aria-label="无变化自动随机换局的等待分钟数，0 关闭"><span>分</span></label></div></div></div>
     <div id="maze-score" class="maze-score" hidden aria-live="polite"></div><div class="quick-tools"><div class="tools paired-tools" role="group" aria-label="鼠标工具"><div class="tool-pair"><button data-tool="move" class="selected">↔ 拖动细胞</button><button data-tool="inspect">⌾ 观察细胞</button></div><div class="tool-pair"><button data-tool="seed">＋ 新增细胞</button><button data-tool="remove">⌫ 擦除细胞</button></div><div class="tool-pair"><button data-tool="wall">▥ 绘制障碍</button><button data-tool="erase">⌫ 擦除障碍</button></div><button data-tool="signal">◉ 释放信号</button></div>
       <p id="tool-hint" class="hint compact-hint">拖动时暂停 · 邻居让位 · 实体墙阻挡</p>
       <div id="seed-options" class="tool-options" hidden><div class="seed-row"><label>新增类型<select id="seed-kind"><option value="1">正常细胞</option><option value="2">肿瘤细胞</option><option value="3" selected>免疫细胞</option></select></label><label>数量<input id="seed-count" type="number" min="1" step="1" value="5" inputmode="numeric" required></label><button id="sprinkle" title="在空隙中随机加入所选类型的细胞">＋ 加入</button></div><p id="seed-status" class="hint"></p><p class="hint">单击加入一颗，可挤入已有细胞区域；邻居变形、核区逐格让位，切面缩小不超过设定上限，总目标量保留。只检查局部空间，不按总数量拒绝新增；挤入失败不改动原有细胞。</p></div>
@@ -212,7 +226,9 @@ aside.statistics-focused #record-options>summary{padding:4px 0}
         <div class="checks" role="group" aria-label="细胞标记"><label><input id="nuclei" type="checkbox" checked>显示细胞核</label><label title="红色细线标出可识别抗原的肿瘤和异常细胞"><input id="antigen-marks" type="checkbox" checked>抗原轮廓</label><label><input id="cycle-marks" type="checkbox">周期文字</label></div>
         <div class="checks"><label><input id="show-tracks" type="checkbox">显示运动轨迹</label></div><label class="slider"><span>轨迹保留时长<output id="track-duration-out">400 MCS</output></span><input id="track-duration" type="range" min="20" max="2000" value="400" step="20"></label><p class="hint">开启后记录；按模拟时间保留，暂停时不消退。</p><div class="checks"><label><input id="edge-activity" type="checkbox" checked>启用所选类型的 Act 显示</label><label><input id="normal-activity" type="checkbox">正常细胞 Act</label><label><input id="tumor-activity" type="checkbox">肿瘤细胞 Act</label><label><input id="immune-activity" type="checkbox">免疫细胞 Act</label><label><input id="cell-seams" type="checkbox" checked>细分界线</label><label><input id="arrows" type="checkbox">极性箭头</label></div>
         <p class="hint">默认配色：免疫未激活淡红，实际识别后激活深红；肿瘤遗传增殖性状越高越黑，范围 0.25–3。核区默认用深蓝、深红或浅金。可在「细胞配色」分别修改；各类 Act 独立开启，开启后覆盖局部胞体色。</p>
-      </div></details><details class="subsection" id="module-colors"><summary>细胞配色 <span>预设 · 胞体 · 胞核</span></summary><div class="section-body"><div class="color-presets" id="color-presets" role="group" aria-label="细胞配色方案"></div><p class="hint" id="palette-status">当前：原始配色</p><p class="hint palette-key">预览从左到右：正常 · 异常 · 肿瘤 · 免疫 · 激活</p><div class="color-grid" id="color-controls"><span>类型 / 状态</span><span>胞体</span><span>胞核</span></div><div class="checks"><label><input id="proliferation-shading" type="checkbox" checked>肿瘤保留增殖深浅变化</label></div><p class="hint">点击方案立即应用，也可继续自定义，颜色保存在当前浏览器；不会重启模拟。高增殖使用所选肿瘤色，低增殖逐渐变浅；关闭上方选项可使用统一纯色。Act 与高强度热图仍可覆盖胞体色，关闭图层可查看本色。</p><button id="reset-colors" class="quiet">恢复原始配色</button></div></details></div></details>
+      </div></details><details class="subsection" id="module-colors"><summary>细胞配色 <span>预设 · 胞体 · 胞核</span></summary><div class="section-body">
+        <label class="slider"><span>边缘淡化<output id="body-feather-out">80%</output></span><input id="body-feather" type="range" min="0" max="100" step="5" value="80"></label><p class="hint">沿当前胞体轮廓由内向外渐透明；0% 为纯色。Act 和标记独立显示。</p>
+        <div class="color-presets" id="color-presets" role="group" aria-label="细胞配色方案"></div><p class="hint" id="palette-status">当前：原始配色</p><p class="hint palette-key">预览从左到右：正常 · 异常 · 肿瘤 · 免疫 · 激活</p><div class="color-grid" id="color-controls"><span>类型 / 状态</span><span>胞体</span><span>胞核</span></div><div class="checks"><label><input id="proliferation-shading" type="checkbox" checked>肿瘤保留增殖深浅变化</label></div><p class="hint">点击方案立即应用，也可继续自定义，颜色保存在当前浏览器；不会重启模拟。高增殖使用所选肿瘤色，低增殖逐渐变浅；关闭上方选项可使用统一纯色。Act 与高强度热图仍可覆盖胞体色，关闭图层可查看本色。</p><button id="reset-colors" class="quiet">恢复原始配色</button></div></details></div></details>
 <details class="section" name="parameters" id="module-environment"><summary><b>微环境</b><span>资源 / 信号 / 炎性促癌</span></summary><div class="section-body"><div id="environment-sliders"></div><details class="subsection" id="evolution-controls"><summary>演化实验</summary><div id="evolution-sliders"></div></details></div></details>
 <details class="section" name="parameters" id="module-normal"><summary><b>正常细胞</b><span>运动 / 聚集 / 癌变</span></summary><div class="section-body"><div id="normal-sliders"></div></div></details>
 <details class="section" name="parameters" id="module-tumor"><summary><b>肿瘤细胞</b><span>生长 / 侵袭 / 遗传</span></summary><div class="section-body"><div id="tumor-sliders"></div><details class="subsection" id="tumor-evolution-controls"><summary>突变与抗原演化</summary><div id="tumor-evolution-sliders"></div></details><details class="subsection" id="tumor-cycle-controls"><summary>细胞周期与静息</summary><div id="tumor-cycle-sliders"></div></details><details class="subsection" id="module-mechanics"><summary>形态与穿行 <span>分枝 · 成网 · 让位</span></summary><div class="section-body"><label class="select-row">肿瘤形态<select id="tumor-morphology"><option value="0">紧凑 / 阿米巴样</option><option value="1">间质样 · 梭形双极</option><option value="2">胶质瘤样 · 分枝成网</option></select></label><p class="hint">切换后，已有肿瘤逐渐重塑真实胞体。分枝接触持续 20 MCS 后开始稳定连接；分离或死亡即解除。U87 等胶质瘤形态研究启发，未经细胞系标定。</p><div id="branch-sliders"></div><button id="network-demo">重新开始分枝成网示例</button><p id="network-status" class="hint"></p></div></details></div></details>
@@ -13409,6 +13425,8 @@ var CPM = (function (exports, module$1) {
     if(data.maze?.signalThroughWalls!==undefined&&typeof data.maze.signalThroughWalls!=='boolean')invalid('maze.signalThroughWalls');
     const display={},input=data.display??{};if(!object(input))invalid('display');
     if(input.cellColors!==undefined){if(!object(input.cellColors))invalid('cellColors');const colors={};for(const kind of ['normal','abnormal','tumor','immune','activated','suppressive'])if(input.cellColors[kind]!==undefined){if(!object(input.cellColors[kind]))invalid(kind);colors[kind]={};for(const part of ['body','nucleus'])if(input.cellColors[kind][part]!==undefined){const c=input.cellColors[kind][part];if(typeof c!=='string'||!/^#[0-9a-f]{6}$/i.test(c))invalid(kind+'.'+part);colors[kind][part]=c.toLowerCase();}}if(input.cellColors.proliferationShading!==undefined){if(typeof input.cellColors.proliferationShading!=='boolean')invalid('proliferationShading');colors.proliferationShading=input.cellColors.proliferationShading;}display.cellColors=colors;}
+    if(input.edgeFade!==undefined)display.edgeFade=number(input.edgeFade,0,100,'edgeFade');
+    if(input.autoRandomMinutes!==undefined)display.autoRandomMinutes=number(input.autoRandomMinutes,0,1440,'autoRandomMinutes');
     if(input.trackDuration!==undefined)display.trackDuration=number(input.trackDuration,20,2000,'trackDuration');
     if(input.cellMarker!==undefined)display.cellMarker=choice(input.cellMarker,['none','nucleus','antigen','cycle'],'cellMarker');
     if(input.fieldView!==undefined)display.fieldView=choice(input.fieldView,['none','adversity','oxygen','glucose','acid','density'],'fieldView');
@@ -13785,6 +13803,129 @@ globalThis.CellLabSignalGesture=class {
   globalThis.CellLabStartSeed={createGenerator};
 })();
 
+/* Read-only optical thickness from the current occupied membrane. An eight-way
+ * chamfer distance (axial 1, diagonal sqrt(2)) approximates Euclidean distance
+ * within 8.3%, without changing the physical lattice or contact calculations.
+ * Periodic padding is needed only as far as the translucent band. Buffers and
+ * paused-frame results are reused; no random stream or model state is changed. */
+(() => {
+  'use strict';
+  const INF=1e9,DIAGONAL=Math.SQRT2;
+  class Surface {
+    get(s){
+      if(this.snapshot===s)return this.layer;
+      const {width:w,height:h,grid}=s,n=w*h,wrap=s.boundary==='wrap';
+      // At high physical refinement, optical thickness needs less detail than
+      // mechanics. The shader reconstructs a half-resolution optical field and
+      // clips it to EVERY original membrane pixel. IDs, silhouettes, collision,
+      // Act, nuclei and biology keep their full resolution.
+      if(s.refinement>=2&&n>350000&&w%2===0&&h%2===0)return this.refined(s);
+      if(this.width!==w||this.height!==h){this.width=w;this.height=h;this.depth=new Float32Array(n);this.interior=new Uint8Array(n);}
+      if(!this.live){this.live=new Uint8Array(65536);this.maxDepth=new Float32Array(65536);this.fadeWidth=new Float32Array(65536);}
+      const {depth,interior,live,maxDepth,fadeWidth}=this;
+      live.fill(0);maxDepth.fill(0);fadeWidth.fill(0);let radius=1;
+      for(const c of s.cells)if(c.kind>0&&c.kind<4){live[c.id]=1;fadeWidth[c.id]=Math.max(1,.85*Math.sqrt(c.area/Math.PI));radius=Math.max(radius,fadeWidth[c.id]);}
+      for(let y=0;y<h;y++){
+        const start=y*w,up=y?start-w:wrap?(h-1)*w:-1,down=y<h-1?start+w:wrap?0:-1;
+        for(let x=0;x<w;x++){
+          const q=start+x,id=grid[q];
+          const boundary=!live[id]||grid[x?q-1:wrap?start+w-1:-1]!==id||grid[x<w-1?q+1:wrap?start:-1]!==id||grid[up<0?-1:up+x]!==id||grid[down<0?-1:down+x]!==id;
+          depth[q]=boundary?.5:INF;
+        }
+      }
+      // Bucket padding sizes so modest growth does not reallocate the work grid.
+      const pad=wrap?Math.ceil(radius/8)*8+2:0,px=Math.min(w,pad),py=Math.min(h,pad),pw=w+2*px,ph=h+2*py;
+      if(this.paddedWidth!==pw||this.paddedHeight!==ph){this.paddedWidth=pw;this.paddedHeight=ph;this.work=new Float32Array(pw*ph);}
+      const d=this.work;
+      for(let y=0;y<ph;y++){
+        const sy=(y-py+h)%h,start=sy*w,row=y*pw;
+        d.set(depth.subarray(start,start+w),row+px);
+        if(px){d.set(depth.subarray(start+w-px,start+w),row);d.set(depth.subarray(start,start+px),row+px+w);}
+      }
+      for(let x=1;x<pw;x++)d[x]=Math.min(d[x],d[x-1]+1);
+      for(let y=1;y<ph;y++){
+        const start=y*pw,end=start+pw-1;
+        d[start]=Math.min(d[start],d[start-pw]+1,d[start-pw+1]+DIAGONAL);
+        for(let q=start+1;q<end;q++)if(d[q]>.5)d[q]=Math.min(d[q],d[q-1]+1,d[q-pw]+1,d[q-pw-1]+DIAGONAL,d[q-pw+1]+DIAGONAL);
+        d[end]=Math.min(d[end],d[end-1]+1,d[end-pw]+1,d[end-pw-1]+DIAGONAL);
+      }
+      for(let q=d.length-2;q>=d.length-pw;q--)d[q]=Math.min(d[q],d[q+1]+1);
+      for(let y=ph-2;y>=0;y--){
+        const start=y*pw,end=start+pw-1;
+        d[end]=Math.min(d[end],d[end+pw]+1,d[end+pw-1]+DIAGONAL);
+        for(let q=end-1;q>start;q--)if(d[q]>.5)d[q]=Math.min(d[q],d[q+1]+1,d[q+pw]+1,d[q+pw-1]+DIAGONAL,d[q+pw+1]+DIAGONAL);
+        d[start]=Math.min(d[start],d[start+1]+1,d[start+pw]+1,d[start+pw+1]+DIAGONAL);
+      }
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+        const q=y*w+x,id=grid[q];if(!live[id])continue;
+        const value=depth[q]=d[(y+py)*pw+x+px];if(value>maxDepth[id])maxDepth[id]=value;
+      }
+      for(const c of s.cells)if(live[c.id])fadeWidth[c.id]=1/Math.max(.5,Math.min(fadeWidth[c.id],maxDepth[c.id]));
+      for(let q=0;q<n;q++){
+        const id=grid[q];if(!live[id]){interior[q]=255;continue;}
+        // Preserve saturated cores even in elongated bodies; thin extensions
+        // fade according to their own membrane, never an imposed ellipse.
+        const t=Math.min(1,depth[q]*fadeWidth[id]);interior[q]=Math.round(255*t*t*(3-2*t));
+      }
+      this.snapshot=s;return this.layer={width:w,height:h,interior};
+    }
+    refined(s){
+      const {width:w,height:h,grid}=s,cw=w/2,ch=h/2;
+      if(!this.coarse)this.coarse=new Surface();
+      if(this.coarseGrid?.length!==cw*ch)this.coarseGrid=new Uint16Array(cw*ch);
+      for(let y=0;y<ch;y++)for(let x=0;x<cw;x++)this.coarseGrid[y*cw+x]=grid[(2*y+1)*w+2*x+1];
+      const layer=this.coarse.get({width:cw,height:ch,grid:this.coarseGrid,cells:s.cells.map(c=>({id:c.id,kind:c.kind,area:c.area/4})),boundary:s.boundary});
+      this.snapshot=s;return this.layer={...layer,scale:2};
+    }
+    full(s){
+      if(this.fullSnapshot!==s){this.fullSnapshot=s;if(!this.fullCache)this.fullCache=new Surface();this.fullLayer=this.fullCache.get({...s,refinement:1});}
+      return this.fullLayer;
+    }
+  }
+  globalThis.CellLabAppearance={Surface};
+})();
+
+/* Wall-clock exhibition control, outside the seeded simulation. Only discrete
+ * biology and population events reset the idle timer; motion/shape, concentration
+ * noise, numerical damage and cycle progress are deliberately not activity. */
+(() => {
+  'use strict';
+  const phases={G0:0,G1:1,S:2,G2:3,M:4};
+  const events=['divisions','immuneDivisions','manualRemoved','kills','apoptosis','environment','apoptosisStarted','killStarted','environmentStarted','mutations','normalTraitMutations','abnormalInitiations','malignantTransitions','antigenExposures','antigenEscapes','suppressiveTransitions','suppressiveRecoveries','injuryDeactivations','signalDeactivations'];
+  function state(c){return (c.kind||0)|(c.state==='abnormal'?4:0)|(c.immunePhenotype==='suppressive'?8:0)|(c.activation>0?16:0)|(c.antigen?32:0)|(c.dying?64:0)|(({spontaneous:1,kill:2,environment:3}[c.deathCause]||0)<<7)|((phases[c.cycle?.phase]||0)<<9)|(c.cycle?.arrest?4096:0);}
+  class Controller {
+    constructor(){this.minutes=0;this.reset();}
+    configure(value,now=0){this.minutes=Number.isFinite(value)&&value>=0&&value<=1440?value:0;this.reset(now);}
+    reset(now=0){this.elapsed=0;this.lastTick=now;this.active=false;this.fired=false;this.observed=null;this.members=new Map();this.eventStamp='';this.epoch=null;this.count=0;}
+    observe(s,now){
+      if(!s||s===this.observed)return;
+      const epoch=s.revision+':'+s.seed;
+      if(epoch!==this.epoch||s.time<this.time){this.reset(now);this.epoch=epoch;}
+      let changed=false,count=0;
+      for(const c of s.cells)if(c.kind>0&&c.kind<4){
+        count++;const key=c.birth??c.id,code=state(c);if(this.members.get(key)!==code)changed=true;
+      }
+      const stamp=events.map(k=>s.counters?.[k]||0).join(',');
+      if(count!==this.count||stamp!==this.eventStamp)changed=true;
+      if(changed){this.elapsed=0;this.lastTick=now;this.members.clear();for(const c of s.cells)if(c.kind>0&&c.kind<4)this.members.set(c.birth??c.id,state(c));}
+      this.count=count;this.eventStamp=stamp;this.time=s.time;this.observed=s;
+      // Pause/resume messages arrive independently of animation frames. Never
+      // charge a paused interval when a frame was delayed or the tab was hidden.
+      if(!s.playing){this.active=false;this.lastTick=now;}
+    }
+    tick(s,now,allowed=true){
+      this.observe(s,now);const delta=Math.max(0,now-this.lastTick);this.lastTick=now;
+      if(!this.minutes||!s?.playing||!allowed||this.fired){this.active=false;return null;}
+      if(this.active)this.elapsed+=delta;this.active=true;
+      const reason=this.count===0?'empty':this.elapsed>=this.minutes*60000?'idle':null;
+      if(reason){this.fired=true;this.active=false;}return reason;
+    }
+    suspend(now){this.active=false;this.lastTick=now;}
+    status(){return {minutes:this.minutes,elapsedMs:this.elapsed,remainingMs:Math.max(0,this.minutes*60000-this.elapsed),count:this.count,fired:this.fired};}
+  }
+  globalThis.CellLabAutoRandom={Controller};
+})();
+
 /* UI-only translation. No model state, random stream or simulation clock is read
  * or changed here. DOM sources are retained so switching back is lossless. */
 (() => {
@@ -13793,6 +13934,14 @@ globalThis.CellLabSignalGesture=class {
   function add(rows){for(const line of rows.trim().split('\n')){const at=line.indexOf('|');if(at>0)dictionary.set(line.slice(0,at),line.slice(at+1));}}
   add(`
 Cell-Arena · 细胞生态竞技场|Cell-Arena · Cell ecology playground
+边缘淡化|Edge translucency
+沿当前胞体轮廓由内向外渐透明；0% 为纯色。Act 和标记独立显示。|Fade outward along the current cell shape; 0% restores solid color. Act and markers remain independent.
+无变化|Idle
+分|min
+无变化自动随机换局的等待分钟数，0 关闭|Minutes without population or state changes before randomizing; 0 disables
+数量或生物状态持续不变时自动换局；0 关闭。全部细胞消失立即换局，暂停和后台不计时。|Randomize after no population or biological state changes; 0 disables. An empty arena restarts immediately. Paused and hidden time is excluded.
+长时间无状态变化，已随机开启新一轮|No state changes for the set duration; a new random round has started
+全部细胞已消失，已随机开启新一轮|All cells have disappeared; a new random round has started
 Arena 培养皿|Arena culture dish
 模拟控制面板|Simulation controls
 模型与来源|Model & sources
@@ -14807,22 +14956,27 @@ Arena ＋ 右侧栏|Arena + sidebar
       void main(){vec2 p=vec2((gl_VertexID<<1)&2,gl_VertexID&2);gl_Position=vec4(p*2.-1.,0,1);}`;
       const fragment=`#version 300 es
       precision highp float;precision highp int;precision highp usampler2D;
-      uniform usampler2D ids,activity,walls,metadata;uniform sampler2D environment,palette,signalLayer,bodySignalLayer;
+      uniform usampler2D ids,activity,walls,metadata;uniform sampler2D environment,palette,signalLayer,bodySignalLayer,interior;
       uniform vec3 bodyColors[8];uniform int showSignals,proliferationShading;uniform float environmentOpacity,bodyEnvironmentOpacity,pixelRatio;
       uniform ivec2 lattice;uniform vec2 viewport;uniform int fieldScale,fieldMode,seams,selected,wrap,smoothWall,antigen;
-      uniform ivec4 actFlags;out vec4 color;
+      uniform ivec4 actFlags;uniform float edgeFade;uniform int appearanceScale;out vec4 color;
       uint idAt(ivec2 p){if(wrap==1)p=(p+lattice)%lattice;else if(any(lessThan(p,ivec2(0)))||any(greaterThanEqual(p,lattice)))return 0u;return texelFetch(ids,p,0).r;}
       bool antigenEdge(uint id,ivec2 p,bool marked){uint other=idAt(p);return other!=id&&(marked||(texelFetch(metadata,ivec2(int(other)&255,int(other)>>8),0).g&8u)>0u);}
       vec3 body(int kind){return bodyColors[kind];}
+      float insideAt(ivec2 p,uint id){if(idAt(p*appearanceScale+ivec2(appearanceScale/2))!=id)return 0.;ivec2 size=lattice/appearanceScale;if(wrap==1)p=(p+size)%size;return texelFetch(interior,p,0).r;}
+      float interiorAt(vec2 xy,uint id){vec2 at=xy/float(appearanceScale)-.5;ivec2 p=ivec2(floor(at));vec2 f=fract(at);float v=mix(mix(insideAt(p,id),insideAt(p+ivec2(1,0),id),f.x),mix(insideAt(p+ivec2(0,1),id),insideAt(p+ivec2(1,1),id),f.x),f.y);
+        if(appearanceScale>1){p=ivec2(xy);f=fract(xy);float rim=2.;if(idAt(p+ivec2(1,0))!=id)rim=min(rim,1.-f.x);if(idAt(p-ivec2(1,0))!=id)rim=min(rim,f.x);if(idAt(p+ivec2(0,1))!=id)rim=min(rim,1.-f.y);if(idAt(p-ivec2(0,1))!=id)rim=min(rim,f.y);v=min(v,smoothstep(0.,2.,rim));}return v;}
       void main(){
         vec2 xy=vec2(gl_FragCoord.x,viewport.y-gl_FragCoord.y)*vec2(lattice)/viewport;
         ivec2 p=clamp(ivec2(xy),ivec2(0),lattice-1);uint id=idAt(p);
-        uvec4 m=texelFetch(metadata,ivec2(int(id)&255,int(id)>>8),0);int kind=int(m.r),physicalKind=kind==5?1:(kind==6||kind==7)?3:kind;vec3 base=body(kind);if(kind==2&&proliferationShading==1)base=mix(base,vec3(1),float(m.b)/255.);vec3 rgb=base;
-        if(fieldMode>0){float value=texelFetch(environment,p/fieldScale,0).r;int q=int(clamp(floor(value*255.+.5),0.,255.));rgb=mix(rgb,texelFetch(palette,ivec2(q,kind),0).rgb,kind>0?bodyEnvironmentOpacity:environmentOpacity);}
-        if(showSignals==1){vec4 signal=kind>0?texelFetch(bodySignalLayer,p/fieldScale,0):texelFetch(signalLayer,p/fieldScale,0);rgb=mix(rgb,signal.rgb,signal.a);}
+        uvec4 m=texelFetch(metadata,ivec2(int(id)&255,int(id)>>8),0);int kind=int(m.r),physicalKind=kind==5?1:(kind==6||kind==7)?3:kind;vec3 base=body(kind);if(kind==2&&proliferationShading==1)base=mix(base,vec3(1),float(m.b)/255.);vec3 rgb=base,under=body(0);
+        if(fieldMode>0){float value=texelFetch(environment,p/fieldScale,0).r;int q=int(clamp(floor(value*255.+.5),0.,255.));vec3 heat=texelFetch(palette,ivec2(q,kind),0).rgb;rgb=mix(rgb,heat,kind>0?bodyEnvironmentOpacity:environmentOpacity);under=mix(under,heat,environmentOpacity);}
+        if(showSignals==1){vec4 full=texelFetch(signalLayer,p/fieldScale,0),signal=kind>0?texelFetch(bodySignalLayer,p/fieldScale,0):full;rgb=mix(rgb,signal.rgb,signal.a);under=mix(under,full.rgb,full.a);}
         if(texelFetch(walls,p,0).r>0u&&id!=uint(smoothWall))rgb=(p.x+p.y)%7<2?vec3(66,83,87)/255.:body(4);
-        if(physicalKind>0&&physicalKind<4){uint death=m.g&7u;if(death>0u){float p=float(m.a)/255.;vec3 tint=death==2u?vec3(248,177,48):death==3u?vec3(158,145,112):vec3(75,78,86);float weight=death==2u?.15+.85*p:death==3u?.4+.45*p:.2+.65*p;rgb=mix(rgb,tint/255.,weight);}else if(actFlags[physicalKind]>0){float a=float(texelFetch(activity,p,0).r);if(a>0.)rgb=vec3(min(255.,a*2.),min(255.,(255.-a)*2.),0.)/255.;}
-          if(seams==1||int(id)==selected){vec2 f=fract(xy),thin=min(vec2(.32),vec2(lattice)/viewport*.55*pixelRatio);bool edge=(f.x>1.-thin.x&&idAt(p+ivec2(1,0))!=id)||(f.x<thin.x&&idAt(p-ivec2(1,0))!=id)||(f.y>1.-thin.y&&idAt(p+ivec2(0,1))!=id)||(f.y<thin.y&&idAt(p-ivec2(0,1))!=id);if(edge)rgb=mix(rgb,physicalKind==1?vec3(98,110,109)/255.:kind==7?vec3(26,69,107)/255.:kind==3?vec3(128,61,70)/255.:vec3(225,230,225)/255.,.9);}
+        if(physicalKind>0&&physicalKind<4){uint death=m.g&7u;if(death>0u){float p=float(m.a)/255.;vec3 tint=death==2u?vec3(248,177,48):death==3u?vec3(158,145,112):vec3(75,78,86);float weight=death==2u?.15+.85*p:death==3u?.4+.45*p:.2+.65*p;rgb=mix(rgb,tint/255.,weight);}
+          if(edgeFade>0.)rgb=mix(under,rgb,1.-edgeFade*(1.-interiorAt(xy,id)));
+          if(death==0u&&actFlags[physicalKind]>0){float a=float(texelFetch(activity,p,0).r);if(a>0.)rgb=vec3(min(255.,a*2.),min(255.,(255.-a)*2.),0.)/255.;}
+          if(seams==1||int(id)==selected){vec2 f=fract(xy),thin=min(vec2(.32),vec2(lattice)/viewport*.55*pixelRatio);bool edge=(f.x>1.-thin.x&&idAt(p+ivec2(1,0))!=id)||(f.x<thin.x&&idAt(p-ivec2(1,0))!=id)||(f.y>1.-thin.y&&idAt(p+ivec2(0,1))!=id)||(f.y<thin.y&&idAt(p-ivec2(0,1))!=id);if(edge)rgb=mix(rgb,physicalKind==1?vec3(98,110,109)/255.:kind==7?vec3(26,69,107)/255.:kind==3?vec3(128,61,70)/255.:vec3(225,230,225)/255.,mix(.9,.25,edgeFade));}
         }
         if(antigen==1){vec2 f=fract(xy),stepSize=vec2(lattice)/viewport;float limit=.5*pixelRatio+.5,coverage=0.;bool marked=(m.g&8u)>0u;
           float d=(1.-f.x)/stepSize.x;if(d<limit&&antigenEdge(id,p+ivec2(1,0),marked))coverage=max(coverage,limit-d);
@@ -14835,8 +14989,8 @@ Arena ＋ 右侧栏|Arena + sidebar
       const compile=(type,source)=>{const sh=gl.createShader(type);gl.shaderSource(sh,source);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(sh));return sh;};
       const program=this.program=gl.createProgram();gl.attachShader(program,compile(gl.VERTEX_SHADER,vertex));gl.attachShader(program,compile(gl.FRAGMENT_SHADER,fragment));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));
       gl.useProgram(program);gl.uniform3fv(gl.getUniformLocation(program,'bodyColors[0]'),Float32Array.from(CellLabDisplay.BODY_COLORS.flat(),v=>v/255));
-      this.uniforms={};for(const key of ['lattice','viewport','fieldScale','fieldMode','seams','selected','wrap','smoothWall','antigen','actFlags','showSignals','environmentOpacity','bodyEnvironmentOpacity','pixelRatio','bodyColors[0]','proliferationShading'])this.uniforms[key]=gl.getUniformLocation(program,key);
-      this.textures=[];for(const [i,key] of ['ids','activity','walls','metadata','environment','palette','signalLayer','bodySignalLayer'].entries()){const t=gl.createTexture();this.textures.push(t);gl.activeTexture(gl.TEXTURE0+i);gl.bindTexture(gl.TEXTURE_2D,t);for(const p of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,p,gl.NEAREST);for(const p of [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T])gl.texParameteri(gl.TEXTURE_2D,p,gl.CLAMP_TO_EDGE);gl.uniform1i(gl.getUniformLocation(program,key),i);}
+      this.uniforms={};for(const key of ['lattice','viewport','fieldScale','fieldMode','seams','selected','wrap','smoothWall','antigen','actFlags','showSignals','environmentOpacity','bodyEnvironmentOpacity','pixelRatio','bodyColors[0]','proliferationShading','edgeFade','appearanceScale'])this.uniforms[key]=gl.getUniformLocation(program,key);
+      this.textures=[];for(const [i,key] of ['ids','activity','walls','metadata','environment','palette','signalLayer','bodySignalLayer','interior'].entries()){const t=gl.createTexture();this.textures.push(t);gl.activeTexture(gl.TEXTURE0+i);gl.bindTexture(gl.TEXTURE_2D,t);for(const p of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,p,gl.NEAREST);for(const p of [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T])gl.texParameteri(gl.TEXTURE_2D,p,gl.CLAMP_TO_EDGE);gl.uniform1i(gl.getUniformLocation(program,key),i);}
       this.meta=new Uint8Array(256*256*4);this.palettes=new WeakMap();this.textureSizes=[];
       const ext=gl.getExtension('WEBGL_debug_renderer_info');this.device=ext?gl.getParameter(ext.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER);
       this.hardware=ext?!/swiftshader|llvmpipe|software/i.test(this.device):null;
@@ -14845,7 +14999,7 @@ Arena ＋ 右侧栏|Arena + sidebar
       const old=this.textureSizes[unit];if(old&&old[0]===w&&old[1]===h&&old[2]===internal)g.texSubImage2D(g.TEXTURE_2D,0,0,0,w,h,format,type,data);
       else{g.texImage2D(g.TEXTURE_2D,0,internal,w,h,0,format,type,data);this.textureSizes[unit]=[w,h,internal];}
     }
-    draw(ctx,s,{actFlags,seams,selected,showAntigen=false,field,info,signal,bodySignal=signal,environmentOpacity=1,bodyEnvironmentOpacity=environmentOpacity,pixelRatio=1,cellColors=null}){
+    draw(ctx,s,{actFlags,seams,selected,showAntigen=false,field,info,signal,bodySignal=signal,environmentOpacity=1,bodyEnvironmentOpacity=environmentOpacity,pixelRatio=1,cellColors=null,surface=null,edgeFade=0}){
       if(this.lost||this.gl.isContextLost())return false;
       const g=this.gl,u=this.uniforms,c=this.canvas;const start=performance.now();
       if(c.width!==ctx.canvas.width||c.height!==ctx.canvas.height){c.width=ctx.canvas.width;c.height=ctx.canvas.height;}
@@ -14859,6 +15013,9 @@ Arena ＋ 右侧栏|Arena + sidebar
       if(info!==this.info||!this.paletteReady){let p=this.palettes.get(info);if(!p&&info){p=Uint8Array.from(info.palette.flat(2));this.palettes.set(info,p);}this.upload(5,256,8,g.RGB8,g.RGB,g.UNSIGNED_BYTE,p||new Uint8Array(256*8*3));this.info=info;this.paletteReady=true;}
       if(this.signal!==signal||!this.signalReady){this.upload(6,signal?.width||1,signal?.height||1,g.RGBA8,g.RGBA,g.UNSIGNED_BYTE,signal?.rgba||new Uint8Array(4));this.signal=signal;this.signalReady=true;}
       if(this.bodySignal!==bodySignal||!this.bodySignalReady){this.upload(7,bodySignal?.width||1,bodySignal?.height||1,g.RGBA8,g.RGBA,g.UNSIGNED_BYTE,bodySignal?.rgba||new Uint8Array(4));this.bodySignal=bodySignal;this.bodySignalReady=true;}
+      if(this.surface!==surface||!this.surfaceReady){this.upload(8,surface?.width||1,surface?.height||1,g.R8,g.RED,g.UNSIGNED_BYTE,surface?.interior||new Uint8Array([255]));this.surface=surface;this.surfaceReady=true;}
+      g.uniform1f(u.edgeFade,surface?edgeFade:0);
+      g.uniform1i(u.appearanceScale,surface?.scale||1);
       g.uniform1i(u.showSignals,signal?1:0);g.uniform1i(u.smoothWall,s.maze?.wallID||0);g.uniform1i(u.antigen,showAntigen?1:0);
       g.uniform1f(u.environmentOpacity,environmentOpacity);g.uniform1f(u.bodyEnvironmentOpacity,bodyEnvironmentOpacity);g.uniform1f(u.pixelRatio,pixelRatio);
       g.uniform2i(u.lattice,s.width,s.height);g.uniform2f(u.viewport,c.width,c.height);g.uniform1i(u.fieldScale,s.fieldScale);g.uniform1i(u.fieldMode,field?(info.low?1:2):0);g.uniform1i(u.seams,seams?1:0);g.uniform1i(u.selected,selected);g.uniform1i(u.wrap,s.boundary==='wrap'?1:0);g.uniform4iv(u.actFlags,actFlags);
@@ -14898,6 +15055,8 @@ Arena ＋ 右侧栏|Arena + sidebar
     if(data.maze?.signalThroughWalls!==undefined&&typeof data.maze.signalThroughWalls!=='boolean')invalid('maze.signalThroughWalls');
     const display={},input=data.display??{};if(!object(input))invalid('display');
     if(input.cellColors!==undefined){if(!object(input.cellColors))invalid('cellColors');const colors={};for(const kind of ['normal','abnormal','tumor','immune','activated','suppressive'])if(input.cellColors[kind]!==undefined){if(!object(input.cellColors[kind]))invalid(kind);colors[kind]={};for(const part of ['body','nucleus'])if(input.cellColors[kind][part]!==undefined){const c=input.cellColors[kind][part];if(typeof c!=='string'||!/^#[0-9a-f]{6}$/i.test(c))invalid(kind+'.'+part);colors[kind][part]=c.toLowerCase();}}if(input.cellColors.proliferationShading!==undefined){if(typeof input.cellColors.proliferationShading!=='boolean')invalid('proliferationShading');colors.proliferationShading=input.cellColors.proliferationShading;}display.cellColors=colors;}
+    if(input.edgeFade!==undefined)display.edgeFade=number(input.edgeFade,0,100,'edgeFade');
+    if(input.autoRandomMinutes!==undefined)display.autoRandomMinutes=number(input.autoRandomMinutes,0,1440,'autoRandomMinutes');
     if(input.trackDuration!==undefined)display.trackDuration=number(input.trackDuration,20,2000,'trackDuration');
     if(input.cellMarker!==undefined)display.cellMarker=choice(input.cellMarker,['none','nucleus','antigen','cycle'],'cellMarker');
     if(input.fieldView!==undefined)display.fieldView=choice(input.fieldView,['none','adversity','oxygen','glucose','acid','density'],'fieldView');
@@ -15164,7 +15323,7 @@ Arena ＋ 右侧栏|Arena + sidebar
     const $=id=>document.getElementById(id),query=matchMedia('(max-width:850px)'),workspace=document.querySelector('.workspace');
     const moves=[
       [document.querySelector('.scenes'),$('mobile-scenes-host')],
-      [$('reset'),$('mobile-session-actions')],[$('shuffle'),$('mobile-session-actions')],
+      [$('reset'),$('mobile-session-actions')],[document.querySelector('.shuffle-controls'),$('mobile-session-actions')],
       [$('about'),$('mobile-session-actions')],[document.querySelector('.quick-tools'),$('mobile-tools-host')]
     ].map(([node,host])=>{const anchor=document.createComment('desktop control position');node.before(anchor);return{node,host,anchor};});
     let expanded=false;
@@ -15243,7 +15402,8 @@ Arena ＋ 右侧栏|Arena + sidebar
   const raster=document.createElement('canvas'),rctx=raster.getContext('2d',{alpha:false});
   const colors=CellLabDisplay.BODY_COLORS;
   let cellColors;try{cellColors=CellLabDisplay.normalizeColors(JSON.parse(localStorage.getItem('cell-arena-colors-v1')));}catch{cellColors=CellLabDisplay.normalizeColors();}
-  const signalLayers=new Set(),displayCache=new CellLabDisplay.Cache();
+  const signalLayers=new Set(),displayCache=new CellLabDisplay.Cache(),surfaceCache=new CellLabAppearance.Surface();
+  const autoRandom=new CellLabAutoRandom.Controller();let autoRandomBusy=false,setupBusy=0;
   const opacity={adversity:.35,oxygen:.35,glucose:.35,acid:.35,density:.35,cohesion:.45,danger:.45,trail:.45,il2:.45,normalDamage:.45,inhibition:.45};
   let hover=null,probeDirty=false,panGesture=null,recordingScale=0,eraseSource=false;
   const trajectories=new CellLabTrajectories();
@@ -15395,6 +15555,18 @@ Arena ＋ 右侧栏|Arena + sidebar
   function applyColors(value){cellColors=CellLabDisplay.normalizeColors(value);try{localStorage.setItem('cell-arena-colors-v1',JSON.stringify(cellColors));}catch{/* Private/storage-disabled contexts still support this session. */}syncColors();dirty=true;}
   $('reset-colors').addEventListener('click',()=>applyColors(null));
   $('proliferation-shading').addEventListener('change',e=>applyColors({...cellColors,proliferationShading:e.target.checked}));syncColors();
+  try{const saved=localStorage.getItem('cell-arena-edge-fade-v1');if(saved!==null&&Number.isFinite(Number(saved)))$('body-feather').value=Math.max(0,Math.min(100,Number(saved)));}catch{}
+  function syncAppearance(){ $('body-feather-out').textContent=$('body-feather').value+'%';dirty=true;forceFrame=true; }
+  $('body-feather').addEventListener('input',()=>{syncAppearance();try{localStorage.setItem('cell-arena-edge-fade-v1',$('body-feather').value);}catch{}});syncAppearance();
+  try{const saved=localStorage.getItem('cell-arena-auto-random-v1');if(saved!==null&&Number.isFinite(Number(saved))&&Number(saved)>=0&&Number(saved)<=1440)$('auto-random-minutes').value=saved;}catch{}
+  function configureAutoRandom(){const input=$('auto-random-minutes');autoRandom.configure(input.valueAsNumber,performance.now());try{localStorage.setItem('cell-arena-auto-random-v1',String(autoRandom.minutes));}catch{}}
+  $('auto-random-minutes').addEventListener('input',configureAutoRandom);configureAutoRandom();
+  function tickAutoRandom(now){
+    const allowed=!document.hidden&&!autoRandomBusy&&!setupBusy&&!stroke&&!pending.size&&!document.querySelector('dialog[open]')&&document.activeElement!==$('auto-random-minutes');
+    const reason=autoRandom.tick(snapshot,now,allowed);if(!reason)return;
+    autoRandomBusy=true;
+    start('random',{shuffle:true}).then(()=>toast(reason==='empty'?'全部细胞已消失，已随机开启新一轮':'长时间无状态变化，已随机开启新一轮')).catch(error=>{$('auto-random-minutes').value=0;configureAutoRandom();fail(error);}).finally(()=>{autoRandomBusy=false;});
+  }
   const pending=new Map(),errors=[];
   let resolveReady;const ready=new Promise(r=>resolveReady=r);
   function rpc(command,payload={}){
@@ -15410,11 +15582,13 @@ Arena ＋ 右侧栏|Arena + sidebar
       if(family){if(!family.cells.some(c=>c.id===selected))selected=family.cells[0]?.id||0;}
       else if(previous&&next&&previous.birth!==next.birth)selected=0;
       snapshot=m.data;if(snapshot.revision!==lastRevision){lastRevision=snapshot.revision;selected=0;observedBirth=0;adaptive.reset(performance.now());}
+      autoRandom.observe(snapshot,performance.now());
       performanceContext();
       if(raster.width!==snapshot.width||raster.height!==snapshot.height){raster.width=snapshot.width;raster.height=snapshot.height;image=rctx.createImageData(snapshot.width,snapshot.height);}
       pendingFrame=m.frame||0;trajectories.sample(snapshot);dirty=true;uiPending=true;
       if(m.interactive)forceFrame=true;
       if(m.interactive||performance.now()-lastUISync>=performancePlan.uiMs){sync(!!m.interactive);lastUISync=performance.now();uiPending=false;}
+      if(autoRandom.count===0)tickAutoRandom(performance.now());
     }else if(m.type==='response'){
       const p=pending.get(m.id);if(p){clearTimeout(p.timeout);pending.delete(m.id);p.resolve(m.value);}
     }else if(m.type==='error'){
@@ -15628,19 +15802,22 @@ Arena ＋ 右侧栏|Arena + sidebar
     document.querySelector('.antigen-key').hidden=!showAntigen;
     document.querySelector('.cycle-key').hidden=!showCycle;
     }
-    let gpu=false;if(gpuRenderer)try{gpu=gpuRenderer.draw(ctx,s,{actFlags,seams,selected,showAntigen,field,info,signal,bodySignal,environmentOpacity,bodyEnvironmentOpacity,pixelRatio,cellColors});}catch(e){rendererFailure=String(e);gpuRenderer.lost=true;}
+    const edgeFade=Number($('body-feather').value)/100,surface=edgeFade>0?surfaceCache.get(s):null;
+    let gpu=false;if(gpuRenderer)try{gpu=gpuRenderer.draw(ctx,s,{actFlags,seams,selected,showAntigen,field,info,signal,bodySignal,environmentOpacity,bodyEnvironmentOpacity,pixelRatio,cellColors,surface,edgeFade});}catch(e){rendererFailure=String(e);gpuRenderer.lost=true;}
     if(!gpu){
+    const bodySurface=surface?.scale>1?surfaceCache.full(s):surface;
     for(let q=0;q<grid.length;q++){
       const x=q%w,y=(q/w)|0,id=grid[q],m=meta[id];let rgb;
-      const kind=CellLabDisplay.displayKind(m),base=m?bodies[id]:colors[0];rgb=base;
+      const kind=CellLabDisplay.displayKind(m),base=m?bodies[id]:colors[0];rgb=base;let under=colors[0];
       if(field){const value=field.values[Math.floor(y/s.fieldScale)*field.width+Math.floor(x/s.fieldScale)];
-        const heat=info.palette[kind][Math.min(255,Math.max(0,Math.round(value*255)))],alpha=m?bodyEnvironmentOpacity:environmentOpacity;rgb=base.map((v,k)=>v+(heat[k]-v)*alpha);
+        const heat=info.palette[kind][Math.min(255,Math.max(0,Math.round(value*255)))],alpha=m?bodyEnvironmentOpacity:environmentOpacity;rgb=base.map((v,k)=>v+(heat[k]-v)*alpha);if(surface&&m)under=under.map((v,k)=>v+(heat[k]-v)*environmentOpacity);
       }
-      if(signal){const layer=m?bodySignal:signal,p=(Math.floor(y/s.fieldScale)*layer.width+Math.floor(x/s.fieldScale))*4,a=layer.rgba[p+3]/255;rgb=rgb.map((v,k)=>v+(layer.rgba[p+k]-v)*a);}
+      if(signal){const layer=m?bodySignal:signal,p=(Math.floor(y/s.fieldScale)*layer.width+Math.floor(x/s.fieldScale))*4,a=layer.rgba[p+3]/255;rgb=rgb.map((v,k)=>v+(layer.rgba[p+k]-v)*a);if(surface&&m){const a=signal.rgba[p+3]/255;under=under.map((v,k)=>v+(signal.rgba[p+k]-v)*a);}}
       if(s.walls[q]&&id!==s.maze?.wallID){const hatch=(x+y)%7<2;rgb=hatch?[66,83,87]:colors[4];}
       if(m){
         if(m.dying)rgb=CellLabDisplay.deathColor(rgb,m);
-        else if(actFlags[m.kind]&&s.activity[q]>0)rgb=activityPalette[s.activity[q]];
+        if(bodySurface&&m.kind>0&&m.kind<4){const alpha=1-edgeFade*(1-bodySurface.interior[q]/255);rgb=rgb.map((v,k)=>under[k]+(v-under[k])*alpha);}
+        if(!m.dying&&actFlags[m.kind]&&s.activity[q]>0)rgb=activityPalette[s.activity[q]];
       }
       const k=q*4;data[k]=rgb[0];data[k+1]=rgb[1];data[k+2]=rgb[2];data[k+3]=255;
     }
@@ -15651,13 +15828,13 @@ Arena ＋ 右侧栏|Arena + sidebar
     ctx.save();ctx.lineWidth=1.1*pixelRatio;ctx.setLineDash([3*pixelRatio,3*pixelRatio]);for(const source of s.sources||[]){ctx.strokeStyle=({trail:'#8654ad',danger:'#c26a2a',cohesion:'#238b74',il2:'#1f92cd',normalDamage:'#c96e42',inhibition:'#395bc9',oxygen:'#318ab5',glucose:'#9a802f',acid:'#b34d51',nutrient:'#378597',hostile:'#a04d41'})[source.type];for(const dx of wrap?[-s.width,0,s.width]:[0])for(const dy of wrap?[-s.height,0,s.height]:[0]){const x=source.x+dx,y=source.y+dy;if(x+source.radius<0||x-source.radius>s.width||y+source.radius<0||y-source.radius>s.height)continue;ctx.beginPath();ctx.arc(x*scale,y*scale,source.radius*scale,0,2*Math.PI);ctx.stroke();}}ctx.restore();
     drawMazeWalls(ctx,s,scale);
     // Optional subpixel display seams; these never enter the lattice mechanics.
-    if(!gpu&&(seams||selected)){const paths=[new Path2D(),new Path2D(),new Path2D(),new Path2D()];ctx.lineWidth=.55*pixelRatio;
+    if(!gpu&&(seams||selected)){const paths=[new Path2D(),new Path2D(),new Path2D(),new Path2D()];ctx.lineWidth=.55*pixelRatio;ctx.globalAlpha=(.9-.65*edgeFade)/.9;
       for(let y=0;y<h;y++)for(let x=0;x<w;x++){const q=y*w+x,id=grid[q];if(!meta[id]||(!seams&&id!==selected))continue;
         const path=paths[CellLabDisplay.immuneSuppressive(meta[id])?3:meta[id].kind===1?0:meta[id].kind===3&&!CellLabDisplay.immuneActive(meta[id])?2:1];
         const right=x<w-1?grid[q+1]:(wrap?grid[q-w+1]:0),down=y<h-1?grid[q+w]:(wrap?grid[x]:0);
         if(right!==id){path.moveTo((x+1)*scale,y*scale);path.lineTo((x+1)*scale,(y+1)*scale);}if(down!==id){path.moveTo(x*scale,(y+1)*scale);path.lineTo((x+1)*scale,(y+1)*scale);}}
       ctx.strokeStyle='#626e6de6';ctx.stroke(paths[0]);ctx.strokeStyle='#e1e6e1e6';ctx.stroke(paths[1]);
-      ctx.strokeStyle='#803d46e6';ctx.stroke(paths[2]);ctx.strokeStyle='#1a456be6';ctx.stroke(paths[3]);
+      ctx.strokeStyle='#803d46e6';ctx.stroke(paths[2]);ctx.strokeStyle='#1a456be6';ctx.stroke(paths[3]);ctx.globalAlpha=1;
     }
     if(showAntigen&&!gpu)drawAntigenOutlines(s,scale,pixelRatio);
     if(showNuclei){ctx.save();ctx.scale(scale,scale);ctx.lineWidth=1.5*pixelRatio/scale;for(const batch of displayCache.nucleusBatches(s,cellColors)){ctx.fillStyle=batch.fill;ctx.strokeStyle=batch.stroke;ctx.fill(batch.path);ctx.stroke(batch.path);}ctx.restore();}
@@ -15789,6 +15966,7 @@ Arena ＋ 右侧栏|Arena + sidebar
   }
   for(const id of ['world-size','refinement'])$(id).addEventListener('change',gridPreview);gridPreview();
   async function start(scene=snapshot?.scene||'oncogenesis',{preserve=false,shuffle=false,preset=false}={}){
+    setupBusy++;autoRandom.suspend(performance.now());try{
     await endStroke();panGesture=null;
     if(preset&&scene==='maze'&&Number($('world-size').value)<384){$('world-size').value='384';if(Number($('refinement').value)>2)$('refinement').value='2';gridPreview();}
     selected=0;observedBirth=0;const resetDisplay=preset||shuffle||scene!==snapshot?.scene;
@@ -15804,6 +15982,7 @@ Arena ＋ 右侧栏|Arena + sidebar
     if(preset||shuffle||scene==='empty'){signalLayers.clear();$('field-view').value=tumorPreset?'adversity':'none';if(tumorPreset||scene==='maze')signalLayers.add('trail');if(scene==='maze'){$('edge-activity').checked=true;$('immune-activity').checked=true;$('show-tracks').checked=true;$('track-duration').value='1200';syncTracks();view.x=0;view.y=0;$('zoom').value='100';$('view-fit').value='contain';}updateOverlayButtons();dirty=true;await rpc('speed',{value:tumorPreset||scene==='network'?3:1});await rpc('playing',{value:scene!=='empty'});}
     else if(scene==='stress'||scene==='surveillance'){$('field-view').value='adversity';dirty=true;}
     if(scene==='empty'){view.x=0;view.y=0;$('zoom').value='100';$('seed-kind').value='1';setTool('seed');if(mobileUI.isMobile)mobileUI.focus('mobile-tools');dirty=true;}
+    }finally{setupBusy--;autoRandom.reset(performance.now());autoRandom.observe(snapshot,performance.now());}
   }
   function syncTracks(){trajectories.configure($('show-tracks').checked,Number($('track-duration').value));$('track-duration-out').textContent=$('track-duration').value+' MCS';if(snapshot)trajectories.sample(snapshot);dirty=true;}
   $('show-tracks').addEventListener('change',syncTracks);$('track-duration').addEventListener('input',syncTracks);
@@ -15878,15 +16057,17 @@ Arena ＋ 右侧栏|Arena + sidebar
   $('statistics-play').addEventListener('click',()=>$('play').click());
   for(const id of ['record-format','record-quality','record-scope'])$(id).addEventListener('change',refreshRecordingOptions);refreshRecordingOptions();
   $('snapshot').addEventListener('click',()=>{render();download(canvas.toDataURL('image/png'),`cell-arena-${snapshot.scene}-${snapshot.time}.png`);});
-  function displaySettings(){return {cellColors:CellLabDisplay.normalizeColors(cellColors),trackDuration:Number($('track-duration').value),fieldView:$('field-view').value,signalLayers:[...signalLayers],opacity:{...opacity},flags:Object.fromEntries(CellLabExperiment.flags.map(id=>[id,$(id).checked])),zoom:$('zoom').value,fit:$('view-fit').value,renderResolution:$('render-resolution').value};}
+  function displaySettings(){return {cellColors:CellLabDisplay.normalizeColors(cellColors),edgeFade:Number($('body-feather').value),autoRandomMinutes:autoRandom.minutes,trackDuration:Number($('track-duration').value),fieldView:$('field-view').value,signalLayers:[...signalLayers],opacity:{...opacity},flags:Object.fromEntries(CellLabExperiment.flags.map(id=>[id,$(id).checked])),zoom:$('zoom').value,fit:$('view-fit').value,renderResolution:$('render-resolution').value};}
   async function exportData(){return {...await rpc('export'),display:displaySettings()};}
   $('export-data').addEventListener('click',async()=>{try{const data=await exportData(),url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));download(url,`cell-arena-experiment-${data.time}.json`);setTimeout(()=>URL.revokeObjectURL(url),5000);}catch(e){fail(e);}});
   let pendingImport=null,importSerial=0;
   async function importData(data){
+    setupBusy++;autoRandom.suspend(performance.now());try{
     await endStroke();
     const profile=CellLabExperiment.parse(data);await endStroke();await rpc('import',{data});
     const config=profile.config,select=$('world-size');let option=[...select.options].find(o=>o.value===String(config.worldWidth));if(!option){option=new Option('',String(config.worldWidth));select.append(option);}option.textContent=`${config.worldWidth} × ${config.worldHeight}`;option.dataset.height=config.worldHeight;select.value=String(config.worldWidth);$('refinement').value=String(config.refinement);gridPreview();
-    const d=profile.display;if(d.cellColors)applyColors(d.cellColors);if(d.fieldView!==undefined)$('field-view').value=d.fieldView;if(d.signalLayers){signalLayers.clear();for(const key of d.signalLayers)signalLayers.add(key);}Object.assign(opacity,d.opacity||{});
+    const d=profile.display;if(d.cellColors)applyColors(d.cellColors);if(d.edgeFade!==undefined){$('body-feather').value=d.edgeFade;syncAppearance();}if(d.fieldView!==undefined)$('field-view').value=d.fieldView;if(d.signalLayers){signalLayers.clear();for(const key of d.signalLayers)signalLayers.add(key);}Object.assign(opacity,d.opacity||{});
+    $('auto-random-minutes').value=d.autoRandomMinutes??0;configureAutoRandom();
     // Migrate the short-lived exclusive selector; current independent flags win.
     if(d.cellMarker!==undefined)for(const [id,mode]of [['nuclei','nucleus'],['antigen-marks','antigen'],['cycle-marks','cycle']])$(id).checked=d.cellMarker===mode;
     else if(d.flags&&('nuclei' in d.flags||'antigen-marks' in d.flags))$('cycle-marks').checked=false;
@@ -15894,6 +16075,7 @@ Arena ＋ 右侧栏|Arena + sidebar
     if(d.trackDuration!==undefined)$('track-duration').value=d.trackDuration;syncTracks();
     if(d.zoom)$('zoom').value=d.zoom;if(d.fit)$('view-fit').value=d.fit;if(d.renderResolution)$('render-resolution').value=d.renderResolution;
     view.x=0;view.y=0;selected=0;observedBirth=0;hover=null;probeDirty=true;syncOpacity();updateOverlayButtons();setTool(config.scene==='empty'?'seed':'move');dirty=true;return profile;
+    }finally{setupBusy--;autoRandom.reset(performance.now());autoRandom.observe(snapshot,performance.now());}
   }
   $('import-data').addEventListener('click',()=>$('import-file').click());
   $('import-file').addEventListener('change',async()=>{
@@ -15906,17 +16088,17 @@ Arena ＋ 右侧栏|Arena + sidebar
   $('cancel-import').addEventListener('click',()=>$('import-dialog').close());$('import-dialog').addEventListener('close',()=>{pendingImport=null;importSerial++;$('import-file').value='';});
   $('confirm-import').addEventListener('click',async()=>{if(!pendingImport)return;$('confirm-import').disabled=true;try{await importData(pendingImport);$('import-dialog').close();toast('参数已加载，已暂停重新开局');}catch(error){$('import-status').textContent=String(error.message||error);$('confirm-import').disabled=false;}});
   $('about').addEventListener('click',()=>$('about-dialog').showModal());$('close-about').addEventListener('click',()=>$('about-dialog').close());
-  document.addEventListener('visibilitychange',()=>{if(document.hidden)void endStroke();lastAnimation=0;performanceContext();rpc('visible',{value:!document.hidden}).catch(fail);});
+  document.addEventListener('visibilitychange',()=>{autoRandom.suspend(performance.now());if(document.hidden)void endStroke();lastAnimation=0;performanceContext();rpc('visible',{value:!document.hidden}).catch(fail);});
   document.addEventListener('keydown',e=>{if(e.code==='Space'&&!['INPUT','SELECT','BUTTON','SUMMARY'].includes(document.activeElement.tagName)&&!document.querySelector('dialog[open]')){e.preventDefault();rpc('playing',{value:!snapshot?.playing}).catch(fail);}});
   function frame(){
     const now=performance.now();if(lastAnimation)adaptive.frameGap(now-lastAnimation);lastAnimation=now;
     if(latestInput){adaptive.inputDelay(now-latestInput);latestInput=0;}
-    if(now-lastHeartbeat>=500){performanceContext();if(adaptive.tick(now)){dirty=true;applyPerformance();}performancePlan=adaptive.status();lastHeartbeat=now;}
+    if(now-lastHeartbeat>=500){performanceContext();if(adaptive.tick(now)){dirty=true;applyPerformance();}performancePlan=adaptive.status();lastHeartbeat=now;tickAutoRandom(now);}
     if(uiPending&&now-lastUISync>=performancePlan.uiMs){sync();lastUISync=now;uiPending=false;}
     if(dirty&&(!pendingFrame||forceFrame||now-lastRender>=1000/performancePlan.fps))render();
     if(probeDirty)updateProbe();requestAnimationFrame(frame);
   }requestAnimationFrame(frame);applyPerformance();
-  window.artistooLab={rpc,ready,get snapshot(){return snapshot;},get performance(){return {...adaptive.status(),visiblePanels:[...visiblePanels]};},get errors(){return errors;},get selected(){return selected;},get recording(){return video.status;},get colors(){return CellLabDisplay.normalizeColors(cellColors);},get renderer(){return {gpu:!!gpuRenderer&&!gpuRenderer.lost,device:gpuRenderer?.device,error:rendererFailure,ms:gpuRenderer?.lastMs,fps:snapshot?.playing?frameStats.fps:0,renderMs:frameStats.renderMs,snapshotMs:frameStats.snapshotMs};},setTool,render,exportData,importData};
+  window.artistooLab={rpc,ready,get snapshot(){return snapshot;},get autoRandom(){return {...autoRandom.status(),busy:autoRandomBusy};},get performance(){return {...adaptive.status(),visiblePanels:[...visiblePanels]};},get errors(){return errors;},get selected(){return selected;},get recording(){return video.status;},get colors(){return CellLabDisplay.normalizeColors(cellColors);},get renderer(){return {gpu:!!gpuRenderer&&!gpuRenderer.lost,device:gpuRenderer?.device,error:rendererFailure,ms:gpuRenderer?.lastMs,fps:snapshot?.playing?frameStats.fps:0,renderMs:frameStats.renderMs,snapshotMs:frameStats.snapshotMs};},setTool,render,exportData,importData};
   const language=CellLabI18n.mount($('language'));
   start('oncogenesis',{preset:true}).then(()=>rpc('visible',{value:!document.hidden})).then(resolveReady).catch(fail);
 })();

@@ -3,9 +3,10 @@ import {pathToFileURL} from 'node:url';
 import path from 'node:path';
 export const delay = ms => new Promise(r=>setTimeout(r,ms));
 export async function openBrowser(file,port=9354,{gpu=false,initScript}={}){
-  const process=spawn('C:/Program Files/Google/Chrome/Application/chrome.exe',['--headless=new',...(gpu?[]:['--disable-gpu']),'--no-first-run','--disable-background-networking','--remote-debugging-port='+port,'--remote-allow-origins=*','--user-data-dir='+path.resolve('.profile-'+port),'about:blank'],{windowsHide:true,stdio:'ignore'});
-  let tabs;for(let i=0;i<100;i++){try{tabs=await(await fetch('http://127.0.0.1:'+port+'/json')).json();break;}catch{await delay(100);}}
-  if(!tabs){process.kill();throw Error('Chrome startup failed');}
+  const process=spawn('C:/Program Files/Google/Chrome/Application/chrome.exe',['--headless=new',...(gpu?[]:['--disable-gpu']),'--no-first-run','--disable-background-networking','--remote-debugging-port='+port,'--remote-allow-origins=*','--user-data-dir='+path.resolve('.profile-'+port),'about:blank'],{windowsHide:true,stdio:['ignore','ignore','pipe']});
+  let startupLog='';process.stderr.on('data',data=>{startupLog=(startupLog+data).slice(-3000);});
+  let tabs;for(let i=0;i<300;i++){try{const response=await fetch('http://127.0.0.1:'+port+'/json',{signal:AbortSignal.timeout(500)});if(response.ok){tabs=await response.json();break;}}catch{}await delay(100);}
+  if(!tabs){process.kill();throw Error('Chrome startup failed: '+startupLog);}
   const ws=new WebSocket(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);await new Promise(r=>ws.onopen=r);
   let id=0;const pending=new Map(),errors=[],requests=[];
   ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.id){const p=pending.get(m.id);pending.delete(m.id);m.error?p.reject(Error(JSON.stringify(m.error))):p.resolve(m.result);}else if(m.method==='Runtime.exceptionThrown')errors.push(m.params.exceptionDetails);else if(m.method==='Network.requestWillBeSent'&&/^https?:/.test(m.params.request.url))requests.push(m.params.request.url);};

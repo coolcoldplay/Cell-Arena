@@ -34,7 +34,7 @@
     const $=id=>document.getElementById(id),query=matchMedia('(max-width:850px)'),workspace=document.querySelector('.workspace');
     const moves=[
       [document.querySelector('.scenes'),$('mobile-scenes-host')],
-      [$('reset'),$('mobile-session-actions')],[$('shuffle'),$('mobile-session-actions')],
+      [$('reset'),$('mobile-session-actions')],[document.querySelector('.shuffle-controls'),$('mobile-session-actions')],
       [$('about'),$('mobile-session-actions')],[document.querySelector('.quick-tools'),$('mobile-tools-host')]
     ].map(([node,host])=>{const anchor=document.createComment('desktop control position');node.before(anchor);return{node,host,anchor};});
     let expanded=false;

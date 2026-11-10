@@ -6,6 +6,14 @@
   function add(rows){for(const line of rows.trim().split('\n')){const at=line.indexOf('|');if(at>0)dictionary.set(line.slice(0,at),line.slice(at+1));}}
   add(`
 Cell-Arena · 细胞生态竞技场|Cell-Arena · Cell ecology playground
+边缘淡化|Edge translucency
+沿当前胞体轮廓由内向外渐透明；0% 为纯色。Act 和标记独立显示。|Fade outward along the current cell shape; 0% restores solid color. Act and markers remain independent.
+无变化|Idle
+分|min
+无变化自动随机换局的等待分钟数，0 关闭|Minutes without population or state changes before randomizing; 0 disables
+数量或生物状态持续不变时自动换局；0 关闭。全部细胞消失立即换局，暂停和后台不计时。|Randomize after no population or biological state changes; 0 disables. An empty arena restarts immediately. Paused and hidden time is excluded.
+长时间无状态变化，已随机开启新一轮|No state changes for the set duration; a new random round has started
+全部细胞已消失，已随机开启新一轮|All cells have disappeared; a new random round has started
 Arena 培养皿|Arena culture dish
 模拟控制面板|Simulation controls
 模型与来源|Model & sources

@@ -5,7 +5,8 @@
   const raster=document.createElement('canvas'),rctx=raster.getContext('2d',{alpha:false});
   const colors=CellLabDisplay.BODY_COLORS;
   let cellColors;try{cellColors=CellLabDisplay.normalizeColors(JSON.parse(localStorage.getItem('cell-arena-colors-v1')));}catch{cellColors=CellLabDisplay.normalizeColors();}
-  const signalLayers=new Set(),displayCache=new CellLabDisplay.Cache();
+  const signalLayers=new Set(),displayCache=new CellLabDisplay.Cache(),surfaceCache=new CellLabAppearance.Surface();
+  const autoRandom=new CellLabAutoRandom.Controller();let autoRandomBusy=false,setupBusy=0;
   const opacity={adversity:.35,oxygen:.35,glucose:.35,acid:.35,density:.35,cohesion:.45,danger:.45,trail:.45,il2:.45,normalDamage:.45,inhibition:.45};
   let hover=null,probeDirty=false,panGesture=null,recordingScale=0,eraseSource=false;
   const trajectories=new CellLabTrajectories();
@@ -157,6 +158,18 @@
   function applyColors(value){cellColors=CellLabDisplay.normalizeColors(value);try{localStorage.setItem('cell-arena-colors-v1',JSON.stringify(cellColors));}catch{/* Private/storage-disabled contexts still support this session. */}syncColors();dirty=true;}
   $('reset-colors').addEventListener('click',()=>applyColors(null));
   $('proliferation-shading').addEventListener('change',e=>applyColors({...cellColors,proliferationShading:e.target.checked}));syncColors();
+  try{const saved=localStorage.getItem('cell-arena-edge-fade-v1');if(saved!==null&&Number.isFinite(Number(saved)))$('body-feather').value=Math.max(0,Math.min(100,Number(saved)));}catch{}
+  function syncAppearance(){ $('body-feather-out').textContent=$('body-feather').value+'%';dirty=true;forceFrame=true; }
+  $('body-feather').addEventListener('input',()=>{syncAppearance();try{localStorage.setItem('cell-arena-edge-fade-v1',$('body-feather').value);}catch{}});syncAppearance();
+  try{const saved=localStorage.getItem('cell-arena-auto-random-v1');if(saved!==null&&Number.isFinite(Number(saved))&&Number(saved)>=0&&Number(saved)<=1440)$('auto-random-minutes').value=saved;}catch{}
+  function configureAutoRandom(){const input=$('auto-random-minutes');autoRandom.configure(input.valueAsNumber,performance.now());try{localStorage.setItem('cell-arena-auto-random-v1',String(autoRandom.minutes));}catch{}}
+  $('auto-random-minutes').addEventListener('input',configureAutoRandom);configureAutoRandom();
+  function tickAutoRandom(now){
+    const allowed=!document.hidden&&!autoRandomBusy&&!setupBusy&&!stroke&&!pending.size&&!document.querySelector('dialog[open]')&&document.activeElement!==$('auto-random-minutes');
+    const reason=autoRandom.tick(snapshot,now,allowed);if(!reason)return;
+    autoRandomBusy=true;
+    start('random',{shuffle:true}).then(()=>toast(reason==='empty'?'全部细胞已消失，已随机开启新一轮':'长时间无状态变化，已随机开启新一轮')).catch(error=>{$('auto-random-minutes').value=0;configureAutoRandom();fail(error);}).finally(()=>{autoRandomBusy=false;});
+  }
   const pending=new Map(),errors=[];
   let resolveReady;const ready=new Promise(r=>resolveReady=r);
   function rpc(command,payload={}){
@@ -172,11 +185,13 @@
       if(family){if(!family.cells.some(c=>c.id===selected))selected=family.cells[0]?.id||0;}
       else if(previous&&next&&previous.birth!==next.birth)selected=0;
       snapshot=m.data;if(snapshot.revision!==lastRevision){lastRevision=snapshot.revision;selected=0;observedBirth=0;adaptive.reset(performance.now());}
+      autoRandom.observe(snapshot,performance.now());
       performanceContext();
       if(raster.width!==snapshot.width||raster.height!==snapshot.height){raster.width=snapshot.width;raster.height=snapshot.height;image=rctx.createImageData(snapshot.width,snapshot.height);}
       pendingFrame=m.frame||0;trajectories.sample(snapshot);dirty=true;uiPending=true;
       if(m.interactive)forceFrame=true;
       if(m.interactive||performance.now()-lastUISync>=performancePlan.uiMs){sync(!!m.interactive);lastUISync=performance.now();uiPending=false;}
+      if(autoRandom.count===0)tickAutoRandom(performance.now());
     }else if(m.type==='response'){
       const p=pending.get(m.id);if(p){clearTimeout(p.timeout);pending.delete(m.id);p.resolve(m.value);}
     }else if(m.type==='error'){
@@ -390,19 +405,22 @@
     document.querySelector('.antigen-key').hidden=!showAntigen;
     document.querySelector('.cycle-key').hidden=!showCycle;
     }
-    let gpu=false;if(gpuRenderer)try{gpu=gpuRenderer.draw(ctx,s,{actFlags,seams,selected,showAntigen,field,info,signal,bodySignal,environmentOpacity,bodyEnvironmentOpacity,pixelRatio,cellColors});}catch(e){rendererFailure=String(e);gpuRenderer.lost=true;}
+    const edgeFade=Number($('body-feather').value)/100,surface=edgeFade>0?surfaceCache.get(s):null;
+    let gpu=false;if(gpuRenderer)try{gpu=gpuRenderer.draw(ctx,s,{actFlags,seams,selected,showAntigen,field,info,signal,bodySignal,environmentOpacity,bodyEnvironmentOpacity,pixelRatio,cellColors,surface,edgeFade});}catch(e){rendererFailure=String(e);gpuRenderer.lost=true;}
     if(!gpu){
+    const bodySurface=surface?.scale>1?surfaceCache.full(s):surface;
     for(let q=0;q<grid.length;q++){
       const x=q%w,y=(q/w)|0,id=grid[q],m=meta[id];let rgb;
-      const kind=CellLabDisplay.displayKind(m),base=m?bodies[id]:colors[0];rgb=base;
+      const kind=CellLabDisplay.displayKind(m),base=m?bodies[id]:colors[0];rgb=base;let under=colors[0];
       if(field){const value=field.values[Math.floor(y/s.fieldScale)*field.width+Math.floor(x/s.fieldScale)];
-        const heat=info.palette[kind][Math.min(255,Math.max(0,Math.round(value*255)))],alpha=m?bodyEnvironmentOpacity:environmentOpacity;rgb=base.map((v,k)=>v+(heat[k]-v)*alpha);
+        const heat=info.palette[kind][Math.min(255,Math.max(0,Math.round(value*255)))],alpha=m?bodyEnvironmentOpacity:environmentOpacity;rgb=base.map((v,k)=>v+(heat[k]-v)*alpha);if(surface&&m)under=under.map((v,k)=>v+(heat[k]-v)*environmentOpacity);
       }
-      if(signal){const layer=m?bodySignal:signal,p=(Math.floor(y/s.fieldScale)*layer.width+Math.floor(x/s.fieldScale))*4,a=layer.rgba[p+3]/255;rgb=rgb.map((v,k)=>v+(layer.rgba[p+k]-v)*a);}
+      if(signal){const layer=m?bodySignal:signal,p=(Math.floor(y/s.fieldScale)*layer.width+Math.floor(x/s.fieldScale))*4,a=layer.rgba[p+3]/255;rgb=rgb.map((v,k)=>v+(layer.rgba[p+k]-v)*a);if(surface&&m){const a=signal.rgba[p+3]/255;under=under.map((v,k)=>v+(signal.rgba[p+k]-v)*a);}}
       if(s.walls[q]&&id!==s.maze?.wallID){const hatch=(x+y)%7<2;rgb=hatch?[66,83,87]:colors[4];}
       if(m){
         if(m.dying)rgb=CellLabDisplay.deathColor(rgb,m);
-        else if(actFlags[m.kind]&&s.activity[q]>0)rgb=activityPalette[s.activity[q]];
+        if(bodySurface&&m.kind>0&&m.kind<4){const alpha=1-edgeFade*(1-bodySurface.interior[q]/255);rgb=rgb.map((v,k)=>under[k]+(v-under[k])*alpha);}
+        if(!m.dying&&actFlags[m.kind]&&s.activity[q]>0)rgb=activityPalette[s.activity[q]];
       }
       const k=q*4;data[k]=rgb[0];data[k+1]=rgb[1];data[k+2]=rgb[2];data[k+3]=255;
     }
@@ -413,13 +431,13 @@
     ctx.save();ctx.lineWidth=1.1*pixelRatio;ctx.setLineDash([3*pixelRatio,3*pixelRatio]);for(const source of s.sources||[]){ctx.strokeStyle=({trail:'#8654ad',danger:'#c26a2a',cohesion:'#238b74',il2:'#1f92cd',normalDamage:'#c96e42',inhibition:'#395bc9',oxygen:'#318ab5',glucose:'#9a802f',acid:'#b34d51',nutrient:'#378597',hostile:'#a04d41'})[source.type];for(const dx of wrap?[-s.width,0,s.width]:[0])for(const dy of wrap?[-s.height,0,s.height]:[0]){const x=source.x+dx,y=source.y+dy;if(x+source.radius<0||x-source.radius>s.width||y+source.radius<0||y-source.radius>s.height)continue;ctx.beginPath();ctx.arc(x*scale,y*scale,source.radius*scale,0,2*Math.PI);ctx.stroke();}}ctx.restore();
     drawMazeWalls(ctx,s,scale);
     // Optional subpixel display seams; these never enter the lattice mechanics.
-    if(!gpu&&(seams||selected)){const paths=[new Path2D(),new Path2D(),new Path2D(),new Path2D()];ctx.lineWidth=.55*pixelRatio;
+    if(!gpu&&(seams||selected)){const paths=[new Path2D(),new Path2D(),new Path2D(),new Path2D()];ctx.lineWidth=.55*pixelRatio;ctx.globalAlpha=(.9-.65*edgeFade)/.9;
       for(let y=0;y<h;y++)for(let x=0;x<w;x++){const q=y*w+x,id=grid[q];if(!meta[id]||(!seams&&id!==selected))continue;
         const path=paths[CellLabDisplay.immuneSuppressive(meta[id])?3:meta[id].kind===1?0:meta[id].kind===3&&!CellLabDisplay.immuneActive(meta[id])?2:1];
         const right=x<w-1?grid[q+1]:(wrap?grid[q-w+1]:0),down=y<h-1?grid[q+w]:(wrap?grid[x]:0);
         if(right!==id){path.moveTo((x+1)*scale,y*scale);path.lineTo((x+1)*scale,(y+1)*scale);}if(down!==id){path.moveTo(x*scale,(y+1)*scale);path.lineTo((x+1)*scale,(y+1)*scale);}}
       ctx.strokeStyle='#626e6de6';ctx.stroke(paths[0]);ctx.strokeStyle='#e1e6e1e6';ctx.stroke(paths[1]);
-      ctx.strokeStyle='#803d46e6';ctx.stroke(paths[2]);ctx.strokeStyle='#1a456be6';ctx.stroke(paths[3]);
+      ctx.strokeStyle='#803d46e6';ctx.stroke(paths[2]);ctx.strokeStyle='#1a456be6';ctx.stroke(paths[3]);ctx.globalAlpha=1;
     }
     if(showAntigen&&!gpu)drawAntigenOutlines(s,scale,pixelRatio);
     if(showNuclei){ctx.save();ctx.scale(scale,scale);ctx.lineWidth=1.5*pixelRatio/scale;for(const batch of displayCache.nucleusBatches(s,cellColors)){ctx.fillStyle=batch.fill;ctx.strokeStyle=batch.stroke;ctx.fill(batch.path);ctx.stroke(batch.path);}ctx.restore();}
@@ -551,6 +569,7 @@
   }
   for(const id of ['world-size','refinement'])$(id).addEventListener('change',gridPreview);gridPreview();
   async function start(scene=snapshot?.scene||'oncogenesis',{preserve=false,shuffle=false,preset=false}={}){
+    setupBusy++;autoRandom.suspend(performance.now());try{
     await endStroke();panGesture=null;
     if(preset&&scene==='maze'&&Number($('world-size').value)<384){$('world-size').value='384';if(Number($('refinement').value)>2)$('refinement').value='2';gridPreview();}
     selected=0;observedBirth=0;const resetDisplay=preset||shuffle||scene!==snapshot?.scene;
@@ -566,6 +585,7 @@
     if(preset||shuffle||scene==='empty'){signalLayers.clear();$('field-view').value=tumorPreset?'adversity':'none';if(tumorPreset||scene==='maze')signalLayers.add('trail');if(scene==='maze'){$('edge-activity').checked=true;$('immune-activity').checked=true;$('show-tracks').checked=true;$('track-duration').value='1200';syncTracks();view.x=0;view.y=0;$('zoom').value='100';$('view-fit').value='contain';}updateOverlayButtons();dirty=true;await rpc('speed',{value:tumorPreset||scene==='network'?3:1});await rpc('playing',{value:scene!=='empty'});}
     else if(scene==='stress'||scene==='surveillance'){$('field-view').value='adversity';dirty=true;}
     if(scene==='empty'){view.x=0;view.y=0;$('zoom').value='100';$('seed-kind').value='1';setTool('seed');if(mobileUI.isMobile)mobileUI.focus('mobile-tools');dirty=true;}
+    }finally{setupBusy--;autoRandom.reset(performance.now());autoRandom.observe(snapshot,performance.now());}
   }
   function syncTracks(){trajectories.configure($('show-tracks').checked,Number($('track-duration').value));$('track-duration-out').textContent=$('track-duration').value+' MCS';if(snapshot)trajectories.sample(snapshot);dirty=true;}
   $('show-tracks').addEventListener('change',syncTracks);$('track-duration').addEventListener('input',syncTracks);
@@ -640,15 +660,17 @@
   $('statistics-play').addEventListener('click',()=>$('play').click());
   for(const id of ['record-format','record-quality','record-scope'])$(id).addEventListener('change',refreshRecordingOptions);refreshRecordingOptions();
   $('snapshot').addEventListener('click',()=>{render();download(canvas.toDataURL('image/png'),`cell-arena-${snapshot.scene}-${snapshot.time}.png`);});
-  function displaySettings(){return {cellColors:CellLabDisplay.normalizeColors(cellColors),trackDuration:Number($('track-duration').value),fieldView:$('field-view').value,signalLayers:[...signalLayers],opacity:{...opacity},flags:Object.fromEntries(CellLabExperiment.flags.map(id=>[id,$(id).checked])),zoom:$('zoom').value,fit:$('view-fit').value,renderResolution:$('render-resolution').value};}
+  function displaySettings(){return {cellColors:CellLabDisplay.normalizeColors(cellColors),edgeFade:Number($('body-feather').value),autoRandomMinutes:autoRandom.minutes,trackDuration:Number($('track-duration').value),fieldView:$('field-view').value,signalLayers:[...signalLayers],opacity:{...opacity},flags:Object.fromEntries(CellLabExperiment.flags.map(id=>[id,$(id).checked])),zoom:$('zoom').value,fit:$('view-fit').value,renderResolution:$('render-resolution').value};}
   async function exportData(){return {...await rpc('export'),display:displaySettings()};}
   $('export-data').addEventListener('click',async()=>{try{const data=await exportData(),url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));download(url,`cell-arena-experiment-${data.time}.json`);setTimeout(()=>URL.revokeObjectURL(url),5000);}catch(e){fail(e);}});
   let pendingImport=null,importSerial=0;
   async function importData(data){
+    setupBusy++;autoRandom.suspend(performance.now());try{
     await endStroke();
     const profile=CellLabExperiment.parse(data);await endStroke();await rpc('import',{data});
     const config=profile.config,select=$('world-size');let option=[...select.options].find(o=>o.value===String(config.worldWidth));if(!option){option=new Option('',String(config.worldWidth));select.append(option);}option.textContent=`${config.worldWidth} × ${config.worldHeight}`;option.dataset.height=config.worldHeight;select.value=String(config.worldWidth);$('refinement').value=String(config.refinement);gridPreview();
-    const d=profile.display;if(d.cellColors)applyColors(d.cellColors);if(d.fieldView!==undefined)$('field-view').value=d.fieldView;if(d.signalLayers){signalLayers.clear();for(const key of d.signalLayers)signalLayers.add(key);}Object.assign(opacity,d.opacity||{});
+    const d=profile.display;if(d.cellColors)applyColors(d.cellColors);if(d.edgeFade!==undefined){$('body-feather').value=d.edgeFade;syncAppearance();}if(d.fieldView!==undefined)$('field-view').value=d.fieldView;if(d.signalLayers){signalLayers.clear();for(const key of d.signalLayers)signalLayers.add(key);}Object.assign(opacity,d.opacity||{});
+    $('auto-random-minutes').value=d.autoRandomMinutes??0;configureAutoRandom();
     // Migrate the short-lived exclusive selector; current independent flags win.
     if(d.cellMarker!==undefined)for(const [id,mode]of [['nuclei','nucleus'],['antigen-marks','antigen'],['cycle-marks','cycle']])$(id).checked=d.cellMarker===mode;
     else if(d.flags&&('nuclei' in d.flags||'antigen-marks' in d.flags))$('cycle-marks').checked=false;
@@ -656,6 +678,7 @@
     if(d.trackDuration!==undefined)$('track-duration').value=d.trackDuration;syncTracks();
     if(d.zoom)$('zoom').value=d.zoom;if(d.fit)$('view-fit').value=d.fit;if(d.renderResolution)$('render-resolution').value=d.renderResolution;
     view.x=0;view.y=0;selected=0;observedBirth=0;hover=null;probeDirty=true;syncOpacity();updateOverlayButtons();setTool(config.scene==='empty'?'seed':'move');dirty=true;return profile;
+    }finally{setupBusy--;autoRandom.reset(performance.now());autoRandom.observe(snapshot,performance.now());}
   }
   $('import-data').addEventListener('click',()=>$('import-file').click());
   $('import-file').addEventListener('change',async()=>{
@@ -668,17 +691,17 @@
   $('cancel-import').addEventListener('click',()=>$('import-dialog').close());$('import-dialog').addEventListener('close',()=>{pendingImport=null;importSerial++;$('import-file').value='';});
   $('confirm-import').addEventListener('click',async()=>{if(!pendingImport)return;$('confirm-import').disabled=true;try{await importData(pendingImport);$('import-dialog').close();toast('参数已加载，已暂停重新开局');}catch(error){$('import-status').textContent=String(error.message||error);$('confirm-import').disabled=false;}});
   $('about').addEventListener('click',()=>$('about-dialog').showModal());$('close-about').addEventListener('click',()=>$('about-dialog').close());
-  document.addEventListener('visibilitychange',()=>{if(document.hidden)void endStroke();lastAnimation=0;performanceContext();rpc('visible',{value:!document.hidden}).catch(fail);});
+  document.addEventListener('visibilitychange',()=>{autoRandom.suspend(performance.now());if(document.hidden)void endStroke();lastAnimation=0;performanceContext();rpc('visible',{value:!document.hidden}).catch(fail);});
   document.addEventListener('keydown',e=>{if(e.code==='Space'&&!['INPUT','SELECT','BUTTON','SUMMARY'].includes(document.activeElement.tagName)&&!document.querySelector('dialog[open]')){e.preventDefault();rpc('playing',{value:!snapshot?.playing}).catch(fail);}});
   function frame(){
     const now=performance.now();if(lastAnimation)adaptive.frameGap(now-lastAnimation);lastAnimation=now;
     if(latestInput){adaptive.inputDelay(now-latestInput);latestInput=0;}
-    if(now-lastHeartbeat>=500){performanceContext();if(adaptive.tick(now)){dirty=true;applyPerformance();}performancePlan=adaptive.status();lastHeartbeat=now;}
+    if(now-lastHeartbeat>=500){performanceContext();if(adaptive.tick(now)){dirty=true;applyPerformance();}performancePlan=adaptive.status();lastHeartbeat=now;tickAutoRandom(now);}
     if(uiPending&&now-lastUISync>=performancePlan.uiMs){sync();lastUISync=now;uiPending=false;}
     if(dirty&&(!pendingFrame||forceFrame||now-lastRender>=1000/performancePlan.fps))render();
     if(probeDirty)updateProbe();requestAnimationFrame(frame);
   }requestAnimationFrame(frame);applyPerformance();
-  window.artistooLab={rpc,ready,get snapshot(){return snapshot;},get performance(){return {...adaptive.status(),visiblePanels:[...visiblePanels]};},get errors(){return errors;},get selected(){return selected;},get recording(){return video.status;},get colors(){return CellLabDisplay.normalizeColors(cellColors);},get renderer(){return {gpu:!!gpuRenderer&&!gpuRenderer.lost,device:gpuRenderer?.device,error:rendererFailure,ms:gpuRenderer?.lastMs,fps:snapshot?.playing?frameStats.fps:0,renderMs:frameStats.renderMs,snapshotMs:frameStats.snapshotMs};},setTool,render,exportData,importData};
+  window.artistooLab={rpc,ready,get snapshot(){return snapshot;},get autoRandom(){return {...autoRandom.status(),busy:autoRandomBusy};},get performance(){return {...adaptive.status(),visiblePanels:[...visiblePanels]};},get errors(){return errors;},get selected(){return selected;},get recording(){return video.status;},get colors(){return CellLabDisplay.normalizeColors(cellColors);},get renderer(){return {gpu:!!gpuRenderer&&!gpuRenderer.lost,device:gpuRenderer?.device,error:rendererFailure,ms:gpuRenderer?.lastMs,fps:snapshot?.playing?frameStats.fps:0,renderMs:frameStats.renderMs,snapshotMs:frameStats.snapshotMs};},setTool,render,exportData,importData};
   const language=CellLabI18n.mount($('language'));
   start('oncogenesis',{preset:true}).then(()=>rpc('visible',{value:!document.hidden})).then(resolveReady).catch(fail);
 })();
