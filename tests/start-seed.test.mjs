@@ -35,7 +35,7 @@ test('visit seeds diversify actual onset geometry while retaining the bounded co
     assert.deepEqual(s.settings,{...CellLab.DEFAULTS,...CellLab.PRESETS.oncogenesis.settings});
     const report=s.scenarioReport();assert.equal(report.initial.tumor,0);assert.equal(report.initial.immune,12);assert.ok(s.live().every(m=>m.state!=='abnormal'&&m.stress===0));
     assertConfluentTissue(s);
-    assert.ok(s.supplyMap.some(v=>v<.15)&&s.supplyMap.some(v=>v>.95),'weak niches and viable edges remain');
+    assert.ok(s.supplyMap.some(v=>v<.3)&&s.supplyMap.some(v=>v>.95),'weak niches and viable edges remain');
     if(baseline)assert.deepEqual(s.supplyMap,baseline);else baseline=s.supplyMap.slice();
     assert.ok(s.live().every(m=>s.section.fits(m,m.nucleusX,m.nucleusY)));hashes.add(fingerprint(s));
   }

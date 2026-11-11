@@ -19,7 +19,7 @@ test('random founder layouts differ by seed but restart and imported parameters 
   assertConfluentTissue(a);
   assert.ok(a.live().filter(m=>m.kind===3).length>=12);assert.ok(a.live().every(m=>m.state!=='abnormal'&&m.stress===0));
   assert.deepEqual(a.supplyMap,b.supplyMap);assert.notDeepEqual(a.supplyMap,c.supplyMap);
-  assert.ok(a.supplyMap.some(v=>v<.15)&&a.supplyMap.some(v=>v>.95),'both hostile niches and a viable frontier');
+  assert.ok(a.supplyMap.some(v=>v<.3)&&a.supplyMap.some(v=>v>.95),'both hostile niches and a viable frontier');
   assert.equal(a.scenarioReport().initial.tumor,0);assert.equal(a.scenarioReport().customized,false);assert.ok(a.settings.damagePolarization>0&&a.settings.suppressionRecovery>0);
   assert.ok(a.live().every(m=>a.section.fits(m,m.nucleusX,m.nucleusY)));assert.equal(a.C.time,0);
 });

@@ -10,7 +10,7 @@ async function click(selector){const rev=await b.evaluate('artistooLab.snapshot.
 const fingerprint=`(()=>{const s=artistooLab.snapshot;let h=2166136261;for(const v of s.grid)h=Math.imul(h^v,16777619);return JSON.stringify({seed:s.seed,time:s.time,hash:h>>>0,counters:s.counters,cells:s.cells.map(c=>[c.id,c.area,c.x,c.y,c.antigenLevel,c.cycle])});})()`;
 try{
  await ready();const first=await b.evaluate('artistooLab.exportData()'),visits=[first.seed];
- check('The opening development experiment keeps the established parameters and 3x wrap display',first.scene==='oncogenesis'&&first.boundary==='wrap'&&first.speed===3&&first.scenario.initial.tumor===0&&first.scenario.initial.immune===12&&first.settings.supply===2.5&&first.settings.metabolism===1.2&&first.settings.normalSupport===35);
+ check('The opening development experiment keeps the established parameters and 3x wrap display',first.scene==='oncogenesis'&&first.boundary==='wrap'&&first.speed===3&&first.scenario.initial.tumor===0&&first.scenario.initial.immune===12&&first.settings.supply===2.8&&first.settings.metabolism===.85&&first.settings.normalSupport===20);
  for(let i=0;i<3;i++){
   const prior=visits.at(-1);await b.call('Page.reload',{ignoreCache:true});await wait(`!!window.artistooLab?.snapshot&&artistooLab.snapshot.seed!==${prior}`);await ready();
   const profile=await b.evaluate('artistooLab.exportData()');visits.push(profile.seed);assert.deepEqual(profile.settings,first.settings);assert.deepEqual(profile.supplyMap,first.supplyMap);
@@ -23,8 +23,8 @@ try{
  await b.evaluate('artistooLab.rpc("advance",{steps:40})');const advanced=await b.evaluate(fingerprint);
  await click('#reset');check('Restart keeps the current imported seed and returns to the initial mechanical warmup state',await b.evaluate(`artistooLab.snapshot.seed===${first.seed}&&artistooLab.snapshot.time===35`));
  await b.evaluate('artistooLab.rpc("advance",{steps:40})');check('Imported experiment and Restart reproduce the same 40-MCS cells, geometry and counters',await b.evaluate(fingerprint)===advanced);
- await click('#restore-scenario');check('Restore returns to this page visit opening seed and the scenario defaults',await b.evaluate(`artistooLab.snapshot.seed===${opening}&&artistooLab.snapshot.settings.supply===2.5&&artistooLab.snapshot.scenario.initial.tumor===0`));
- await click('#shuffle');const randomSeed=await b.evaluate('artistooLab.snapshot.seed');check('Random Generate still creates a new bounded random-development experiment',await b.evaluate(`artistooLab.snapshot.scene==='random'&&artistooLab.snapshot.seed!==${opening}&&artistooLab.snapshot.settings.supply>=2.3&&artistooLab.snapshot.settings.supply<=2.8&&artistooLab.snapshot.scenario.initial.tumor===0`));
+ await click('#restore-scenario');check('Restore returns to this page visit opening seed and the scenario defaults',await b.evaluate(`artistooLab.snapshot.seed===${opening}&&artistooLab.snapshot.settings.supply===2.8&&artistooLab.snapshot.scenario.initial.tumor===0`));
+ await click('#shuffle');const randomSeed=await b.evaluate('artistooLab.snapshot.seed');check('Random Generate still creates a new bounded random-development experiment',await b.evaluate(`artistooLab.snapshot.scene==='random'&&artistooLab.snapshot.seed!==${opening}&&artistooLab.snapshot.settings.supply>=2.7&&artistooLab.snapshot.settings.supply<=2.9&&artistooLab.snapshot.scenario.initial.tumor===0`));
  await click('#reset');check('Random Generate also remains restartable',await b.evaluate(`artistooLab.snapshot.scene==='random'&&artistooLab.snapshot.seed===${randomSeed}`));
  await click('[data-scene="oncogenesis"]');check('Returning to development reuses this visit seed for controlled comparison',await b.evaluate(`artistooLab.snapshot.seed===${opening}`));
  for(const lang of ['zh','en']){

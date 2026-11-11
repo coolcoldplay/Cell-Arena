@@ -1,47 +1,33 @@
+// Browser wiring checks; seeded long-run ecology is tested by the model suite.
 import {openBrowser,delay} from './browser-session.mjs';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
-const out=process.argv.find(a=>a.startsWith('--output='))?.slice(9)||'output/unrestricted-growth/browser-scenarios';await mkdir(out,{recursive:true});
-const b=await openBrowser('dist/artistoo-playground.html',9384,{gpu:true}),checks=[];
-const {evaluate,call}=b;
-const check=(ok,name,detail={})=>{checks.push({name,passed:!!ok,...detail});if(!ok)throw Error(name+' '+JSON.stringify(detail));};
-const click=async selector=>{const p=await evaluate(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});e.scrollIntoView({block:'nearest'});const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);for(const type of ['mousePressed','mouseReleased'])await call('Input.dispatchMouseEvent',{type,...p,button:'left',buttons:type==='mousePressed'?1:0,clickCount:1});await delay(120);};
-const preset=async scene=>{await click(`[data-scene="${scene}"]`);for(let i=0;i<100;i++){if(await evaluate(`artistooLab.snapshot.scene==='${scene}'&&artistooLab.snapshot.playing&&artistooLab.snapshot.speed===${['oncogenesis','cold','hot','random'].includes(scene)?3:1}`))break;await delay(50);}await evaluate('artistooLab.rpc("playing",{value:false})');};
-const shot=async name=>{await evaluate('artistooLab.render();window.scrollTo(0,0)');await delay(80);const data=await call('Page.captureScreenshot',{format:'png'});await writeFile(out+'/'+name+'.png',Buffer.from(data.data,'base64'));};
+import assert from 'node:assert/strict';
+const out='output/scenario-calibration/browser';await mkdir(out,{recursive:true});
+const b=await openBrowser('dist/index.html',9384,{gpu:true}),checks=[];
+function check(ok,name,details={}){checks.push({name,passed:!!ok,...details});assert.ok(ok,name);}
+async function wait(expr){for(let i=0;i<300;i++){if(await b.evaluate(expr))return;await delay(100);}throw Error('Timed out: '+expr);}
 try{
-  for(let i=0;i<150;i++){if(await evaluate('!!window.artistooLab?.snapshot&&artistooLab.snapshot.speed===3'))break;await delay(100);}await delay(80);await evaluate('artistooLab.rpc("playing",{value:false})');
-  const initial=await evaluate('({scene:artistooLab.snapshot.scene,report:artistooLab.snapshot.scenario,labels:[...document.querySelectorAll("[data-scene]")].map(e=>e.dataset.scene),risk:document.getElementById("stressMutation").value,kernel:artistooLab.snapshot.kernel,gpu:artistooLab.renderer.gpu})');
-  check(initial.scene==='oncogenesis'&&initial.labels.join(',')==='oncogenesis,cold,hot','Exactly three requested scenarios; oncogenesis is the default',initial);
-  check(initial.report.initial.tumor===0&&initial.report.initial.normal===48&&initial.report.initial.immune===4&&initial.risk==='8','Actual initial populations and revised risk values reach the UI');
-  check(await evaluate('!document.getElementById("capacity")&&!("capacity" in artistooLab.snapshot.settings)&&!("limit" in artistooLab.snapshot)&&document.getElementById("population-load").textContent.includes("不按细胞数量冻结")'),'Population budget is absent from settings, snapshot and UI; load information replaces it');
-  check(initial.kernel==='wasm'&&initial.gpu&&await evaluate('document.querySelectorAll("aside details[open]").length===0'),'GPU/WASM remain active and parameter modules remain folded');
-  await evaluate('artistooLab.rpc("advance",{steps:3000})');
-  const emergence=await evaluate('({report:artistooLab.snapshot.scenario,counters:artistooLab.snapshot.counters,text:document.getElementById("scenario-phase").textContent})');
-  check(emergence.report.achieved&&emergence.counters.malignantTransitions>0&&emergence.report.tumorDivisions>0&&emergence.text==='新生肿瘤克隆扩增','Default scenario genuinely develops malignant clones',emergence);await shot('oncogenesis');
-  await preset('hot');
-  check(await evaluate('artistooLab.snapshot.settings.stressMutation===0&&artistooLab.snapshot.settings.growth===.75&&artistooLab.snapshot.scenario.initial.tumor===37&&artistooLab.snapshot.scenario.initial.immune===18&&document.querySelector("[data-layer=trail]").getAttribute("aria-pressed")==="true"'),'Hot preset starts a local 37-cell tumor burden, 18 surrounding immune cells and the recruitment view');await shot('hot-initial');
-  await evaluate('artistooLab.rpc("advance",{steps:1500})');
-  const hot=await evaluate('({report:artistooLab.snapshot.scenario,kills:artistooLab.snapshot.counters.kills,text:document.getElementById("scenario-phase").textContent})');
-  check(hot.report.achieved&&hot.report.tumorBodies===0&&hot.report.tumorDivisions>0&&hot.kills===37+hot.report.tumorDivisions&&hot.text==='当前区域持续清除','Hot scenario clears founders and proliferating descendants through actual killing and the observation interval',hot);await shot('hot-clearance');
-  await preset('cold');
-  check(await evaluate('artistooLab.snapshot.settings.growth===1.4&&artistooLab.snapshot.settings.antigen===15&&artistooLab.snapshot.scenario.initial.immune===3&&document.querySelectorAll("[data-layer][aria-pressed=true]").length===0'),'Cold preset restores sparse patrols, low antigen and independent display defaults');
-  await evaluate('artistooLab.rpc("advance",{steps:1000})');const cold=await evaluate('artistooLab.snapshot.scenario');
-  check(cold.achieved&&cold.farTumor>0&&cold.distalDivisions>0,'Cold scenario displays actual primary-lineage dispersal and distant division',cold);await shot('cold-dispersal');
-  await evaluate(`(async()=>{await artistooLab.rpc('set',{name:'growth',value:0});await artistooLab.rpc('set',{name:'immuneSeparation',value:2.3});})()`);
-  check(await evaluate('document.getElementById("scenario-configuration").textContent==="参数已调整"'),'Changed settings are identified instead of mislabeled as a preset');
-  await click('#restore-scenario');await evaluate('artistooLab.rpc("playing",{value:false})');
-  check(await evaluate('artistooLab.snapshot.seed===17&&artistooLab.snapshot.settings.growth===1.4&&artistooLab.snapshot.settings.immuneSeparation===1&&artistooLab.snapshot.scenario.tumor===19&&!artistooLab.snapshot.scenario.customized'),'Restore button restores parameters, seed and real initial cells');
-  await preset('oncogenesis');const exported=await evaluate('artistooLab.rpc("export")');
-  check(exported.scenario.profile.environment==='poor-core'&&Math.min(...exported.supplyMap)<.051&&Math.max(...exported.supplyMap)===1&&exported.settings.stressMutation===8&&!('capacity' in exported.settings),'Export retains the heterogeneous environment and revised scenario configuration without a budget');
-  await evaluate('artistooLab.rpc("backend",{mode:"gpu"})');await evaluate('artistooLab.rpc("advance",{steps:16})');
-  check(await evaluate('artistooLab.snapshot.compute.active==="gpu"&&artistooLab.snapshot.kernel==="wasm"'),'Worker executes the heterogeneous preset with real WebGPU fields');
-  await evaluate(`(async()=>{await artistooLab.rpc('start',{scene:'cold',worldWidth:512,worldHeight:384,refinement:1,warmup:0,settings:{capacity:40}});window.largeInitial=artistooLab.snapshot.cells.length;await artistooLab.rpc('advance',{steps:250});})()`);
-  const uncapped=await evaluate('({initial:largeInitial,now:artistooLab.snapshot.cells.length,divisions:artistooLab.snapshot.scenario.tumorDivisions,settings:artistooLab.snapshot.settings,orphans:artistooLab.snapshot.orphans})');
-  check(uncapped.initial>320&&uncapped.now>uncapped.initial&&uncapped.divisions>0&&!('capacity' in uncapped.settings)&&uncapped.orphans===0,'Large tissue actually proliferates beyond the former 320-cell limit through the worker',{initial:uncapped.initial,now:uncapped.now,divisions:uncapped.divisions});
-  const sources=await Promise.all(['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/model.js','src/gpu-fields.js'].map(f=>readFile(f,'utf8')));await evaluate(sources.join('\n'));
-  const parity=await evaluate(`(async()=>{const results=[];for(const boundary of ['solid','wrap']){const opts={worldWidth:192,worldHeight:144,refinement:1.5,scene:'oncogenesis',warmup:0,boundary},a=new CellLab.Simulation(opts),c=new CellLab.Simulation(opts);for(const s of [a,c]){s.prepareEnvironment();for(const key of ['oxygen','glucose','acid'])for(let i=0;i<s.fields[key].values.length;i++)s.fields[key].values[i]=.1+((i*17)%67)/80;}const gpu=await CellLabGPU.GPUFields.create(c);for(let n=0;n<20;n++){a.integrateEnvironment(4);await gpu.step(c,4);}let error=0;for(const key of ['oxygen','glucose','acid'])for(let i=0;i<a.fields[key].values.length;i++)error=Math.max(error,Math.abs(a.fields[key].values[i]-c.fields[key].values[i]));results.push({boundary,error});gpu.destroy();}return results;})()`);
-  check(parity.every(row=>row.error<2e-5),'CPU and WebGPU agree for the spatial supply/clearance profile over 80 MCS',{parity});
-  await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await delay(100);
-  check(await evaluate('document.documentElement.scrollWidth<=392&&[...document.querySelectorAll("[data-scene]")].every(e=>e.getBoundingClientRect().width>300)'),'Three scenario cards and explanatory panel fit a mobile viewport');await shot('mobile-scenarios');
-  check(b.errors.length===0&&(await evaluate('artistooLab.errors.length'))===0,'No browser or worker runtime errors');check(b.requests.length===0,'Standalone scenarios make no network requests');
-}catch(e){checks.push({passed:false,error:String(e)});console.error(e);process.exitCode=1;await shot('failure');}
-finally{await writeFile(out+'/browser-checks.json',JSON.stringify(checks,null,2));await writeFile(out+'/tested-manifest.json',await readFile('dist/manifest.json'));console.log(JSON.stringify(checks,null,2));await b.close();}
+  await wait('!!window.artistooLab?.snapshot');await b.evaluate('artistooLab.ready');
+  for(const [scene,tumor,immune,dependence,support] of [['oncogenesis',0,12,20,20],['cold',19,3,25,20],['hot',37,18,25,15]]){
+    const revision=await b.evaluate('artistooLab.snapshot.revision');
+    await b.evaluate(`document.querySelector('[data-scene="${scene}"]').click()`);
+    await wait(`artistooLab.snapshot.revision>${revision}&&artistooLab.snapshot.scene==='${scene}'`);
+    await b.evaluate('artistooLab.ready');await b.evaluate('artistooLab.rpc("playing",{value:false})');
+    const data=await b.evaluate(`(()=>{const s=artistooLab.snapshot;return {scene:s.scene,settings:s.settings,initial:s.scenario.initial,speed:s.speed,boundary:s.boundary,kernel:s.kernel,controls:Object.fromEntries(['supply','metabolism','vesselDependence','normalSupport','reserveCapacity'].map(k=>[k,Number(document.getElementById(k).value)]))};})()`);
+    check(data.initial.tumor===tumor&&data.initial.immune===immune&&data.initial.endothelial>0,scene+' loads the intended founders and endothelial vessels',{initial:data.initial});
+    check(data.settings.vesselDependence===dependence&&data.settings.normalSupport===support&&data.settings.vesselCount===2,scene+' loads rebalanced vascular and host-support settings');
+    for(const [key,value] of Object.entries(data.controls))assert.equal(value,data.settings[key],scene+': '+key+' control agrees with the Worker');
+    check(data.speed===3&&data.boundary==='wrap'&&data.kernel==='wasm',scene+' retains 3x wrap display and WASM');
+    await b.evaluate('artistooLab.rpc("advance",{steps:40})');
+    check(await b.evaluate('artistooLab.snapshot.orphans===0'),scene+' advances with intact geometry');
+  }
+  await b.evaluate(`document.querySelector('[data-scene="oncogenesis"]').click()`);await wait('artistooLab.snapshot.scene==="oncogenesis"');await b.evaluate('artistooLab.ready');await b.evaluate('artistooLab.rpc("playing",{value:false})');
+  const exported=await b.evaluate('artistooLab.exportData()');
+  check(exported.settings.reserveCapacity===140&&exported.settings.metabolism===.85&&Math.min(...exported.supplyMap)>.21&&Math.min(...exported.supplyMap)<.23&&Math.max(...exported.supplyMap)===1,'Development exports revised reserves and localized clearance');
+  await b.evaluate(`artistooLab.importData(${JSON.stringify(exported)})`);
+  check(await b.evaluate(`artistooLab.snapshot.seed===${exported.seed}&&artistooLab.snapshot.settings.vesselDependence===20&&!artistooLab.snapshot.playing`),'Import preserves seed and calibrated settings');
+  await b.call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await delay(150);
+  check(await b.evaluate('document.documentElement.scrollWidth<=392'),'Preset controls still fit mobile');
+  check(!b.errors.length&&await b.evaluate('artistooLab.errors.length===0'),'No browser or Worker errors');
+}catch(error){checks.push({passed:false,error:String(error)});console.error(error);process.exitCode=1;}
+finally{await writeFile(out+'/checks.json',JSON.stringify(checks,null,2));await writeFile(out+'/tested-manifest.json',await readFile('dist/manifest.json'));console.log(JSON.stringify(checks,null,2));await b.close();}
