@@ -190,14 +190,25 @@
       this.updateJunctions(dt);this.updateBranches(dt);
       for(const m of live){
         if(m.dying)continue;
-        let push=0,total=0;
-        for(const edge of s.contacts.get(m.id)?.values()||[]){const other=s.cells[edge.id];if(!other||other.dying)continue;
+        let push=0;
+        const area=s.C.getVolume(m.id),drive=m.drive/35;
+        for(const edge of s.contacts.get(m.id)?.values()||[]){const other=s.cells[edge.id];if(other?.dying)continue;
           const length=Math.hypot(edge.nx,edge.ny)||1,normalX=edge.nx/length,normalY=edge.ny/length;
-          const active=other.kind===3?s.settings.immuneMotility:other.kind===2?s.settings.tumorMotility*other.genome.invasion:s.settings.normalMotility*.2;
-          push+=edge.length*active*(.35+.65*Math.max(0,-other.px*normalX-other.py*normalY));total+=edge.length;
+          // Reaction to this cell's front and a neighbour pushing inward. Use
+          // the effective drive, including metabolic, mitotic and synapse gates;
+          // ordinary contact (or tangential/outward motion) is not pressure.
+          const own=drive*Math.max(0,m.px*normalX+m.py*normalY);
+          const incoming=other?other.drive/35*Math.max(0,-other.px*normalX-other.py*normalY):0;
+          push+=edge.length*(own+incoming);
         }
-        const pressure=clamp(.3*m.confinement+(total?push/Math.max(1,4*Math.sqrt(s.C.getVolume(m.id)))*1.8:0));
-        const goal=1-s.settings.sectionYield*pressure,rate=goal<m.sectionFraction?.018:.006;
+        const pressure=clamp(push/Math.max(1,4*Math.sqrt(area))*1.8);
+        // Transfer only material displaced by actual compression. Lowering the
+        // target before geometry changes stores a tissue-wide contraction that
+        // a single death can release into a macroscopic cavity. Yield follows
+        // existing area loss rather than anticipating more. All movement still
+        // pays the ordinary CPM energy and nuclear/topological constraints.
+        const compression=clamp(1-area/Math.max(1,m.target));
+        const goal=1-Math.min(s.settings.sectionYield*pressure,compression),rate=goal<m.sectionFraction?.018:.006;
         next.push([m,m.sectionFraction+clamp(goal-m.sectionFraction,-rate*dt,rate*dt),pressure]);
       }
       for(const [m,f,pressure] of next){m.sectionFraction=clamp(f,0.5,1);m.sectionPressure=pressure;this.sync(m);s.updateMechanics(m);}

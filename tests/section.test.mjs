@@ -7,7 +7,11 @@ function fill(s,kind,points){const id=s.C.makeNewCellID(kind);for(const [x,y] of
 function rect(x,y,w,h){const out=[];for(let a=x;a<x+w;a++)for(let b=y;b<y+h;b++)out.push([a,b]);return out;}
 function gradient(s){const f=s.fields.danger;for(let y=0;y<f.height;y++)for(let x=0;x<f.width;x++)if(!f.blocked[y*f.width+x])f.values[y*f.width+x]=x*.6;}
 test('bounded reversible slice yielding retains biological target and metabolic material',async()=>{
-  const s=await sim(),a=fill(s,1,rect(20,25,12,12)),b=fill(s,3,rect(32,25,8,8)),m=s.cells[a];s.cells[b].px=-1;s.cells[b].py=0;s.scanContacts();const mass=m.target;
+  const s=await sim(),a=fill(s,1,rect(20,25,12,12)),b=fill(s,3,rect(32,25,8,8)),m=s.cells[a];s.cells[b].px=-1;s.cells[b].py=0;const mass=m.target;
+  // Yield follows occupied-area displacement, rather than manufacturing a
+  // smaller target just because an immune cell points at an intact neighbour.
+  for(const p of rect(29,25,3,8))s.C.setpix(p,b);
+  s.refreshPositions();s.scanContacts();
   for(let i=0;i<100;i++)s.section.update(1);
   assert.ok(m.sectionFraction>=.65&&m.sectionFraction<.95);assert.equal(m.target,mass);assert.equal(m.planarTarget+m.offPlaneTarget,mass);
   s.prepareEnvironment();const visible=s.densities[1].reduce((a,b)=>a+b,0),material=s.loads[1].reduce((a,b)=>a+b,0);assert.ok(material>visible*1.05);

@@ -48,7 +48,11 @@ test('immune exits and tumor entry require continuous bodies and nuclei, never t
   for(const kind of [3,2]){
     const s=create({width:110,height:90,vessels:[{x:50,y:45,radius:11}],settings:{vesselPassage:3,tumorIntravasation:3,metabolism:.3,growth:0,immuneGrowth:0}});await CellLabWasm.install(s,module);
     const v=s.vascular.vessels[0],id=kind===3?s.vascular.enter(v):s.seed(2,76,45,7),m=s.cells[id];assert.ok(m);
-    if(kind===3)s.addSource(78,45,'trail',12);else{m.genome.invasion=2.8;s.updateMechanics(m);}
+    // Test the crossing geometry, not whether an unconstrained initial random
+    // polarity happens to bring the tumor back from the far side of the dish.
+    // Only its initial direction is prescribed; contact, passage permission
+    // and every subsequent membrane/nuclear step remain part of the model.
+    if(kind===3)s.addSource(78,45,'trail',12);else{m.genome.invasion=2.8;m.px=-1;m.py=0;s.updateMechanics(m);}
     let previous=[m.nucleusX,m.nucleusY],seenTransit=false,seenInside=false;
     for(let t=0;t<1200&&!(kind===3?s.counters.extravasations:s.counters.bloodstreamExports);t++){
       s.advance(1);if(!s.cells[id])break;
@@ -56,7 +60,7 @@ test('immune exits and tumor entry require continuous bodies and nuclei, never t
       assert.ok(s.section.fits(m,...previous));assert.equal(s.components(id).length,1);
       if(m.vascularPhase>=2)seenTransit=true;if(m.vascularPhase===4){seenInside=true;assert.ok(s.vascular.extent(m,v).nucleusInside);}
     }
-    assert.ok(seenTransit);assert.equal(s.counters.kills+s.counters.environment+s.counters.apoptosis+s.counters.lifespan,0);
+    assert.ok(seenTransit,`kind ${kind} enters a real local transit`);assert.equal(s.counters.kills+s.counters.environment+s.counters.apoptosis+s.counters.lifespan,0);
     if(kind===3){assert.equal(s.counters.extravasations,1);assert.equal(m.vascularPhase,0);assert.ok(s.vascular.extent(m,v).nucleusOutside);}
     else{assert.ok(seenInside);assert.equal(s.counters.intravasations,1);assert.equal(s.counters.bloodstreamExports,1);assert.equal(s.cells[id],undefined);}
   }
