@@ -19,7 +19,7 @@
     <nav class="panel-nav" aria-label="面板导航"><button data-panel="display-panel" aria-pressed="false">显示</button><button data-panel="parameter-groups" aria-pressed="true">参数</button><button data-panel="statistics-panel" aria-pressed="false">统计</button><button data-panel="cell-inspector" aria-pressed="false">选中</button></nav>
     <div class="sidebar-scroll" id="sidebar-scroll" tabindex="0" aria-label="参数与统计滚动区">
       <details class="subsection" id="cell-inspector" hidden><summary>细胞详情与操作 <span id="selection-label">未选中</span></summary><div class="section-body"><div class="utility"><button id="divide" title="实验干预：绕过周期许可，仍受胞体、胞核和分裂几何限制" class="quiet">手动分裂（实验干预）</button></div><div id="inspection" class="inspection">点击细胞，查看抗原、受损程度与接触状态。</div></div></details>
-      <section id="display-panel" hidden aria-label="显示设置"><details class="section" open id="module-display"><summary><b>显示调整</b><span>视野 / 图层 / 配色</span></summary><div class="section-body"><label class="auto-random-control" title="0 关闭。无变化超时、全部消失、仅剩肿瘤、免疫为 0 或正常为 0 时，提示 10 秒后换局；迷宫不检查正常细胞，暂停和后台不计时。"><span>换局等待时间</span><input id="auto-random-minutes" type="number" min="0" max="1440" step="any" value="0" inputmode="decimal" aria-label="无变化自动随机换局的等待分钟数，0 关闭"><span>分钟</span></label><details class="subsection" id="module-layers"><summary>观察图层</summary><div class="overlay-bar" role="group" aria-label="可视化图层">
+      <section id="display-panel" hidden aria-label="显示设置"><details class="section" open id="module-display"><summary><b>显示调整</b><span>视野 / 图层 / 配色</span></summary><div class="section-body"><div class="auto-random-control"><label class="auto-random-toggle"><input id="auto-random-enabled" type="checkbox" checked><span>自动换局</span></label><label for="auto-random-minutes">换局等待时间</label><input id="auto-random-minutes" type="number" min="0.001" max="1440" step="any" value="1" inputmode="decimal" aria-label="无变化自动随机换局的等待分钟数"><span>分钟</span></div><details class="subsection" id="module-layers"><summary>观察图层</summary><div class="overlay-bar" role="group" aria-label="可视化图层">
         <span class="overlay-title">观察图层</span>
         <button data-layer="adversity" aria-pressed="false"><i class="adversity-key"></i>环境恶劣度</button>
         <button data-layer="cohesion" aria-pressed="false" title="正常细胞分泌的局部凝聚信号"><i style="--signal:#24ab84"></i>细胞凝聚因子</button>
@@ -68,7 +68,14 @@
           <div class="history-options"><span id="history-mode">细胞数量</span><label id="history-percent-option" hidden><input type="checkbox" id="history-percent">百分比</label><span id="history-states" class="history-states" hidden></span></div>
           <canvas id="history" width="960" height="125" tabindex="0" aria-label="细胞数量历史曲线"></canvas><div id="history-readout" class="history-readout"></div>
         </div>
-        <section id="round-results" hidden><div class="round-toolbar"><span>历局记录保存在本机</span><button id="export-rounds">导出 CSV</button></div><div id="round-list"></div><div class="round-pagination"><button id="round-newer">较新</button><span id="round-page"></span><button id="round-older">较早</button></div></section>
+        <section id="round-results" hidden>
+          <div class="round-toolbar"><span>历局记录保存在本机</span><div><button id="round-cleanup" aria-pressed="false" disabled>清理</button><button id="export-rounds">导出 CSV</button></div></div>
+          <div id="round-cleanup-controls" class="round-cleanup-controls" hidden>
+            <div class="round-selection-bar"><label><input type="checkbox" id="round-select-all"><span>全选（所有页）</span></label><span><span>已选 </span><b id="round-selected-count">0</b> / <b id="round-selection-total">0</b></span></div>
+            <div class="round-cleanup-actions"><button id="round-keep-selected" disabled>仅保留所选</button><button id="round-delete-selected" disabled>清除所选</button></div>
+          </div>
+          <div id="round-list"></div><div class="round-pagination"><button id="round-newer">较新</button><span id="round-page"></span><button id="round-older">较早</button></div>
+        </section>
         <div class="stats-section-label">本局累计</div>
         <div class="metrics outcome-metrics"><div><b id="division-count">0</b><span>细胞分裂</span><small id="immune-division-count">免疫分裂 0</small></div><div><b id="malignant-count">0</b><span>恶性转变</span></div><div><b id="escape-count">0</b><span>抗原逃逸</span></div></div>
         <section class="death-overview" aria-label="死亡清除原因"><div class="death-heading"><span>死亡清除</span><b id="total-death-count">0</b><small id="total-death-progress">清除中 0</small></div>
@@ -91,6 +98,13 @@
   </aside>
 </main>
 <div id="field-probe" class="field-probe" role="tooltip" hidden><b id="probe-position"></b><div id="probe-cell"></div><dl><dt>氧可用量</dt><dd id="probe-oxygen"></dd><dt>葡萄糖可用量</dt><dd id="probe-glucose"></dd><dt>酸负荷</dt><dd id="probe-acid"></dd><dt class="probe-cohesion">细胞凝聚因子</dt><dd id="probe-cohesion"></dd><dt class="probe-danger">损伤趋化因子</dt><dd id="probe-danger"></dd><dt class="probe-trail">免疫招募因子</dt><dd id="probe-trail"></dd><dt>IL-2 扩增信号</dt><dd id="probe-il2"></dd><dt>正常细胞损伤信号</dt><dd id="probe-normalDamage"></dd><dt>免疫抑制信号</dt><dd id="probe-inhibition"></dd></dl><small id="probe-note"></small></div>
+<dialog id="round-cleanup-dialog" aria-labelledby="round-cleanup-title" aria-describedby="round-cleanup-description">
+  <h3 id="round-cleanup-title">清除所选</h3>
+  <p id="round-cleanup-description"><span>将从本机永久删除 </span><b id="round-delete-count">0</b><span id="round-delete-scope"> 局勾选的历史记录（包括其他页）。此操作不可撤销。</span></p>
+  <p>当前模拟与参数设置会保留；需要备份可先取消并导出 CSV。</p>
+  <p id="round-cleanup-error" role="alert"></p>
+  <div class="dialog-actions"><button id="round-cleanup-cancel" autofocus>取消</button><button id="round-cleanup-confirm">确认清除</button></div>
+</dialog>
 <dialog id="import-dialog"><h2>导入实验参数</h2><div id="import-summary" class="inspection"></div><p>加载后按文件中的情境、种子和参数重新开局并暂停，不恢复导出时的细胞布置、障碍、浓度场或统计历史。</p><p id="import-status" role="status"></p><div class="dialog-actions"><button id="cancel-import">取消</button><button id="confirm-import" class="primary">加载参数并重新开局</button></div></dialog>
 <dialog id="about-dialog"><button id="close-about" class="close" aria-label="关闭">×</button><div data-language="zh">
   <h2>模型与来源</h2>

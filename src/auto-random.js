@@ -44,5 +44,12 @@
     suspend(now){this.active=false;this.lastTick=now;}
     status(){return {minutes:this.minutes,elapsedMs:this.elapsed,remainingMs:Math.max(0,this.minutes*60000-this.elapsed),count:this.count,fired:this.fired,pendingReason:this.pendingReason,countdownMs:this.pendingReason?Math.max(0,NOTICE_MS-this.noticeElapsed):0};}
   }
-  globalThis.CellLabAutoRandom={Controller};
+  function preferences(saved,legacy){
+    const valid=n=>Number.isFinite(n)&&n>0&&n<=1440;
+    if(saved&&typeof saved.enabled==='boolean'&&valid(saved.minutes))return {enabled:saved.enabled,minutes:saved.minutes};
+    // v1 wrote its implicit zero default on every visit. Migrate that default;
+    // v2 stores an explicit opt-out independently from the waiting duration.
+    return {enabled:true,minutes:valid(Number(legacy))?Number(legacy):1};
+  }
+  globalThis.CellLabAutoRandom={Controller,preferences};
 })();

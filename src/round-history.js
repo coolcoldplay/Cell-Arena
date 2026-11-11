@@ -47,7 +47,20 @@
   }
   const reasons={'history-replay':'重新模拟历史局',empty:'全部细胞消失','tumor-only':'仅剩肿瘤细胞','no-immune':'免疫细胞为 0','no-normal':'正常细胞为 0',idle:'数量与生物状态长时间不变','manual-random':'手动随机生成','manual-restart':'手动重来','scene-change':'切换情境','preset-reset':'恢复情境','import':'导入参数','external-reset':'重新开局',interrupted:'页面关闭／重新载入',running:'进行中'};
   const reasonLabel=reason=>reasons[String(reason).replace(/^auto-/,'')]||reason;
-  function numbered(records){return records.slice().sort((a,b)=>a.startedAt.localeCompare(b.startedAt)||a.id.localeCompare(b.id)).map((r,i)=>({...r,roundNumber:i+1}));}
+  function numbered(records,floor=0){
+    let last=records.reduce((n,r)=>Number.isSafeInteger(r.roundNumber)&&r.roundNumber>n?r.roundNumber:n,floor);
+    return records.slice().sort((a,b)=>String(a.startedAt||'').localeCompare(String(b.startedAt||''))||a.id.localeCompare(b.id)).map(r=>({...r,roundNumber:Number.isSafeInteger(r.roundNumber)&&r.roundNumber>0?r.roundNumber:++last}));
+  }
+  function startTime(iso){
+    const date=iso?new Date(iso):null;if(!date||!Number.isFinite(date.getTime()))return null;
+    const pad=n=>String(n).padStart(2,'0');return date.getFullYear()+'-'+pad(date.getMonth()+1)+'-'+pad(date.getDate())+' '+pad(date.getHours())+':'+pad(date.getMinutes());
+  }
+  function cleanupIds(records,selected,keepSelected=false){
+    const chosen=new Set(selected),known=records.filter(r=>chosen.has(r.id));
+    // An empty or stale selection must never turn "keep selected" into clear-all.
+    if(!known.length)return [];
+    return records.filter(r=>chosen.has(r.id)!==keepSelected).map(r=>r.id);
+  }
   function replayExperiment(r){
     return copy({format:'cell-arena-experiment',schemaVersion:1,version:'4.0.0',scene:r.scene,seed:r.seed,boundary:r.boundary,worldWidth:r.worldWidth,worldHeight:r.worldHeight,refinement:r.refinement,settings:r.initialSettings,warmup:r.initialWarmup,sources:r.initialSources,maze:r.initialMaze,speed:r.initialSpeed||1,display:{...(r.initialDisplay||{}),autoRandomMinutes:0}});
   }
@@ -63,13 +76,38 @@
   // truncated to a display buffer; pagination only limits rendered rows.
   function openStore(){
     let tabKey;try{tabKey=sessionStorage.getItem('cell-arena-round-tab');if(!tabKey){tabKey=crypto.randomUUID();sessionStorage.setItem('cell-arena-round-tab',tabKey);}}catch{tabKey='tab-'+Date.now()+'-'+Math.random();}
-    const database=new Promise((resolve,reject)=>{const request=indexedDB.open('cell-arena-rounds',1);request.onupgradeneeded=()=>{request.result.createObjectStore('rounds',{keyPath:'id'});request.result.createObjectStore('active');};request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});
-    async function transaction(action){const db=await database;return new Promise((resolve,reject)=>{const tx=db.transaction(['rounds','active'],'readwrite');let result;action(tx,value=>result=value);tx.oncomplete=()=>resolve(result);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);});}
+    let lastRoundNumber=0;
+    // A reserved scalar key keeps the serial even after all records are removed.
+    // Reuse the existing store so upgrading does not block on an older open tab.
+    const serialKey='meta:lastRoundNumber';
+    const database=new Promise((resolve,reject)=>{const request=indexedDB.open('cell-arena-rounds',1);request.onupgradeneeded=()=>{request.result.createObjectStore('rounds',{keyPath:'id'});request.result.createObjectStore('active');};request.onsuccess=()=>{request.result.onversionchange=()=>request.result.close();resolve(request.result);};request.onerror=()=>reject(request.error);});
+    async function transaction(action){const db=await database;return new Promise((resolve,reject)=>{const tx=db.transaction(['rounds','active'],'readwrite');let result;tx.oncomplete=()=>resolve(result);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);try{action(tx,value=>result=value);}catch(error){tx.abort();reject(error);}});}
     return {
-      load:()=>transaction((tx,done)=>{const all=tx.objectStore('rounds').getAll();all.onsuccess=()=>{const active=tx.objectStore('active').get(tabKey);active.onsuccess=()=>{const records=all.result;if(active.result&&!records.some(r=>r.id===active.result.id)){const r={...active.result,reason:'interrupted',endedAt:active.result.lastSeenAt};tx.objectStore('rounds').put(r);records.push(r);}tx.objectStore('active').delete(tabKey);done(records);};};}),
+      get lastRoundNumber(){return lastRoundNumber;},
+      load:()=>transaction((tx,done)=>{
+        const all=tx.objectStore('rounds').getAll();all.onsuccess=()=>{
+          const serial=tx.objectStore('active').get(serialKey);serial.onsuccess=()=>{
+            const records=numbered(all.result,Number(serial.result)||0),legacy=new Set(all.result.filter(r=>!Number.isSafeInteger(r.roundNumber)||r.roundNumber<=0).map(r=>r.id));
+            for(const r of records)if(legacy.has(r.id))tx.objectStore('rounds').put(r);
+            lastRoundNumber=records.reduce((n,r)=>Math.max(n,r.roundNumber),Number(serial.result)||0);
+            const active=tx.objectStore('active').get(tabKey);active.onsuccess=()=>{
+              if(active.result&&!records.some(r=>r.id===active.result.id)){const r={...active.result,roundNumber:++lastRoundNumber,reason:'interrupted',endedAt:active.result.lastSeenAt};tx.objectStore('rounds').put(r);records.push(r);}
+              tx.objectStore('active').put(lastRoundNumber,serialKey);tx.objectStore('active').delete(tabKey);done(records);
+            };
+          };
+        };
+      }),
       checkpoint:r=>transaction(tx=>{if(r)tx.objectStore('active').put(r,tabKey);}),
-      archive:r=>transaction(tx=>{tx.objectStore('rounds').put(r);tx.objectStore('active').delete(tabKey);})
+      archive:r=>transaction((tx,done)=>{
+        const serial=tx.objectStore('active').get(serialKey);serial.onsuccess=()=>{
+          const existing=tx.objectStore('rounds').get(r.id);existing.onsuccess=()=>{
+            lastRoundNumber=Math.max(lastRoundNumber,Number(serial.result)||0);const record={...r,roundNumber:existing.result?.roundNumber||++lastRoundNumber};
+            tx.objectStore('rounds').put(record);tx.objectStore('active').put(lastRoundNumber,serialKey);tx.objectStore('active').delete(tabKey);done(record);
+          };
+        };
+      }),
+      remove:ids=>transaction(tx=>{for(const id of new Set(ids))tx.objectStore('rounds').delete(id);})
     };
   }
-  globalThis.CellLabRounds={Locks,Journal,randomGeometry,population,csv,reasonLabel,openStore,numbered,replayExperiment};
+  globalThis.CellLabRounds={Locks,Journal,randomGeometry,population,csv,reasonLabel,openStore,numbered,replayExperiment,startTime,cleanupIds};
 })();

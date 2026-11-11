@@ -2,6 +2,14 @@ import {test} from 'node:test';import assert from 'node:assert/strict';import vm
 vm.runInThisContext(await readFile('src/auto-random.js','utf8'));vm.runInThisContext(await readFile('src/experiment.js','utf8'));
 const scene=changes=>({revision:1,seed:123,time:35,playing:true,counters:{},cells:[{id:1,birth:1,kind:1,state:'normal',cycle:{phase:'G0'}},{id:2,birth:2,kind:3,cycle:{phase:'G0'}}],...changes});
 function active(){const c=new CellLabAutoRandom.Controller();c.configure(1,0);c.tick(scene(),0);return c;}
+
+test('restart preferences default to one enabled minute and preserve explicit new opt-outs',()=>{
+ for(const legacy of [undefined,null,'0','-1','invalid','1441'])assert.deepEqual(CellLabAutoRandom.preferences(null,legacy),{enabled:true,minutes:1});
+ assert.deepEqual(CellLabAutoRandom.preferences(null,'2.5'),{enabled:true,minutes:2.5});
+ assert.deepEqual(CellLabAutoRandom.preferences({enabled:false,minutes:3},'0'),{enabled:false,minutes:3});
+ assert.deepEqual(CellLabAutoRandom.preferences({enabled:true,minutes:7}),{enabled:true,minutes:7});
+ assert.deepEqual(CellLabAutoRandom.preferences({enabled:'no',minutes:NaN}),{enabled:true,minutes:1});
+});
 test('zero disables automatic notices even for an empty arena',()=>{
   const c=new CellLabAutoRandom.Controller(),s=scene({cells:[]});assert.equal(c.tick(s,999999),null);assert.equal(c.status().pendingReason,null);c.configure(10,999999);assert.equal(c.tick({...s,playing:false},999999),null);assert.equal(c.status().pendingReason,null);
 });

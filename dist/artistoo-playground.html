@@ -169,9 +169,9 @@ aside.statistics-focused #record-options>summary{padding:4px 0}
 }
 .playback-row{display:flex;align-items:center;gap:7px;flex:0 0 100%;order:2;min-width:0}
 .playback-row .speed-label{width:auto;min-width:0;flex:1;order:0;margin:0}
-.auto-random-control{display:flex;align-items:center;gap:6px;white-space:nowrap;font-size:12px;color:var(--ink);padding:8px 0}.auto-random-control>span:first-child{margin-right:auto}
-.auto-random-control input{width:43px;min-width:0;height:27px;min-height:27px;border:1px solid var(--line);border-radius:0;background:var(--paper);color:var(--ink);padding:3px;text-align:right;font:12px Consolas,monospace}
-.auto-random-control input:invalid{border-color:#b13b36}
+.auto-random-control{display:flex;align-items:center;gap:6px;white-space:nowrap;font-size:12px;color:var(--ink);padding:8px 0}.auto-random-toggle{display:flex;align-items:center;gap:5px;margin-right:auto;cursor:pointer}.auto-random-toggle input{accent-color:var(--accent);width:16px;height:16px}
+.auto-random-control input[type=number]{width:43px;min-width:0;height:27px;min-height:27px;border:1px solid var(--line);border-radius:0;background:var(--paper);color:var(--ink);padding:3px;text-align:right;font:12px Consolas,monospace}
+.auto-random-control input[type=number]:invalid{border-color:#b13b36}
 .auto-round-notice{position:fixed;left:clamp(12px,25vw,calc(100vw - 340px));bottom:24px;z-index:30;width:310px;max-width:calc(100vw - 24px);padding:13px 15px;background:var(--paper);border:2px solid #927349;box-shadow:4px 4px 0 #594a3340;font-size:13px}
 .auto-round-notice>div{display:flex;justify-content:space-between;align-items:center;gap:12px}.auto-round-notice strong{font:26px Consolas,monospace;color:#a14829}.auto-round-notice p{margin:8px 0}.auto-round-notice small{display:block;margin-bottom:7px}.auto-round-notice button{width:100%;font-size:12px}
 .parameter-lock{display:inline-flex;align-items:center;justify-content:center;flex:0 0 24px;width:24px;min-height:24px;height:24px;padding:2px!important;border:1px solid transparent;background:transparent;color:#b09b79;box-shadow:none}
@@ -199,7 +199,7 @@ aside.statistics-focused #record-options>summary{padding:4px 0}
 @media(max-width:850px){
   .playback-row{display:contents}
   #mobile-session-actions   .auto-random-control{font-size:12px;gap:5px}
-  .auto-random-control input{width:70px;min-height:44px;font-size:16px}
+  .auto-random-control input[type=number]{width:70px;min-height:44px;font-size:16px}
 }
 
 .panel-head{position:relative}.panel-head .header-icon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 28px;width:28px;min-height:28px;height:28px;padding:4px!important;box-shadow:none;background:transparent;border-color:transparent}.header-icon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}.header-icon .record-dot{fill:currentColor;stroke:none}.header-icon.recording{color:#b63c30;background:#ead3c4}.file-menu{position:absolute;right:8px;top:calc(100% + 4px);z-index:50;display:grid;width:230px;max-width:calc(100vw - 20px);padding:6px;gap:5px;border:1px solid var(--line);background:var(--paper);box-shadow:3px 3px 0 #594a3340}.file-menu button{text-align:left;min-height:34px}
@@ -215,6 +215,18 @@ body.arena-fullscreen .workspace>aside{display:none!important}
 body.arena-fullscreen .simulation,body.arena-fullscreen .viewport{width:100vw!important;height:100dvh!important;max-height:none!important;min-height:0!important;margin:0!important;border:0!important}
 body.arena-fullscreen .mobile-tools,body.arena-fullscreen #mobile-dock{display:none!important}
 .replay-round{margin:5px 0;font-size:12px;min-height:32px}
+
+/* Completed-round selection stays outside details so checking never expands it. */
+.round-toolbar>div{display:flex;gap:5px;flex-shrink:0}.round-toolbar>span{min-width:0}
+.round-entry{display:flex;align-items:flex-start;gap:4px}.round-entry .round-result{flex:1;min-width:0}
+.round-select{display:flex;justify-content:center;align-items:center;min-width:28px;min-height:40px;cursor:pointer;margin-top:4px}
+.round-select input,.round-selection-bar input{accent-color:var(--accent);width:16px;height:16px;flex-shrink:0}
+.round-start{display:flex;flex-wrap:wrap;gap:4px;font-size:10px;color:var(--muted);margin-top:3px}.round-start time{font-variant-numeric:tabular-nums}
+.round-cleanup-controls{padding:7px;background:#e5d8bc;border:1px solid var(--line);margin-bottom:6px}
+.round-selection-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px}.round-selection-bar label{display:flex;align-items:center;gap:5px;min-height:30px;cursor:pointer}
+.round-cleanup-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}.round-cleanup-actions button{font-size:12px;padding:5px}
+#round-delete-selected,#round-cleanup-confirm{color:#913d2f}#round-cleanup-dialog{max-width:420px}#round-cleanup-dialog h3{margin:0}#round-cleanup-error{color:#913d2f}#round-cleanup-error:empty{display:none}
+@media(max-width:850px){.auto-random-control{flex-wrap:wrap;white-space:normal}.auto-random-toggle{min-height:44px}.round-select{min-width:36px;min-height:44px}.round-cleanup-actions button,.round-selection-bar label{min-height:40px}}
 </style></head>
 <body>
 <main class="workspace">
@@ -234,7 +246,7 @@ body.arena-fullscreen .mobile-tools,body.arena-fullscreen #mobile-dock{display:n
     <nav class="panel-nav" aria-label="面板导航"><button data-panel="display-panel" aria-pressed="false">显示</button><button data-panel="parameter-groups" aria-pressed="true">参数</button><button data-panel="statistics-panel" aria-pressed="false">统计</button><button data-panel="cell-inspector" aria-pressed="false">选中</button></nav>
     <div class="sidebar-scroll" id="sidebar-scroll" tabindex="0" aria-label="参数与统计滚动区">
       <details class="subsection" id="cell-inspector" hidden><summary>细胞详情与操作 <span id="selection-label">未选中</span></summary><div class="section-body"><div class="utility"><button id="divide" title="实验干预：绕过周期许可，仍受胞体、胞核和分裂几何限制" class="quiet">手动分裂（实验干预）</button></div><div id="inspection" class="inspection">点击细胞，查看抗原、受损程度与接触状态。</div></div></details>
-      <section id="display-panel" hidden aria-label="显示设置"><details class="section" open id="module-display"><summary><b>显示调整</b><span>视野 / 图层 / 配色</span></summary><div class="section-body"><label class="auto-random-control" title="0 关闭。无变化超时、全部消失、仅剩肿瘤、免疫为 0 或正常为 0 时，提示 10 秒后换局；迷宫不检查正常细胞，暂停和后台不计时。"><span>换局等待时间</span><input id="auto-random-minutes" type="number" min="0" max="1440" step="any" value="0" inputmode="decimal" aria-label="无变化自动随机换局的等待分钟数，0 关闭"><span>分钟</span></label><details class="subsection" id="module-layers"><summary>观察图层</summary><div class="overlay-bar" role="group" aria-label="可视化图层">
+      <section id="display-panel" hidden aria-label="显示设置"><details class="section" open id="module-display"><summary><b>显示调整</b><span>视野 / 图层 / 配色</span></summary><div class="section-body"><div class="auto-random-control"><label class="auto-random-toggle"><input id="auto-random-enabled" type="checkbox" checked><span>自动换局</span></label><label for="auto-random-minutes">换局等待时间</label><input id="auto-random-minutes" type="number" min="0.001" max="1440" step="any" value="1" inputmode="decimal" aria-label="无变化自动随机换局的等待分钟数"><span>分钟</span></div><details class="subsection" id="module-layers"><summary>观察图层</summary><div class="overlay-bar" role="group" aria-label="可视化图层">
         <span class="overlay-title">观察图层</span>
         <button data-layer="adversity" aria-pressed="false"><i class="adversity-key"></i>环境恶劣度</button>
         <button data-layer="cohesion" aria-pressed="false" title="正常细胞分泌的局部凝聚信号"><i style="--signal:#24ab84"></i>细胞凝聚因子</button>
@@ -283,7 +295,14 @@ body.arena-fullscreen .mobile-tools,body.arena-fullscreen #mobile-dock{display:n
           <div class="history-options"><span id="history-mode">细胞数量</span><label id="history-percent-option" hidden><input type="checkbox" id="history-percent">百分比</label><span id="history-states" class="history-states" hidden></span></div>
           <canvas id="history" width="960" height="125" tabindex="0" aria-label="细胞数量历史曲线"></canvas><div id="history-readout" class="history-readout"></div>
         </div>
-        <section id="round-results" hidden><div class="round-toolbar"><span>历局记录保存在本机</span><button id="export-rounds">导出 CSV</button></div><div id="round-list"></div><div class="round-pagination"><button id="round-newer">较新</button><span id="round-page"></span><button id="round-older">较早</button></div></section>
+        <section id="round-results" hidden>
+          <div class="round-toolbar"><span>历局记录保存在本机</span><div><button id="round-cleanup" aria-pressed="false" disabled>清理</button><button id="export-rounds">导出 CSV</button></div></div>
+          <div id="round-cleanup-controls" class="round-cleanup-controls" hidden>
+            <div class="round-selection-bar"><label><input type="checkbox" id="round-select-all"><span>全选（所有页）</span></label><span><span>已选 </span><b id="round-selected-count">0</b> / <b id="round-selection-total">0</b></span></div>
+            <div class="round-cleanup-actions"><button id="round-keep-selected" disabled>仅保留所选</button><button id="round-delete-selected" disabled>清除所选</button></div>
+          </div>
+          <div id="round-list"></div><div class="round-pagination"><button id="round-newer">较新</button><span id="round-page"></span><button id="round-older">较早</button></div>
+        </section>
         <div class="stats-section-label">本局累计</div>
         <div class="metrics outcome-metrics"><div><b id="division-count">0</b><span>细胞分裂</span><small id="immune-division-count">免疫分裂 0</small></div><div><b id="malignant-count">0</b><span>恶性转变</span></div><div><b id="escape-count">0</b><span>抗原逃逸</span></div></div>
         <section class="death-overview" aria-label="死亡清除原因"><div class="death-heading"><span>死亡清除</span><b id="total-death-count">0</b><small id="total-death-progress">清除中 0</small></div>
@@ -306,6 +325,13 @@ body.arena-fullscreen .mobile-tools,body.arena-fullscreen #mobile-dock{display:n
   </aside>
 </main>
 <div id="field-probe" class="field-probe" role="tooltip" hidden><b id="probe-position"></b><div id="probe-cell"></div><dl><dt>氧可用量</dt><dd id="probe-oxygen"></dd><dt>葡萄糖可用量</dt><dd id="probe-glucose"></dd><dt>酸负荷</dt><dd id="probe-acid"></dd><dt class="probe-cohesion">细胞凝聚因子</dt><dd id="probe-cohesion"></dd><dt class="probe-danger">损伤趋化因子</dt><dd id="probe-danger"></dd><dt class="probe-trail">免疫招募因子</dt><dd id="probe-trail"></dd><dt>IL-2 扩增信号</dt><dd id="probe-il2"></dd><dt>正常细胞损伤信号</dt><dd id="probe-normalDamage"></dd><dt>免疫抑制信号</dt><dd id="probe-inhibition"></dd></dl><small id="probe-note"></small></div>
+<dialog id="round-cleanup-dialog" aria-labelledby="round-cleanup-title" aria-describedby="round-cleanup-description">
+  <h3 id="round-cleanup-title">清除所选</h3>
+  <p id="round-cleanup-description"><span>将从本机永久删除 </span><b id="round-delete-count">0</b><span id="round-delete-scope"> 局勾选的历史记录（包括其他页）。此操作不可撤销。</span></p>
+  <p>当前模拟与参数设置会保留；需要备份可先取消并导出 CSV。</p>
+  <p id="round-cleanup-error" role="alert"></p>
+  <div class="dialog-actions"><button id="round-cleanup-cancel" autofocus>取消</button><button id="round-cleanup-confirm">确认清除</button></div>
+</dialog>
 <dialog id="import-dialog"><h2>导入实验参数</h2><div id="import-summary" class="inspection"></div><p>加载后按文件中的情境、种子和参数重新开局并暂停，不恢复导出时的细胞布置、障碍、浓度场或统计历史。</p><p id="import-status" role="status"></p><div class="dialog-actions"><button id="cancel-import">取消</button><button id="confirm-import" class="primary">加载参数并重新开局</button></div></dialog>
 <dialog id="about-dialog"><button id="close-about" class="close" aria-label="关闭">×</button><div data-language="zh">
   <h2>模型与来源</h2>
@@ -14192,7 +14218,14 @@ globalThis.CellLabSignalGesture=class {
     suspend(now){this.active=false;this.lastTick=now;}
     status(){return {minutes:this.minutes,elapsedMs:this.elapsed,remainingMs:Math.max(0,this.minutes*60000-this.elapsed),count:this.count,fired:this.fired,pendingReason:this.pendingReason,countdownMs:this.pendingReason?Math.max(0,NOTICE_MS-this.noticeElapsed):0};}
   }
-  globalThis.CellLabAutoRandom={Controller};
+  function preferences(saved,legacy){
+    const valid=n=>Number.isFinite(n)&&n>0&&n<=1440;
+    if(saved&&typeof saved.enabled==='boolean'&&valid(saved.minutes))return {enabled:saved.enabled,minutes:saved.minutes};
+    // v1 wrote its implicit zero default on every visit. Migrate that default;
+    // v2 stores an explicit opt-out independently from the waiting duration.
+    return {enabled:true,minutes:valid(Number(legacy))?Number(legacy):1};
+  }
+  globalThis.CellLabAutoRandom={Controller,preferences};
 })();
 
 /* Experiment controls and compact round records, never part of the model RNG. */
@@ -14244,7 +14277,20 @@ globalThis.CellLabSignalGesture=class {
   }
   const reasons={'history-replay':'重新模拟历史局',empty:'全部细胞消失','tumor-only':'仅剩肿瘤细胞','no-immune':'免疫细胞为 0','no-normal':'正常细胞为 0',idle:'数量与生物状态长时间不变','manual-random':'手动随机生成','manual-restart':'手动重来','scene-change':'切换情境','preset-reset':'恢复情境','import':'导入参数','external-reset':'重新开局',interrupted:'页面关闭／重新载入',running:'进行中'};
   const reasonLabel=reason=>reasons[String(reason).replace(/^auto-/,'')]||reason;
-  function numbered(records){return records.slice().sort((a,b)=>a.startedAt.localeCompare(b.startedAt)||a.id.localeCompare(b.id)).map((r,i)=>({...r,roundNumber:i+1}));}
+  function numbered(records,floor=0){
+    let last=records.reduce((n,r)=>Number.isSafeInteger(r.roundNumber)&&r.roundNumber>n?r.roundNumber:n,floor);
+    return records.slice().sort((a,b)=>String(a.startedAt||'').localeCompare(String(b.startedAt||''))||a.id.localeCompare(b.id)).map(r=>({...r,roundNumber:Number.isSafeInteger(r.roundNumber)&&r.roundNumber>0?r.roundNumber:++last}));
+  }
+  function startTime(iso){
+    const date=iso?new Date(iso):null;if(!date||!Number.isFinite(date.getTime()))return null;
+    const pad=n=>String(n).padStart(2,'0');return date.getFullYear()+'-'+pad(date.getMonth()+1)+'-'+pad(date.getDate())+' '+pad(date.getHours())+':'+pad(date.getMinutes());
+  }
+  function cleanupIds(records,selected,keepSelected=false){
+    const chosen=new Set(selected),known=records.filter(r=>chosen.has(r.id));
+    // An empty or stale selection must never turn "keep selected" into clear-all.
+    if(!known.length)return [];
+    return records.filter(r=>chosen.has(r.id)!==keepSelected).map(r=>r.id);
+  }
   function replayExperiment(r){
     return copy({format:'cell-arena-experiment',schemaVersion:1,version:'4.0.0',scene:r.scene,seed:r.seed,boundary:r.boundary,worldWidth:r.worldWidth,worldHeight:r.worldHeight,refinement:r.refinement,settings:r.initialSettings,warmup:r.initialWarmup,sources:r.initialSources,maze:r.initialMaze,speed:r.initialSpeed||1,display:{...(r.initialDisplay||{}),autoRandomMinutes:0}});
   }
@@ -14260,15 +14306,40 @@ globalThis.CellLabSignalGesture=class {
   // truncated to a display buffer; pagination only limits rendered rows.
   function openStore(){
     let tabKey;try{tabKey=sessionStorage.getItem('cell-arena-round-tab');if(!tabKey){tabKey=crypto.randomUUID();sessionStorage.setItem('cell-arena-round-tab',tabKey);}}catch{tabKey='tab-'+Date.now()+'-'+Math.random();}
-    const database=new Promise((resolve,reject)=>{const request=indexedDB.open('cell-arena-rounds',1);request.onupgradeneeded=()=>{request.result.createObjectStore('rounds',{keyPath:'id'});request.result.createObjectStore('active');};request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});
-    async function transaction(action){const db=await database;return new Promise((resolve,reject)=>{const tx=db.transaction(['rounds','active'],'readwrite');let result;action(tx,value=>result=value);tx.oncomplete=()=>resolve(result);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);});}
+    let lastRoundNumber=0;
+    // A reserved scalar key keeps the serial even after all records are removed.
+    // Reuse the existing store so upgrading does not block on an older open tab.
+    const serialKey='meta:lastRoundNumber';
+    const database=new Promise((resolve,reject)=>{const request=indexedDB.open('cell-arena-rounds',1);request.onupgradeneeded=()=>{request.result.createObjectStore('rounds',{keyPath:'id'});request.result.createObjectStore('active');};request.onsuccess=()=>{request.result.onversionchange=()=>request.result.close();resolve(request.result);};request.onerror=()=>reject(request.error);});
+    async function transaction(action){const db=await database;return new Promise((resolve,reject)=>{const tx=db.transaction(['rounds','active'],'readwrite');let result;tx.oncomplete=()=>resolve(result);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);try{action(tx,value=>result=value);}catch(error){tx.abort();reject(error);}});}
     return {
-      load:()=>transaction((tx,done)=>{const all=tx.objectStore('rounds').getAll();all.onsuccess=()=>{const active=tx.objectStore('active').get(tabKey);active.onsuccess=()=>{const records=all.result;if(active.result&&!records.some(r=>r.id===active.result.id)){const r={...active.result,reason:'interrupted',endedAt:active.result.lastSeenAt};tx.objectStore('rounds').put(r);records.push(r);}tx.objectStore('active').delete(tabKey);done(records);};};}),
+      get lastRoundNumber(){return lastRoundNumber;},
+      load:()=>transaction((tx,done)=>{
+        const all=tx.objectStore('rounds').getAll();all.onsuccess=()=>{
+          const serial=tx.objectStore('active').get(serialKey);serial.onsuccess=()=>{
+            const records=numbered(all.result,Number(serial.result)||0),legacy=new Set(all.result.filter(r=>!Number.isSafeInteger(r.roundNumber)||r.roundNumber<=0).map(r=>r.id));
+            for(const r of records)if(legacy.has(r.id))tx.objectStore('rounds').put(r);
+            lastRoundNumber=records.reduce((n,r)=>Math.max(n,r.roundNumber),Number(serial.result)||0);
+            const active=tx.objectStore('active').get(tabKey);active.onsuccess=()=>{
+              if(active.result&&!records.some(r=>r.id===active.result.id)){const r={...active.result,roundNumber:++lastRoundNumber,reason:'interrupted',endedAt:active.result.lastSeenAt};tx.objectStore('rounds').put(r);records.push(r);}
+              tx.objectStore('active').put(lastRoundNumber,serialKey);tx.objectStore('active').delete(tabKey);done(records);
+            };
+          };
+        };
+      }),
       checkpoint:r=>transaction(tx=>{if(r)tx.objectStore('active').put(r,tabKey);}),
-      archive:r=>transaction(tx=>{tx.objectStore('rounds').put(r);tx.objectStore('active').delete(tabKey);})
+      archive:r=>transaction((tx,done)=>{
+        const serial=tx.objectStore('active').get(serialKey);serial.onsuccess=()=>{
+          const existing=tx.objectStore('rounds').get(r.id);existing.onsuccess=()=>{
+            lastRoundNumber=Math.max(lastRoundNumber,Number(serial.result)||0);const record={...r,roundNumber:existing.result?.roundNumber||++lastRoundNumber};
+            tx.objectStore('rounds').put(record);tx.objectStore('active').put(lastRoundNumber,serialKey);tx.objectStore('active').delete(tabKey);done(record);
+          };
+        };
+      }),
+      remove:ids=>transaction(tx=>{for(const id of new Set(ids))tx.objectStore('rounds').delete(id);})
     };
   }
-  globalThis.CellLabRounds={Locks,Journal,randomGeometry,population,csv,reasonLabel,openStore,numbered,replayExperiment};
+  globalThis.CellLabRounds={Locks,Journal,randomGeometry,population,csv,reasonLabel,openStore,numbered,replayExperiment,startTime,cleanupIds};
 })();
 
 /* UI-only translation. No model state, random stream or simulation clock is read
@@ -14299,6 +14370,25 @@ Cell-Arena · 细胞生态竞技场|Cell-Arena · Cell ecology playground
 免疫状态|Immune states
 本局走势|This round
 历局结果|Past rounds
+自动换局|Auto restart
+无变化自动随机换局的等待分钟数|Minutes without population or state changes before randomizing
+清理|Clean up
+完成清理|Done
+全选（所有页）|Select all pages
+已选|Selected
+仅保留所选|Keep selected only
+清除所选|Delete selected
+选择此局|Select round
+开始时间|Started
+导入参数|Import parameters
+时间未知|Time unavailable
+将从本机永久删除|Permanently delete
+局勾选的历史记录（包括其他页）。此操作不可撤销。|selected round records from this device, including other pages. This cannot be undone.
+局未选中的历史记录（包括其他页）。此操作不可撤销。|unselected round records from this device, including other pages. This cannot be undone.
+当前模拟与参数设置会保留；需要备份可先取消并导出 CSV。|Your current simulation and settings will be kept. Cancel and export CSV first if you need a backup.
+确认清除|Confirm deletion
+已清理所选历局记录|Round records deleted
+清理失败，记录未删除，请重试或先导出 CSV。|Deletion failed; records were kept. Retry or export CSV first.
 历局记录保存在本机|Round history is saved on this device
 导出 CSV|Export CSV
 较新|Newer
@@ -15899,9 +15989,10 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
   const autoRandom=new CellLabAutoRandom.Controller();let autoRandomBusy=false,setupBusy=0;
   const setupLocks={'world-size':true,refinement:true,boundary:true};let savedLocks=setupLocks;try{savedLocks={...setupLocks,...JSON.parse(localStorage.getItem('cell-arena-parameter-locks-v1'))};}catch{}
   const parameterLocks=new CellLabRounds.Locks([...Object.keys(CellLabExperiment.ranges),'boundary','world-size','refinement'],savedLocks);
-  const journal=new CellLabRounds.Journal(),completedRounds=[],roundStore=CellLabRounds.openStore();let historyPage=0,historyVersion=0,lastCheckpoint=0,storageWarning=false;
+  const journal=new CellLabRounds.Journal(),completedRounds=[],roundStore=CellLabRounds.openStore();let historyPage=0,historyVersion=0,lastCheckpoint=0,storageWarning=false,lastRoundNumber=0;
+  const selectedRounds=new Set();let historyCleanup=false,cleanupBusy=false,pendingCleanup=[];
   function storageError(){if(!storageWarning){storageWarning=true;toast('历史记录暂时无法保存到本机，仍可导出本页 CSV');}}
-  const historyReady=roundStore.load().then(records=>{completedRounds.push(...records);historyVersion++;renderRoundHistory();}).catch(storageError);
+  const historyReady=roundStore.load().then(records=>{completedRounds.push(...records);lastRoundNumber=roundStore.lastRoundNumber;historyVersion++;renderRoundHistory();}).catch(storageError);
   const opacity={adversity:.35,oxygen:.35,glucose:.35,acid:.35,density:.35,cohesion:.45,danger:.45,trail:.45,il2:.45,normalDamage:.45,inhibition:.45};
   let hover=null,probeDirty=false,panGesture=null,recordingScale=0,eraseSource=false;
   const trajectories=new CellLabTrajectories();
@@ -16074,17 +16165,23 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
   try{const saved=localStorage.getItem('cell-arena-edge-fade-v1');if(saved!==null&&Number.isFinite(Number(saved)))$('body-feather').value=Math.max(0,Math.min(100,Number(saved)));}catch{}
   function syncAppearance(){ $('body-feather-out').textContent=$('body-feather').value+'%';dirty=true;forceFrame=true; }
   $('body-feather').addEventListener('input',()=>{syncAppearance();try{localStorage.setItem('cell-arena-edge-fade-v1',$('body-feather').value);}catch{}});syncAppearance();
-  try{const saved=localStorage.getItem('cell-arena-auto-random-v1');if(saved!==null&&Number.isFinite(Number(saved))&&Number(saved)>=0&&Number(saved)<=1440)$('auto-random-minutes').value=saved;}catch{}
-  function configureAutoRandom(){const input=$('auto-random-minutes');autoRandom.configure(input.valueAsNumber,performance.now());renderAutoNotice();try{localStorage.setItem('cell-arena-auto-random-v1',String(autoRandom.minutes));}catch{}}
-  $('auto-random-minutes').addEventListener('input',configureAutoRandom);configureAutoRandom();
+  let restartPreferences=CellLabAutoRandom.preferences();try{restartPreferences=CellLabAutoRandom.preferences(JSON.parse(localStorage.getItem('cell-arena-auto-random-v2')),localStorage.getItem('cell-arena-auto-random-v1'));}catch{}
+  $('auto-random-enabled').checked=restartPreferences.enabled;$('auto-random-minutes').value=restartPreferences.minutes;
+  function configureAutoRandom(){
+    const input=$('auto-random-minutes'),enabled=$('auto-random-enabled').checked;input.disabled=!enabled;
+    autoRandom.configure(enabled?input.valueAsNumber:0,performance.now());renderAutoNotice();
+    if(input.validity.valid&&Number.isFinite(input.valueAsNumber))try{localStorage.setItem('cell-arena-auto-random-v2',JSON.stringify({enabled,minutes:input.valueAsNumber}));}catch{}
+  }
+  function setAutoRandomMinutes(minutes){$('auto-random-enabled').checked=minutes>0;$('auto-random-minutes').value=minutes>0?minutes:1;configureAutoRandom();}
+  $('auto-random-minutes').addEventListener('input',configureAutoRandom);$('auto-random-enabled').addEventListener('change',configureAutoRandom);configureAutoRandom();
   function tickAutoRandom(now){
     const allowed=!document.hidden&&!autoRandomBusy&&!setupBusy&&!stroke&&!pending.size&&!document.querySelector('dialog[open]')&&document.activeElement!==$('auto-random-minutes');
     const reason=autoRandom.tick(snapshot,now,allowed);renderAutoNotice();if(!reason)return;
     autoRandomBusy=true;
-    start('random',{shuffle:true,reason:'auto-'+reason}).then(()=>toast('已按未锁定参数随机开启新一轮')).catch(error=>{$('auto-random-minutes').value=0;configureAutoRandom();fail(error);}).finally(()=>{autoRandomBusy=false;renderAutoNotice();});
+    start('random',{shuffle:true,reason:'auto-'+reason}).then(()=>toast('已按未锁定参数随机开启新一轮')).catch(error=>{$('auto-random-enabled').checked=false;configureAutoRandom();fail(error);}).finally(()=>{autoRandomBusy=false;renderAutoNotice();});
   }
   function renderAutoNotice(){const status=autoRandom.status();$('auto-round-notice').hidden=!status.pendingReason||status.fired||!status.minutes;$('auto-round-reason').textContent=status.pendingReason?CellLabRounds.reasonLabel(status.pendingReason):'';$('auto-round-seconds').textContent=Math.ceil(status.countdownMs/1000);$('auto-round-paused').hidden=!!snapshot?.playing&&!document.hidden;}
-  $('auto-round-cancel').addEventListener('click',()=>{$('auto-random-minutes').value=0;configureAutoRandom();});
+  $('auto-round-cancel').addEventListener('click',()=>{$('auto-random-enabled').checked=false;configureAutoRandom();});
   const pending=new Map(),errors=[];
   let resolveReady;const ready=new Promise(r=>resolveReady=r);
   function rpc(command,payload={}){
@@ -16105,7 +16202,8 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
   $('lock-all-parameters').addEventListener('click',()=>{parameterLocks.all(!parameterLocks.keys.every(k=>parameterLocks.values[k]));persistLocks();});syncLocks();
   function archiveRound(reason){
     const record=journal.finish(reason,performance.now(),undefined,parameterLocks.toJSON(),displaySettings());if(!record)return;
-    completedRounds.push(record);historyVersion++;historyPage=0;roundStore.archive(record).catch(storageError);renderRoundHistory();
+    record.roundNumber=++lastRoundNumber;completedRounds.push(record);historyVersion++;historyPage=0;
+    roundStore.archive(record).then(saved=>{record.roundNumber=saved.roundNumber;lastRoundNumber=Math.max(lastRoundNumber,saved.roundNumber);historyVersion++;renderRoundHistory();}).catch(storageError);renderRoundHistory();
   }
   function checkpointRound(now,force=false){
     if(!journal.active||(!force&&now-lastCheckpoint<5000))return;
@@ -16114,22 +16212,58 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
   function renderRoundHistory(){
     const all=CellLabRounds.numbered(completedRounds).reverse(),pages=Math.max(1,Math.ceil(all.length/6));historyPage=Math.max(0,Math.min(pages-1,historyPage));
     $('round-total').textContent=all.length;$('round-page').textContent=(historyPage+1)+' / '+pages;$('round-newer').disabled=!historyPage;$('round-older').disabled=historyPage>=pages-1;
-    const list=$('round-list'),stamp=historyVersion+':'+historyPage;if(list.dataset.version===stamp)return;list.dataset.version=stamp;list.replaceChildren();
+    syncHistoryCleanup();
+    const list=$('round-list'),stamp=historyVersion+':'+historyPage+':'+historyCleanup;if(list.dataset.version===stamp)return;list.dataset.version=stamp;list.replaceChildren();
     if(!all.length){const p=document.createElement('p');p.className='hint';p.textContent='换局后在这里比较历局结果；CSV 也包含当前进行中的一局。';list.append(p);return;}
     for(const record of all.slice(historyPage*6,historyPage*6+6)){
       const row=document.createElement('details');row.className='round-result';
       const head=document.createElement('summary'),reason=document.createElement('b'),time=document.createElement('span');reason.textContent='#'+record.roundNumber+' · '+CellLabRounds.reasonLabel(record.reason);time.textContent=record.simulatedMCS.toLocaleString()+' MCS';const heading=document.createElement('div');heading.append(reason);head.append(heading,time);
+      const started=document.createElement('div'),startLabel=document.createElement('span'),date=document.createElement('time');started.className='round-start';startLabel.textContent='开始时间 ';const formatted=CellLabRounds.startTime(record.startedAt);date.textContent=formatted||'时间未知';if(formatted){date.dateTime=record.startedAt;date.dataset.noI18n='';}started.append(startLabel,date);heading.append(started);
       const state=document.createElement('p');state.textContent='正常 '+record.population.normal+' · 癌前 '+record.population.abnormal+' · 肿瘤 '+record.population.tumor+' · 免疫 '+record.population.immune;
-      const info=document.createElement('small');info.textContent=new Date(record.startedAt).toLocaleString()+' · '+(record.runningMs/60000).toFixed(1)+' min · '+record.scene+' · '+record.seed;
+      const info=document.createElement('small');info.textContent=(record.runningMs/60000).toFixed(1)+' min · '+record.scene+' · '+record.seed;
       const phenotypes=document.createElement('p');phenotypes.textContent='免疫：静息 '+record.population.immuneResting+' · 激活 '+record.population.immuneActive+' · 抑制 '+record.population.immuneSuppressive+'\n肿瘤：抗原阳性 '+record.population.tumorAntigenPositive+' · 阴性 '+record.population.tumorAntigenNegative;
       const params=document.createElement('pre');params.textContent=JSON.stringify(record.finalSettings,null,2);const replay=document.createElement('button');replay.className='replay-round';replay.textContent='↻ 再次模拟此局';replay.dataset.roundId=record.id;replay.addEventListener('click',async()=>{replay.disabled=true;try{await replayRound(record);}catch(e){fail(e);}finally{replay.disabled=false;}});
-      const note=document.createElement('p');note.className='hint';note.textContent=(record.modelRevision===snapshot?.modelRevision?'':'模型版本已变化，演化可能不同。')+'按种子与初始参数重新模拟，不重放手动操作。';heading.append(state);row.append(head,info,phenotypes,replay,note,params);list.append(row);
+      const note=document.createElement('p');note.className='hint';note.textContent=(record.modelRevision===snapshot?.modelRevision?'':'模型版本已变化，演化可能不同。')+'按种子与初始参数重新模拟，不重放手动操作。';heading.append(state);row.append(head,info,phenotypes,replay,note,params);
+      const entry=document.createElement('div');entry.className='round-entry';entry.dataset.roundId=record.id;
+      if(historyCleanup){
+        const label=document.createElement('label'),choice=document.createElement('input');label.className='round-select';choice.type='checkbox';choice.dataset.roundSelect=record.id;choice.checked=selectedRounds.has(record.id);choice.disabled=cleanupBusy;choice.setAttribute('aria-label','选择此局 #'+record.roundNumber);label.append(choice);entry.append(label);
+        choice.addEventListener('change',()=>{choice.checked?selectedRounds.add(record.id):selectedRounds.delete(record.id);syncHistoryCleanup();});
+      }
+      entry.append(row);list.append(entry);
     }
   }
+  function syncHistoryCleanup(){
+    const ids=new Set(completedRounds.map(r=>r.id));for(const id of selectedRounds)if(!ids.has(id))selectedRounds.delete(id);
+    $('round-cleanup').textContent=historyCleanup?'完成清理':'清理';$('round-cleanup').setAttribute('aria-pressed',String(historyCleanup));$('round-cleanup').disabled=cleanupBusy||!completedRounds.length&&!historyCleanup;
+    $('round-cleanup-controls').hidden=!historyCleanup;$('round-selected-count').textContent=selectedRounds.size;$('round-selection-total').textContent=completedRounds.length;
+    const all=$('round-select-all');all.checked=!!ids.size&&selectedRounds.size===ids.size;all.indeterminate=selectedRounds.size>0&&selectedRounds.size<ids.size;all.disabled=cleanupBusy||!ids.size;
+    $('round-delete-selected').disabled=cleanupBusy||!selectedRounds.size;$('round-keep-selected').disabled=cleanupBusy||!selectedRounds.size||selectedRounds.size===ids.size;
+    for(const input of document.querySelectorAll('[data-round-select]')){input.checked=selectedRounds.has(input.dataset.roundSelect);input.disabled=cleanupBusy;}
+  }
+  $('round-cleanup').addEventListener('click',()=>{historyCleanup=!historyCleanup;selectedRounds.clear();renderRoundHistory();});
+  $('round-select-all').addEventListener('change',e=>{selectedRounds.clear();if(e.target.checked)for(const r of completedRounds)selectedRounds.add(r.id);syncHistoryCleanup();});
+  function prepareCleanup(keep){
+    if(cleanupBusy)return;pendingCleanup=CellLabRounds.cleanupIds(completedRounds,selectedRounds,keep);if(!pendingCleanup.length)return;
+    $('round-cleanup-title').textContent=keep?'仅保留所选':'清除所选';$('round-delete-count').textContent=pendingCleanup.length;$('round-delete-scope').textContent=keep?' 局未选中的历史记录（包括其他页）。此操作不可撤销。':' 局勾选的历史记录（包括其他页）。此操作不可撤销。';$('round-cleanup-error').textContent='';$('round-cleanup-confirm').disabled=false;$('round-cleanup-cancel').disabled=false;$('round-cleanup-dialog').showModal();
+  }
+  $('round-delete-selected').addEventListener('click',()=>prepareCleanup(false));$('round-keep-selected').addEventListener('click',()=>prepareCleanup(true));
+  $('round-cleanup-cancel').addEventListener('click',()=>$('round-cleanup-dialog').close());
+  $('round-cleanup-dialog').addEventListener('cancel',e=>{if(cleanupBusy)e.preventDefault();});
+  $('round-cleanup-dialog').addEventListener('close',()=>{if(!$('round-cleanup-dialog').open)pendingCleanup=[];});
+  $('round-cleanup-confirm').addEventListener('click',async()=>{
+    if(cleanupBusy||!pendingCleanup.length)return;const ids=new Set(pendingCleanup);cleanupBusy=true;syncHistoryCleanup();$('round-cleanup-confirm').disabled=true;$('round-cleanup-cancel').disabled=true;
+    try{
+      // Commit the exact confirmed IDs first. New rounds and the active checkpoint
+      // remain untouched, including when a round completes while the dialog is open.
+      await roundStore.remove([...ids]);for(let i=completedRounds.length-1;i>=0;i--)if(ids.has(completedRounds[i].id))completedRounds.splice(i,1);
+      for(const id of ids)selectedRounds.delete(id);historyVersion++;$('round-cleanup-dialog').close();toast('已清理所选历局记录');
+    }catch{ $('round-cleanup-error').textContent='清理失败，记录未删除，请重试或先导出 CSV。'; }
+    finally{cleanupBusy=false;$('round-cleanup-confirm').disabled=false;$('round-cleanup-cancel').disabled=false;renderRoundHistory();}
+  });
   for(const [id,results]of [['history-current-tab',false],['history-rounds-tab',true]])$(id).addEventListener('click',()=>{$('current-history').hidden=results;$('round-results').hidden=!results;$('history-current-tab').setAttribute('aria-pressed',String(!results));$('history-rounds-tab').setAttribute('aria-pressed',String(results));renderRoundHistory();dirty=true;});
   $('round-newer').addEventListener('click',()=>{historyPage--;renderRoundHistory();});$('round-older').addEventListener('click',()=>{historyPage++;renderRoundHistory();});
   $('export-rounds').addEventListener('click',()=>{
-    if(snapshot)journal.observe(snapshot,performance.now(),!document.hidden&&!stroke);const current=journal.current();if(current){current.finalLocks=parameterLocks.toJSON();current.display=displaySettings();}
+    if(snapshot)journal.observe(snapshot,performance.now(),!document.hidden&&!stroke);const current=journal.current();if(current){current.roundNumber=lastRoundNumber+1;current.finalLocks=parameterLocks.toJSON();current.display=displaySettings();}
     const data=CellLabRounds.csv([...completedRounds,...(current?[current]:[])]),url=URL.createObjectURL(new Blob([data],{type:'text/csv;charset=utf-8'})),link=document.createElement('a');link.href=url;link.download='cell-arena-rounds-'+new Date().toISOString().slice(0,10)+'.csv';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   });
   function toast(message){$('toast').textContent=message;$('toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),2200);}
@@ -16652,7 +16786,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     const profile=CellLabExperiment.parse(data);if(snapshot){await rpc('playing',{value:false});journal.observe(snapshot,performance.now(),false);}await rpc('import',{data,kernel:options.kernel,computeMode:options.computeMode});archiveRound(options.reason||'import');
     const config=profile.config,select=$('world-size');let option=[...select.options].find(o=>o.value===String(config.worldWidth));if(!option){option=new Option('',String(config.worldWidth));select.append(option);}option.textContent=`${config.worldWidth} × ${config.worldHeight}`;option.dataset.height=config.worldHeight;select.value=String(config.worldWidth);$('refinement').value=String(config.refinement);gridPreview();
     const d=profile.display;if(d.parameterLocks){parameterLocks.restore(d.parameterLocks);persistLocks();}if(d.cellColors)applyColors(d.cellColors);if(d.edgeFade!==undefined){$('body-feather').value=d.edgeFade;syncAppearance();}if(d.fieldView!==undefined)$('field-view').value=d.fieldView;if(d.signalLayers){signalLayers.clear();for(const key of d.signalLayers)signalLayers.add(key);}Object.assign(opacity,d.opacity||{});
-    $('auto-random-minutes').value=d.autoRandomMinutes??0;configureAutoRandom();
+    if(d.autoRandomMinutes!==undefined)setAutoRandomMinutes(d.autoRandomMinutes);
     // Migrate the short-lived exclusive selector; current independent flags win.
     if(d.cellMarker!==undefined)for(const [id,mode]of [['nuclei','nucleus'],['antigen-marks','antigen'],['cycle-marks','cycle']])$(id).checked=d.cellMarker===mode;
     else if(d.flags&&('nuclei' in d.flags||'antigen-marks' in d.flags))$('cycle-marks').checked=false;

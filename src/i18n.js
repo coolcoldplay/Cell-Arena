@@ -26,6 +26,25 @@ Cell-Arena · 细胞生态竞技场|Cell-Arena · Cell ecology playground
 免疫状态|Immune states
 本局走势|This round
 历局结果|Past rounds
+自动换局|Auto restart
+无变化自动随机换局的等待分钟数|Minutes without population or state changes before randomizing
+清理|Clean up
+完成清理|Done
+全选（所有页）|Select all pages
+已选|Selected
+仅保留所选|Keep selected only
+清除所选|Delete selected
+选择此局|Select round
+开始时间|Started
+导入参数|Import parameters
+时间未知|Time unavailable
+将从本机永久删除|Permanently delete
+局勾选的历史记录（包括其他页）。此操作不可撤销。|selected round records from this device, including other pages. This cannot be undone.
+局未选中的历史记录（包括其他页）。此操作不可撤销。|unselected round records from this device, including other pages. This cannot be undone.
+当前模拟与参数设置会保留；需要备份可先取消并导出 CSV。|Your current simulation and settings will be kept. Cancel and export CSV first if you need a backup.
+确认清除|Confirm deletion
+已清理所选历局记录|Round records deleted
+清理失败，记录未删除，请重试或先导出 CSV。|Deletion failed; records were kept. Retry or export CSV first.
 历局记录保存在本机|Round history is saved on this device
 导出 CSV|Export CSV
 较新|Newer

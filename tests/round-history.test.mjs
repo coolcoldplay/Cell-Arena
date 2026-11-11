@@ -56,3 +56,27 @@ test('re-simulation uses initial seed, sources and parameters, never the final s
 test('legacy replay never silently treats final intervention sources as initial sources',()=>{
  const old={...snapshot(),initialSettings:{growth:1},sources:[{type:'acid',x:3,y:3,radius:4}]};const data=CellLabRounds.replayExperiment(old);assert.equal(data.sources,undefined);assert.equal(data.warmup,undefined);
 });
+
+test('cleanup targets only known archived IDs, with an empty selection safe in either mode',()=>{
+ const records=Array.from({length:9},(_,i)=>({id:'r'+i})),selected=new Set(['r0','r8','missing']);
+ assert.deepEqual(CellLabRounds.cleanupIds(records,selected),['r0','r8']);
+ assert.deepEqual(CellLabRounds.cleanupIds(records,selected,true),['r1','r2','r3','r4','r5','r6','r7']);
+ for(const keep of [false,true])for(const ids of [[],['missing']])assert.deepEqual(CellLabRounds.cleanupIds(records,ids,keep),[]);
+ assert.deepEqual(CellLabRounds.cleanupIds(records,records.map(r=>r.id),true),[]);
+ assert.equal(records.length,9);assert.equal(selected.size,3);
+});
+
+test('cleanup preserves retained round numbers, CSV ordinals and subsequent serials',()=>{
+ const j=new CellLabRounds.Journal(),s=snapshot();j.begin(s,0,'2026-11-11T00:00:00Z');const a={...j.finish('manual-random',1),roundNumber:8};
+ j.begin({...s,revision:2},2,'2026-11-11T00:01:00Z');const b={...j.finish('manual-random',3),roundNumber:11};
+ assert.deepEqual(CellLabRounds.numbered([b,a]).map(r=>r.roundNumber),[8,11]);
+ assert.deepEqual(CellLabRounds.numbered([b]).map(r=>r.roundNumber),[11]);
+ assert.ok(CellLabRounds.csv([b]).split('\r\n')[1].startsWith('"11",'));
+ assert.equal(CellLabRounds.numbered([{id:'new',startedAt:'2026-11-12'}],14)[0].roundNumber,15);
+});
+
+test('round start times use local date and minute precision without rounding or inventing missing dates',()=>{
+ const date=new Date(2026,10,11,9,7,59,999);
+ assert.equal(CellLabRounds.startTime(date.toISOString()),'2026-11-11 09:07');
+ for(const invalid of [undefined,null,'','not-a-date'])assert.equal(CellLabRounds.startTime(invalid),null);
+});

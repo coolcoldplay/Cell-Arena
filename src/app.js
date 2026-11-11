@@ -9,9 +9,10 @@
   const autoRandom=new CellLabAutoRandom.Controller();let autoRandomBusy=false,setupBusy=0;
   const setupLocks={'world-size':true,refinement:true,boundary:true};let savedLocks=setupLocks;try{savedLocks={...setupLocks,...JSON.parse(localStorage.getItem('cell-arena-parameter-locks-v1'))};}catch{}
   const parameterLocks=new CellLabRounds.Locks([...Object.keys(CellLabExperiment.ranges),'boundary','world-size','refinement'],savedLocks);
-  const journal=new CellLabRounds.Journal(),completedRounds=[],roundStore=CellLabRounds.openStore();let historyPage=0,historyVersion=0,lastCheckpoint=0,storageWarning=false;
+  const journal=new CellLabRounds.Journal(),completedRounds=[],roundStore=CellLabRounds.openStore();let historyPage=0,historyVersion=0,lastCheckpoint=0,storageWarning=false,lastRoundNumber=0;
+  const selectedRounds=new Set();let historyCleanup=false,cleanupBusy=false,pendingCleanup=[];
   function storageError(){if(!storageWarning){storageWarning=true;toast('历史记录暂时无法保存到本机，仍可导出本页 CSV');}}
-  const historyReady=roundStore.load().then(records=>{completedRounds.push(...records);historyVersion++;renderRoundHistory();}).catch(storageError);
+  const historyReady=roundStore.load().then(records=>{completedRounds.push(...records);lastRoundNumber=roundStore.lastRoundNumber;historyVersion++;renderRoundHistory();}).catch(storageError);
   const opacity={adversity:.35,oxygen:.35,glucose:.35,acid:.35,density:.35,cohesion:.45,danger:.45,trail:.45,il2:.45,normalDamage:.45,inhibition:.45};
   let hover=null,probeDirty=false,panGesture=null,recordingScale=0,eraseSource=false;
   const trajectories=new CellLabTrajectories();
@@ -184,17 +185,23 @@
   try{const saved=localStorage.getItem('cell-arena-edge-fade-v1');if(saved!==null&&Number.isFinite(Number(saved)))$('body-feather').value=Math.max(0,Math.min(100,Number(saved)));}catch{}
   function syncAppearance(){ $('body-feather-out').textContent=$('body-feather').value+'%';dirty=true;forceFrame=true; }
   $('body-feather').addEventListener('input',()=>{syncAppearance();try{localStorage.setItem('cell-arena-edge-fade-v1',$('body-feather').value);}catch{}});syncAppearance();
-  try{const saved=localStorage.getItem('cell-arena-auto-random-v1');if(saved!==null&&Number.isFinite(Number(saved))&&Number(saved)>=0&&Number(saved)<=1440)$('auto-random-minutes').value=saved;}catch{}
-  function configureAutoRandom(){const input=$('auto-random-minutes');autoRandom.configure(input.valueAsNumber,performance.now());renderAutoNotice();try{localStorage.setItem('cell-arena-auto-random-v1',String(autoRandom.minutes));}catch{}}
-  $('auto-random-minutes').addEventListener('input',configureAutoRandom);configureAutoRandom();
+  let restartPreferences=CellLabAutoRandom.preferences();try{restartPreferences=CellLabAutoRandom.preferences(JSON.parse(localStorage.getItem('cell-arena-auto-random-v2')),localStorage.getItem('cell-arena-auto-random-v1'));}catch{}
+  $('auto-random-enabled').checked=restartPreferences.enabled;$('auto-random-minutes').value=restartPreferences.minutes;
+  function configureAutoRandom(){
+    const input=$('auto-random-minutes'),enabled=$('auto-random-enabled').checked;input.disabled=!enabled;
+    autoRandom.configure(enabled?input.valueAsNumber:0,performance.now());renderAutoNotice();
+    if(input.validity.valid&&Number.isFinite(input.valueAsNumber))try{localStorage.setItem('cell-arena-auto-random-v2',JSON.stringify({enabled,minutes:input.valueAsNumber}));}catch{}
+  }
+  function setAutoRandomMinutes(minutes){$('auto-random-enabled').checked=minutes>0;$('auto-random-minutes').value=minutes>0?minutes:1;configureAutoRandom();}
+  $('auto-random-minutes').addEventListener('input',configureAutoRandom);$('auto-random-enabled').addEventListener('change',configureAutoRandom);configureAutoRandom();
   function tickAutoRandom(now){
     const allowed=!document.hidden&&!autoRandomBusy&&!setupBusy&&!stroke&&!pending.size&&!document.querySelector('dialog[open]')&&document.activeElement!==$('auto-random-minutes');
     const reason=autoRandom.tick(snapshot,now,allowed);renderAutoNotice();if(!reason)return;
     autoRandomBusy=true;
-    start('random',{shuffle:true,reason:'auto-'+reason}).then(()=>toast('已按未锁定参数随机开启新一轮')).catch(error=>{$('auto-random-minutes').value=0;configureAutoRandom();fail(error);}).finally(()=>{autoRandomBusy=false;renderAutoNotice();});
+    start('random',{shuffle:true,reason:'auto-'+reason}).then(()=>toast('已按未锁定参数随机开启新一轮')).catch(error=>{$('auto-random-enabled').checked=false;configureAutoRandom();fail(error);}).finally(()=>{autoRandomBusy=false;renderAutoNotice();});
   }
   function renderAutoNotice(){const status=autoRandom.status();$('auto-round-notice').hidden=!status.pendingReason||status.fired||!status.minutes;$('auto-round-reason').textContent=status.pendingReason?CellLabRounds.reasonLabel(status.pendingReason):'';$('auto-round-seconds').textContent=Math.ceil(status.countdownMs/1000);$('auto-round-paused').hidden=!!snapshot?.playing&&!document.hidden;}
-  $('auto-round-cancel').addEventListener('click',()=>{$('auto-random-minutes').value=0;configureAutoRandom();});
+  $('auto-round-cancel').addEventListener('click',()=>{$('auto-random-enabled').checked=false;configureAutoRandom();});
   const pending=new Map(),errors=[];
   let resolveReady;const ready=new Promise(r=>resolveReady=r);
   function rpc(command,payload={}){
@@ -215,7 +222,8 @@
   $('lock-all-parameters').addEventListener('click',()=>{parameterLocks.all(!parameterLocks.keys.every(k=>parameterLocks.values[k]));persistLocks();});syncLocks();
   function archiveRound(reason){
     const record=journal.finish(reason,performance.now(),undefined,parameterLocks.toJSON(),displaySettings());if(!record)return;
-    completedRounds.push(record);historyVersion++;historyPage=0;roundStore.archive(record).catch(storageError);renderRoundHistory();
+    record.roundNumber=++lastRoundNumber;completedRounds.push(record);historyVersion++;historyPage=0;
+    roundStore.archive(record).then(saved=>{record.roundNumber=saved.roundNumber;lastRoundNumber=Math.max(lastRoundNumber,saved.roundNumber);historyVersion++;renderRoundHistory();}).catch(storageError);renderRoundHistory();
   }
   function checkpointRound(now,force=false){
     if(!journal.active||(!force&&now-lastCheckpoint<5000))return;
@@ -224,22 +232,58 @@
   function renderRoundHistory(){
     const all=CellLabRounds.numbered(completedRounds).reverse(),pages=Math.max(1,Math.ceil(all.length/6));historyPage=Math.max(0,Math.min(pages-1,historyPage));
     $('round-total').textContent=all.length;$('round-page').textContent=(historyPage+1)+' / '+pages;$('round-newer').disabled=!historyPage;$('round-older').disabled=historyPage>=pages-1;
-    const list=$('round-list'),stamp=historyVersion+':'+historyPage;if(list.dataset.version===stamp)return;list.dataset.version=stamp;list.replaceChildren();
+    syncHistoryCleanup();
+    const list=$('round-list'),stamp=historyVersion+':'+historyPage+':'+historyCleanup;if(list.dataset.version===stamp)return;list.dataset.version=stamp;list.replaceChildren();
     if(!all.length){const p=document.createElement('p');p.className='hint';p.textContent='换局后在这里比较历局结果；CSV 也包含当前进行中的一局。';list.append(p);return;}
     for(const record of all.slice(historyPage*6,historyPage*6+6)){
       const row=document.createElement('details');row.className='round-result';
       const head=document.createElement('summary'),reason=document.createElement('b'),time=document.createElement('span');reason.textContent='#'+record.roundNumber+' · '+CellLabRounds.reasonLabel(record.reason);time.textContent=record.simulatedMCS.toLocaleString()+' MCS';const heading=document.createElement('div');heading.append(reason);head.append(heading,time);
+      const started=document.createElement('div'),startLabel=document.createElement('span'),date=document.createElement('time');started.className='round-start';startLabel.textContent='开始时间 ';const formatted=CellLabRounds.startTime(record.startedAt);date.textContent=formatted||'时间未知';if(formatted){date.dateTime=record.startedAt;date.dataset.noI18n='';}started.append(startLabel,date);heading.append(started);
       const state=document.createElement('p');state.textContent='正常 '+record.population.normal+' · 癌前 '+record.population.abnormal+' · 肿瘤 '+record.population.tumor+' · 免疫 '+record.population.immune;
-      const info=document.createElement('small');info.textContent=new Date(record.startedAt).toLocaleString()+' · '+(record.runningMs/60000).toFixed(1)+' min · '+record.scene+' · '+record.seed;
+      const info=document.createElement('small');info.textContent=(record.runningMs/60000).toFixed(1)+' min · '+record.scene+' · '+record.seed;
       const phenotypes=document.createElement('p');phenotypes.textContent='免疫：静息 '+record.population.immuneResting+' · 激活 '+record.population.immuneActive+' · 抑制 '+record.population.immuneSuppressive+'\n肿瘤：抗原阳性 '+record.population.tumorAntigenPositive+' · 阴性 '+record.population.tumorAntigenNegative;
       const params=document.createElement('pre');params.textContent=JSON.stringify(record.finalSettings,null,2);const replay=document.createElement('button');replay.className='replay-round';replay.textContent='↻ 再次模拟此局';replay.dataset.roundId=record.id;replay.addEventListener('click',async()=>{replay.disabled=true;try{await replayRound(record);}catch(e){fail(e);}finally{replay.disabled=false;}});
-      const note=document.createElement('p');note.className='hint';note.textContent=(record.modelRevision===snapshot?.modelRevision?'':'模型版本已变化，演化可能不同。')+'按种子与初始参数重新模拟，不重放手动操作。';heading.append(state);row.append(head,info,phenotypes,replay,note,params);list.append(row);
+      const note=document.createElement('p');note.className='hint';note.textContent=(record.modelRevision===snapshot?.modelRevision?'':'模型版本已变化，演化可能不同。')+'按种子与初始参数重新模拟，不重放手动操作。';heading.append(state);row.append(head,info,phenotypes,replay,note,params);
+      const entry=document.createElement('div');entry.className='round-entry';entry.dataset.roundId=record.id;
+      if(historyCleanup){
+        const label=document.createElement('label'),choice=document.createElement('input');label.className='round-select';choice.type='checkbox';choice.dataset.roundSelect=record.id;choice.checked=selectedRounds.has(record.id);choice.disabled=cleanupBusy;choice.setAttribute('aria-label','选择此局 #'+record.roundNumber);label.append(choice);entry.append(label);
+        choice.addEventListener('change',()=>{choice.checked?selectedRounds.add(record.id):selectedRounds.delete(record.id);syncHistoryCleanup();});
+      }
+      entry.append(row);list.append(entry);
     }
   }
+  function syncHistoryCleanup(){
+    const ids=new Set(completedRounds.map(r=>r.id));for(const id of selectedRounds)if(!ids.has(id))selectedRounds.delete(id);
+    $('round-cleanup').textContent=historyCleanup?'完成清理':'清理';$('round-cleanup').setAttribute('aria-pressed',String(historyCleanup));$('round-cleanup').disabled=cleanupBusy||!completedRounds.length&&!historyCleanup;
+    $('round-cleanup-controls').hidden=!historyCleanup;$('round-selected-count').textContent=selectedRounds.size;$('round-selection-total').textContent=completedRounds.length;
+    const all=$('round-select-all');all.checked=!!ids.size&&selectedRounds.size===ids.size;all.indeterminate=selectedRounds.size>0&&selectedRounds.size<ids.size;all.disabled=cleanupBusy||!ids.size;
+    $('round-delete-selected').disabled=cleanupBusy||!selectedRounds.size;$('round-keep-selected').disabled=cleanupBusy||!selectedRounds.size||selectedRounds.size===ids.size;
+    for(const input of document.querySelectorAll('[data-round-select]')){input.checked=selectedRounds.has(input.dataset.roundSelect);input.disabled=cleanupBusy;}
+  }
+  $('round-cleanup').addEventListener('click',()=>{historyCleanup=!historyCleanup;selectedRounds.clear();renderRoundHistory();});
+  $('round-select-all').addEventListener('change',e=>{selectedRounds.clear();if(e.target.checked)for(const r of completedRounds)selectedRounds.add(r.id);syncHistoryCleanup();});
+  function prepareCleanup(keep){
+    if(cleanupBusy)return;pendingCleanup=CellLabRounds.cleanupIds(completedRounds,selectedRounds,keep);if(!pendingCleanup.length)return;
+    $('round-cleanup-title').textContent=keep?'仅保留所选':'清除所选';$('round-delete-count').textContent=pendingCleanup.length;$('round-delete-scope').textContent=keep?' 局未选中的历史记录（包括其他页）。此操作不可撤销。':' 局勾选的历史记录（包括其他页）。此操作不可撤销。';$('round-cleanup-error').textContent='';$('round-cleanup-confirm').disabled=false;$('round-cleanup-cancel').disabled=false;$('round-cleanup-dialog').showModal();
+  }
+  $('round-delete-selected').addEventListener('click',()=>prepareCleanup(false));$('round-keep-selected').addEventListener('click',()=>prepareCleanup(true));
+  $('round-cleanup-cancel').addEventListener('click',()=>$('round-cleanup-dialog').close());
+  $('round-cleanup-dialog').addEventListener('cancel',e=>{if(cleanupBusy)e.preventDefault();});
+  $('round-cleanup-dialog').addEventListener('close',()=>{if(!$('round-cleanup-dialog').open)pendingCleanup=[];});
+  $('round-cleanup-confirm').addEventListener('click',async()=>{
+    if(cleanupBusy||!pendingCleanup.length)return;const ids=new Set(pendingCleanup);cleanupBusy=true;syncHistoryCleanup();$('round-cleanup-confirm').disabled=true;$('round-cleanup-cancel').disabled=true;
+    try{
+      // Commit the exact confirmed IDs first. New rounds and the active checkpoint
+      // remain untouched, including when a round completes while the dialog is open.
+      await roundStore.remove([...ids]);for(let i=completedRounds.length-1;i>=0;i--)if(ids.has(completedRounds[i].id))completedRounds.splice(i,1);
+      for(const id of ids)selectedRounds.delete(id);historyVersion++;$('round-cleanup-dialog').close();toast('已清理所选历局记录');
+    }catch{ $('round-cleanup-error').textContent='清理失败，记录未删除，请重试或先导出 CSV。'; }
+    finally{cleanupBusy=false;$('round-cleanup-confirm').disabled=false;$('round-cleanup-cancel').disabled=false;renderRoundHistory();}
+  });
   for(const [id,results]of [['history-current-tab',false],['history-rounds-tab',true]])$(id).addEventListener('click',()=>{$('current-history').hidden=results;$('round-results').hidden=!results;$('history-current-tab').setAttribute('aria-pressed',String(!results));$('history-rounds-tab').setAttribute('aria-pressed',String(results));renderRoundHistory();dirty=true;});
   $('round-newer').addEventListener('click',()=>{historyPage--;renderRoundHistory();});$('round-older').addEventListener('click',()=>{historyPage++;renderRoundHistory();});
   $('export-rounds').addEventListener('click',()=>{
-    if(snapshot)journal.observe(snapshot,performance.now(),!document.hidden&&!stroke);const current=journal.current();if(current){current.finalLocks=parameterLocks.toJSON();current.display=displaySettings();}
+    if(snapshot)journal.observe(snapshot,performance.now(),!document.hidden&&!stroke);const current=journal.current();if(current){current.roundNumber=lastRoundNumber+1;current.finalLocks=parameterLocks.toJSON();current.display=displaySettings();}
     const data=CellLabRounds.csv([...completedRounds,...(current?[current]:[])]),url=URL.createObjectURL(new Blob([data],{type:'text/csv;charset=utf-8'})),link=document.createElement('a');link.href=url;link.download='cell-arena-rounds-'+new Date().toISOString().slice(0,10)+'.csv';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   });
   function toast(message){$('toast').textContent=message;$('toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),2200);}
@@ -762,7 +806,7 @@
     const profile=CellLabExperiment.parse(data);if(snapshot){await rpc('playing',{value:false});journal.observe(snapshot,performance.now(),false);}await rpc('import',{data,kernel:options.kernel,computeMode:options.computeMode});archiveRound(options.reason||'import');
     const config=profile.config,select=$('world-size');let option=[...select.options].find(o=>o.value===String(config.worldWidth));if(!option){option=new Option('',String(config.worldWidth));select.append(option);}option.textContent=`${config.worldWidth} × ${config.worldHeight}`;option.dataset.height=config.worldHeight;select.value=String(config.worldWidth);$('refinement').value=String(config.refinement);gridPreview();
     const d=profile.display;if(d.parameterLocks){parameterLocks.restore(d.parameterLocks);persistLocks();}if(d.cellColors)applyColors(d.cellColors);if(d.edgeFade!==undefined){$('body-feather').value=d.edgeFade;syncAppearance();}if(d.fieldView!==undefined)$('field-view').value=d.fieldView;if(d.signalLayers){signalLayers.clear();for(const key of d.signalLayers)signalLayers.add(key);}Object.assign(opacity,d.opacity||{});
-    $('auto-random-minutes').value=d.autoRandomMinutes??0;configureAutoRandom();
+    if(d.autoRandomMinutes!==undefined)setAutoRandomMinutes(d.autoRandomMinutes);
     // Migrate the short-lived exclusive selector; current independent flags win.
     if(d.cellMarker!==undefined)for(const [id,mode]of [['nuclei','nucleus'],['antigen-marks','antigen'],['cycle-marks','cycle']])$(id).checked=d.cellMarker===mode;
     else if(d.flags&&('nuclei' in d.flags||'antigen-marks' in d.flags))$('cycle-marks').checked=false;
