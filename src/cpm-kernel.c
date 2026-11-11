@@ -11,7 +11,8 @@ void *memset(void *p,int value,unsigned long n){volatile u8 *q=p;for(unsigned lo
 #define STRIDE 32
 #define BONDS 131072
 #define SEGMENTS 262144
-enum {PRESENT,KIND,DYING,VOLUME,PERIMETER,TARGET,LV,PT,LP,ACT,DRIVE,PX,PY,TARGET_ID,INVASION,HAS_NUCLEUS,NX,NY,NR,REACH,SOFT_REACH,MIN_AREA,MORPHOLOGY,CORE,BRANCH_PENALTY,SEGMENT_START,SEGMENT_COUNT,PROTRUSION_FORCE,SCALE};
+enum {PRESENT,KIND,DYING,VOLUME,PERIMETER,TARGET,LV,PT,LP,ACT,DRIVE,PX,PY,TARGET_ID,INVASION,HAS_NUCLEUS,NX,NY,NR,REACH,SOFT_REACH,MIN_AREA,MORPHOLOGY,CORE,BRANCH_PENALTY,SEGMENT_START,SEGMENT_COUNT,PROTRUSION_FORCE,SCALE,VESSEL,ACCESS,TRANSIT};
+static u16 vascular_region[MAX];static double vessels[65*8];
 static u16 grid[MAX];static u8 activity[MAX],degree[MAX],nc[MAX],connected[256];
 static int neighbors[MAX*8],rings[MAX*8],pool[MAX],where[MAX];
 static u8 interior[MAX];static int ring_offsets[8],neighbor_offsets[8];
@@ -52,6 +53,18 @@ static inline double random_value(){
   y=mt[at++];mt[624]=at;y^=y>>11;y^=(y<<7)&0x9d2c5680u;y^=(y<<15)&0xefc60000u;y^=y>>18;return(double)y*(1./4294967296.);
 }
 static inline double *cell(int id){return cells+id*STRIDE;}
+static inline double vessel_distance(int i,double *v){double dx=(i>>ybits)-v[1],dy=(i&((1<<ybits)-1))-v[2];if(wrap){if(dx>width/2.)dx-=width;else if(dx< -width/2.)dx+=width;if(dy>height/2.)dy-=height;else if(dy< -height/2.)dy+=height;}return __builtin_sqrt(dx*dx+dy*dy);}
+static inline double *vessel(int id){return id>0&&id<=64&&vessels[id*8]>0?vessels+id*8:0;}
+__attribute__((export_name("vascular_region"))) u32 region_pointer(){return(u32)vascular_region;}
+__attribute__((export_name("vascular_geometry"))) u32 vessel_pointer(){return(u32)vessels;}
+static inline int vascular_allowed(int tgt,int a){
+  double *m=cell(a);if(!params[33]||!m[PRESENT]||m[DYING]||m[TRANSIT]<0)return 1;double *v=vessel((int)m[VESSEL]);
+  if(v){double d=vessel_distance(tgt,v),lo=v[3]-v[5];if(lo<0)lo=0;return d>=lo&&d<=v[3]+v[4]+2*v[5];}
+  if(m[TRANSIT]==1){v=vessel((int)m[ACCESS]);if(v)return vessel_distance(tgt,v)<v[3];}
+  int id=vascular_region[tgt];v=vessel(id);if(!v)return 1;
+  return vessel_distance(tgt,v)>=v[3]+(m[KIND]==2?v[4]-2*v[5]:0)||(m[ACCESS]==id&&m[TRANSIT]>=2);
+}
+static inline double vascular_energy(int tgt,double *m){if(!params[33]||m[DYING])return 0;double *v=vessel((int)m[VESSEL]);if(!v)return 0;double q=(vessel_distance(tgt,v)-v[3]-v[4]/2)/v[5];return .65*q*q;}
 static inline double distance2(int i,double *m){double dx=(i>>ybits)-m[NX],dy=(i&((1<<ybits)-1))-m[NY];if(wrap){if(dx>width/2.)dx-=width;else if(dx< -width/2.)dx+=width;if(dy>height/2.)dy-=height;else if(dy< -height/2.)dy+=height;}return dx*dx+dy*dy;}
 static inline int own(int j,int id,int tgt,int a){return j>=0&&(j==tgt?a:grid[j])==id;}
 static inline int thick(int j,int id,int tgt,int a){return(own(ring_at(j,0),id,tgt,a)&&own(ring_at(j,1),id,tgt,a)&&own(ring_at(j,7),id,tgt,a))||(own(ring_at(j,2),id,tgt,a)&&own(ring_at(j,1),id,tgt,a)&&own(ring_at(j,3),id,tgt,a))||(own(ring_at(j,4),id,tgt,a)&&own(ring_at(j,3),id,tgt,a)&&own(ring_at(j,5),id,tgt,a))||(own(ring_at(j,6),id,tgt,a)&&own(ring_at(j,5),id,tgt,a)&&own(ring_at(j,7),id,tgt,a));}
@@ -113,7 +126,7 @@ __attribute__((export_name("energy"))) double energy(int src,int tgt,int a,int b
   double vol=0;if(ca[PRESENT])vol+=ca[LV]*(2*(ca[VOLUME]-ca[TARGET])+1);if(cb[PRESENT])vol+=cb[LV]*(-2*(cb[VOLUME]-cb[TARGET])+1);h+=vol;
   double direction=0;int mask=(1<<ybits)-1;double dx=(tgt>>ybits)-(src>>ybits),dy=(tgt&mask)-(src&mask);if(wrap){if(dx>1)dx-=width;else if(dx< -1)dx+=width;if(dy>1)dy-=height;else if(dy< -1)dy+=height;}
   if(ca[PRESENT]&&!ca[DYING])direction=-ca[DRIVE]*(dx*ca[PX]+dy*ca[PY]);
-  if(cb[KIND]==3&&!cb[DYING])direction-=cb[DRIVE]*(dx*cb[PX]+dy*cb[PY]);return h+direction;
+  if(cb[KIND]==3&&!cb[DYING])direction-=cb[DRIVE]*(dx*cb[PX]+dy*cb[PY]);return h+direction+(vascular_energy(tgt,ca)-vascular_energy(tgt,cb));
 }
 static inline void insert(int j){if(where[j]>=0)return;where[j]=count;pool[count++]=j;}
 static inline void remove_pixel(int j){int slot=where[j];if(slot<0)return;where[j]=-1;int last=pool[--count];if(last!=j){pool[slot]=last;where[last]=slot;}}
@@ -129,7 +142,7 @@ static void setpixel(int i,int a,int b){
 __attribute__((export_name("run"))) int run(int length){
   count=length;logcount=0;for(int i=0;i<nraw;i++)where[i]=-1;for(int i=0;i<count;i++)where[pool[i]]=i;
   double t=0;while(t<1&&count){t+=1./count;int tgt=pool[(int)(random_value()*count)],src=neighbor_at(tgt,(int)(random_value()*nc[tgt])),a=grid[src],b=grid[tgt];
-    if(a==b||cell(a)[KIND]==4||cell(b)[KIND]==4)continue;if(section&&!section_allowed(tgt,a,b))continue;if(!topology(tgt,b))continue;
+    if(a==b||cell(a)[KIND]==4||cell(b)[KIND]==4)continue;if(section&&!section_allowed(tgt,a,b))continue;if(!topology(tgt,b))continue;if(!vascular_allowed(tgt,a))continue;
     double h=energy(src,tgt,a,b);if(h<0||random_value()<js_exp(-h/params[30]))setpixel(tgt,a,b);
   }return logcount;
 }

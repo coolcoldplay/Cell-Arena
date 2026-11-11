@@ -2,10 +2,10 @@
 (() => {
   'use strict';
   const clamp=x=>Math.max(0,Math.min(1,x));
-  const BODY_COLORS=[[246,240,226],[204,204,204],[0,0,0],[233,154,154],[93,108,111],[160,139,102],[153,0,0],[99,152,210]];
+  const BODY_COLORS=[[246,240,226],[204,204,204],[0,0,0],[233,154,154],[93,108,111],[160,139,102],[153,0,0],[99,152,210],[97,163,154]];
   const immuneSuppressive=m=>m?.kind===3&&m.immunePhenotype==='suppressive';
   const immuneActive=m=>m?.kind===3&&!immuneSuppressive(m)&&m.activation>0;
-  const displayKind=m=>m?.state==='abnormal'?5:immuneSuppressive(m)?7:immuneActive(m)?6:m?.kind||0;
+  const displayKind=m=>m?.state==='endothelial'?8:m?.state==='abnormal'?5:immuneSuppressive(m)?7:immuneActive(m)?6:m?.kind||0;
   const COLOR_DEFAULTS={normal:{body:'#cccccc',nucleus:'#243b53'},abnormal:{body:'#a08b66',nucleus:'#243b53'},tumor:{body:'#000000',nucleus:'#f2d38a'},immune:{body:'#e99a9a',nucleus:'#8f3548'},activated:{body:'#990000',nucleus:'#f2d38a'},proliferationShading:true};
   const COLOR_PRESETS={
     slate:{name:'岩灰 · 珊瑚',description:'冷灰胞体，珊瑚免疫',colors:{normal:{body:'#aebfc6',nucleus:'#36515f'},abnormal:{body:'#d5ac78',nucleus:'#76512d'},tumor:{body:'#202b33',nucleus:'#d9e4e9'},immune:{body:'#efb1ad',nucleus:'#9b4e53'},activated:{body:'#aa3449',nucleus:'#ffe0d9'},proliferationShading:true}},
@@ -14,12 +14,13 @@
     violet:{name:'雾紫 · 玫瑰',description:'灰紫组织，玫瑰免疫',colors:{normal:{body:'#c1bacf',nucleus:'#625574'},abnormal:{body:'#cbb18c',nucleus:'#725836'},tumor:{body:'#30253d',nucleus:'#e5d9f2'},immune:{body:'#efb6c4',nucleus:'#9b5067'},activated:{body:'#a03260',nucleus:'#ffe2eb'},proliferationShading:true}}
   };
   COLOR_DEFAULTS.suppressive={body:'#6398d2',nucleus:'#173d69'};
-  for(const preset of Object.values(COLOR_PRESETS))preset.colors.suppressive={...COLOR_DEFAULTS.suppressive};
-  const colorKey=m=>m?.state==='abnormal'?'abnormal':m?.kind===3?(immuneSuppressive(m)?'suppressive':immuneActive(m)?'activated':'immune'):m?.kind===2?'tumor':'normal';
+  COLOR_DEFAULTS.endothelial={body:'#61a39a',nucleus:'#164e57'};
+  for(const preset of Object.values(COLOR_PRESETS)){preset.colors.suppressive={...COLOR_DEFAULTS.suppressive};preset.colors.endothelial={...COLOR_DEFAULTS.endothelial};}
+  const colorKey=m=>m?.state==='endothelial'?'endothelial':m?.state==='abnormal'?'abnormal':m?.kind===3?(immuneSuppressive(m)?'suppressive':immuneActive(m)?'activated':'immune'):m?.kind===2?'tumor':'normal';
   const hexRGB=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
   function normalizeColors(value){
     const result={proliferationShading:value?.proliferationShading!==false};
-    for(const key of ['normal','abnormal','tumor','immune','activated','suppressive']){result[key]={};for(const part of ['body','nucleus']){const c=value?.[key]?.[part];result[key][part]=typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c)?c.toLowerCase():COLOR_DEFAULTS[key][part];}}
+    for(const key of ['normal','abnormal','tumor','immune','activated','suppressive','endothelial']){result[key]={};for(const part of ['body','nucleus']){const c=value?.[key]?.[part];result[key][part]=typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c)?c.toLowerCase():COLOR_DEFAULTS[key][part];}}
     return result;
   }
   function colorPresetID(value){
@@ -27,7 +28,7 @@
     for(const [id,preset] of Object.entries(COLOR_PRESETS))if(same(preset.colors))return id;
     return same(COLOR_DEFAULTS)?'original':'custom';
   }
-  const paletteBodies=palette=>{const colors=BODY_COLORS.map(c=>c.slice());for(const [i,key] of [[1,'normal'],[2,'tumor'],[3,'immune'],[5,'abnormal'],[6,'activated'],[7,'suppressive']])colors[i]=hexRGB(palette[key].body);return colors;};
+  const paletteBodies=palette=>{const colors=BODY_COLORS.map(c=>c.slice());for(const [i,key] of [[1,'normal'],[2,'tumor'],[3,'immune'],[5,'abnormal'],[6,'activated'],[7,'suppressive'],[8,'endothelial']])colors[i]=hexRGB(palette[key].body);return colors;};
   // Fixed scale across scenes and generations, using the heritable trait,
   // not transient nutrient suppression or a population-relative ranking.
   const gray=Array.from({length:89},(_,v)=>[v,v,v]);
@@ -38,7 +39,7 @@
     const base=hexRGB(palette[colorKey(m)].body),t=m.kind===2&&palette.proliferationShading?tumorShade(m)/255:0;
     return base.map(v=>Math.round(v+(255-v)*t));
   };
-  const cellName=m=>m?.state==='abnormal'?'癌前细胞':m?.kind===3?(immuneSuppressive(m)?'免疫抑制样细胞':immuneActive(m)?'已激活免疫细胞':'未激活免疫细胞'):['培养液','正常细胞','肿瘤细胞','免疫细胞','实体障碍'][m?.kind||0];
+  const cellName=m=>m?.state==='endothelial'?'血管内皮细胞':m?.state==='abnormal'?'癌前细胞':m?.kind===3?(immuneSuppressive(m)?'免疫抑制样细胞':immuneActive(m)?'已激活免疫细胞':'未激活免疫细胞'):['培养液','正常细胞','肿瘤细胞','免疫细胞','实体障碍'][m?.kind||0];
   const deathCode=m=>m?.dying?({spontaneous:1,kill:2,environment:3}[m.deathCause]||1):0;
   function deathColor(rgb,m){
     if(!m?.dying)return rgb;

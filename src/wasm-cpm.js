@@ -23,6 +23,8 @@
       this.contactData=view(Int32Array,12,16384*5);this.contactPresent=view(Uint8Array,13,65536);this.freeMembrane=view(Int32Array,23,65536);
       this.bondKeys=view(Uint32Array,14,BONDS);this.bondStrength=view(Float64Array,15,BONDS);this.bondSlots=[];
       this.segments=view(Float32Array,16,SEGMENTS*6);
+      if(e.vascular_region){this.vascularRegion=new Uint16Array(buffer,e.vascular_region(),n);this.vascularGeometry=new Float64Array(buffer,e.vascular_geometry(),65*8);this.vascularVersion=-1;}
+      else if(s.vascular?.vessels.length)throw Error('Vascular constraints require the current WASM kernel');
       if(e.raster){const size=s.width*s.height;this.rasterKind=view(Uint8Array,17,65536);this.rasterVisited=view(Uint8Array,18,n);this.rasterGrid=view(Uint16Array,19,size);this.rasterActivity=view(Uint8Array,20,size);this.rasterWalls=view(Uint8Array,21,size);this.rasterCounts=view(Uint32Array,22,3);}
       const boundary=i=>{this.nc[i]=s.neighbors[i].length;this.neighbors.set(s.neighbors[i],i*8);this.rings.set(s.rings[i],i*8);};
       if(e.geometry_version?.()===1){
@@ -43,6 +45,7 @@
       let segmentStart=0;for(const m of s.live()){
         const values=[1,m.kind,m.dying&&!m.deathIntact?1:0,C.getVolume(m.id)||0,p.cellperimeters[m.id]||0,m.planarTarget,m.lambdaV,m.perimeter,m.lambdaP,m.activity,m.drive,m.px,m.py,m.targetID,m.genome?.invasion||1,m.hasNucleus?1:0,m.nucleusX||0,m.nucleusY||0,m.nucleusRadius||0,m.maxReach,m.softReach,m.minVisibleArea];
         this.cells.set(values,m.id*stride);
+        this.cells.set(m.dying?[0,0,-1]:[m.vesselID||0,m.vascularID||0,m.vascularPhase||0],m.id*stride+29);
         if(m.morphologyMode){const segments=m.shapeSegments;if(segmentStart+segments.length>this.segments.length)throw Error('Protrusion geometry exceeds WASM storage; continuing on JS');this.segments.set(segments,segmentStart);this.cells.set([m.morphologyMode,m.branchCore,m.branchPenalty,segmentStart,segments.length/6,m.protrusionForce,s.scale],m.id*stride+22);segmentStart+=segments.length;}
       }
       this.params.set(C.conf.MAX_ACT);this.params.set(C.conf.J.flat(),5);this.params[30]=C.conf.T;
@@ -54,6 +57,11 @@
       }
       this.params[31]=this.bondSlots.length?1:0;
       this.params[32]=s.settings.tumorMorphology===2?1:0;
+      this.params[33]=s.vascular.vessels.length?1:0;
+      if(this.vascularGeometry){
+        if(this.vascularVersion!==s.vascular.version){this.vascularRegion.set(s.vascular.region.subarray(0,this.length));this.vascularVersion=s.vascular.version;}
+        this.vascularGeometry.fill(0);for(const v of s.vascular.vessels)this.vascularGeometry.set([v.active?1:0,v.x,v.y,v.radius,v.wall,s.scale,0,0],v.id*8);
+      }
     }
     installBorderIndex(){
       const C=this.s.C,border=C.borderpixels,indices=new Int32Array(C.grid._pixels.length);indices.fill(-1);

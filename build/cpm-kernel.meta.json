@@ -1,6 +1,6 @@
 {
-  "sourceSHA256": "dacd7623fae434c7b731230ecd7447ec8e2a2cd203021763626628c33f512945",
-  "wasmSHA256": "b37e4a4e531eaa9cc4b9d5f68694f4410b1432c6b02d8fbdbf90221eac317af8",
+  "sourceSHA256": "2366e864674e30e64687ff5de574625e5e58c19314098098fe097bcd763905bc",
+  "wasmSHA256": "6647a5483533df72d9b9f9c12682596db56067dc7fbbb6a57e47ddcd043ed566",
   "compiler": "WASI SDK 20 / Clang 16",
   "flags": [
     "--target=wasm32",
@@ -11,8 +11,8 @@
     "-nostdlib",
     "-Wl,--no-entry",
     "-Wl,--export-memory",
-    "-Wl,--initial-memory=134217728",
-    "-Wl,--max-memory=134217728",
+    "-Wl,--initial-memory=138412032",
+    "-Wl,--max-memory=138412032",
     "-Wl,-z,stack-size=65536",
     "src/cpm-kernel.c",
     "-o",

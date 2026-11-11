@@ -26,6 +26,7 @@
   function shift(s,id,sx,sy,oldPoints,reference){
     const m=s.cells[id],moved=oldPoints.map(i=>s.section.at(s.xs[i]+sx,s.ys[i]+sy));
     if(moved.some(i=>i<0))return {ok:false,reason:'edge'};
+    if(moved.some(i=>s.vascular&&!s.vascular.allowed(i,i,id,s.C.pixti(i))))return {ok:false,reason:'vascular'};
     const x=m.nucleusX+sx,y=m.nucleusY+sy,delta=(v,n)=>s.section.delta(v,n);
     const radius=Math.sqrt(Math.max(...moved.map(i=>delta(s.xs[i]-x,s.width)**2+delta(s.ys[i]-y,s.height)**2)));
     // Prefer displacement before repeated squeezing can wrap a neighbour into
@@ -53,7 +54,7 @@
         const touching=new Set([...reserved].map(i=>grid[i]).filter(Boolean));if(!touching.size)break;
         const group=new Set(touching),queue=[...touching],targets=new Map();
         for(let q=0;q<queue.length&&valid;q++){
-          const id=queue[q],p=points.get(id);if(!p){valid=false;break;}
+          const id=queue[q],p=points.get(id);if(!p||s.cells[id]?.vesselID){valid=false;break;}
           const next=p.map(i=>at(s.xs[i]+dx,s.ys[i]+dy));targets.set(id,next);
           for(const i of next){
             if(i<0||held.has(i)){valid=false;break;}
@@ -82,7 +83,7 @@
     // The vacated trailing edge is available for elastic neighbour motion.
     // No live pixels are edited until the entire one-site move is valid.
     for(const i of oldPoints)grid[i]=0;
-    for(const i of reserved){const id=grid[i];if(id&&!s.cells[id])return reject('wall');if(id)affected.add(id);}
+    for(const i of reserved){const id=grid[i];if(id&&!s.cells[id])return reject('wall');if(s.cells[id]?.vesselID)return reject('vascular');if(id)affected.add(id);}
     const cells=new Map();for(const m of s.live())if(m.id!==movingID)cells.set(m.id,{m,points:new Set(),nx:m.nucleusX,ny:m.nucleusY});
     for(const i of s.positions)cells.get(grid[i])?.points.add(i);
     for(const c of cells.values()){
@@ -180,7 +181,7 @@
       if(!done)return reject('crowded');
     }
     // Validate the entire draft, including neighbours that donated area.
-    for(const id of changed){const c=cells.get(id);if(!c||c.points.size<c.minimum||!connected(c.points)||!fits(c,c.nx,c.ny)||![...c.points].every(neckSafe))return reject('crowded');}
+    for(const id of changed){const c=cells.get(id);if(!c||c.points.size<c.minimum||!connected(c.points)||!fits(c,c.nx,c.ny)||![...c.points].every(neckSafe))return reject('crowded');if(s.vascular&&[...c.points].some(i=>!s.vascular.allowed(i,i,id,grid[i])))return reject('vascular');}
     if([...reserved].some(i=>grid[i]))return reject('crowded');
     if(movingID)for(const i of reserved)changes.set(i,movingID);
     return {ok:true,changed,commit(){

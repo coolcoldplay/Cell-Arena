@@ -1,3 +1,4 @@
+import {assertConfluentTissue} from './vascular-layout-helper.mjs';
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
 for(const file of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/model.js','src/experiment.js'])vm.runInThisContext(await readFile(file,'utf8'),{filename:file});
 test('random starts sample moderate ranges reproducibly, including all slider settings',()=>{
@@ -15,7 +16,7 @@ test('random founder layouts differ by seed but restart and imported parameters 
   const a=make(17),b=make(17,{...a.settings}),c=make(18);
   assert.deepEqual(a.snapshot().grid,b.snapshot().grid);assert.notDeepEqual(a.snapshot().grid,c.snapshot().grid);
   assert.deepEqual(new Set(a.live().map(m=>m.kind)),new Set([1,3]));
-  assert.ok(a.snapshot().grid.every(id=>id>0),'random development also starts with a confluent normal sheet');
+  assertConfluentTissue(a);
   assert.ok(a.live().filter(m=>m.kind===3).length>=12);assert.ok(a.live().every(m=>m.state!=='abnormal'&&m.stress===0));
   assert.deepEqual(a.supplyMap,b.supplyMap);assert.notDeepEqual(a.supplyMap,c.supplyMap);
   assert.ok(a.supplyMap.some(v=>v<.15)&&a.supplyMap.some(v=>v>.95),'both hostile niches and a viable frontier');

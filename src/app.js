@@ -14,7 +14,7 @@
   function storageError(){if(!storageWarning){storageWarning=true;toast('历史记录暂时无法保存到本机，仍可导出本页 CSV');}}
   const historyReady=roundStore.load().then(records=>{completedRounds.push(...records);lastRoundNumber=roundStore.lastRoundNumber;historyVersion++;renderRoundHistory();}).catch(storageError);
   const opacity={adversity:.35,oxygen:.35,glucose:.35,acid:.35,density:.35,cohesion:.45,danger:.45,trail:.45,il2:.45,normalDamage:.45,inhibition:.45};
-  let hover=null,probeDirty=false,panGesture=null,recordingScale=0,eraseSource=false;
+  let hover=null,hoverMovedAt=0,probeDirty=false,panGesture=null,recordingScale=0,eraseSource=false;
   const trajectories=new CellLabTrajectories();
   const historyChart=CellLabHistory.mount();
   const viewport=canvas.parentElement,view={x:0,y:0};
@@ -45,6 +45,18 @@
   const labels=['培养液','正常细胞','肿瘤细胞','免疫细胞','实体障碍'];
   const titles={random:'随机生成',empty:'空白自建',ecosystem:'免疫共培养',collective:'群体迁移',invasion:'肿瘤扩张',maze:'免疫细胞迷宫',stress:'密度与逃逸',surveillance:'癌前监视',network:'胶质瘤样分枝成网'};
   const controls=[
+    ['vesselCount','初始血管数',0,6,1,'重开后生效；空白场景可在新增类型中选择血管，放到空隙中',''],
+    ['vesselRadius','新血管管腔半径',8,20,1,'只影响新建血管；内皮是可形变的真实胞体，管腔不含组织细胞',''],
+    ['vesselSupply','血管交换能力',0,3,.1,'有限速率补充氧糖与排酸；实际通量随灌注、管腔与正常组织保留率变化','×'],
+    ['vesselDependence','供给的血管依赖程度',0,100,5,'越高越减少均匀背景供给；血管全部失效后不会自动恢复背景供给','%'],
+    ['vesselImmuneRate','循环免疫补充速率',0,3,.1,'管腔内按模型时间概率到达；局部招募信号增强，实际空隙不足时不能生成','×'],
+    ['vesselImmuneHealth','免疫补充与组织健康联动',0,100,5,'健康正常组织减少时，延迟下调循环免疫可用量；不把内皮计入正常组织基数','%'],
+    ['vesselPassage','免疫跨内皮通行',0,3,.1,'必须接触内皮并持续黏附，随后沿真实胞体形变穿出；0 关闭跨出许可','×'],
+    ['vesselRepair','内皮修复速度',0,3,.1,'局部缺口诱导迁移与有限增殖；营养不足或分裂额度耗尽可修复失败','×'],
+    ['vesselDivisions','内皮修复谱系分裂上限',0,12,1,'每次分裂两个子代都扣一次；耗尽后仍可存活和有限迁移',' 次'],
+    ['vesselLifespan','内皮参考寿命',0,50000,1000,'超过个体寿命后死亡风险逐渐上升；初始年龄有差异，0 关闭年龄凋亡',' MCS'],
+    ['vesselInflammation','内皮慢性炎症损伤',0,5,.1,'持续招募信号与代谢压力累积损伤；短时招募不直接杀死内皮。为可调代理机制','×'],
+    ['tumorIntravasation','肿瘤入血倾向',0,3,.1,'高侵袭肿瘤实际接触内皮后才可能穿入；整个核区和大部分胞体进入管腔后才可随血流离场','×'],
     ['cycleCoupling','周期—营养耦合',0,1,.05,'0 恢复旧周期门控；1 启用分阶段消耗、储备与复制损伤。依据：Colombo 2011；系数为模型假设',''],
     ['reserveCapacity','营养储备容量',10,240,10,'能量与合成原料的有限缓冲；分裂按实际胞体比例分配。依据：Colombo 2011；无量纲容量',''],
     ['replicationStress','复制压力敏感性',0,3,.1,'S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；速率未标定','×'],
@@ -116,6 +128,7 @@
   ];
   const modules={
     'branch-sliders':['branchLength','branchStrength','branching','networkAdhesion'],
+    'vascular-sliders':['vesselCount','vesselRadius','vesselSupply','vesselDependence','vesselImmuneRate','vesselImmuneHealth','vesselPassage','vesselRepair','vesselDivisions','vesselLifespan','vesselInflammation','tumorIntravasation'],
     'environment-sliders':['supply','normalSupport','metabolism','halfLife','chemotaxis','escape','inflammation'],
     'evolution-sliders':['mutationBias','evolutionMemory'],
     'normal-sliders':['normalRepair','normalDivisions','normalMotility','cohesion','stressMutation','progression','normalMutationGain'],
@@ -158,7 +171,7 @@
   let pendingFrame=0,lastUISync=0,uiPending=false,lastHistoryDraw=0;
   let settingsKey='',legendKey='';
   const frameStats={fps:0,renderMs:0,snapshotMs:0,count:0,since:performance.now(),time:null,revision:null};
-  const colorTypes=[['normal','正常细胞'],['abnormal','癌前细胞'],['tumor','肿瘤细胞'],['immune','未激活免疫'],['activated','已激活免疫'],['suppressive','免疫抑制样']];
+  const colorTypes=[['normal','正常细胞'],['abnormal','癌前细胞'],['tumor','肿瘤细胞'],['immune','未激活免疫'],['activated','已激活免疫'],['suppressive','免疫抑制样'],['endothelial','血管内皮']];
   for(const [id,preset] of Object.entries(CellLabDisplay.COLOR_PRESETS)){
     const button=document.createElement('button');button.type='button';button.className='color-preset';button.dataset.palette=id;button.setAttribute('aria-label','应用'+preset.name+'配色');
     const name=document.createElement('b');name.textContent=preset.name;button.append(name);
@@ -174,7 +187,7 @@
     for(const button of $('color-presets').children){const active=button.dataset.palette===preset;button.classList.toggle('selected',active);button.setAttribute('aria-pressed',active);}
     for(const [key] of colorTypes)for(const part of ['body','nucleus'])$('color-'+key+'-'+part).value=cellColors[key][part];
     $('proliferation-shading').checked=cellColors.proliferationShading;
-    for(const [key,css] of [['normal','normal'],['abnormal','abnormal'],['tumor','tumor'],['immune','immune'],['activated','immune-active'],['suppressive','immune-suppressive']]){for(const node of document.querySelectorAll('.legend .'+css))node.style.background=cellColors[key].body;document.querySelector('.population-'+key)?.style.setProperty('--population-color',cellColors[key].body);}
+    for(const [key,css] of [['normal','normal'],['abnormal','abnormal'],['tumor','tumor'],['immune','immune'],['activated','immune-active'],['suppressive','immune-suppressive'],['endothelial','endothelial']]){for(const node of document.querySelectorAll('.legend .'+css))node.style.background=cellColors[key].body;document.querySelector('.population-'+key)?.style.setProperty('--population-color',cellColors[key].body);}
     const ramp=document.querySelector('.proliferation-key'),low=CellLabDisplay.bodyColor({kind:2,genome:{proliferation:.25}},cellColors),high=cellColors.tumor.body;
     ramp.querySelector('i').style.background=`linear-gradient(90deg,rgb(${low.join(',')}),${high})`;
     ramp.lastChild.textContent=cellColors.proliferationShading?'肿瘤：浅 → 深，增殖能力低 → 高':'肿瘤：统一胞体色';
@@ -324,8 +337,8 @@
     if(s.maze){$('maze-diffusion').textContent=s.maze.signalThroughWalls?'招募扩散：穿墙':'招募扩散：沿通道';$('maze-diffusion').setAttribute('aria-pressed',!!s.maze.signalThroughWalls);}
     if(s.maze){const leader=s.maze.arrivals[0],parts=[leader?`首达 #${s.maze.arrivals.filter(a=>a.time===leader.time).map(a=>a.number).join("/")} · ${leader.time} MCS`:'向圆心出发'];$('maze-score').replaceChildren(...parts.map(text=>{const e=document.createElement('b');e.textContent=text;return e;}),...s.maze.racers.map(r=>{const e=document.createElement('span');e.textContent=`#${r.number} ${r.arrivedAt!==null?r.arrivedAt+' MCS':r.alive?'探索中':'已移除'}`;return e;}));}
     const scenario=s.scenario;$('scenario-guide').hidden=!scenario;
+    $('scenario-phase').textContent=scenario?.phase||(s.vascular?.vessels.length?'血管灌注与循环补充':'');$('scenario-phase').classList.toggle('achieved',!!scenario?.achieved);
     if(scenario&&(force||panelVisible('scenario-guide'))){
-      $('scenario-phase').textContent=scenario.phase;$('scenario-phase').classList.toggle('achieved',scenario.achieved);
       $('scenario-description').textContent=scenario.description;
       $('scenario-configuration').textContent=scenario.customized?'参数已调整':'预设参数';
       const initial=scenario.initial;
@@ -350,7 +363,8 @@
     $('seed-status').textContent=`当前 ${s.cells.length} 颗 · 按局部空间尝试加入`;
     if(force||panelVisible('statistics-panel')){
       const p=CellLabRounds.population(s);
-      for(const kind of ['normal','abnormal','tumor','immune'])$(kind+'-count').textContent=p[kind];
+      for(const kind of ['normal','abnormal','tumor','immune','endothelial'])$(kind+'-count').textContent=p[kind];
+      const vas=s.vascular; $('vascular-statistics').hidden=!vas?.vessels?.length; if(vas){$('vessel-functional').textContent=vas.functional+' / '+vas.vessels.length;$('vessel-perfusion').textContent=Math.round(vas.meanPerfusion*100)+'%';$('vessel-immune').textContent=(s.counters.extravasations||0)+' / '+(s.counters.vascularArrivals||0);$('vessel-export').textContent=s.counters.bloodstreamExports||0;$('vessel-repair').textContent='内皮分裂 '+(s.counters.endothelialDivisions||0)+' · 内皮死亡 '+(s.counters.endothelialDeaths||0)+' · 循环返回 '+(s.counters.circulationReturns||0);}
       $('alive-count').textContent=p.total;$('resting-immune-count').textContent=p.immuneResting;$('activated-immune-count').textContent=p.immuneActive;$('suppressive-immune-count').textContent=p.immuneSuppressive;
       $('division-count').textContent=s.counters.divisions;$('malignant-count').textContent=s.counters.malignantTransitions;$('escape-count').textContent=s.counters.antigenEscapes;
       $('immune-division-count').textContent='免疫分裂 '+s.counters.immuneDivisions;$('recognition-count').textContent=s.counters.recognitions;
@@ -399,11 +413,13 @@
         lines.push(`细胞周期 ${c.phase} · 阶段进度 ${Math.round(c.progress*100)}%`,c.phase==='G0'&&!c.arrest?'整合增殖信号':reasons[c.arrest]);
       }
       if(cell.resources)lines.push(`能量储备 ${Math.round(cell.resources.energy*100)}% · 合成储备 ${Math.round(cell.resources.precursor*100)}% · DNA 损伤 ${Math.round(cell.resources.dnaDamage*100)}%`);
+      if(cell.vesselID)lines.push('血管 #'+cell.vesselID+' · 内皮年龄 '+Math.round(cell.age)+' MCS','剩余修复分裂 '+cell.divisionsLeft+' 次 · 累积内皮损伤 '+Math.round((cell.endothelialInjury||0)*100)+'%');
+      if(cell.vascularID)lines.push('血管 #'+cell.vascularID+' · '+({1:'管腔内循环',2:'跨内皮进入组织',3:'肿瘤跨内皮入血',4:'已进入管腔，等待灌注带离'}[cell.vascularPhase]||''));
       if(cell.kind===1&&cell.state==='normal')lines.push(`剩余修复分裂 ${cell.divisionsLeft} 次 · 空隙接触 ${Math.round(cell.freeFraction*100)}%`);
       if(cell.kind===2)lines.push(cell.isStem?'肿瘤干性：自我更新／分化':'分化肿瘤 · 剩余分裂 '+(cell.tumorDivisionsLeft===null?'无限制':cell.tumorDivisionsLeft+' 次'),`干性生态位记忆 ${Math.round(cell.stemNiche*100)}% · 性状资源代价 ${cell.traitEconomy.demand.toFixed(2)}×`);
       if(cell.state==='abnormal')lines.push(`癌前已持续 ${Math.floor(cell.abnormalAge)} MCS · 尚未获得肿瘤增殖／侵袭表型`,`抗原 ${cell.antigenLevel.toFixed(2)} · ${cell.antigen?'可被接触识别':'低于识别阈值'} · 杀伤损伤 ${(cell.damage*100).toFixed(0)}%`);
       if(cell.kind===1)lines.push(`局部炎性信号 ${(100*(cell.inflammatorySignal||0)).toFixed(0)}% · 累积暴露 ${(100*(cell.inflammatoryExposure||0)).toFixed(0)}%`);
-      if(cell.kind!==3){
+      if(cell.kind!==3&&!cell.vesselID){
         lines.push(`环境致变压力 ${Math.round(cell.mutationPressure*100)}%`);
         if(cell.kind===1)lines.push(`耐受性状 ${cell.normalTolerance.toFixed(2)}`);
         if(cell.kind===2||cell.state==='abnormal')lines.push(`有效免疫接触 ${cell.immuneEncounters} 次 · 接触选择记忆 ${Math.round(cell.immuneContactMemory*100)}%`,`持续招募暴露 ${Math.round(cell.recruitmentExposure*100)}%`);
@@ -418,7 +434,7 @@
       if(cell.kind===3)lines.push(`本细胞已检查 ${cell.patrolChecked} 颗不同组织细胞`);
       if(cell.kind===2&&cell.origin==='normal')lines.push(`源自正常细胞 · ${cell.transformedAt} MCS 恶性转变`);
       if(cell.kind===2&&cell.morphologyMode)lines.push(`${cell.morphologyMode===2?'动态分枝':'梭形双极'} · 伸展／回缩中的突起 ${cell.branchCount} 处 · 稳定接触 ${cell.networkDegree||0} 个邻居`);
-      if(cell.dying)lines.push('死亡原因：'+({environment:'持续代谢压力',kill:'免疫递送损伤',spontaneous:'自发凋亡',lifespan:'达到累计肿瘤杀伤上限'}[cell.deathCause]||cell.deathCause),`触发死亡：${cell.deathStartedAt} MCS · 清除中 ${s.time-cell.deathStartedAt} MCS`);
+      if(cell.dying)lines.push('死亡原因：'+({environment:'持续代谢压力',kill:'免疫递送损伤',spontaneous:'自发凋亡',lifespan:cell.vesselID?'内皮年龄相关凋亡':'达到累计肿瘤杀伤上限'}[cell.deathCause]||cell.deathCause),`触发死亡：${cell.deathStartedAt} MCS · 清除中 ${s.time-cell.deathStartedAt} MCS`);
       $('inspection').textContent=lines.join('\n');
     }else{selected=0;$('inspection').textContent='点击细胞，查看局部代谢、活性、抗原、遗传性状与剩余分裂次数。';}
   }
@@ -547,6 +563,7 @@
       ctx.strokeStyle='#803d46e6';ctx.stroke(paths[2]);ctx.strokeStyle='#1a456be6';ctx.stroke(paths[3]);ctx.globalAlpha=1;
     }
     if(showAntigen&&!gpu)drawAntigenOutlines(s,scale,pixelRatio);
+    drawVessels(s,scale,pixelRatio);
     if(showNuclei){ctx.save();ctx.scale(scale,scale);ctx.lineWidth=1.5*pixelRatio/scale;for(const batch of displayCache.nucleusBatches(s,cellColors)){ctx.fillStyle=batch.fill;ctx.strokeStyle=batch.stroke;ctx.fill(batch.path);ctx.stroke(batch.path);}ctx.restore();}
     // Post-clearance membrane fragments are cosmetic, never extra cells.
     // Their age uses model time, so pausing also freezes the rupture effect.
@@ -592,12 +609,19 @@
     canvas.style.cursor=tool==='move'?'grab':tool==='inspect'?'pointer':'crosshair';
   }
   function point(e){const r=canvas.getBoundingClientRect();return [Math.max(0,Math.min(snapshot.width-1,Math.floor((e.clientX-r.left)/r.width*snapshot.width))),Math.max(0,Math.min(snapshot.height-1,Math.floor((e.clientY-r.top)/r.height*snapshot.height)))];}
+  function drawVessels(s,scale,pixelRatio){
+    if(!s.vascular?.vessels.length)return;
+    ctx.save();ctx.lineWidth=1.2*pixelRatio;ctx.font=`${Math.max(9,10*pixelRatio)}px monospace`;ctx.textAlign='center';ctx.textBaseline='middle';
+    for(const v of s.vascular.vessels){if(!v.active)continue;const x=v.x*scale,y=v.y*scale,r=v.radius*scale;ctx.strokeStyle=v.perfusion>.05?'#347f84aa':'#997b65aa';ctx.fillStyle=v.perfusion>.05?'#286b73':'#876648';ctx.setLineDash([3*pixelRatio,4*pixelRatio]);ctx.beginPath();ctx.arc(x,y,Math.max(1,r-2*pixelRatio),0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+      const index=Math.round(v.y)*s.width+Math.round(v.x);if(!s.grid[index])ctx.fillText(Math.round(v.perfusion*100)+'%',x,y);
+    }ctx.restore();
+  }
   function updateProbe(){
     probeDirty=false;const box=$('field-probe'),brush=$('brush-preview');brush.hidden=true;if(!hover||!snapshot||panGesture){box.hidden=true;return;}
     const r=canvas.getBoundingClientRect(),v=document.querySelector('.viewport').getBoundingClientRect(),{clientX,clientY}=hover;
     if(clientX<Math.max(r.left,v.left)||clientX>=Math.min(r.right,v.right)||clientY<Math.max(r.top,v.top)||clientY>=Math.min(r.bottom,v.bottom)){box.hidden=true;return;}
     if(tool==='remove'){const diameter=2*Number($('eraser-radius').value)*snapshot.refinement*r.width/snapshot.width;brush.style.width=diameter+'px';brush.style.height=diameter+'px';brush.style.left=(clientX-v.left)+'px';brush.style.top=(clientY-v.top)+'px';brush.hidden=false;box.hidden=true;return;}
-    if(stroke||tool==='signal'){box.hidden=true;return;}
+    if(stroke||tool==='signal'||performance.now()-hoverMovedAt>=10000){box.hidden=true;return;}
     const [x,y]=point(hover),sample=CellLabDisplay.sample(snapshot,x,y);if(!sample){box.hidden=true;return;}
     $('probe-position').textContent=`位置 ${x}, ${y} · ${sample.time} MCS`;
     $('probe-cell').textContent=sample.wall?'实体障碍':sample.cell?`#${sample.cell.id} ${CellLabDisplay.cellName(sample.cell)}${sample.cell.dying?' · '+CellLabDisplay.deathPhaseLabel(sample.cell):''}`:'培养液';
@@ -617,8 +641,8 @@
     lastAction=rpc(mode==='source'?'source':'pulse',{x:p[0],y:p[1],channel:type,type,radius}).catch(fail).finally(()=>signalInFlight--);
   }});
   function seedFeedback(result){
-    const reasons={occupied:'此处完整胞体会碰到已有细胞',crowded:'局部挤入失败：核区或切面让位额度不足，周围细胞保持原状',wall:'此处被实体障碍挡住',edge:'胞体会超出实体边界，请向内移动',nucleus:'这处空间放不下完整核区',invalid:'新增参数无效',space:'随机尝试未找到足够空隙，可在画布上单击尝试挤入'};
-    const added=result.added??(result.id?1:0),message=added?(result.id?'加入了细胞 #'+result.id:`加入了 ${added} / ${result.requested} 颗细胞`):'未加入细胞';
+    const reasons={lumen:'管腔仅接收循环免疫细胞，请在血管外放置组织细胞',vascular:'不能把内皮或组织胞体直接拖过血管基底膜',geometry:'血管空间不足或与现有血管过近',occupied:'此处完整胞体会碰到已有细胞',crowded:'局部挤入失败：核区或切面让位额度不足，周围细胞保持原状',wall:'此处被实体障碍挡住',edge:'胞体会超出实体边界，请向内移动',nucleus:'这处空间放不下完整核区',invalid:'新增参数无效',space:'随机尝试未找到足够空隙，可在画布上单击尝试挤入'};
+    const added=result.added??(result.id?1:0),message=added?(result.id?(result.vessel?'加入了血管 #':'加入了细胞 #')+result.id:`加入了 ${added} / ${result.requested} 颗细胞`):'未加入细胞';
     toast(message+(result.inserted?`；已挤入，${result.displaced} 颗邻居让位`:'')+(result.reason?'；'+(reasons[result.reason]||result.reason):''));
   }
   function applyPointer(p,first=false){
@@ -635,7 +659,7 @@
       lastAction=rpc('stroke',{points,erase:false}).catch(fail);
     }else if(tool==='signal'&&eraseSource){
       lastAction=rpc('source',{x:p[0],y:p[1],radius:Number($('source-radius').value),erase:true}).catch(fail);
-    }else if(tool==='seed'&&first){lastAction=rpc('seed',{kind:Number($('seed-kind').value),x:p[0],y:p[1],manual:true,push:true}).then(seedFeedback).catch(fail);}
+    }else if(tool==='seed'&&first){lastAction=rpc('seed',{kind:$('seed-kind').value==='vessel'?'vessel':Number($('seed-kind').value),x:p[0],y:p[1],manual:true,push:true}).then(seedFeedback).catch(fail);}
     stroke.previous=p;
   }
   function flush(){clearTimeout(flushTimer);flushTimer=0;if(queuedPoint){const p=queuedPoint;queuedPoint=null;applyPointer(p);}return lastAction;}
@@ -652,7 +676,7 @@
       stroke.offset=[m.x-p[0],m.y-p[1]];canvas.style.cursor='grabbing';lastAction=rpc('beginDrag',{id:m.id,token:stroke.token}).catch(fail);
     }else applyPointer(p,true);
   });
-  canvas.addEventListener('pointermove',e=>{if(panGesture){if(e.pointerId!==panGesture.pointerId)return;view.x=panGesture.viewX+e.clientX-panGesture.x;view.y=panGesture.viewY+e.clientY-panGesture.y;fitCanvas();hover=null;probeDirty=true;dirty=true;return;}if(e.pointerType!=='touch'){hover={clientX:e.clientX,clientY:e.clientY};probeDirty=true;}if(!stroke||e.pointerId!==stroke.pointerId||stroke.ending||!snapshot||tool==='inspect'||tool==='seed')return;if(stroke.signal){signalGesture.move(point(e),[e.clientX,e.clientY]);return;}queuedPoint=point(e);if(!flushTimer)flushTimer=setTimeout(flush,25);});
+  canvas.addEventListener('pointermove',e=>{if(panGesture){if(e.pointerId!==panGesture.pointerId)return;view.x=panGesture.viewX+e.clientX-panGesture.x;view.y=panGesture.viewY+e.clientY-panGesture.y;fitCanvas();hover=null;probeDirty=true;dirty=true;return;}if(e.pointerType!=='touch'){if(!hover||hover.clientX!==e.clientX||hover.clientY!==e.clientY)hoverMovedAt=performance.now();hover={clientX:e.clientX,clientY:e.clientY};probeDirty=true;}if(!stroke||e.pointerId!==stroke.pointerId||stroke.ending||!snapshot||tool==='inspect'||tool==='seed')return;if(stroke.signal){signalGesture.move(point(e),[e.clientX,e.clientY]);return;}queuedPoint=point(e);if(!flushTimer)flushTimer=setTimeout(flush,25);});
   canvas.addEventListener('pointerleave',()=>{hover=null;probeDirty=true;});
   window.addEventListener('blur',()=>{panGesture=null;hover=null;probeDirty=true;void endStroke();});document.addEventListener('scroll',()=>probeDirty=true,true);window.addEventListener('resize',()=>{hover=null;probeDirty=true;dirty=true;});
   const layoutObserver=new ResizeObserver(()=>{dirty=true;refreshRecordingOptions();});layoutObserver.observe(viewport);layoutObserver.observe($('history'));document.addEventListener('fullscreenchange',()=>dirty=true);
@@ -715,7 +739,7 @@
   $('network-demo').addEventListener('click',()=>start('network',{preset:true}).catch(fail));
   let arenaFullscreen=false,fullscreenHadNative=false,fullscreenFocus=null;
   function fullscreenLayout(value){
-    arenaFullscreen=value;document.body.classList.toggle('arena-fullscreen',value);$('exit-arena-fullscreen').hidden=!value;$('arena-fullscreen').setAttribute('aria-pressed',String(value));dirty=true;
+    arenaFullscreen=value;document.body.classList.toggle('arena-fullscreen',value);$('arena-fullscreen').setAttribute('aria-pressed',String(value));dirty=true;
   }
   async function exitArenaFullscreen(){
     fullscreenLayout(false);if(document.fullscreenElement)try{await document.exitFullscreen();}catch{}fullscreenHadNative=false;fullscreenFocus?.focus({preventScroll:true});
@@ -724,10 +748,10 @@
     if(arenaFullscreen||document.fullscreenElement)return exitArenaFullscreen();
     fullscreenFocus=document.activeElement;
     try{const request=viewport.requestFullscreen?.();fullscreenLayout(true);if(request)await request;fullscreenHadNative=!!document.fullscreenElement;}catch(error){viewport.dataset.fullscreenFallback=error.name+": "+error.message;fullscreenLayout(true);}
-    $('exit-arena-fullscreen').focus({preventScroll:true});
+    canvas.focus({preventScroll:true});toast('Esc 或双指轻触退出全屏');
   }
   for(const id of ['arena-fullscreen','fullscreen'])$(id).addEventListener('click',toggleArenaFullscreen);
-  $('exit-arena-fullscreen').addEventListener('click',exitArenaFullscreen);
+  viewport.addEventListener('touchstart',e=>{if(arenaFullscreen&&e.touches.length===2){e.preventDefault();void endStroke();void exitArenaFullscreen();}},{passive:false});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&arenaFullscreen){e.preventDefault();exitArenaFullscreen();}});
   document.addEventListener('fullscreenchange',()=>{if(document.fullscreenElement)fullscreenHadNative=true;else if(fullscreenHadNative){fullscreenLayout(false);fullscreenHadNative=false;fullscreenFocus?.focus({preventScroll:true});}});
   $('reset').addEventListener('click',()=>start(undefined,{preserve:true}).catch(fail));$('shuffle').addEventListener('click',()=>start('random',{shuffle:true}).catch(fail));
@@ -737,7 +761,7 @@
     const count=$('seed-count').valueAsNumber,button=$('sprinkle');
     if(!Number.isSafeInteger(count)||count<1){toast('请输入正整数数量');$('seed-count').focus();return;}
     button.disabled=true;button.textContent='加入中…';
-    try{seedFeedback(await rpc('sprinkle',{kind:Number($('seed-kind').value),count,manual:true}));}catch(error){fail(error);}finally{button.disabled=false;button.textContent='＋ 加入';}
+    try{seedFeedback(await rpc('sprinkle',{kind:$('seed-kind').value==='vessel'?'vessel':Number($('seed-kind').value),count,manual:true}));}catch(error){fail(error);}finally{button.disabled=false;button.textContent='＋ 加入';}
   });
   $('clear-walls').addEventListener('click',()=>rpc('clearWalls').then(()=>toast('障碍已清除')).catch(fail));
   $('divide').addEventListener('click',()=>{if(!selected){toast('请先点击选中一颗细胞');return;}rpc('divide',{id:selected}).then(id=>toast(id?'已分裂出细胞 #'+id:'面积不足、免疫分裂次数耗尽或轮廓受限')).catch(fail);});
@@ -835,6 +859,7 @@
     if(now-lastHeartbeat>=500){performanceContext();if(adaptive.tick(now)){dirty=true;applyPerformance();}performancePlan=adaptive.status();lastHeartbeat=now;tickAutoRandom(now);if(snapshot){journal.observe(snapshot,now,!document.hidden&&!stroke);checkpointRound(now);}}
     if(uiPending&&now-lastUISync>=performancePlan.uiMs){sync();lastUISync=now;uiPending=false;}
     if(dirty&&(!pendingFrame||forceFrame||now-lastRender>=1000/performancePlan.fps))render();
+    if(hover&&performance.now()-hoverMovedAt>=10000&&!$('field-probe').hidden)probeDirty=true;
     if(probeDirty)updateProbe();requestAnimationFrame(frame);
   }requestAnimationFrame(frame);applyPerformance();
   window.artistooLab={rpc,ready,get snapshot(){return snapshot;},get roundHistory(){return {completed:CellLabRounds.numbered(completedRounds).map(r=>structuredClone(r)),current:journal.current()};},get parameterLocks(){return parameterLocks.toJSON();},get autoRandom(){return {...autoRandom.status(),busy:autoRandomBusy};},get performance(){return {...adaptive.status(),visiblePanels:[...visiblePanels]};},get errors(){return errors;},get selected(){return selected;},get recording(){return video.status;},get colors(){return CellLabDisplay.normalizeColors(cellColors);},get renderer(){return {gpu:!!gpuRenderer&&!gpuRenderer.lost,device:gpuRenderer?.device,error:rendererFailure,ms:gpuRenderer?.lastMs,fps:snapshot?.playing?frameStats.fps:0,renderMs:frameStats.renderMs,snapshotMs:frameStats.snapshotMs};},setTool,render,exportData,importData,replayRound};

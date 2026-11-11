@@ -1,3 +1,4 @@
+import {assertConfluentTissue} from './vascular-layout-helper.mjs';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -33,7 +34,7 @@ test('visit seeds diversify actual onset geometry while retaining the bounded co
     const s=new CellLab.Simulation({scene:'oncogenesis',seed,worldWidth:192,worldHeight:144,refinement:1,warmup:0,boundary:'wrap'});
     assert.deepEqual(s.settings,{...CellLab.DEFAULTS,...CellLab.PRESETS.oncogenesis.settings});
     const report=s.scenarioReport();assert.equal(report.initial.tumor,0);assert.equal(report.initial.immune,12);assert.ok(s.live().every(m=>m.state!=='abnormal'&&m.stress===0));
-    assert.ok(s.snapshot().grid.every(id=>id>0),'healthy tissue fills the canvas');
+    assertConfluentTissue(s);
     assert.ok(s.supplyMap.some(v=>v<.15)&&s.supplyMap.some(v=>v>.95),'weak niches and viable edges remain');
     if(baseline)assert.deepEqual(s.supplyMap,baseline);else baseline=s.supplyMap.slice();
     assert.ok(s.live().every(m=>s.section.fits(m,m.nucleusX,m.nucleusY)));hashes.add(fingerprint(s));

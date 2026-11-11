@@ -205,9 +205,7 @@ aside.statistics-focused #record-options>summary{padding:4px 0}
 
 #language,#language:hover,#language:active{border-color:transparent;background:transparent;box-shadow:none;translate:none}#language:hover{text-decoration:underline}#language:focus-visible{outline:1px dashed var(--accent);outline-offset:-2px}
 
-/* Native fullscreen and a layout fallback share the same exit control. */
-.fullscreen-exit{position:absolute;right:max(12px,env(safe-area-inset-right));top:max(12px,env(safe-area-inset-top));z-index:90;min-height:38px;padding:6px 12px;opacity:.85;background:var(--paper)}
-.fullscreen-exit:hover,.fullscreen-exit:focus{opacity:1}
+/* Native fullscreen and its layout fallback share keyboard/touch exit. */
 body.arena-fullscreen .workspace{display:block!important;width:100vw!important;height:100dvh!important;padding:0!important;gap:0!important}
 body.arena-fullscreen .workspace>aside{display:none!important}
 body.arena-fullscreen .simulation,body.arena-fullscreen .viewport{width:100vw!important;height:100dvh!important;max-height:none!important;min-height:0!important;margin:0!important;border:0!important}
@@ -225,3 +223,5 @@ body.arena-fullscreen .mobile-tools,body.arena-fullscreen #mobile-dock{display:n
 .round-cleanup-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}.round-cleanup-actions button{font-size:12px;padding:5px}
 #round-delete-selected,#round-cleanup-confirm{color:#913d2f}#round-cleanup-dialog{max-width:420px}#round-cleanup-dialog h3{margin:0}#round-cleanup-error{color:#913d2f}#round-cleanup-error:empty{display:none}
 @media(max-width:850px){.auto-random-control{flex-wrap:wrap;white-space:normal}.auto-random-toggle{min-height:44px}.round-select{min-width:36px;min-height:44px}.round-cleanup-actions button,.round-selection-bar label{min-height:40px}}
+
+.population-cards{grid-template-columns:repeat(5,minmax(0,1fr))}.population-endothelial{--population-color:#61a39a}.vascular-stats{border-block:1px solid var(--line);padding:9px 0;margin:8px 0}.vascular-metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:7px 0}.vascular-metrics span{display:flex;justify-content:space-between;gap:6px}.vascular-stats small{color:var(--muted)}

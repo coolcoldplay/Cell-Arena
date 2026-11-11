@@ -1,10 +1,11 @@
+import {assertConfluentTissue} from './vascular-layout-helper.mjs';
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
 for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js','src/experiment.js','src/trajectories.js','src/i18n.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const make=(scene,extra={})=>new CellLab.Simulation({scene,worldWidth:240,worldHeight:180,refinement:1,warmup:0,...extra});
 
 test('oncogenesis fills the entire dish with connected normal bodies and twelve internal patrols',()=>{
  for(const worldWidth of [192,240,384]){const s=make('oncogenesis',{worldWidth,worldHeight:worldWidth*.75}),snap=s.snapshot();
-  assert.ok(snap.grid.every(id=>id>0));assert.equal(snap.cells.filter(c=>c.kind===3).length,12);assert.ok(snap.cells.every(c=>c.kind!==2&&c.state!=='abnormal'));
+  assertConfluentTissue(s);assert.equal(snap.cells.filter(c=>c.kind===3).length,12);assert.ok(snap.cells.every(c=>c.kind!==2&&c.state!=='abnormal'));
   for(const m of s.live()){assert.ok(s.section.fits(m,m.nucleusX,m.nucleusY));assert.equal(s.components(m.id).length,1);if(m.kind===3){assert.ok(m.x>s.width*.1&&m.x<s.width*.9&&m.y>s.height*.1&&m.y<s.height*.9);assert.ok(s.contacts.get(m.id).size>=2);}}
  }
 });

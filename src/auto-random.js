@@ -3,19 +3,19 @@
 (() => {
   'use strict';
   const phases={G0:0,G1:1,S:2,G2:3,M:4},NOTICE_MS=10000;
-  const events=['stemAsymmetric','stemSelfRenewal','stemDifferentiation','stemReversions','normalDivisions','replicationDeaths','divisions','immuneDivisions','manualRemoved','kills','apoptosis','environment','lifespan','apoptosisStarted','killStarted','environmentStarted','lifespanStarted','mutations','normalTraitMutations','abnormalInitiations','malignantTransitions','antigenExposures','antigenEscapes','suppressiveTransitions','suppressiveRecoveries','injuryDeactivations','signalDeactivations'];
-  function state(c){return (c.kind||0)|(c.state==='abnormal'?4:0)|(c.immunePhenotype==='suppressive'?8:0)|(c.activation>0?16:0)|(c.antigen?32:0)|(c.dying?64:0)|(({spontaneous:1,kill:2,environment:3,lifespan:4}[c.deathCause]||0)<<7)|((phases[c.cycle?.phase]||0)<<10)|(c.cycle?.arrest?16384:0)|(c.isStem?32768:0);}
+  const events=['vascularArrivals','extravasations','circulationReturns','intravasations','bloodstreamExports','endothelialDeaths','endothelialDivisions','stemAsymmetric','stemSelfRenewal','stemDifferentiation','stemReversions','normalDivisions','replicationDeaths','divisions','immuneDivisions','manualRemoved','kills','apoptosis','environment','lifespan','apoptosisStarted','killStarted','environmentStarted','lifespanStarted','mutations','normalTraitMutations','abnormalInitiations','malignantTransitions','antigenExposures','antigenEscapes','suppressiveTransitions','suppressiveRecoveries','injuryDeactivations','signalDeactivations'];
+  function state(c){return (c.kind||0)|(c.state==='abnormal'?4:0)|(c.immunePhenotype==='suppressive'?8:0)|(c.activation>0?16:0)|(c.antigen?32:0)|(c.dying?64:0)|(({spontaneous:1,kill:2,environment:3,lifespan:4}[c.deathCause]||0)<<7)|((phases[c.cycle?.phase]||0)<<10)|(c.cycle?.arrest?16384:0)|(c.isStem?32768:0)|((c.vascularPhase||0)<<16)|(c.vesselID?1048576:0);}
   class Controller {
     constructor(){this.minutes=0;this.reset();}
     configure(value,now=0){this.minutes=Number.isFinite(value)&&value>=0&&value<=1440?value:0;this.reset(now);}
-    reset(now=0){this.elapsed=0;this.lastTick=now;this.lastActivity=now;this.active=false;this.fired=false;this.observed=null;this.members=new Map();this.eventStamp='';this.epoch=null;this.count=0;this.population={normal:0,abnormal:0,tumor:0,immune:0};this.pendingReason=null;this.noticeElapsed=0;}
+    reset(now=0){this.elapsed=0;this.lastTick=now;this.lastActivity=now;this.active=false;this.fired=false;this.observed=null;this.members=new Map();this.eventStamp='';this.epoch=null;this.count=0;this.population={normal:0,abnormal:0,tumor:0,immune:0,endothelial:0};this.pendingReason=null;this.noticeElapsed=0;}
     observe(s,now){
       if(!s||s===this.observed)return;
       const epoch=s.revision+':'+s.seed;if(epoch!==this.epoch||s.time<this.time){this.reset(now);this.epoch=epoch;}
-      let changed=false,count=0;const population={normal:0,abnormal:0,tumor:0,immune:0};
+      let changed=false,count=0;const population={normal:0,abnormal:0,tumor:0,immune:0,endothelial:0};
       for(const c of s.cells)if(c.kind>0&&c.kind<4){
         count++;const key=c.birth??c.id,code=state(c);if(this.members.get(key)!==code)changed=true;
-        if(!c.dying)population[c.kind===1?(c.state==='abnormal'?'abnormal':'normal'):c.kind===2?'tumor':'immune']++;
+        if(!c.dying)population[c.kind===1?(c.vesselID?'endothelial':c.state==='abnormal'?'abnormal':'normal'):c.kind===2?'tumor':'immune']++;
       }
       const stamp=events.map(k=>s.counters?.[k]||0).join(',');if(count!==this.count||stamp!==this.eventStamp)changed=true;
       if(changed){this.elapsed=0;this.lastActivity=now;this.members.clear();for(const c of s.cells)if(c.kind>0&&c.kind<4)this.members.set(c.birth??c.id,state(c));if(this.pendingReason==='idle'){this.pendingReason=null;this.noticeElapsed=0;}}
@@ -25,10 +25,11 @@
     reason(s){
       if(!this.count)return 'empty';
       const p=this.population;
-      if(p.tumor&&!p.normal&&!p.abnormal&&!p.immune)return 'tumor-only';
-      if(!p.immune)return 'no-immune';
+      const canRecruit=!!s.vascular?.canRecruit;
+      if(p.tumor&&!p.normal&&!p.abnormal&&!p.immune&&!canRecruit)return 'tumor-only';
+      if(!p.immune&&!canRecruit)return 'no-immune';
       // Pure immune patrol is the explicit purpose of this preset.
-      if(!p.normal&&s.scene!=='maze')return 'no-normal';
+      if(!p.normal&&s.scene!=='maze'&&!(s.vascular?.canRecruit&&!s.normalSupport?.reference))return 'no-normal';
       return this.elapsed>=this.minutes*60000?'idle':null;
     }
     tick(s,now,allowed=true){

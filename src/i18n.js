@@ -6,6 +6,61 @@
   function add(rows){for(const line of rows.trim().split('\n')){const at=line.indexOf('|');if(at>0)dictionary.set(line.slice(0,at),line.slice(at+1));}}
   add(`
 Cell-Arena · 细胞生态竞技场|Cell-Arena · Cell ecology playground
+血管、灌注与浸润|Vessels, perfusion and trafficking
+初始血管数|Initial vessels
+新血管管腔半径|New vessel lumen radius
+血管交换能力|Vascular exchange capacity
+供给的血管依赖程度|Supply dependence on vessels
+循环免疫补充速率|Circulating immune arrival rate
+免疫补充与组织健康联动|Immune supply–tissue health coupling
+免疫跨内皮通行|Immune transendothelial passage
+内皮修复速度|Endothelial repair speed
+内皮修复谱系分裂上限|Endothelial repair division limit
+内皮参考寿命|Endothelial reference lifespan
+内皮慢性炎症损伤|Chronic endothelial inflammatory injury
+肿瘤入血倾向|Tumor intravasation propensity
+重开后生效；空白场景可在新增类型中选择血管，放到空隙中|Applies on restart. In a blank scene, select vessel under Add and place it in free space.
+只影响新建血管；内皮是可形变的真实胞体，管腔不含组织细胞|Affects new vessels only. Endothelium is made of deformable cell bodies surrounding a tissue-free lumen.
+有限速率补充氧糖与排酸；实际通量随灌注、管腔与正常组织保留率变化|Finite oxygen/glucose delivery and acid clearance, scaled by perfusion, lumen size and healthy tissue retention.
+越高越减少均匀背景供给；血管全部失效后不会自动恢复背景供给|Higher values reduce uniform background supply. Vascular failure does not restore background supply.
+管腔内按模型时间概率到达；局部招募信号增强，实际空隙不足时不能生成|Stochastic luminal arrivals per model time, enhanced by local recruitment. Arrival requires actual free space.
+健康正常组织减少时，延迟下调循环免疫可用量；不把内皮计入正常组织基数|Loss of healthy tissue gradually reduces circulating immune availability. Endothelium is excluded from the healthy-normal baseline.
+必须接触内皮并持续黏附，随后沿真实胞体形变穿出；0 关闭跨出许可|Requires sustained endothelial contact, then continuous cell deformation through the wall. 0 disables passage licensing.
+局部缺口诱导迁移与有限增殖；营养不足或分裂额度耗尽可修复失败|Local gaps drive migration and finite proliferation. Repair can fail under nutrient deprivation or exhausted division capacity.
+每次分裂两个子代都扣一次；耗尽后仍可存活和有限迁移|Both daughters lose one lineage division per split. Exhaustion still permits survival and limited migration.
+超过个体寿命后死亡风险逐渐上升；初始年龄有差异，0 关闭年龄凋亡|Death risk gradually rises beyond each cell's lifespan. Initial ages vary; 0 disables age-related apoptosis.
+持续招募信号与代谢压力累积损伤；短时招募不直接杀死内皮。为可调代理机制|Sustained recruitment and metabolic stress accumulate injury. Brief recruitment does not directly kill endothelium. Tunable proxy mechanism.
+高侵袭肿瘤实际接触内皮后才可能穿入；整个核区和大部分胞体进入管腔后才可随血流离场|Invasive tumors need actual endothelial contact to enter. The entire protected nucleus and most of the body must enter the lumen before perfusion can remove the cell.
+血管横截面|Vessel cross-section
+血管内皮细胞|Endothelial cell
+血管内皮|Endothelium
+内皮|Endothelium
+内皮状态|Endothelial states
+血管与播散|Vessels and dissemination
+血管灌注与循环补充|Vascular perfusion and immune supply
+有效血管|Functional vessels
+平均灌注|Mean perfusion
+穿出 / 到达免疫|Immune exits / arrivals
+入血离场|Bloodstream departures
+内皮分裂|Endothelial divisions
+内皮死亡|Endothelial deaths
+循环返回|Returns to circulation
+内皮年龄|Endothelial age
+累积内皮损伤|Accumulated endothelial injury
+血管|Vessel
+管腔内循环|Circulating in lumen
+跨内皮进入组织|Crossing endothelium into tissue
+肿瘤跨内皮入血|Tumor intravasation
+已进入管腔，等待灌注带离|Inside lumen, awaiting perfusion washout
+内皮年龄相关凋亡|Endothelial age-related apoptosis
+局部肿瘤已清除，曾发生入血播散|Local tumor cleared; bloodstream dissemination occurred
+内皮修复依赖局部缺口与营养；虚线标示管腔，中心百分比是灌注能力。入血播散不等于远处转移灶形成。|Repair depends on local gaps and nutrients. Dashed lines mark lumens; center percentages show perfusion. Intravasation does not establish a distant metastasis.
+管腔仅接收循环免疫细胞，请在血管外放置组织细胞|Only circulating immune cells can be placed in the lumen. Place tissue cells outside the vessel.
+不能把内皮或组织胞体直接拖过血管基底膜|Endothelium or tissue bodies cannot be dragged through the vascular basement boundary.
+血管空间不足或与现有血管过近|Insufficient space or too close to an existing vessel.
+加入了血管|Added vessel
+Esc 或双指轻触退出全屏|Press Esc or tap with two fingers to exit fullscreen
+正常细胞铺满背景，中央嵌入 19 颗低抗原肿瘤，外围仅 3 颗免疫细胞。梭形肿瘤侵袭扩增，压力提高性状变异，部分克隆可能暴露抗原；免疫招募较弱。包含局部侵袭与概率性入血播散，不模拟远处器官定植。|A confluent normal sheet contains 19 central low-antigen tumors and 3 peripheral immune cells. Spindle tumors invade and expand; stress promotes variation and possible antigen exposure, under weak recruitment. Includes local invasion and stochastic intravasation, not distant organ colonization.
 免疫寿命：杀伤上限|Immune lifespan: kill limit
 累计致死指定数量的肿瘤后皱缩凋亡；0 关闭。只记实际致死接触，每颗肿瘤一次；分裂后两颗子代各自从 0 计数|Shrink and die after this many tumor kills; 0 disables. Each tumor is credited once to its lethal contact. Both newborn daughters start at zero.
 寿命凋亡|Lifespan apoptosis

@@ -20,7 +20,8 @@ test('solid wall contact is mechanical confinement and never an antigen contact'
  }
 });
 test('basal patrol explores new neighbours in a fully occupied healthy monolayer without a target or imposed gradient',async t=>{
-  const s=new CellLab.Simulation({scene:'oncogenesis',worldWidth:240,worldHeight:180,refinement:1,settings:{metabolism:0,stressMutation:0,progression:0,immuneGrowth:0}});
+  // Isolate tissue patrol from selective vascular barriers and new arrivals.
+  const s=new CellLab.Simulation({scene:'oncogenesis',worldWidth:240,worldHeight:180,refinement:1,settings:{vesselCount:0,metabolism:0,stressMutation:0,progression:0,immuneGrowth:0}});
   await CellLabWasm.install(s,module);const count=s.live().length,tracks=s.live().filter(c=>c.kind===3).map(c=>({id:c.id,x:c.nucleusX,y:c.nucleusY,span:0,seen:new Set()}));
   for(let n=0;n<800;n++){s.advance(1);for(const p of tracks){const m=s.cells[p.id];p.span=Math.max(p.span,Math.hypot(m.nucleusX-p.x,m.nucleusY-p.y));for(const id of s.contacts.get(m.id)?.keys()||[])p.seen.add(id);}}
   t.diagnostic(JSON.stringify(tracks.map(p=>({id:p.id,range:p.span,neighbours:p.seen.size}))));

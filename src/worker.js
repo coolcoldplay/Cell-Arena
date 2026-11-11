@@ -56,14 +56,15 @@ async function handle(event){
     else if(command==='observe')value=sim.observe(payload.id,payload.birth);
     else if(command==='backend'){await backend.configure(sim,['auto','cpu','gpu'].includes(payload.mode)?payload.mode:'auto');resetClock();}
     else if(command==='advance'){if(dragSession)value=false;else{playing=false;resetClock();const steps=Math.min(10000,Math.max(1,payload.steps||1));if(backend.active==='gpu')await sim.advanceAsync(steps,backend);else sim.advance(steps);}}
+    else if(command==='seed'&&payload.kind==='vessel')value=sim.vascular.add(payload.x,payload.y,sim.settings.vesselRadius*sim.scale);
     else if(command==='seed'){const radius=(payload.kind===3?3:4)*sim.scale;value=payload.manual&&payload.push?sim.insert(payload.kind,payload.x,payload.y,radius):sim.seed(payload.kind,payload.x,payload.y,radius);if(payload.manual)value={...sim.lastSeedResult};}
     else if(command==='sprinkle'){
       const requested=payload.count===undefined?5:Number(payload.count);value=0;let reason='space';
       if(!Number.isSafeInteger(requested)||requested<1)reason='invalid';
       else for(let attempts=0,misses=0;value<requested&&misses<600;attempts++){
-        const cell=sim.seed(payload.kind,sim.C.ran(5,sim.width-6),sim.C.ran(5,sim.height-6),(payload.kind===3?3:4)*sim.scale);
+        const cell=payload.kind==='vessel'?sim.vascular.add(sim.C.ran(5,sim.width-6),sim.C.ran(5,sim.height-6),sim.settings.vesselRadius*sim.scale).id:sim.seed(payload.kind,sim.C.ran(5,sim.width-6),sim.C.ran(5,sim.height-6),(payload.kind===3?3:4)*sim.scale);
         // Bound failed searches in crowded cultures, without a population quota.
-        if(cell){value++;misses=0;}else if(sim.lastSeedResult.reason==='invalid'){reason='invalid';break;}else misses++;
+        if(cell){value++;misses=0;}else if(payload.kind!=='vessel'&&sim.lastSeedResult.reason==='invalid'){reason='invalid';break;}else misses++;
         if(attempts%128===127)await new Promise(resolve=>setTimeout(resolve,0));
       }
       if(payload.manual)value={added:value,requested,reason:reason==='invalid'?'invalid':value===requested?'':reason,population:sim.live().length};
@@ -78,7 +79,7 @@ async function handle(event){
     else if(command==='mazeSignal'){value=sim.setMazeSignalMode(payload.throughWalls);resetClock();}
     else if(command==='divide'){
       const target=payload.id||sim.live().filter(c=>!c.dying).sort((a,b)=>sim.C.getVolume(b.id)-sim.C.getVolume(a.id))[0]?.id;value=sim.divide(target);
-    }else if(command==='export')value={format:'cell-arena-experiment',schemaVersion:1,version:'4.0.0',modelRevision:CellLab.MODEL_REVISION,warmup:sim.initialWarmup,speed,kernel:sim.kernel,compute:backend.info(),scene:sim.scene,scenario:sim.scenarioReport(),normalSupport:sim.normalSupportReport(),cycles:sim.cycleReport(),patrol:{...sim.patrolReport(),checkedBirths:[...sim.patrol.checked]},maze:sim.maze?structuredClone(sim.maze):null,sources:sim.sources.map(s=>({type:s.type,x:s.x/sim.scale,y:s.y/sim.scale,radius:s.radius/sim.scale})),supplyMap:Array.from(sim.supplyMap),boundary:sim.boundary,seed:sim.seedValue,worldWidth:sim.worldWidth,worldHeight:sim.worldHeight,refinement:sim.scale,settings:sim.settings,time:sim.C.time,history:sim.populationHistory(),events:sim.events,counters:sim.counters,manualDeathRemovals:sim.manualDeathRemovals,deaths:sim.deathSummary(),deathHistory:sim.deathHistory,lineage:sim.lineage,cells:sim.snapshot().cells};
+    }else if(command==='export')value={format:'cell-arena-experiment',schemaVersion:1,version:'4.0.0',modelRevision:CellLab.MODEL_REVISION,warmup:sim.initialWarmup,speed,kernel:sim.kernel,compute:backend.info(),scene:sim.scene,scenario:sim.scenarioReport(),vessels:sim.vascular.vessels.filter(v=>v.active).map(v=>sim.vascular.definition(v)),vascular:sim.vascular.report(),normalSupport:sim.normalSupportReport(),cycles:sim.cycleReport(),patrol:{...sim.patrolReport(),checkedBirths:[...sim.patrol.checked]},maze:sim.maze?structuredClone(sim.maze):null,sources:sim.sources.map(s=>({type:s.type,x:s.x/sim.scale,y:s.y/sim.scale,radius:s.radius/sim.scale})),supplyMap:Array.from(sim.supplyMap),boundary:sim.boundary,seed:sim.seedValue,worldWidth:sim.worldWidth,worldHeight:sim.worldHeight,refinement:sim.scale,settings:sim.settings,time:sim.C.time,history:sim.populationHistory(),events:sim.events,counters:sim.counters,manualDeathRemovals:sim.manualDeathRemovals,deaths:sim.deathSummary(),deathHistory:sim.deathHistory,lineage:sim.lineage,cells:sim.snapshot().cells};
     else if(command==='snapshot')value={time:sim.C.time,cells:sim.live().length};
     else throw Error('Unknown command: '+command);
     if(['seed','sprinkle','divide'].includes(command))sim.record();

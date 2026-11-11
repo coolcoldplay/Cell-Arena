@@ -242,3 +242,7 @@ node scripts/benchmark-render-pair.mjs <baseline-commit>
 证据与数值假设分开列在 [BIOLOGY_REFERENCES.md](BIOLOGY_REFERENCES.md)，包含本轮每个新生物学控件的来源和适用边界。
 
 - `node scripts/check-history-cleanup.mjs dist/index.html`：独立 Chrome 配置验证跨页多选、批量清理／仅保留、删除事务失败回滚、并发归档保护、原局号、分钟时间、CSV、刷新持久化、自动换局偏好与手机布局。
+
+## 血管、灌注与跨内皮运动
+
+已加入真实内皮胞体围成的空心血管、有限氧糖供给与酸清除、健康组织耦合的循环免疫补充、连续跨内皮运动、肿瘤入血离场，以及有限代内皮修复。内皮单独统计，入血离场不算死亡或已形成远处转移。参数、公式、文献和使用方法见 [血管模型说明](VASCULAR.md)。

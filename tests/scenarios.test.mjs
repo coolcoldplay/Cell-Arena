@@ -1,3 +1,4 @@
+import {assertConfluentTissue} from './vascular-layout-helper.mjs';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -15,7 +16,7 @@ test('guided scenarios start from honest phenotypes and retain intended immune p
     assert.equal(cold.scenarioReport().initial.immune,3);assert.equal(hot.scenarioReport().initial.immune,18);
     assert.equal(cold.scenarioReport().initial.tumor,19);assert.equal(hot.scenarioReport().initial.tumor,37);assert.equal(hot.scenarioReport().initial.antigenPositive,37);
     assert.ok(cold.supplyMap.every(v=>v===1));assert.ok(hot.supplyMap.every(v=>v===1));assert.ok(hot.live().every(m=>hot.section.fits(m,m.nucleusX,m.nucleusY)));
-    for(const s of [a,cold,hot]){assert.ok(s.snapshot().grid.every(id=>id>0),'tissue must fill the dish without an empty moat around the lesion');assert.ok(s.live().every(m=>s.section.fits(m,m.nucleusX,m.nucleusY)));}
+    for(const s of [a,cold,hot]){assertConfluentTissue(s);assert.ok(s.live().every(m=>s.section.fits(m,m.nucleusX,m.nucleusY)));}
   }
 });
 
@@ -52,14 +53,14 @@ test('turning off metabolism or both independent initiation pathways prevents sc
 });
 
 test('cold tumor spreads and divides beyond the original lesion using existing mechanics',async()=>{
-  const s=await make('cold');for(let t=0;t<3000&&!s.scenarioReport().achieved;t+=250)s.advance(250);const report=s.scenarioReport();assert.equal(report.initial.immune,3);assert.ok(report.tumor>report.initial.tumor);assert.ok(report.farTumor>0);assert.ok(report.distalDivisions>0);assert.ok(report.achieved);assert.equal(s.snapshot().orphans,0);
+  const s=await make('cold');for(let t=0;t<5000&&!s.scenarioReport().achieved;t+=250)s.advance(250);const report=s.scenarioReport();assert.equal(report.initial.immune,3);assert.ok(report.tumor>report.initial.tumor);assert.ok(report.farTumor>0);assert.ok(report.distalDivisions>0);assert.ok(report.achieved);assert.equal(s.snapshot().orphans,0);
   const before=report.farTumor;const id=s.seed(2,4*s.scale,4*s.scale,3*s.scale);if(id){assert.ok(!report.initial.clones.includes(s.cells[id].clone));assert.equal(s.scenarioReport().farTumor,before,'unrelated manual seeds are not scored as primary-clone spread');}
 });
 
 test('hot tumor clearance requires real killing and an observation interval; living or dying targets prevent success',async()=>{
   const s=await make('hot');for(let elapsed=0;elapsed<4500&&!s.scenarioReport().achieved;elapsed+=250)s.advance(250);const report=s.scenarioReport();assert.equal(s.counters.kills,37+report.tumorDivisions);assert.equal(s.deathHistory.filter(d=>d.kind===2&&d.cause==='environment').length,0,'tumors clear through immune killing, not environmental death');assert.equal(s.counters.apoptosis,0);assert.equal(report.tumorBodies,0);assert.ok(report.achieved);assert.ok(report.clearanceElapsed>=150);assert.ok(s.counters.recognitions>0);assert.ok(s.counters.immuneDivisions>0);assert.ok(s.live().filter(m=>m.kind===3).every(m=>m.divisionsLeft>=0));
   let id=0;for(let y=5*s.scale;y<s.height-5*s.scale&&!id;y+=10*s.scale)for(let x=5*s.scale;x<s.width-5*s.scale&&!id;x+=10*s.scale)id=s.seed(2,x,y,3*s.scale);assert.ok(id);assert.equal(s.scenarioReport().achieved,false);s.updateScenarioState();assert.equal(s.scenarioReport().clearanceAt,null);s.beginDeath(id,'kill');assert.equal(s.scenarioReport().achieved,false);
-  const control=await make('hot',{kill:0});control.advance(1500);assert.equal(control.counters.kills,0);assert.ok(control.scenarioReport().tumorBodies>37);assert.equal(control.scenarioReport().achieved,false);
+  const control=await make('hot',{kill:0});control.advance(2000);assert.equal(control.counters.kills,0);assert.ok(control.scenarioReport().tumorBodies>37);assert.equal(control.scenarioReport().achieved,false);
 });
 
 test('reporting is read-only and preset restoration has no parameter leakage',async()=>{
@@ -79,7 +80,7 @@ test('acquired antigen loss in a hot tumor can survive early clearance and be in
   const random=s.C.random;try{s.C.random=()=>0;s.evolutionStep(survivor,4);}finally{s.C.random=random;}
   assert.equal(survivor.antigen,false);
   let nadir=37;
-  for(let t=0;t<2500;t+=250){s.advance(250);nadir=Math.min(nadir,s.scenarioReport().tumor);}
+  for(let t=0;t<5000;t+=250){s.advance(250);nadir=Math.min(nadir,s.scenarioReport().tumor);}
   const remaining=s.live().filter(m=>m.kind===2&&!m.dying);
   assert.ok(s.counters.kills>30,'real immune contact must first reduce the lesion');
   assert.ok(s.counters.antigenEscapes>0);assert.ok(remaining.filter(m=>!m.antigen).length>1,'antigen-loss phenotype is inherited by an expanding lineage');
