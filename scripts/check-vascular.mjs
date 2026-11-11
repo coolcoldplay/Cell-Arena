@@ -23,6 +23,14 @@ try{
   check('Vascular English statistics contain no Chinese fragments',await b.evaluate('!/[\\p{Script=Han}]/u.test(document.getElementById("vascular-statistics").textContent)'));
   await b.evaluate('document.getElementById("language").click();artistooLab.setTool("inspect")');
   await b.call('Input.dispatchMouseEvent',{type:'mouseMoved',x:300,y:250});await wait('!document.getElementById("field-probe").hidden');
+  for(const [i,tool]of ['move','seed','wall','remove','signal'].entries()){
+    check(tool+' immediately hides location information',await b.evaluate(`(()=>{document.querySelector('[data-tool="${tool}"]').click();return document.getElementById('field-probe').hidden;})()`));
+    await b.call('Input.dispatchMouseEvent',{type:'mouseMoved',x:310+i,y:250});await delay(150);
+    check(tool+' keeps location information hidden while moving',await b.evaluate('document.getElementById("field-probe").hidden'));
+    if(tool==='remove')check('Eraser keeps its brush preview',await b.evaluate('!document.getElementById("brush-preview").hidden'));
+    await b.evaluate('document.querySelector("[data-tool=inspect]").click()');
+    await b.call('Input.dispatchMouseEvent',{type:'mouseMoved',x:320+i,y:250});await wait('!document.getElementById("field-probe").hidden');
+  }
   await delay(10500);check('Unmoved pointer hides probe after ten seconds',await b.evaluate('document.getElementById("field-probe").hidden'));
   await b.call('Input.dispatchMouseEvent',{type:'mouseMoved',x:302,y:251});await wait('!document.getElementById("field-probe").hidden');check('Moving restores probe',true);
   await b.evaluate('document.getElementById("arena-fullscreen").click()');await wait('document.body.classList.contains("arena-fullscreen")');
