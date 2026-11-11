@@ -8,6 +8,7 @@ async function wait(expr){for(let i=0;i<300;i++){if(await b.evaluate(expr))retur
 async function shot(name){await b.evaluate('artistooLab.render()');await delay(60);const r=await b.call('Page.captureScreenshot',{format:'png'});await writeFile(out+'/'+name+'.png',Buffer.from(r.data,'base64'));}
 try{
   await wait('!!window.artistooLab?.snapshot');await b.evaluate('artistooLab.ready');await b.evaluate('artistooLab.rpc("playing",{value:false})');
+  await b.evaluate('CellLabAppearance.ready');check('Compiled optical kernel loads in the production browser',await b.evaluate('CellLabAppearance.accelerated'));
   check('Default preview enables shape-aware translucency on WebGL2',await b.evaluate(`document.getElementById('body-feather').value==='80'&&artistooLab.renderer.gpu&&!artistooLab.renderer.error`),{renderer:await b.evaluate('artistooLab.renderer')});
   await b.evaluate(`document.getElementById('clear-overlays').click();document.getElementById('cycle-marks').checked=false;document.getElementById('antigen-marks').checked=false;document.getElementById('module-display').open=true;document.getElementById('module-colors').open=true;`);
   await shot('confluent-gradient');
@@ -78,7 +79,7 @@ try{
   check('Context loss retains the same silhouette-based opacity in Canvas2D pixels',!fallback.gpu&&fallback.samples>50&&fallback.maxError<=1,fallback);
   await shot('canvas-fallback');
   await b.call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:2,mobile:true});
-  await b.evaluate(`document.getElementById('language').value='en';document.getElementById('language').dispatchEvent(new Event('change'));document.getElementById('mobile-expand').click();const e=document.getElementById('body-feather');for(let p=e.parentElement;p;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;e.scrollIntoView({block:'center'});`);await delay(150);
+  await b.evaluate(`document.getElementById('language').value='en';document.getElementById('language').dispatchEvent(new Event('change'));document.querySelector('[data-panel="display-panel"]').click();const e=document.getElementById('body-feather');for(let p=e.parentElement;p;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;e.scrollIntoView({block:'center'});`);await delay(150);
   check('Mobile appearance slider is visible, translated and fits the panel',await b.evaluate(`document.getElementById('body-feather').checkVisibility()&&document.getElementById('body-feather').closest('label').textContent.includes('Edge translucency')&&document.documentElement.scrollWidth<=392`));await shot('mobile-control');
   check('No browser or simulation errors',!b.errors.length&&await b.evaluate('artistooLab.errors.length===0'),{errors:b.errors});
 }catch(error){checks.push({passed:false,error:String(error)});console.error(error);process.exitCode=1;await shot('failure');}

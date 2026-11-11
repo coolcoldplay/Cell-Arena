@@ -21,6 +21,7 @@ async function fixture(t){
   await mkdir(join(root,'scripts'));await mkdir(join(root,'build'));
   await copyFile(join(repo,'scripts/build.mjs'),join(root,'scripts/build.mjs'));
   await copyFile(join(repo,'build/cpm-kernel.wasm'),join(root,'build/cpm-kernel.wasm'));
+  for(const ext of ['wasm','meta.json'])await copyFile(join(repo,'build/appearance-kernel.'+ext),join(root,'build/appearance-kernel.'+ext));
   const source=(await readFile(join(root,'src/cpm-kernel.c'),'utf8')).replace(/\r\n/g,'\n');
   const meta=JSON.parse(await readFile(join(repo,'build/cpm-kernel.meta.json'),'utf8'));
   meta.sourceSHA256=sha(source);
@@ -51,4 +52,11 @@ test('Normalizing line endings still rejects a mismatched WASM artifact',async t
   const {root}=await fixture(t),file=join(root,'build/cpm-kernel.wasm'),binary=await readFile(file);
   binary[binary.length-1]^=1;await writeFile(file,binary);
   const result=build(root);assert.notEqual(result.status,0);assert.match(result.stderr,/WASM source\/binary mismatch/);
+});
+
+test('Appearance kernel must match its source before publication',async t=>{
+  const {root}=await fixture(t),file=join(root,'src/appearance-kernel.c'),source=await readFile(file,'utf8');
+  await writeFile(file,source.replace(/\r?\n/g,'\r\n'));assert.equal(build(root).status,0);
+  await writeFile(file,source+'\n/* changed */\n');const result=build(root);
+  assert.notEqual(result.status,0);assert.match(result.stderr,/Appearance WASM source\/binary mismatch/);
 });

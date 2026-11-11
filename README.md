@@ -207,9 +207,9 @@ npm run benchmark
 
 ## 大画布性能与复测
 
-内部格点的邻接关系在 WASM 中直接计算，仅边界保留查表；成功复制仍按原顺序调用 Artistoo 记账，完整保留形变、核区、真实接触、微环境与细胞周期。高分辨率快照采用分块转置，WASM 额外加速栅格打包；JS 回退提供相同结果。绘图复用 GPU 纹理，抗原细线直接在 GPU 中沿膜边绘制。
+内部格点的邻接关系在 WASM 中直接计算，仅边界保留查表；成功复制按原顺序维护体积、Act、占据和巡逻，已由 WASM 算完的周长／边界直接导入，避免 JS 重算。额外像素监听器自动使用完整回放。完整保留形变、核区、真实接触、微环境与细胞周期。高分辨率快照采用分块转置，WASM 额外加速栅格打包；JS 回退提供相同结果。绘图复用 GPU 纹理，抗原细线直接在 GPU 中沿膜边绘制。
 
-Arena 最多每秒推送 60 张新状态，自动帧最多两张在途；渲染忙时合并显示更新，模拟继续计算。侧栏和全程曲线按性能模式以最多 4–8 Hz 更新，交互过载时进一步放缓，用户操作立即刷新；不可见的图表不持续重绘。胞核轮廓按当前快照缓存，并按颜色合并路径绘制，周期边界仅绘制可见副本；每颗核的形变和独立颜色仍保留。完整历史与实验导出不降采样。
+Arena 最多每秒推送 60 张新状态，自动帧最多两张在途；绝对截止时刻保持发布节奏，避免慢模型步与打包时间叠加后意外丢失一半帧率。渲染忙时合并显示更新，模拟继续计算。侧栏和全程曲线按性能模式以最多 4–8 Hz 更新，交互过载时进一步放缓，用户操作立即刷新；不可见的图表不持续重绘。胞核按颜色分批，每条路径最多 32 个轮廓，避免 Chromium 大路径构建成本；形变、颜色和周期边界副本不变。渐变距离场使用独立、只读的 WASM 内核，透明度逐字节匹配 JS，加载失败保留 JS 回退。它不更改物理格点或随机数，48 MiB 线性内存与 128 MiB 形变内存分离。完整历史与实验导出不降采样。
 
 「其他 → 性能与计算」新增实际画面更新 FPS、绘制与打包耗时。FPS 只计展示过的新模型时刻，不计重复重绘；1× 仍是 30 MCS/秒，高倍率受实际计算能力限制，最大格点密铺不能保证 60 FPS。不会自动降低物理分辨率或冻结增殖。
 
@@ -223,6 +223,9 @@ npm run test:adaptive
 npm run test:history
 npm run test:support-nuclei
 npm run benchmark:adaptive -- current
+node scripts/benchmark-large-arena.mjs current dist/index.html 1.5
+node --expose-gc scripts/benchmark-kernel-pair.mjs <baseline-commit> 40 6
+node scripts/benchmark-render-pair.mjs <baseline-commit>
 ```
 
 前者输出固定种子的状态指纹和分项耗时；加 `--baseline=<commit>` 可从 Git 读取旧代码与 WASM 二进制对照，加 `--profile` 生成 CPU profile。后者在本机 Chrome 中以 2560×1920 显示真实培养层，分别测量 1× / 8× 的新画面更新率、MCS/秒和长帧。原始结果保存在忽略提交的 `output/performance/`，本次结论见 `CHECK_RESULTS.md`。

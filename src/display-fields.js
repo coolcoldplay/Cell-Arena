@@ -147,15 +147,19 @@
     }
     nucleusBatches(s,palette){
       if(this.nuclearPathSnapshot===s&&this.nuclearPalette===palette)return this.nuclearPaths;
-      const contours=this.nuclei(s),groups=new Map(),wrap=s.boundary==='wrap';
+      const contours=this.nuclei(s),groups=new Map(),batches=[],wrap=s.boundary==='wrap';
       for(const m of s.cells){const contour=contours.get(m.id);if(!contour)continue;
         const style=m.dying?{stroke:'#89531a',fill:'#ffe6a640'}:nucleusStyle(m,palette),key=style.stroke+style.fill;
-        if(!groups.has(key))groups.set(key,{...style,path:new Path2D()});const path=groups.get(key).path;
         const cx=m.nucleusX+.5,cy=m.nucleusY+.5,r=Math.max(...contour.map(p=>Math.max(Math.abs(p[0]),Math.abs(p[1]))))+1;
         const xs=[0],ys=[0];if(wrap){if(cx-r<0)xs.push(s.width);if(cx+r>s.width)xs.push(-s.width);if(cy-r<0)ys.push(s.height);if(cy+r>s.height)ys.push(-s.height);}
-        for(const dx of xs)for(const dy of ys){contour.forEach(([x,y],i)=>{i?path.lineTo(cx+dx+x,cy+dy+y):path.moveTo(cx+dx+x,cy+dy+y);});path.closePath();}
+        for(const dx of xs)for(const dy of ys){
+          // Chromium's closePath cost grows with an accumulating multi-contour
+          // path. Bound its size, retaining all points, colors and seam copies.
+          let batch=groups.get(key);if(!batch||batch.count===32){batch={...style,path:new Path2D(),count:0};groups.set(key,batch);batches.push(batch);}
+          const path=batch.path;contour.forEach(([x,y],i)=>{i?path.lineTo(cx+dx+x,cy+dy+y):path.moveTo(cx+dx+x,cy+dy+y);});path.closePath();batch.count++;
+        }
       }
-      this.nuclearPathSnapshot=s;this.nuclearPalette=palette;return this.nuclearPaths=[...groups.values()];
+      this.nuclearPathSnapshot=s;this.nuclearPalette=palette;return this.nuclearPaths=batches;
     }
     selections(s,ids){
       const key=ids.join(',');if(this.boxSnapshot!==s||this.boxKey!==key){this.boxSnapshot=s;this.boxKey=key;this.boxes=selectionBoxes(s,ids);}return this.boxes;

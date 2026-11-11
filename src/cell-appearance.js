@@ -6,7 +6,14 @@
 (() => {
   'use strict';
   const INF=1e9,DIAGONAL=Math.SQRT2;
+  let native=null;
+  async function install(bytes){
+    const {instance}=await WebAssembly.instantiate(bytes),e=instance.exports,buffer=e.memory.buffer;
+    native={e,grid:new Uint16Array(buffer,e.pointer(0),1048576),live:new Uint8Array(buffer,e.pointer(1),65536),fade:new Float32Array(buffer,e.pointer(2),65536),depth:new Float32Array(buffer,e.pointer(3),1048576),interior:new Uint8Array(buffer,e.pointer(4),1048576)};
+  }
+  const ready=typeof CELL_LAB_APPEARANCE_WASM==='string'?install(Uint8Array.from(atob(CELL_LAB_APPEARANCE_WASM),c=>c.charCodeAt(0))).catch(()=>{}):Promise.resolve();
   class Surface {
+    constructor({accelerated=true}={}){this.accelerated=accelerated;}
     get(s){
       if(this.snapshot===s)return this.layer;
       const {width:w,height:h,grid}=s,n=w*h,wrap=s.boundary==='wrap';
@@ -20,6 +27,13 @@
       const {depth,interior,live,maxDepth,fadeWidth}=this;
       live.fill(0);maxDepth.fill(0);fadeWidth.fill(0);let radius=1;
       for(const c of s.cells)if(c.kind>0&&c.kind<4){live[c.id]=1;fadeWidth[c.id]=Math.max(1,.85*Math.sqrt(c.area/Math.PI));radius=Math.max(radius,fadeWidth[c.id]);}
+      const pad=wrap?Math.ceil(radius/8)*8+2:0,px=Math.min(w,pad),py=Math.min(h,pad),pw=w+2*px,ph=h+2*py;
+      if(this.accelerated&&native&&n<=1048576&&w>1&&h>1){
+        native.grid.set(grid);native.live.set(live);native.fade.set(fadeWidth);
+        native.e.render(w,h,wrap?1:0,px,py);
+        depth.set(native.depth.subarray(0,n));interior.set(native.interior.subarray(0,n));
+        this.snapshot=s;return this.layer={width:w,height:h,interior};
+      }
       for(let y=0;y<h;y++){
         const start=y*w,up=y?start-w:wrap?(h-1)*w:-1,down=y<h-1?start+w:wrap?0:-1;
         for(let x=0;x<w;x++){
@@ -29,7 +43,6 @@
         }
       }
       // Bucket padding sizes so modest growth does not reallocate the work grid.
-      const pad=wrap?Math.ceil(radius/8)*8+2:0,px=Math.min(w,pad),py=Math.min(h,pad),pw=w+2*px,ph=h+2*py;
       if(this.paddedWidth!==pw||this.paddedHeight!==ph){this.paddedWidth=pw;this.paddedHeight=ph;this.work=new Float32Array(pw*ph);}
       const d=this.work;
       for(let y=0;y<ph;y++){
@@ -66,16 +79,16 @@
     }
     refined(s){
       const {width:w,height:h,grid}=s,cw=w/2,ch=h/2;
-      if(!this.coarse)this.coarse=new Surface();
+      if(!this.coarse)this.coarse=new Surface({accelerated:this.accelerated});
       if(this.coarseGrid?.length!==cw*ch)this.coarseGrid=new Uint16Array(cw*ch);
       for(let y=0;y<ch;y++)for(let x=0;x<cw;x++)this.coarseGrid[y*cw+x]=grid[(2*y+1)*w+2*x+1];
       const layer=this.coarse.get({width:cw,height:ch,grid:this.coarseGrid,cells:s.cells.map(c=>({id:c.id,kind:c.kind,area:c.area/4})),boundary:s.boundary});
       this.snapshot=s;return this.layer={...layer,scale:2};
     }
     full(s){
-      if(this.fullSnapshot!==s){this.fullSnapshot=s;if(!this.fullCache)this.fullCache=new Surface();this.fullLayer=this.fullCache.get({...s,refinement:1});}
+      if(this.fullSnapshot!==s){this.fullSnapshot=s;if(!this.fullCache)this.fullCache=new Surface({accelerated:this.accelerated});this.fullLayer=this.fullCache.get({...s,refinement:1});}
       return this.fullLayer;
     }
   }
-  globalThis.CellLabAppearance={Surface};
+  globalThis.CellLabAppearance={Surface,install,ready,get accelerated(){return !!native;}};
 })();

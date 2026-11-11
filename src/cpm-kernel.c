@@ -1,7 +1,8 @@
 /* Sequential Artistoo copy loop specialized for this project's constraints.
  * No checkerboard approximation, skipped attempts, or parallel cell writes.
  * Double arithmetic, MT19937 and accepted-copy order match the JS reference.
- * JS replays accepted copies through Artistoo's original bookkeeping hooks. */
+ * JS replays ordered activity/occupancy hooks and imports completed boundary
+ * bookkeeping; arbitrary additional listeners retain the full replay path. */
 typedef unsigned int u32;
 typedef unsigned short u16;
 typedef unsigned char u8;
@@ -32,6 +33,8 @@ __attribute__((export_name("init"))) void init(int w,int h,int wr,int bits,int n
 static inline int ring_at(int i,int k){return interior[i]?i+ring_offsets[k]:rings[i*8+k];}
 static inline int neighbor_at(int i,int k){return interior[i]?i+neighbor_offsets[k]:neighbors[i*8+k];}
 __attribute__((export_name("geometry_version"))) int geometry_version(){return 1;}
+__attribute__((export_name("border_count"))) int border_count(){return count;}
+__attribute__((export_name("border_index"))) u32 border_index(){return(u32)where;}
 // Read-only projection of the current lattice, never a model step or an RNG
 // consumer. The bridge copies the result into detached transferable snapshots.
 __attribute__((export_name("raster"))) void raster(){

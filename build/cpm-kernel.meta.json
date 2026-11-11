@@ -1,12 +1,13 @@
 {
-  "sourceSHA256": "3cb62e8f44d0ee2f298bdda6e0d3f39c3b7fddcf6438b599cf6e52711fbc82f2",
-  "wasmSHA256": "0250009a7d6b2386c0d755c267c371494fb423d0d00c7c35cc5416e8e4fc1a48",
+  "sourceSHA256": "dacd7623fae434c7b731230ecd7447ec8e2a2cd203021763626628c33f512945",
+  "wasmSHA256": "b37e4a4e531eaa9cc4b9d5f68694f4410b1432c6b02d8fbdbf90221eac317af8",
   "compiler": "WASI SDK 20 / Clang 16",
   "flags": [
     "--target=wasm32",
     "-O3",
     "-ffp-contract=off",
     "-fno-fast-math",
+    "-mbulk-memory",
     "-nostdlib",
     "-Wl,--no-entry",
     "-Wl,--export-memory",

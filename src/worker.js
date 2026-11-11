@@ -19,7 +19,12 @@ function sendSnapshot(interactive=false){
   data.snapshotMs=performance.now()-begin;
   data.stepMs=stepMs;data.presentation={...presentation};
   const transfers=[data.grid.buffer,data.activity.buffer,data.walls.buffer,data.fieldMask.buffer,...Object.values(data.fields).map(f=>f.values.buffer)];
-  postMessage({type:'snapshot',frame:++frameSerial,interactive,data},transfers);lastSnapshot=performance.now();lastPublishedTime=sim.C.time;
+  postMessage({type:'snapshot',frame:++frameSerial,interactive,data},transfers);
+  // Keep an absolute publication cadence. Resetting the clock after packing
+  // turned a 25 ms MCS into one image every two steps at a 30 FPS limit.
+  // Missed deadlines are discarded, never queued; physics still advances whole MCS.
+  const done=performance.now(),period=1000/presentation.fps;
+  lastSnapshot=interactive?done:done-(done-lastSnapshot)%period;lastPublishedTime=sim.C.time;
 }
 function resetClock(){clock.reset();pendingSteps=0;previous=performance.now();lastMeasure=previous;measuredSteps=0;rate=0;limited=false;stepMs=0;}
 function respond(id,value){if(id)postMessage({type:'response',id,value});}

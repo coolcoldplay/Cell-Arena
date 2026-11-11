@@ -1,0 +1,21 @@
+{
+  "sourceSHA256": "e8669ea8e4f71e8d3ff7c2fcf41eb5fad77a71ae0c7fac34e25043102bb69d5b",
+  "wasmSHA256": "6f0ab7073fa6cdc60621664c8e7e9ba6ca0378704d3a8645148e261128fd99c5",
+  "compiler": "WASI SDK 20 / Clang 16",
+  "flags": [
+    "--target=wasm32",
+    "-O3",
+    "-ffp-contract=off",
+    "-fno-fast-math",
+    "-mbulk-memory",
+    "-nostdlib",
+    "-Wl,--no-entry",
+    "-Wl,--export-memory",
+    "-Wl,--initial-memory=50331648",
+    "-Wl,--max-memory=50331648",
+    "-Wl,-z,stack-size=65536",
+    "src/appearance-kernel.c",
+    "-o",
+    "build/appearance-kernel.wasm"
+  ]
+}

@@ -41,6 +41,27 @@
       return Math.pow(product,1/n);
     };
     act.deltaH=(src,tgt,a,b)=>{const m=cells[a||b];if(!m?.activity)return 0;return m.activity*(act.activityAt(tgt)-act.activityAt(src))/C.conf.MAX_ACT[m.kind];};
+    // Border membership and perimeter bookkeeping visit exactly the same
+    // neighbours after a copy. Fuse those visits, preserving DiceSet order and
+    // the original setpixi volume, activity, occupancy and patrol listeners.
+    const perimeterListener=setListeners.indexOf(perimeter),perimeters=perimeter.cellperimeters,degree=C._neighbours,border=C.borderpixels;
+    C.post_setpix_listeners.splice(perimeterListener,1);
+    C.updateborderneari=(i,old,id)=>{
+      if(old===id)return;
+      const ns=neighbors[i],was=degree[i]>0;let next=0,previous=0;
+      for(let k=0;k<ns.length;k++){
+        const j=ns[k],nt=grid[j];
+        if(nt!==id)next++;if(nt!==old)previous++;
+        if(nt===old){if(degree[j]++===0)border.insert(j);if(nt)perimeters[nt]++;}
+        if(nt===id){if(--degree[j]===0)border.remove(j);if(nt)perimeters[nt]--;}
+      }
+      degree[i]=next;if(!was&&next>0)border.insert(i);if(was&&next===0)border.remove(i);
+      if(old)perimeters[old]-=previous;
+      if(id){if(!(id in perimeters))perimeters[id]=0;perimeters[id]+=next;}
+    };
+    // Only these known listeners (Act plus occupancy/patrol) may be replayed
+    // before importing final WASM borders. Additional observers use full replay.
+    sim.fastCopyState={listeners:C.post_setpix_listeners.slice(),setpixi:C.setpixi,updateborder:C.updateborderneari};
     sim.kernel='fast';
   }
   globalThis.CellLabFast={install};

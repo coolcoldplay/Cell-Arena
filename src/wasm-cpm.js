@@ -1,6 +1,8 @@
 /* WASM executes the exact sequential proposal loop; Artistoo owns the state.
  * Kernel provenance and MIT / MT19937 BSD notices: cpm-kernel.NOTICE and
- * ../THIRD_PARTY_NOTICES.md. This file bridges the port to Artistoo hooks. */
+ * ../THIRD_PARTY_NOTICES.md. DiceSet insert/swap-remove and setpixi bookkeeping
+ * below adapt Artistoo (c) 2019 Johannes Textor & Inge Wortel, MIT: ../vendor/LICENSE.
+ * Ordered activity/occupancy hooks remain in JS; completed borders import once. */
 (() => {
   'use strict';
   const stride=32,MAX_SITES=1048576,BONDS=131072,SEGMENTS=262144;
@@ -53,10 +55,42 @@
       this.params[31]=this.bondSlots.length?1:0;
       this.params[32]=s.settings.tumorMorphology===2?1:0;
     }
+    installBorderIndex(){
+      const C=this.s.C,border=C.borderpixels,indices=new Int32Array(C.grid._pixels.length);indices.fill(-1);
+      for(let k=0;k<border.length;k++)indices[border.elements[k]]=k;
+      // Exact DiceSet insert/swap-remove ordering, using dense integer keys.
+      // Keep a JS-owned index: a trapped WASM run cannot corrupt the fallback.
+      border.indices=indices;
+      border.contains=v=>indices[v]>=0;
+      border.insert=v=>{if(indices[v]>=0)return;indices[v]=border.length++;border.elements.push(v);};
+      border.remove=v=>{const slot=indices[v];if(!(slot>=0))return;indices[v]=-1;const last=border.elements.pop();border.length--;if(last!==v){border.elements[slot]=last;indices[last]=slot;}};
+      this.borderIndex=new Int32Array(this.e.memory.buffer,this.e.border_index(),this.length);
+    }
+    canImportBookkeeping(){
+      const C=this.s.C,known=this.s.fastCopyState;
+      return !!this.e.border_count&&known&&C.setpixi===known.setpixi&&C.updateborderneari===known.updateborder&&C.post_setpix_listeners.length===known.listeners.length&&known.listeners.every((listener,i)=>C.post_setpix_listeners[i]===listener);
+    }
+    commit(n){
+      const s=this.s,C=s.C,grid=C.grid._pixels,volumes=C.cellvolume,listeners=C.post_setpix_listeners;
+      for(let k=0;k<n;k++){
+        const i=this.log[k*2],id=this.log[k*2+1],old=grid[i];if(old===id)continue;
+        if(old&&--volumes[old]===0){delete volumes[old];delete C.t2k[old];C.nr_cells--;}
+        grid[i]=id;if(id)volumes[id]++;
+        // Preserve floating-point moment summation and field-bin update order.
+        // In particular, transient immune visits must still count as patrol.
+        for(const listener of listeners)listener(i,old,id);
+      }
+      C._neighbours.set(this.degree);
+      const border=C.borderpixels,length=this.e.border_count();border.length=length;border.elements.length=length;
+      for(let i=0;i<length;i++)border.elements[i]=this.pool[i];border.indices.set(this.borderIndex);
+      const perimeters=C.getConstraint('PerimeterConstraint').cellperimeters;
+      for(const id of this.previous)if(this.cells[id*stride])perimeters[id]=this.cells[id*stride+4];
+    }
     step(){
-      const C=this.s.C;let n;try{this.sync();n=this.e.run(C.borderpixels.length);}catch(e){this.s.kernel='fast';this.s.kernelNote='WASM 回退：'+String(e);C.timeStep=this.original;this.s.scanContacts=this.originalContacts;this.original();return;}
+      const C=this.s.C,bulk=this.canImportBookkeeping();if(bulk&&!this.borderIndex)this.installBorderIndex();
+      let n;try{this.sync();n=this.e.run(C.borderpixels.length);}catch(e){this.s.kernel='fast';this.s.kernelNote='WASM 回退：'+String(e);C.timeStep=this.original;this.s.scanContacts=this.originalContacts;this.original();return;}
       C.mt.mt.set?C.mt.mt.set(this.mt.subarray(0,624)):this.mt.subarray(0,624).forEach((v,i)=>C.mt.mt[i]=v);C.mt.mti=this.mt[624];
-      for(let k=0;k<n;k++)C.setpixi(this.log[k*2],this.log[k*2+1]);
+      if(bulk)this.commit(n);else for(let k=0;k<n;k++)C.setpixi(this.log[k*2],this.log[k*2+1]);
       C.time++;C.stat_values={};for(const listener of C.post_mcs_listeners)listener();
     }
     contacts(){

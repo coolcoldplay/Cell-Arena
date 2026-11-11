@@ -21,7 +21,21 @@ for(const boundary of ['solid','wrap'])test('WASM matches sequential JS includin
     assert.deepEqual(b.contacts,a.contacts,'ordered contact graph at MCS '+step);
     assert.deepEqual(b.C.grid._pixels,a.C.grid._pixels,'grid at MCS '+step);assert.deepEqual(Uint32Array.from(b.C.mt.mt),Uint32Array.from(a.C.mt.mt),'RNG state');assert.equal(b.C.mt.mti,a.C.mt.mti,'RNG index');
     assert.deepEqual(b.C.borderpixels.elements,a.C.borderpixels.elements,'border ordering');assert.deepEqual(b.C.getConstraint('PerimeterConstraint').cellperimeters,a.C.getConstraint('PerimeterConstraint').cellperimeters);
+    assert.deepEqual(b.C.cellvolume,a.C.cellvolume,'volumes and last-pixel deletion');assert.deepEqual(b.C._neighbours,a.C._neighbours,'membrane degrees');assert.deepEqual(b.act.cellpixelsact,a.act.cellpixelsact,'Act history');
+    for(const i of b.positions)assert.equal(b.C.borderpixels.contains(i),a.C.borderpixels.contains(i),'dense border membership at '+i);
   }
   assert.deepEqual(b.snapshot().cells,a.snapshot().cells);assert.deepEqual(b.counters,a.counters);for(const k of Object.keys(a.fields))assert.deepEqual(b.fields[k].values,a.fields[k].values);
+});
+
+test('unrecognized pixel observers retain complete sequential bookkeeping',async()=>{
+  const options={width:64,height:48,scene:'empty',warmup:0,boundary:'wrap'},a=new CellLab.Simulation(options),b=new CellLab.Simulation(options);
+  for(const s of [a,b]){s.seed(1,20,25,7);s.seed(3,31,25,5);}
+  const w=await CellLabWasm.install(b,module);let commits=0;const commit=w.commit.bind(w);w.commit=n=>{commits++;commit(n);};
+  a.advance(2);b.advance(2);assert.equal(commits,2);
+  const observations=[];
+  for(const s of [a,b]){const rows=[];observations.push(rows);s.C.post_setpix_listeners.push((i,old,id)=>rows.push([i,old,id,s.C._neighbours[i],s.C.borderpixels.length,s.C.getConstraint('PerimeterConstraint').cellperimeters[old]]));}
+  a.advance(5);b.advance(5);assert.deepEqual(observations[1],observations[0]);assert.equal(commits,2,'extra observers disable the bulk commit');
+  for(const s of [a,b])s.C.post_setpix_listeners.pop();
+  a.advance(2);b.advance(2);assert.equal(commits,4);assert.deepEqual(b.snapshot().cells,a.snapshot().cells);assert.deepEqual(b.C.grid._pixels,a.C.grid._pixels);
 });
 

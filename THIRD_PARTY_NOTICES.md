@@ -13,9 +13,9 @@ Cell-Arena 基于 Artistoo 构建。下表说明直接包含、改写／移植�
 | 本项目位置 | 使用方式与来源 |
 |---|---|
 | `vendor/artistoo.js` | 原样包含上游 [`build/artistoo.js`](https://github.com/ingewortel/artistoo/blob/e997d81213a5dcdfc40ad976a18958f412f00cc9/build/artistoo.js)，保留内部原有注释与第三方声明。 |
-| `src/fast-cpm.js` | 对上游 `Adhesion`、`PerimeterConstraint`、`ActivityConstraint` 做等价专门化与存储优化。改编部分保留 Artistoo 来源和 MIT 声明。 |
+| `src/fast-cpm.js` | 对上游 `Adhesion`、`PerimeterConstraint`、`ActivityConstraint` 做等价专门化与存储优化；融合 `CPM.updateborderneari` 与周长更新的邻居遍历。改编部分保留 Artistoo 来源和 MIT 声明。 |
 | `src/cpm-kernel.c`、`build/cpm-kernel.wasm` | 移植／专门化 Artistoo 的顺序 CPM 复制、接受规则、约束能量与状态更新顺序，并加入本项目的核区等约束；随机数部分另见下节。邻接声明见 [`src/cpm-kernel.NOTICE`](src/cpm-kernel.NOTICE)。 |
-| `src/wasm-cpm.js` | 本项目的 WebAssembly 桥接层，将成功复制按原顺序交给 Artistoo 原始状态维护钩子。 |
+| `src/wasm-cpm.js` | WebAssembly 桥接层；改编上游 `DiceSet` 的插入／交换删除及 `CPM.setpixi` 的体积维护。逐次回放 Act、占据和巡逻钩子，批量导入已计算的周长／边界；额外监听器使用完整顺序回放。改编部分保留 Artistoo MIT 署名。 |
 | `src/app.js`、`src/gpu-renderer.js` | Act 活性颜色沿用上游 `Canvas.drawActivityValues` 的绿—黄—红映射，分别用于 Canvas 与 WebGL2 显示。 |
 
 `vendor/artistoo.js` 的 Git blob ID 为 `0ebf46bc3b16ea71eec7093c92070bc944a0c47e`，与上述固定提交的文件一致；SHA-256 为 `cf324da4b8a475853f02bcc842662ade65140132fe11d6db4e034ea17a5ca7e5`。本项目的“内核优化”和“WebAssembly 加速”包含对上游机制与代码的改编，不表示整个 CPM 内核均由本项目原创。
