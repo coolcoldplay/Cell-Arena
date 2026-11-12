@@ -1,5 +1,5 @@
 import vm from 'node:vm';import {readFile,writeFile} from 'node:fs/promises';import {createHash} from 'node:crypto';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'));
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'));
 const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm')),rows=[];
 for(const [worldWidth,refinement] of [[240,1.5],[320,2],[384,2]]){
   let expected='';for(const kernel of ['fast','wasm']){

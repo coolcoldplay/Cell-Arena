@@ -1,6 +1,6 @@
 import vm from 'node:vm';import {readFile,writeFile,mkdir} from 'node:fs/promises';
 const shared=await Promise.all(['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js'].map(f=>readFile(f,'utf8')));
-const contexts={};for(const [name,file] of [['before','output/immune-patrol/model-before.js'],['after','src/model.js']]){const c=vm.createContext({console,performance});vm.runInContext(shared.join('\n')+'\n'+await readFile(file,'utf8'),c);contexts[name]=c;}
+const contexts={};for(const [name,file] of [['before','output/immune-patrol/model-before.js'],['after','src/immune-genetics.js','src/model.js']]){const c=vm.createContext({console,performance});vm.runInContext(shared.join('\n')+'\n'+await readFile(file,'utf8'),c);contexts[name]=c;}
 const module=await WebAssembly.compile(await readFile('build/cpm-kernel.wasm'));
 const distance=(x,y,s)=>Math.hypot(Math.min(Math.abs(x),s.width-Math.abs(x)),Math.min(Math.abs(y),s.height-Math.abs(y)));
 function measure(s){const live=s.live(),n=live.length;let touching=0,nearest=0,radius=0,largest=0;const seen=new Set();

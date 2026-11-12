@@ -1,6 +1,6 @@
 // Descriptive preset validation; paired seeds never select or filter website starts.
 import vm from 'node:vm';import {readFile,writeFile,mkdir} from 'node:fs/promises';import {createHash} from 'node:crypto';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const args=Object.fromEntries(process.argv.slice(2).map(s=>s.replace(/^--/,'').split('='))),scene=args.scene||'oncogenesis',seeds=(args.seeds||'17,77,2026').split(',').map(Number),limits=(args.limits||'10').split(',').map(Number),steps=Number(args.steps||12000);
 const out='output/cycle-stem-presets';await mkdir(out,{recursive:true});const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm'));
 for(const seed of seeds)for(const limit of limits){

@@ -1,7 +1,8 @@
+import {cognateCulture,peptide,receptor,trait} from './cognate-fixture.mjs';
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm'));
-const make=(settings={},options={})=>new CellLab.Simulation({width:80,height:60,scene:'empty',warmup:0,seed:17,settings:{noise:0,metabolism:0,growth:0,apoptosis:0,immuneGrowth:0,...settings},...options});
+const make=(settings={},options={})=>cognateCulture(new CellLab.Simulation({width:80,height:60,scene:'empty',warmup:0,seed:17,settings:{noise:0,metabolism:0,growth:0,apoptosis:0,immuneGrowth:0,...settings},...options}));
 function touchingPair(s,kind=3){const a=s.seed(3,30,25,4),b=s.seed(kind,39,25,4);s.cells[a].px=0;s.cells[a].py=1;s.cells[b].px=1;s.cells[b].py=0;s.scanContacts();assert.ok(s.contacts.get(a).has(b));return [a,b];}
 function fill(s,kind,x,y,w,h){const id=s.C.makeNewCellID(kind),points=[];for(let a=x;a<x+w;a++)for(let b=y;b<y+h;b++){s.C.setpix([a,b],id);points.push(s.C.grid.p2i([a,b]));}s.refreshPositions();assert.ok(s.section.initialize(s.cells[id],points));s.updateMechanics(s.cells[id]);return id;}
 
@@ -28,18 +29,18 @@ test('either local damage or recruitment gradients attract an unrecognized patro
   }
 });
 test('recognition of abnormal or tumor contact is still required for secretion; neighboring immune responders do not relay',()=>{
-  for(const kind of [1,2]){const s=make({kill:0,antigen:100}),target=s.seed(kind,30,25,5),ctl=s.seed(3,40,25,4),peer=s.seed(3,49,25,4);if(kind===1)s.beginAbnormal(target);s.cells[target].antigenLevel=.5;s.cells[target].antigen=true;
+  for(const kind of [1,2]){const s=make({kill:0,antigen:100}),target=s.seed(kind,30,25,5),ctl=s.seed(3,40,25,4),peer=s.seed(3,49,25,4);if(kind===1)s.beginAbnormal(target);peptide(s,s.cells[target],.5);
     s.updateLocal(4);s.updateSignals(4);assert.equal(s.cells[ctl].phase,'scan');assert.equal(s.cells[ctl].recruitment,0);assert.ok(s.fields.trail.values.every(v=>v===0));
     for(let n=0;n<40;n++)s.updateLocal(4);s.updateSignals(4);assert.ok(s.cells[ctl].recruitment>0);assert.ok(s.fields.trail.values.some(v=>v>0));assert.equal(s.cells[peer].recruitment,0);assert.equal(s.cells[peer].activation,0);
   }
 });
 test('peer separation cannot turn a scanning or killing immune cell away from its real antigen contact',()=>{
-  for(const dt of [1,40]){const makeContacts=amount=>{const s=make({immuneSeparation:amount,antigen:100,kill:.5}),t=fill(s,2,20,20,8,16),a=fill(s,3,28,20,8,8),b=fill(s,3,28,28,8,8);s.cells[t].genome.antigen=1;s.applyGenome(s.cells[t]);s.cells[a].px=0;s.cells[a].py=1;s.cells[b].px=1;s.cells[b].py=0;s.updateLocal(dt);return s;};
+  for(const dt of [1,40]){const makeContacts=amount=>{const s=make({immuneSeparation:amount,antigen:100,kill:.5}),t=fill(s,2,20,20,8,16),a=fill(s,3,28,20,8,8),b=fill(s,3,28,28,8,8);peptide(s,s.cells[t],1);s.cells[a].px=0;s.cells[a].py=1;s.cells[b].px=1;s.cells[b].py=0;s.updateLocal(dt);return s;};
     const a=makeContacts(0),b=makeContacts(3);assert.equal(a.cells[2].phase,dt===1?'scan':'kill');assert.deepEqual(a.snapshot().cells.map(c=>[c.px,c.py,c.damage,c.targetID,c.recruitment]),b.snapshot().cells.map(c=>[c.px,c.py,c.damage,c.targetID,c.recruitment]));
   }
 });
 test('new immune daughters need their own antigen recognition before secreting, while activation and division budget still inherit',()=>{
-  const s=make({antigen:100,kill:0}),ctl=fill(s,3,20,20,16,12),target=fill(s,2,36,20,8,12);s.cells[target].genome.antigen=1;s.applyGenome(s.cells[target]);s.updateLocal(20);assert.ok(s.cells[ctl].recruitment>0);
+  const s=make({antigen:100,kill:0}),ctl=fill(s,3,20,20,16,12),target=fill(s,2,36,20,8,12);peptide(s,s.cells[target],1);s.updateLocal(20);assert.ok(s.cells[ctl].recruitment>0);
   const child=s.divide(ctl);assert.ok(child);assert.ok(s.cells[child].activation>0);assert.equal(s.cells[child].divisionsLeft,s.cells[ctl].divisionsLeft);assert.equal(s.cells[child].recruitment,0);
   s.eraseCell(ctl);s.eraseCell(target);s.fields.trail.values.fill(0);s.updateSignals(4);assert.ok(s.fields.trail.values.every(v=>v===0));
 });

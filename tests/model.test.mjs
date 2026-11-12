@@ -1,13 +1,15 @@
+import {cognateCulture,peptide,receptor,trait} from './cognate-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
-const context=vm.createContext({console,performance,Float32Array,Float64Array,Uint8Array,Uint16Array,Uint32Array,Int32Array,Math,Map,Set});
+const context=vm.createContext({structuredClone,console,performance,Float32Array,Float64Array,Uint8Array,Uint16Array,Uint32Array,Int32Array,Math,Map,Set});
 vm.runInContext(await readFile(new URL('../vendor/artistoo.js',import.meta.url),'utf8'),context);
+vm.runInContext(await readFile(new URL('../src/immune-genetics.js',import.meta.url),'utf8'),context);
 const source=await readFile(new URL('../src/model.js',import.meta.url),'utf8').catch(()=>null);
 if(source)vm.runInContext(source,context);
 const library=()=>{assert.ok(context.CellLab,'CellLab model with local communication is available');return context.CellLab;};
-const create=(settings={})=>{const {Simulation}=library();return new Simulation({width:64,height:48,scene:'empty',warmup:0,seed:17,settings:{normalMotility:0,tumorMotility:0,immuneMotility:0,growth:0,apoptosis:0,...settings}});};
+const create=(settings={})=>{const {Simulation}=library();return cognateCulture(new Simulation({width:64,height:48,scene:'empty',warmup:0,seed:17,settings:{normalMotility:0,tumorMotility:0,immuneMotility:0,growth:0,apoptosis:0,...settings}}));};
 const disk=(s,kind,x,y,r=5)=>s.seed(kind,x,y,r);
 test('diffusion is positive, conserves mass without decay, then decays',()=>{
   const {SignalField}=library();const f=new SignalField(16,12,false);f.values[6*16+8]=10;
@@ -32,7 +34,7 @@ test('recognition and damage require present membrane contact and antigen',()=>{
   t.scanContacts();assert.ok(t.contacts.get(target)?.has(immune));
   for(let i=0;i<30;i++)t.updateLocal(4);
   assert.equal(t.cells[target].damage,0);assert.equal(t.counters.recognitions,0);
-  t.cells[target].genome.antigen=1;t.applyGenome(t.cells[target]);for(let i=0;i<80;i++)t.updateLocal(4);
+  peptide(t,t.cells[target],1);for(let i=0;i<80;i++)t.updateLocal(4);
   assert.ok(t.counters.recognitions>0);assert.ok(t.cells[target].dying);assert.equal(t.cells[target].deathCause,'kill');
 });
 test('contact loss stops damage immediately and clears the immune binding',()=>{

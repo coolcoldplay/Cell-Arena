@@ -27,7 +27,7 @@ try{
   check('English mobile support control fits the screen',await b.evaluate(`document.getElementById('normalSupport-label').textContent==='Normal-cell support coupling'&&!/[\u4e00-\u9fff]/.test(document.getElementById('normal-support-status').textContent)&&document.documentElement.scrollWidth<=innerWidth+1`));
   await shot('mobile-support');
   // Compare both numerical backends at a non-unit coupling factor, across walls.
-  const sources=await Promise.all(['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/model.js','src/gpu-fields.js'].map(f=>readFile(f,'utf8')));await b.evaluate(sources.join('\n'));
+  const sources=await Promise.all(['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/immune-genetics.js','src/model.js','src/gpu-fields.js'].map(f=>readFile(f,'utf8')));await b.evaluate(sources.join('\n'));
   const parity=await b.evaluate(`(async()=>{const rows=[];for(const boundary of ['solid','wrap']){
     const options={width:96,height:72,scene:'empty',warmup:0,boundary,settings:{normalSupport:80,supply:2}},a=new CellLab.Simulation(options),s=new CellLab.Simulation(options);
     for(const m of [a,s]){const ids=[15,35,55,75].map(x=>m.seed(1,x,18,5));m.eraseCell(ids[0]);m.eraseCell(ids[1]);m.seed(2,25,48,6);m.seed(3,67,48,4);for(let y=0;y<72;y++)m.paint(46,y,0,false,false);m.rebuildMask();for(const key of ['oxygen','glucose','acid'])for(let i=0;i<m.fields[key].values.length;i++)m.fields[key].values[i]=m.fields[key].blocked[i]?0:.1+(i*17%67)/80;m.prepareEnvironment();}

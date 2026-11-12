@@ -1,0 +1,84 @@
+[
+  {
+    "fixedPopulation": true,
+    "speed": 1,
+    "lattice": [
+      768,
+      576
+    ],
+    "display": [
+      1920,
+      1440
+    ],
+    "antigen": true,
+    "cells": 483,
+    "elapsed": 10008,
+    "renderedFPS": 29.976019184652277,
+    "snapshotFPS": 29.976019184652277,
+    "mcsPerSecond": 29.976019184652277,
+    "frameGapP95": 44.299999952316284,
+    "longTasks": 0,
+    "maxLongTask": 0,
+    "renderer": {
+      "gpu": true,
+      "device": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4050 Laptop GPU (0x000028E1) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "error": "",
+      "ms": 0.30000001192092896,
+      "fps": 29.59455460230127,
+      "renderMs": 6.800000011920929,
+      "snapshotMs": 4.100000023841858
+    },
+    "compute": {
+      "mode": "cpu",
+      "active": "cpu",
+      "reason": "已选择 CPU 微环境；GPU 绘图独立运行。",
+      "cpuMs": 0.45000001788139343,
+      "gpuMs": 3.5750000029802322,
+      "adapter": {
+        "vendor": "nvidia",
+        "fallback": false
+      }
+    }
+  },
+  {
+    "fixedPopulation": true,
+    "speed": 8,
+    "lattice": [
+      768,
+      576
+    ],
+    "display": [
+      1920,
+      1440
+    ],
+    "antigen": true,
+    "cells": 483,
+    "elapsed": 10017,
+    "renderedFPS": 36.637715882998904,
+    "snapshotFPS": 36.637715882998904,
+    "mcsPerSecond": 38.13517021064191,
+    "frameGapP95": 34.30000001192093,
+    "longTasks": 0,
+    "maxLongTask": 0,
+    "renderer": {
+      "gpu": true,
+      "device": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4050 Laptop GPU (0x000028E1) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "error": "",
+      "ms": 0.5999999642372131,
+      "fps": 36.24608150427891,
+      "renderMs": 8,
+      "snapshotMs": 6.300000011920929
+    },
+    "compute": {
+      "mode": "cpu",
+      "active": "cpu",
+      "reason": "已选择 CPU 微环境；GPU 绘图独立运行。",
+      "cpuMs": 0.45000001788139343,
+      "gpuMs": 3.5750000029802322,
+      "adapter": {
+        "vendor": "nvidia",
+        "fallback": false
+      }
+    }
+  }
+]

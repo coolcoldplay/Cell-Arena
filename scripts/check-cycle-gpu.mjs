@@ -10,7 +10,7 @@ try{
   await browser.evaluate('(async()=>{await artistooLab.ready;await artistooLab.rpc("playing",{value:false});await artistooLab.rpc("start",{scene:"empty",worldWidth:128,worldHeight:96,warmup:0});await artistooLab.rpc("backend",{mode:"gpu"});await artistooLab.rpc("seed",{kind:2,x:35,y:48});await artistooLab.rpc("seed",{kind:3,x:90,y:48});await artistooLab.rpc("source",{type:"il2",x:90,y:48,radius:12});await artistooLab.rpc("advance",{steps:80});})()');
   const worker=await browser.evaluate('({compute:artistooLab.snapshot.compute,time:artistooLab.snapshot.time,cycles:artistooLab.snapshot.cycles,il2:Math.max(...artistooLab.snapshot.fields.il2.values)})');
   check('Worker advances cycles and IL-2 with real WebGPU metabolism',worker.compute.active==='gpu'&&worker.time===80&&worker.il2>0&&worker.cycles.immune.G0===1,worker);
-  const sources=await Promise.all(['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/model.js','src/gpu-fields.js'].map(f=>readFile(f,'utf8')));
+  const sources=await Promise.all(['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/immune-genetics.js','src/model.js','src/gpu-fields.js'].map(f=>readFile(f,'utf8')));
   await browser.evaluate(sources.join('\n'));
   const parity=await browser.evaluate(`(async()=>{
     const results=[];

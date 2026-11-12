@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/display-fields.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/display-fields.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const make=()=>new CellLab.Simulation({width:96,height:72,scene:'empty',warmup:0,settings:{metabolism:0,growth:0,apoptosis:0}});
 function reshape(s,m,a,b){for(const [p,id]of [...s.C.pixels()])if(id===m.id)s.C.setpix(p,0);for(let x=25;x<71;x++)for(let y=18;y<54;y++)if(((x-48)/a)**2+((y-36)/b)**2<=1)s.C.setpix([x,y],m.id);s.refreshPositions();m.nucleusX=48;m.nucleusY=36;}
 test('nuclear contours are individually varied and remain bounded within the protected envelope',()=>{

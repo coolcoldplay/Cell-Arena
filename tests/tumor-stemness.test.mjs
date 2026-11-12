@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/model.js','src/experiment.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/immune-genetics.js','src/model.js','src/experiment.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const make=(settings={})=>new CellLab.Simulation({width:96,height:72,scene:'empty',warmup:0,seed:17,sectionModel:false,settings:{stemFraction:100,stemPlasticity:0,apoptosis:0,growth:0,normalRepair:0,metabolism:0,mutation:0,...settings}});
 function body(s,kind=2){const id=s.C.makeNewCellID(kind);for(let x=30;x<50;x++)for(let y=20;y<40;y++)s.C.setpix([x,y],id);s.refreshPositions();s.scanContacts();return s.cells[id];}
 test('initial stemness is seeded, tumor-specific, and independent of antigen visibility',()=>{

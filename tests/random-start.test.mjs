@@ -1,6 +1,6 @@
 import {assertConfluentTissue} from './vascular-layout-helper.mjs';
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
-for(const file of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/model.js','src/experiment.js'])vm.runInThisContext(await readFile(file,'utf8'),{filename:file});
+for(const file of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/immune-genetics.js','src/model.js','src/experiment.js'])vm.runInThisContext(await readFile(file,'utf8'),{filename:file});
 test('random starts sample moderate ranges reproducibly, including all slider settings',()=>{
   const seen=new Set();
   for(let seed=0;seed<200;seed++){

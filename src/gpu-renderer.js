@@ -20,7 +20,7 @@
       uniform ivec2 lattice;uniform vec2 viewport;uniform int fieldScale,fieldMode,seams,selected,wrap,smoothWall,antigen;
       uniform ivec4 actFlags;uniform float edgeFade;uniform int appearanceScale;out vec4 color;
       uint idAt(ivec2 p){if(wrap==1)p=(p+lattice)%lattice;else if(any(lessThan(p,ivec2(0)))||any(greaterThanEqual(p,lattice)))return 0u;return texelFetch(ids,p,0).r;}
-      bool antigenEdge(uint id,ivec2 p,bool marked){uint other=idAt(p);return other!=id&&(marked||(texelFetch(metadata,ivec2(int(other)&255,int(other)>>8),0).g&8u)>0u);}
+      float antigenEdge(uint id,ivec2 p,float level){uint other=idAt(p);if(other==id)return 0.;uvec4 n=texelFetch(metadata,ivec2(int(other)&255,int(other)>>8),0);float strength=max(level,(n.g&8u)>0u?float(n.a)/255.:0.);return strength>0.?.25+.75*strength:0.;}
       vec3 body(int kind){return bodyColors[kind];}
       float insideAt(ivec2 p,uint id){if(idAt(p*appearanceScale+ivec2(appearanceScale/2))!=id)return 0.;ivec2 size=lattice/appearanceScale;if(wrap==1)p=(p+size)%size;return texelFetch(interior,p,0).r;}
       float interiorAt(vec2 xy,uint id){vec2 at=xy/float(appearanceScale)-.5;ivec2 p=ivec2(floor(at));vec2 f=fract(at);float v=mix(mix(insideAt(p,id),insideAt(p+ivec2(1,0),id),f.x),mix(insideAt(p+ivec2(0,1),id),insideAt(p+ivec2(1,1),id),f.x),f.y);
@@ -37,11 +37,11 @@
           if(death==0u&&actFlags[physicalKind]>0){float a=float(texelFetch(activity,p,0).r);if(a>0.)rgb=vec3(min(255.,a*2.),min(255.,(255.-a)*2.),0.)/255.;}
           if(seams==1||int(id)==selected){vec2 f=fract(xy),thin=min(vec2(.32),vec2(lattice)/viewport*.55*pixelRatio);bool edge=(f.x>1.-thin.x&&idAt(p+ivec2(1,0))!=id)||(f.x<thin.x&&idAt(p-ivec2(1,0))!=id)||(f.y>1.-thin.y&&idAt(p+ivec2(0,1))!=id)||(f.y<thin.y&&idAt(p-ivec2(0,1))!=id);if(edge)rgb=mix(rgb,physicalKind==1?vec3(98,110,109)/255.:kind==7?vec3(26,69,107)/255.:kind==3?vec3(128,61,70)/255.:vec3(225,230,225)/255.,mix(.9,.25,edgeFade));}
         }
-        if(antigen==1){vec2 f=fract(xy),stepSize=vec2(lattice)/viewport;float limit=.5*pixelRatio+.5,coverage=0.;bool marked=(m.g&8u)>0u;
-          float d=(1.-f.x)/stepSize.x;if(d<limit&&antigenEdge(id,p+ivec2(1,0),marked))coverage=max(coverage,limit-d);
-          d=f.x/stepSize.x;if(d<limit&&antigenEdge(id,p-ivec2(1,0),marked))coverage=max(coverage,limit-d);
-          d=(1.-f.y)/stepSize.y;if(d<limit&&antigenEdge(id,p+ivec2(0,1),marked))coverage=max(coverage,limit-d);
-          d=f.y/stepSize.y;if(d<limit&&antigenEdge(id,p-ivec2(0,1),marked))coverage=max(coverage,limit-d);
+        if(antigen==1){vec2 f=fract(xy),stepSize=vec2(lattice)/viewport;float limit=.5*pixelRatio+.5,coverage=0.,level=(m.g&8u)>0u?float(m.a)/255.:0.;
+          float d=(1.-f.x)/stepSize.x;if(d<limit)coverage=max(coverage,min(1.,limit-d)*antigenEdge(id,p+ivec2(1,0),level));
+          d=f.x/stepSize.x;if(d<limit)coverage=max(coverage,min(1.,limit-d)*antigenEdge(id,p-ivec2(1,0),level));
+          d=(1.-f.y)/stepSize.y;if(d<limit)coverage=max(coverage,min(1.,limit-d)*antigenEdge(id,p+ivec2(0,1),level));
+          d=f.y/stepSize.y;if(d<limit)coverage=max(coverage,min(1.,limit-d)*antigenEdge(id,p-ivec2(0,1),level));
           rgb=mix(rgb,vec3(209,47,57)/255.,min(1.,coverage));
         }color=vec4(rgb,1);
       }`;
@@ -67,7 +67,7 @@
       if(this.cellColors!==cellColors){g.uniform3fv(u['bodyColors[0]'],Float32Array.from((cellColors?CellLabDisplay.paletteBodies(cellColors):CellLabDisplay.BODY_COLORS).flat(),v=>v/255));this.cellColors=cellColors;}
       g.uniform1i(u.proliferationShading,cellColors?.proliferationShading===false?0:1);
       if(this.snapshot!==s){this.upload(0,s.width,s.height,g.R16UI,g.RED_INTEGER,g.UNSIGNED_SHORT,s.grid);this.upload(1,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.activity);this.upload(2,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.walls);
-        this.meta.fill(0);for(const m of s.cells){this.meta[m.id*4]=CellLabDisplay.displayKind(m);this.meta[m.id*4+1]=CellLabDisplay.deathCode(m)|(CellLabDisplay.antigenMarked(m)?8:0);this.meta[m.id*4+2]=m.kind===2?CellLabDisplay.tumorShade(m):0;this.meta[m.id*4+3]=Math.round(Math.max(0,Math.min(1,m.deathProgress||0))*255);}this.upload(3,256,256,g.RGBA8UI,g.RGBA_INTEGER,g.UNSIGNED_BYTE,this.meta);this.snapshot=s;this.field=null;}
+        this.meta.fill(0);for(const m of s.cells){this.meta[m.id*4]=CellLabDisplay.displayKind(m);this.meta[m.id*4+1]=CellLabDisplay.deathCode(m)|(CellLabDisplay.antigenMarked(m)?8:0);this.meta[m.id*4+2]=m.kind===2?CellLabDisplay.tumorShade(m):0;this.meta[m.id*4+3]=Math.round((m.dying?Math.max(0,Math.min(1,m.deathProgress||0)):CellLabDisplay.antigenStrength(m))*255);}this.upload(3,256,256,g.RGBA8UI,g.RGBA_INTEGER,g.UNSIGNED_BYTE,this.meta);this.snapshot=s;this.field=null;}
       if(this.field!==field){if(field)this.upload(4,field.width,field.height,g.R32F,g.RED,g.FLOAT,field.values);else this.upload(4,1,1,g.R32F,g.RED,g.FLOAT,new Float32Array(1));this.field=field;}
       if(info!==this.info||!this.paletteReady){let p=this.palettes.get(info);if(!p&&info){p=Uint8Array.from(info.palette.flat(2));this.palettes.set(info,p);}this.upload(5,256,9,g.RGB8,g.RGB,g.UNSIGNED_BYTE,p||new Uint8Array(256*9*3));this.info=info;this.paletteReady=true;}
       if(this.signal!==signal||!this.signalReady){this.upload(6,signal?.width||1,signal?.height||1,g.RGBA8,g.RGBA,g.UNSIGNED_BYTE,signal?.rgba||new Uint8Array(4));this.signal=signal;this.signalReady=true;}

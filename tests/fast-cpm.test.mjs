@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
-const c=vm.createContext({console,performance});for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/model.js'])vm.runInContext(await readFile(new URL('../'+f,import.meta.url),'utf8'),c);
+const c=vm.createContext({structuredClone,console,performance});for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/immune-genetics.js','src/model.js'])vm.runInContext(await readFile(new URL('../'+f,import.meta.url),'utf8'),c);
 test('fast CPU kernel preserves exact energies, copy decisions, contacts and fields',()=>{
   for(const boundary of ['solid','wrap']){
     const opts={width:80,height:60,scene:'empty',warmup:0,seed:17,boundary,settings:{apoptosis:0,growth:0}},a=new c.CellLab.Simulation({...opts,kernel:'reference'}),b=new c.CellLab.Simulation({...opts,kernel:'fast'});

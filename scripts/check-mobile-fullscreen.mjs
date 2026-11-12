@@ -1,0 +1,39 @@
+import {openBrowser,delay} from './browser-session.mjs';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+const out='output/antigen-upgrade/fullscreen';await mkdir(out,{recursive:true});
+const b=await openBrowser('dist/index.html',9462,{gpu:true}),checks=[];
+const check=(name,ok,data)=>{checks.push({name,passed:!!ok,data});if(!ok)throw Error(name+' '+JSON.stringify(data));};
+const wait=async e=>{for(let i=0;i<180;i++){if(await b.evaluate(e))return;await delay(100);}throw Error('Timeout: '+e);};
+const shot=async name=>{const r=await b.call('Page.captureScreenshot',{format:'png'});await writeFile(out+'/'+name+'.png',Buffer.from(r.data,'base64'));};
+const tap=async p=>{await b.call('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...p,id:1}]});await b.call('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await delay(180);};
+const center=async selector=>b.evaluate(`(()=>{const r=document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()`);
+const cellPoint=async id=>b.evaluate(`(()=>{const s=artistooLab.snapshot,c=s.cells.find(c=>c.id===${id}),r=document.getElementById('world').getBoundingClientRect(),rot=document.getElementById('arena-stage').dataset.rotated==='true',u=(c.nucleusX+.5)/s.width,v=(c.nucleusY+.5)/s.height;return rot?{x:r.left+(1-v)*r.width,y:r.top+u*r.height}:{x:r.left+u*r.width,y:r.top+v*r.height}})()`);
+try{
+ await wait('!!window.artistooLab?.snapshot');await b.evaluate('artistooLab.ready');
+ const recipe=JSON.parse(await readFile('experiments/immune-genetics/01-specific-recognition.json','utf8'));await b.evaluate('artistooLab.importData('+JSON.stringify(recipe)+')');
+ await b.call('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:2});await b.call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+ // Exercise browsers such as iOS Safari that cannot lock native orientation.
+ await b.evaluate('window.nativeFullscreen=Element.prototype.requestFullscreen;Element.prototype.requestFullscreen=undefined;artistooLab.setTool("inspect");document.getElementById("view-fit").value="cover";document.getElementById("zoom").value="150";artistooLab.render()');
+ const before=await b.evaluate('JSON.stringify([artistooLab.snapshot.time,Array.from(artistooLab.snapshot.grid),artistooLab.snapshot.settings])');await tap(await center('#arena-fullscreen'));await delay(300);
+ const frame=await b.evaluate('(()=>{const c=document.getElementById("world"),r=c.getBoundingClientRect();return {rotated:document.getElementById("arena-stage").dataset.rotated,rect:{left:r.left,top:r.top,width:r.width,height:r.height},cssRatio:parseFloat(c.style.width)/parseFloat(c.style.height),pixels:[c.width,c.height],railVisible:[...document.querySelectorAll(".fullscreen-rail")].every(x=>x.checkVisibility()),sidebar:document.querySelector("aside").checkVisibility(),overflow:document.documentElement.scrollWidth>innerWidth}})()');
+ check('portrait fallback rotates 90 degrees, contains the whole arena and preserves its ratio',frame.rotated==='true'&&Math.abs(frame.cssRatio-4/3)<.001&&Math.abs(frame.rect.width/frame.rect.height-.75)<.001&&frame.rect.left>=-.1&&frame.rect.top>=-.1&&frame.rect.top+frame.rect.height<=844.1&&!frame.overflow,frame);
+ check('unused margins contain live statistics while the sidebar is hidden',frame.railVisible&&!frame.sidebar&&await b.evaluate('document.querySelector("[data-fullscreen-rail=left]").textContent.includes("2")'));
+ check('entering fullscreen does not change time, cells or biological parameters',before===await b.evaluate('JSON.stringify([artistooLab.snapshot.time,Array.from(artistooLab.snapshot.grid),artistooLab.snapshot.settings])'));
+ await tap(await cellPoint(2));await wait('artistooLab.selected===2');check('rotated touch selects the actual cell beneath the finger',await b.evaluate('artistooLab.selected===2'));await shot('portrait-fallback');
+ await b.evaluate('artistooLab.setTool("move")');const p=await cellPoint(4),old=await b.evaluate('(()=>{const c=artistooLab.snapshot.cells.find(c=>c.id===4);return {x:c.x,y:c.y}})()');
+ await b.call('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...p,id:1}]});await delay(150);
+ for(let i=1;i<=6;i++){await b.call('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:p.x-3*i,y:p.y+6*i,id:1}]});await delay(35);}await b.call('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await delay(300);
+ const moved=await b.evaluate('(()=>{const c=artistooLab.snapshot.cells.find(c=>c.id===4);return {x:c.x,y:c.y,playing:artistooLab.snapshot.playing,time:artistooLab.snapshot.time}})()');check('rotated drag follows both physical finger axes and stays paused',moved.x>old.x+2&&moved.y>old.y+1&&!moved.playing&&moved.time===0,{old,moved});
+ await b.call('Emulation.setDeviceMetricsOverride',{width:844,height:390,deviceScaleFactor:1,mobile:true});await delay(300);await shot('landscape-statistics');
+ check('turning the device into landscape removes software rotation without stretching',await b.evaluate('(()=>{const r=document.getElementById("world").getBoundingClientRect();return document.getElementById("arena-stage").dataset.rotated==="false"&&Math.abs(r.width/r.height-4/3)<.001&&r.left>100&&r.right<744})()'));
+ await b.evaluate('artistooLab.setTool("inspect")');await tap(await cellPoint(1));check('native landscape touch mapping remains correct',await b.evaluate('artistooLab.selected===1'));
+ await b.evaluate('artistooLab.rpc("advance",{steps:32})');await delay(250);check('fullscreen statistics update with simulation time',await b.evaluate('document.querySelector("[data-fullscreen-rail=right]").textContent.includes("32")'));
+ await b.call('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:250,y:190,id:1},{x:280,y:190,id:2}]});await b.call('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await delay(250);
+ check('two-finger tap exits without a permanent exit button and restores zoom settings',await b.evaluate('!document.body.classList.contains("arena-fullscreen")&&document.querySelector("aside").checkVisibility()&&document.getElementById("zoom").value==="150"&&document.getElementById("view-fit").value==="cover"&&!document.getElementById("arena-stage").dataset.rotated'));
+ await b.call('Emulation.setTouchEmulationEnabled',{enabled:false});await b.call('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});await b.evaluate('Element.prototype.requestFullscreen=window.nativeFullscreen');
+ const button=await center('#arena-fullscreen');for(const type of ['mousePressed','mouseReleased'])await b.call('Input.dispatchMouseEvent',{type,...button,button:'left',clickCount:1});await delay(200);
+ const desktop=await b.evaluate('({native:!!document.fullscreenElement,fallback:document.querySelector(".viewport").dataset.fullscreenFallback,full:document.body.classList.contains("arena-fullscreen"),mobile:document.body.classList.contains("mobile-arena-fullscreen"),rail:document.querySelector(".fullscreen-rail").checkVisibility(),width:document.querySelector(".viewport").clientWidth})');check('desktop fullscreen fills the viewport without rotation or phone statistics',desktop.full&&!desktop.mobile&&!desktop.rail&&desktop.width===1440,desktop);
+ await b.call('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});await b.call('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});await delay(200);
+ check('no browser or worker errors',b.errors.length===0&&await b.evaluate('artistooLab.errors.length===0'),b.errors);
+}catch(e){checks.push({passed:false,error:String(e)});process.exitCode=1;await shot('failure');}
+finally{await writeFile(out+'/checks.json',JSON.stringify(checks,null,2));console.log(JSON.stringify(checks,null,2));await b.close();}

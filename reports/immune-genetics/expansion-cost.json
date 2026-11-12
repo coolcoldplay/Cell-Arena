@@ -1,0 +1,127 @@
+{
+  "protocol": "Hot scene seed 77, 240x180 lattice, identical settings except immuneGrowth 0 vs 0.65. 3x64-step timing windows near start and 6000 MCS. This observes indirect ecosystem workload: changed immune expansion also changes tumor survival, contacts and lineage; it is not a per-immune-cell microbenchmark.",
+  "runs": [
+    {
+      "immuneGrowth": 0,
+      "initial": {
+        "time": 35,
+        "cells": 205,
+        "immune": 18,
+        "tumor": 37,
+        "immuneDivisions": 0,
+        "kills": 0
+      },
+      "windows": [
+        {
+          "before": {
+            "time": 100,
+            "cells": 205,
+            "immune": 18,
+            "tumor": 37,
+            "immuneDivisions": 0,
+            "kills": 0
+          },
+          "after": {
+            "time": 292,
+            "cells": 201,
+            "immune": 18,
+            "tumor": 33,
+            "immuneDivisions": 0,
+            "kills": 4
+          },
+          "stepMs": [
+            4.782034375000002,
+            4.535501562500002,
+            4.492474999999999
+          ],
+          "heapMiB": 33.46332550048828
+        },
+        {
+          "before": {
+            "time": 6000,
+            "cells": 204,
+            "immune": 22,
+            "tumor": 8,
+            "immuneDivisions": 0,
+            "kills": 73
+          },
+          "after": {
+            "time": 6192,
+            "cells": 205,
+            "immune": 22,
+            "tumor": 7,
+            "immuneDivisions": 0,
+            "kills": 74
+          },
+          "stepMs": [
+            4.015315624999971,
+            4.172114062500043,
+            4.128573437500052
+          ],
+          "heapMiB": 34.73693084716797
+        }
+      ]
+    },
+    {
+      "immuneGrowth": 0.65,
+      "initial": {
+        "time": 35,
+        "cells": 205,
+        "immune": 18,
+        "tumor": 37,
+        "immuneDivisions": 0,
+        "kills": 0
+      },
+      "windows": [
+        {
+          "before": {
+            "time": 100,
+            "cells": 205,
+            "immune": 18,
+            "tumor": 37,
+            "immuneDivisions": 0,
+            "kills": 0
+          },
+          "after": {
+            "time": 292,
+            "cells": 200,
+            "immune": 18,
+            "tumor": 32,
+            "immuneDivisions": 0,
+            "kills": 4
+          },
+          "stepMs": [
+            5.341543750000028,
+            4.380137499999989,
+            4.102751562499975
+          ],
+          "heapMiB": 33.415809631347656
+        },
+        {
+          "before": {
+            "time": 6000,
+            "cells": 244,
+            "immune": 71,
+            "tumor": 0,
+            "immuneDivisions": 46,
+            "kills": 56
+          },
+          "after": {
+            "time": 6192,
+            "cells": 245,
+            "immune": 72,
+            "tumor": 0,
+            "immuneDivisions": 46,
+            "kills": 56
+          },
+          "stepMs": [
+            5.898890624999922,
+            5.945090625000034,
+            5.599523437500011
+          ],
+          "heapMiB": 35.61529541015625
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 import {assertConfluentTissue} from './vascular-layout-helper.mjs';
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js','src/experiment.js','src/trajectories.js','src/i18n.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js','src/experiment.js','src/trajectories.js','src/i18n.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const make=(scene,extra={})=>new CellLab.Simulation({scene,worldWidth:240,worldHeight:180,refinement:1,warmup:0,...extra});
 
 test('oncogenesis fills the entire dish with connected normal bodies and twelve internal patrols',()=>{

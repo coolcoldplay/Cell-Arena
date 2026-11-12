@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/insertion.js','src/model.js','src/experiment.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/insertion.js','src/immune-genetics.js','src/model.js','src/experiment.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const make=settings=>new CellLab.Simulation({width:96,height:72,scene:'empty',warmup:0,settings:{growth:0,immuneGrowth:0,apoptosis:0,metabolism:0,...settings}});
 function normals(s){return [15,35,55,75].map(x=>s.seed(1,x,18,5));}
 test('custom scenes default to no coupling and no-normal scenes have a neutral reference',()=>{

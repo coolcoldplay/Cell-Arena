@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/model.js','src/display-fields.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/immune-genetics.js','src/model.js','src/display-fields.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const make=()=>new CellLab.Simulation({width:128,height:96,scene:'empty',warmup:0,settings:{growth:0,apoptosis:0,metabolism:0}});
 test('observation follows both daughters and grandchildren without intermediate frames or the event log',()=>{
   const s=make(),id=s.seed(2,40,48,14),birth=s.cells[id].birth;

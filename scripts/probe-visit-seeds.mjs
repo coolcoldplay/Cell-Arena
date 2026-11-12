@@ -1,7 +1,7 @@
 // Descriptive multi-seed observation; never screens seeds used by the website.
 import vm from 'node:vm';import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js','src/start-seed.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js','src/start-seed.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm'));
 const out='output/visit-seeds';await mkdir(out,{recursive:true});
 const result={modelSHA256:createHash('sha256').update(await readFile('src/model.js')).digest('hex'),config:{scene:'oncogenesis',worldWidth:240,worldHeight:180,refinement:1.5,boundary:'wrap'},runs:[]};

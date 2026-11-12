@@ -1,5 +1,5 @@
 import vm from 'node:vm';import {readFile,writeFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'));
+for(const f of ['vendor/artistoo.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'));
 const results=[];
 for(const kind of [3,2]){
   const s=new CellLab.Simulation({width:88,height:60,scene:'empty',warmup:0,seed:17,settings:{normalMotility:0,immuneMotility:1,tumorMotility:1,noise:0,alignment:0,repulsion:0,cohesion:0,chemotaxis:3,metabolism:0,growth:0,immuneGrowth:0,apoptosis:0}});

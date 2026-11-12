@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
-for(const file of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/model.js','src/experiment.js','src/start-seed.js'])vm.runInThisContext(await readFile(file,'utf8'),{filename:file});
+for(const file of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/immune-genetics.js','src/model.js','src/experiment.js','src/start-seed.js'])vm.runInThisContext(await readFile(file,'utf8'),{filename:file});
 const inputs={now:()=>1794300000123,precise:()=>12.345,random:()=>0xa812f035};
 const first=overrides=>CellLabStartSeed.createGenerator({...inputs,...overrides})();
 const fingerprint=s=>createHash('sha256').update(new Uint8Array(s.C.grid._pixels.buffer)).digest('hex');

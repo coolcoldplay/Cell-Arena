@@ -1,5 +1,5 @@
 import vm from 'node:vm';import inspector from 'node:inspector';import {readFile,writeFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const s=new CellLab.Simulation({worldWidth:320,worldHeight:240,refinement:2,seed:17});s.advance(100);
 const session=new inspector.Session();session.connect();const post=(method,params={})=>new Promise((resolve,reject)=>session.post(method,params,(e,r)=>e?reject(e):resolve(r)));
 await post('Profiler.enable');await post('Profiler.start');const start=performance.now();s.advance(200);const elapsed=performance.now()-start,{profile}=await post('Profiler.stop');session.disconnect();

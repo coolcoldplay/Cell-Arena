@@ -1,9 +1,10 @@
+import {cognateCulture,peptide,receptor,trait} from './cognate-fixture.mjs';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js','src/experiment.js','src/i18n.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
-const make=(settings={})=>new CellLab.Simulation({width:96,height:72,scene:'empty',seed:17,warmup:0,sectionModel:false,settings:{metabolism:0,apoptosis:0,growth:0,immuneGrowth:0,mutation:0,normalMutationGain:0,tumorMutationGain:0,antigenStressGain:0,contactEscape:0,signalEscape:0,antigen:100,kill:0,noise:0,...settings}});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js','src/experiment.js','src/i18n.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+const make=(settings={})=>cognateCulture(new CellLab.Simulation({width:96,height:72,scene:'empty',seed:17,warmup:0,sectionModel:false,settings:{metabolism:0,apoptosis:0,growth:0,immuneGrowth:0,mutation:0,normalMutationGain:0,tumorMutationGain:0,antigenStressGain:0,contactEscape:0,signalEscape:0,antigen:100,kill:0,noise:0,...settings}}));
 function body(s,kind,x,y,w=12,h=12){const id=s.C.makeNewCellID(kind);for(let xx=x;xx<x+w;xx++)for(let yy=y;yy<y+h;yy++)s.C.setpix([xx,yy],id);s.refreshPositions();s.scanContacts();return s.cells[id];}
 
 test('blue recovery waits for both current normal injury and accumulated exposure to fall',()=>{
@@ -33,7 +34,7 @@ test('blue cells choose normal injury over opposed generic danger and recruitmen
 });
 
 test('unrecognizable tumor and abnormal bodies emit no constitutive tracking cue',()=>{
-  for(const kind of [1,2]){const s=make(),m=body(s,kind,30,30);if(kind===1)s.beginAbnormal(m.id);s.changeAntigen(m,.8,'exposure');s.updateSignals(4);assert.ok(s.fields.danger.values.some(v=>v>0));
+  for(const kind of [1,2]){const s=make(),m=body(s,kind,30,30);if(kind===1)s.beginAbnormal(m.id);peptide(s,m,.8);s.updateSignals(4);assert.ok(s.fields.danger.values.some(v=>v>0));
     s.changeAntigen(m,.05,'escape');s.fields.danger.values.fill(0);s.updateSignals(100);assert.ok(s.fields.danger.values.every(v=>v===0),'antigen loss stops the moving source');
     s.pulse(20,20,'danger');s.updateSignals(4);assert.ok(s.fields.danger.values.some(v=>v>0),'independent local injury cues remain available');
   }
@@ -42,7 +43,7 @@ test('unrecognizable tumor and abnormal bodies emit no constitutive tracking cue
 test('antigen loss clears binding and recruitment immediately through escape and genome mutation',()=>{
   for(const route of ['escape','genome']){const s=make(),m=body(s,2,30,30),ctl=body(s,3,42,30);s.immuneInteractions(100);assert.equal(ctl.targetID,m.id);assert.ok(ctl.recruitment>0);
     ctl.antigenMemory=.8;m.damage=.6;s.fields.trail.values.fill(2);const grid=s.C.grid._pixels.slice(),trail=s.fields.trail.values.slice();
-    if(route==='escape')s.changeAntigen(m,.05,'escape');else{m.genome.antigen=.05;s.applyGenome(m);}
+    if(route==='escape')s.changeAntigen(m,.05,'escape');else{s.immunity.alter(m,g=>g.peptides.forEach(p=>p.present=false));}
     assert.equal(ctl.targetID,0);assert.equal(ctl.phase,'search');assert.equal(ctl.recruitment,0);assert.equal(s.histories.size,0);assert.equal(ctl.antigenMemory,.8);assert.equal(m.damage,.6);
     assert.deepEqual(s.C.grid._pixels,grid);assert.deepEqual(s.fields.trail.values,trail,'released signals decay rather than being globally erased');
     const recognitions=s.counters.recognitions;s.set('kill',2);s.immuneInteractions(4);assert.equal(s.counters.recognitions,recognitions);assert.equal(ctl.targetID,0);assert.ok(m.damage<=.6);

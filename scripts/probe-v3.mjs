@@ -1,7 +1,7 @@
 import vm from 'node:vm';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
-const c=vm.createContext({console,performance});
-vm.runInContext(await readFile('vendor/artistoo.js','utf8'),c);vm.runInContext(await readFile('src/model.js','utf8'),c);
+const c=vm.createContext({console,structuredClone,performance});
+vm.runInContext(await readFile('vendor/artistoo.js','utf8'),c);vm.runInContext(await readFile('src/immune-genetics.js','utf8'),c);vm.runInContext(await readFile('src/model.js','utf8'),c);
 const reports=[];
 for(const kind of [3,2])for(const gap of [0,6,10]){
   const s=new c.CellLab.Simulation({width:80,height:56,scene:'empty',warmup:0,seed:17,settings:{noise:0,alignment:0,cohesion:0,repulsion:0,chemotaxis:3,escape:0,apoptosis:0,growth:0,immuneGrowth:0,metabolism:0}});

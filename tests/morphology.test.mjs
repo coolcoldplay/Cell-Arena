@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const setup=(mode=2,boundary='solid')=>new CellLab.Simulation({width:120,height:90,scene:'empty',warmup:0,seed:29,boundary,settings:{tumorMorphology:mode,branchLength:2.8,branchStrength:5,networkAdhesion:1,growth:0,apoptosis:0,tumorMotility:.12,metabolism:0}});
 test('shape modes use finite evolving protrusions, preserve nucleus and other cell mechanics',()=>{
   const s=setup(),id=s.seed(2,55,45,7),m=s.cells[id];

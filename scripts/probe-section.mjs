@@ -1,5 +1,5 @@
 import vm from 'node:vm';import {readFile,writeFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'));
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'));
 const results=[];
 for(const kernel of ['reference','fast']){
   const s=new CellLab.Simulation({worldWidth:320,worldHeight:240,refinement:2,kernel});s.advance(100);const begin=performance.now();s.advance(200);

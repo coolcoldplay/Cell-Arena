@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const make=(boundary='solid')=>new CellLab.Simulation({width:96,height:72,scene:'empty',warmup:0,boundary,settings:{growth:0,immuneGrowth:0,metabolism:0,apoptosis:0}});
 test('a swept eraser removes whole touched cells once, preserves walls and signals, and records manual removals separately',()=>{
   const s=make(),ids=[s.seed(1,20,30,4),s.seed(2,40,30,4),s.seed(3,60,30,3)],survivor=s.seed(1,80,55,4);s.paint(40,15,2);s.pulse(40,40,'trail');

@@ -1,9 +1,10 @@
+import {cognateCulture,peptide,receptor,trait} from './cognate-fixture.mjs';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js','src/display-fields.js','src/experiment.js','src/i18n.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
-const make=(settings={},boundary='solid',sectionModel=false)=>new CellLab.Simulation({width:96,height:72,scene:'empty',warmup:0,seed:17,boundary,sectionModel,settings:{metabolism:0,apoptosis:0,growth:0,immuneGrowth:0,mutation:0,normalMutationGain:0,tumorMutationGain:0,antigenStressGain:0,contactEscape:0,signalEscape:0,...settings}});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js','src/display-fields.js','src/experiment.js','src/i18n.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+const make=(settings={},boundary='solid',sectionModel=false)=>cognateCulture(new CellLab.Simulation({width:96,height:72,scene:'empty',warmup:0,seed:17,boundary,sectionModel,settings:{metabolism:0,apoptosis:0,growth:0,immuneGrowth:0,mutation:0,normalMutationGain:0,tumorMutationGain:0,antigenStressGain:0,contactEscape:0,signalEscape:0,...settings}}));
 function body(s,kind,x,y,w=12,h=12){const id=s.C.makeNewCellID(kind);for(let xx=x;xx<x+w;xx++)for(let yy=y;yy<y+h;yy++)s.C.setpix([xx,yy],id);s.refreshPositions();s.scanContacts();return s.cells[id];}
 
 test('injured normal tissue emits source-tagged danger; tumor alarm and healthy normals do not',()=>{

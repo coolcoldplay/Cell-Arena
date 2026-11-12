@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm'));
 function originalRaster(s){const grid=new Uint16Array(s.width*s.height),activity=new Uint8Array(grid.length),walls=new Uint8Array(grid.length);let orphans=0,visitedPixels=0,freePixels=0;
   for(let q=0;q<grid.length;q++){const i=s.positions[q],id=s.C.grid.pixti(i);grid[q]=id;const m=s.cells[id];if(m)activity[q]=Math.min(255,Math.round(s.act.pxact(i)/s.C.conf.MAX_ACT[m.kind]*255));else if(id){if(s.C.cellKind(id)===4)walls[q]=1;else orphans++;}if(!walls[q]){freePixels++;visitedPixels+=s.patrol.visited[i];}}

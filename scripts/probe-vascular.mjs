@@ -1,5 +1,5 @@
 import vm from 'node:vm';import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm'));
 for(const mode of (process.argv[2]?[process.argv[2]]:['immune','tumor','repair'])){
  const s=new CellLab.Simulation({width:110,height:90,scene:'empty',warmup:0,seed:Number(process.argv[3]||31),vessels:[{x:50,y:45,radius:11}],settings:{vesselImmuneRate:0,vesselLifespan:0,normalRepair:0,apoptosis:0,vesselPassage:3,tumorIntravasation:3,vesselRepair:1,metabolism:.3,growth:0,immuneGrowth:0}});await CellLabWasm.install(s,module);const v=s.vascular.vessels[0];let id;

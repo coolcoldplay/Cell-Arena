@@ -3,6 +3,7 @@ import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {execFileSync} from 'node:child_process';
 const version=process.argv[2]||'after',out='output/patrol-memory';
 for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+if(version!=='before')vm.runInThisContext(await readFile('src/immune-genetics.js','utf8'));
 const model=version==='before'?execFileSync('git',['show','411dbd1:src/model.js'],{encoding:'utf8'}):await readFile('src/model.js','utf8');vm.runInThisContext(model,{filename:version+'-model.js'});
 const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm')),results=[];
 for(const seed of [17,41,101]){

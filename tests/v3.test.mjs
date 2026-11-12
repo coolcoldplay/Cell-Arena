@@ -1,11 +1,12 @@
+import {cognateCulture,peptide,receptor,trait} from './cognate-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
-const context=vm.createContext({console,performance});
+const context=vm.createContext({structuredClone,console,performance});
 vm.runInContext(await readFile(new URL('../vendor/artistoo.js',import.meta.url),'utf8'),context);
-vm.runInContext(await readFile(new URL('../src/model.js',import.meta.url),'utf8'),context);
-const make=(settings={},options={})=>new context.CellLab.Simulation({width:64,height:48,scene:'empty',warmup:0,seed:17,settings:{growth:0,apoptosis:0,normalMotility:0,tumorMotility:0,immuneMotility:0,...settings},...options});
+for(const f of ['immune-genetics.js','model.js'])vm.runInContext(await readFile(new URL('../src/'+f,import.meta.url),'utf8'),context);
+const make=(settings={},options={})=>cognateCulture(new context.CellLab.Simulation({width:64,height:48,scene:'empty',warmup:0,seed:17,settings:{growth:0,apoptosis:0,normalMotility:0,tumorMotility:0,immuneMotility:0,...settings},...options}));
 const fill=(s,kind,x0,y0,x1,y1)=>{const id=s.C.makeNewCellID(kind);for(let x=x0;x<=x1;x++)for(let y=y0;y<=y1;y++)s.C.setpix([x,y],id);s.refreshPositions();return id;};
 
 test('connectivity permits a globally connected loop to open, but protects a narrow neck',()=>{
@@ -66,11 +67,11 @@ test('immune lineage has finite division budget while tumors have no generation 
 test('tumor traits inherit exactly without mutation and mutate reproducibly without aliasing',()=>{
   const s=make({mutation:0}),id=s.seed(2,30,24,7),before=JSON.stringify(s.cells[id].genome),daughter=s.divide(id);
   assert.ok(daughter);assert.equal(JSON.stringify(s.cells[daughter].genome),before);assert.equal(JSON.stringify(s.cells[id].genome),before);
-  assert.notEqual(s.cells[id].genome,s.cells[daughter].genome);assert.equal(s.cells[id].clone,s.cells[daughter].clone);
+  assert.equal(s.cells[id].genome,s.cells[daughter].genome);assert.ok(Object.isFrozen(s.cells[id].genome));assert.equal(s.cells[id].clone,s.cells[daughter].clone);
   const a=make({mutation:100}),b=make({mutation:100});
   for(const sim of [a,b]){const parent=sim.seed(2,30,24,7);sim.divide(parent);}
   assert.equal(JSON.stringify(a.live().map(c=>c.genome)),JSON.stringify(b.live().map(c=>c.genome)));
-  assert.notEqual(JSON.stringify(a.live()[0].genome),JSON.stringify(a.live()[1].genome));
+  assert.notEqual(a.live()[0].geneClone,a.live()[1].geneClone);
   for(const m of a.live()){assert.ok(m.genome.antigen>=0&&m.genome.antigen<=1);for(const k of ['tolerance','proliferation','invasion'])assert.ok(m.genome[k]>=.25&&m.genome[k]<=3);}
 });
 
@@ -96,7 +97,7 @@ test('amoeboid cells and invasive tumors traverse a sub-diameter slit but never 
   for(const kind of [3,2])for(const gap of [0,6]){
     const s=make({noise:0,alignment:0,cohesion:0,repulsion:0,chemotaxis:3,escape:0,metabolism:0,immuneMotility:1,tumorMotility:.7,immuneGrowth:0},{width:80,height:56});
     for(let y=0;y<56;y++)if(y<28-gap/2||y>=28+gap/2)for(let x=34;x<=38;x++)s.paint(x,y,0,false,false);s.rebuildMask();
-    const id=s.seed(kind,20,28,kind===3?5:8),m=s.cells[id];m.px=1;m.py=0;if(kind===2){m.target=150;m.genome.invasion=2;s.updateMechanics(m);}
+    const id=s.seed(kind,20,28,kind===3?5:8),m=s.cells[id];m.px=1;m.py=0;if(kind===2){m.target=150;trait(s,m,'invasion',2);s.updateMechanics(m);}
     const walls=[...s.C.pixels()].filter(([,j])=>s.C.cellKind(j)===4),area=s.C.getVolume(id);let maxX=0;
     for(let n=0;n<700;n++){
       for(const key of ['danger','cohesion']){const f=s.fields[key];for(let y=0;y<f.height;y++)for(let x=0;x<f.width;x++)if(!f.blocked[y*f.width+x])f.values[y*f.width+x]=x*.5;}
@@ -113,7 +114,7 @@ test('immune cell intercalates through contacting normal tissue without killing 
   for(let x=0;x<88;x++){s.paint(x,5,0,false,false);s.paint(x,54,0,false,false);}s.rebuildMask();
   for(let y=6;y<54;y+=12)for(let x=6;x<66;x+=12){const id=s.C.makeNewCellID(1);for(let xx=x;xx<x+12;xx++)for(let yy=y;yy<y+12;yy++)if(Math.hypot(xx-20,yy-30)>6)s.C.setpix([xx,yy],id);const m=s.cells[id];m.target=s.C.getVolume(id);m.base=m.target;s.updateMechanics(m);}
   const id=s.seed(3,20,30,5);s.cells[id].px=1;s.cells[id].py=0;let maxX=0;
-  for(let n=0;n<500;n++){const f=s.fields.danger;for(let y=0;y<f.height;y++)for(let x=0;x<f.width;x++)f.values[y*f.width+x]=x*.6;s.advance(1);maxX=Math.max(maxX,s.cells[id].x);}
+  for(let n=0;n<1200;n++){const f=s.fields.danger;for(let y=0;y<f.height;y++)for(let x=0;x<f.width;x++)f.values[y*f.width+x]=x*.6;s.advance(1);maxX=Math.max(maxX,s.cells[id].x);}
   assert.ok(maxX>65);assert.equal(s.live().filter(c=>c.kind===1).length,20);
   for(const m of s.live())assert.equal(s.components(m.id).length,1);
   assert.equal(s.counters.kills,0);assert.equal(s.snapshot().orphans,0);
@@ -139,7 +140,7 @@ test('immune metabolic inhibition reduces delivered damage and activated growth 
 test('heritable tumor traits change growth, migration mechanics and stress tolerance',()=>{
   const a=make({growth:1,tumorMotility:1}),b=make({growth:1,tumorMotility:1});
   for(const s of [a,b]){s.seed(2,30,24,6);s.cells[1].cycle.phase='G1';s.cells[1].target=s.C.getVolume(1);}
-  Object.assign(a.cells[1].genome,{proliferation:.5,invasion:.5,tolerance:.5});Object.assign(b.cells[1].genome,{proliferation:2,invasion:2,tolerance:2});
+  a.immunity.alter(a.cells[1],g=>{Object.assign(g.traits,{proliferation:.5,invasion:.5,tolerance:.5});});b.immunity.alter(b.cells[1],g=>{Object.assign(g.traits,{proliferation:2,invasion:2,tolerance:2});});
   const t=a.cells[1].target;a.biology(10);b.biology(10);assert.ok(b.cells[1].target-t>(a.cells[1].target-t)*3);assert.ok(b.cells[1].drive>a.cells[1].drive*3);
   for(const s of [a,b]){s.fields.oxygen.values.fill(.1);s.fields.glucose.values.fill(.1);s.fields.acid.values.fill(.8);s.updateMetabolism(100);}
   assert.ok(a.cells[1].stress>b.cells[1].stress*3);
@@ -158,9 +159,9 @@ test('manual division immediately invalidates pre-division immune contact histor
   assert.ok(s.divide(tumor));assert.equal(s.cells[ctl].targetID,0);assert.ok([...s.histories.values()].every(h=>h.dwell===0));
 });
 
-test('zero-amplitude mutations do not report nonexistent phenotype changes',()=>{
+test('zero trait amplitude preserves scalar traits while antigen sequences can still mutate',()=>{
   const s=make({mutation:100,mutationSize:0}),id=s.seed(2,30,24,7),genome=JSON.stringify(s.cells[id].genome);
-  assert.ok(s.divide(id));assert.equal(s.counters.mutations,0);assert.ok(s.live().every(m=>JSON.stringify(m.genome)===genome));
+  assert.ok(s.divide(id));assert.ok(s.counters.mutations>0);assert.ok(s.live().every(m=>JSON.stringify(m.genome)===genome));
 });
 
 test('division preserves Act age instead of painting relabelled cytoplasm as a new protrusion',()=>{

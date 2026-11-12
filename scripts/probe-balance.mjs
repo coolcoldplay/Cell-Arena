@@ -1,5 +1,5 @@
 import vm from 'node:vm';import {readFile,writeFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'));
+for(const f of ['vendor/artistoo.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'));
 const reports=[];
 for(const supply of [1.4,1.8,2.2])for(const scene of ['ecosystem','invasion']){
   const s=new CellLab.Simulation({scene,worldWidth:192,worldHeight:144,refinement:1,settings:{supply,growth:.8},seed:17});const rows=[];

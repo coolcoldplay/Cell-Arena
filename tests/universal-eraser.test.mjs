@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const make=boundary=>new CellLab.Simulation({worldWidth:96,worldHeight:72,refinement:1,scene:'empty',seed:17,boundary,warmup:0});
 test('one brush removes whole cells, source objects, wall pixels and local fields without counting a biological death',()=>{
  const s=make('solid'),a=s.seed(1,29,30,4),b=s.seed(2,76,30,4);s.paint(39,30,2);s.addSource(36,32,'trail',3);s.addSource(76,30,'trail',3);s.pulse(35,30,'hostile',10);

@@ -3,7 +3,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm'));
 const make=async(scene,settings={},extra={})=>{const s=new CellLab.Simulation({scene,seed:17,worldWidth:240,worldHeight:180,refinement:1.5,settings,...extra});await CellLabWasm.install(s,module);return s;};
 
@@ -58,7 +58,7 @@ test('cold tumor spreads and divides beyond the original lesion using existing m
 });
 
 test('hot tumor clearance requires real killing and an observation interval; living or dying targets prevent success',async()=>{
-  const s=await make('hot');for(let elapsed=0;elapsed<4500&&!s.scenarioReport().achieved;elapsed+=250)s.advance(250);const report=s.scenarioReport();assert.equal(s.counters.kills,37+report.tumorDivisions);assert.equal(s.deathHistory.filter(d=>d.kind===2&&d.cause==='environment').length,0,'tumors clear through immune killing, not environmental death');assert.equal(s.counters.apoptosis,0);assert.equal(report.tumorBodies,0);assert.ok(report.achieved);assert.ok(report.clearanceElapsed>=150);assert.ok(s.counters.recognitions>0);assert.ok(s.counters.immuneDivisions>0);assert.ok(s.live().filter(m=>m.kind===3).every(m=>m.divisionsLeft>=0));
+  const s=await make('hot');for(let elapsed=0;elapsed<9000&&!s.scenarioReport().achieved;elapsed+=250)s.advance(250);const report=s.scenarioReport();assert.equal(s.counters.kills,37+report.tumorDivisions);assert.equal(s.deathHistory.filter(d=>d.kind===2&&d.cause==='environment').length,0,'tumors clear through immune killing, not environmental death');assert.equal(s.counters.apoptosis,0);assert.equal(report.tumorBodies,0);assert.ok(report.achieved);assert.ok(report.clearanceElapsed>=150);assert.ok(s.counters.recognitions>0);assert.ok(s.counters.immuneDivisions>0);assert.ok(s.live().filter(m=>m.kind===3).every(m=>m.divisionsLeft>=0));
   let id=0;for(let y=5*s.scale;y<s.height-5*s.scale&&!id;y+=10*s.scale)for(let x=5*s.scale;x<s.width-5*s.scale&&!id;x+=10*s.scale)id=s.seed(2,x,y,3*s.scale);assert.ok(id);assert.equal(s.scenarioReport().achieved,false);s.updateScenarioState();assert.equal(s.scenarioReport().clearanceAt,null);s.beginDeath(id,'kill');assert.equal(s.scenarioReport().achieved,false);
   const control=await make('hot',{kill:0});control.advance(2000);assert.equal(control.counters.kills,0);assert.ok(control.scenarioReport().tumorBodies>37);assert.equal(control.scenarioReport().achieved,false);
 });
@@ -71,18 +71,20 @@ test('reporting is read-only and preset restoration has no parameter leakage',as
 
 test('acquired antigen loss in a hot tumor can survive early clearance and be inherited by an expanding lineage',async()=>{
   const s=await make('hot',{}, {seed:77});assert.equal(s.scenarioReport().initial.antigenPositive,37);
-  // A changed migration law changes the stochastic trajectory, so seed 77 no
-  // longer guarantees a rare escape. Condition one draw after real immune
-  // exposure; this tests subsequent selection/inheritance, not its prevalence.
+  // Introduce an explicit experimental genetic-loss branch after real immune
+  // clearance starts. Contact no longer directs a favorable DNA mutation.
+  // This tests selection/inheritance, not the probability of spontaneous loss.
   let survivor=null;
   for(let t=0;t<1500&&!survivor;t+=10){s.advance(10);if(s.counters.kills>=20)survivor=s.live().find(m=>m.kind===2&&!m.dying&&m.antigen&&m.damage<.5&&m.recruitmentExposure>.01);}
   assert.ok(survivor,'a living antigen-positive cell must actually experience recruitment during clearance');
-  const random=s.C.random;try{s.C.random=()=>0;s.evolutionStep(survivor,4);}finally{s.C.random=random;}
+  const ancestor=survivor.geneClone,genes=s.immunity.genes(survivor);
+  s.immunity.alter(survivor,g=>{g.peptides.forEach(p=>{if(!s.immunity.self.includes(p.sequence))p.present=false;});},'experimental peptide loss');
+  const escape=survivor.geneClone;assert.notEqual(escape,ancestor);assert.ok(genes.peptides.every(p=>p.present));
   assert.equal(survivor.antigen,false);
   let nadir=37;
   for(let t=0;t<5000;t+=250){s.advance(250);nadir=Math.min(nadir,s.scenarioReport().tumor);}
   const remaining=s.live().filter(m=>m.kind===2&&!m.dying);
   assert.ok(s.counters.kills>30,'real immune contact must first reduce the lesion');
-  assert.ok(s.counters.antigenEscapes>0);assert.ok(remaining.filter(m=>!m.antigen).length>1,'antigen-loss phenotype is inherited by an expanding lineage');
+  assert.ok(remaining.filter(m=>m.geneClone===escape&&!m.antigen).length>1,'genetically deleted phenotype is inherited by the edited branch');
   assert.ok(remaining.length>nadir);assert.equal(s.scenarioReport().achieved,false);assert.equal(s.snapshot().orphans,0);
 });

@@ -6,8 +6,8 @@
   const states={
     endothelial:[['endothelialLiving','存活','#3d9288'],['endothelialDying','清除中','#c4ae86']],
     normal:[['normalLiving','存活','#899992'],['normalDying','清除中','#c4ae86']],
-    abnormal:[['abnormalPositive','抗原阳性','#b97758'],['abnormalNegative','抗原阴性','#947743'],['abnormalDying','清除中','#c4ae86']],
-    tumor:[['tumorPositive','抗原阳性','#a64146'],['tumorNegative','抗原阴性','#36302b'],['tumorDying','清除中','#e2a343']],
+    abnormal:[['abnormalPositive','非自身呈递高','#b97758'],['abnormalNegative','非自身呈递低','#947743'],['abnormalDying','清除中','#c4ae86']],
+    tumor:[['tumorPositive','非自身呈递高','#a64146'],['tumorNegative','非自身呈递低','#36302b'],['tumorDying','清除中','#e2a343']],
     immune:[['immuneSuppressive','抑制','#548fbc'],['immuneActive','激活','#bc353b'],['immuneResting','静息','#e2a1ad'],['immuneDying','清除中','#c4ae86']]
   };
   const number=v=>Math.max(0,Number.isFinite(v)?v:0);

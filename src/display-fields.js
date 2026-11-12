@@ -84,6 +84,7 @@
     return ['G0','G1','S','G2','M'].includes(m.cycle?.phase)?m.cycle.phase:'';
   }
   const antigenMarked=m=>!!m&&!m.dying&&(m.kind===2||m.state==='abnormal')&&m.antigen;
+  const antigenStrength=m=>antigenMarked(m)?Math.max(0,Math.min(1,m.antigenLevel??1)):0;
   // Smallest occupied interval on each periodic axis. A cell crossing a seam
   // gets a local box repeated at the edges, never a box spanning the dish.
   function occupiedInterval(axis,wrap){
@@ -183,5 +184,5 @@
     const wall=!!s.walls[q],blocked=wall||!!s.fieldMask?.[bin];
     return {x,y,bin,time:s.time,cell:s.cells.find(m=>m.id===s.grid[q])||null,wall,blocked,values:blocked?null:Object.fromEntries(['oxygen','glucose','acid',...Object.keys(SIGNALS)].map(key=>[key,s.fields[key]?.values[bin]??0]))};
   }
-  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,immuneSuppressive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,cycleColor,antigenMarked,selectionBounds,selectionBoxes,bodyOpacity,adversity,signals,sample,Cache};
+  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,immuneSuppressive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,cycleColor,antigenMarked,antigenStrength,selectionBounds,selectionBoxes,bodyOpacity,adversity,signals,sample,Cache};
 })();

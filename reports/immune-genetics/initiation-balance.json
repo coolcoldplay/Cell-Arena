@@ -1,0 +1,342 @@
+[
+  {
+    "size": 192,
+    "metabolism": 0.85,
+    "supply": 2.8,
+    "initial": 108,
+    "samples": [
+      {
+        "time": 1035,
+        "normal": 108,
+        "tumor": 0,
+        "initiations": 0,
+        "deaths": 0,
+        "maxStress": 0,
+        "maxAdversity": 0.15718565116757932,
+        "maxInflammation": 0
+      },
+      {
+        "time": 2035,
+        "normal": 108,
+        "tumor": 0,
+        "initiations": 0,
+        "deaths": 0,
+        "maxStress": 0,
+        "maxAdversity": 0.15881820925767873,
+        "maxInflammation": 0
+      },
+      {
+        "time": 3035,
+        "normal": 108,
+        "tumor": 0,
+        "initiations": 0,
+        "deaths": 0,
+        "maxStress": 0.0014672636343882393,
+        "maxAdversity": 0.16168260424889647,
+        "maxInflammation": 0
+      },
+      {
+        "time": 4035,
+        "normal": 108,
+        "tumor": 0,
+        "initiations": 0,
+        "deaths": 0,
+        "maxStress": 0,
+        "maxAdversity": 0.15820672260276203,
+        "maxInflammation": 0
+      },
+      {
+        "time": 5035,
+        "normal": 108,
+        "tumor": 0,
+        "initiations": 0,
+        "deaths": 0,
+        "maxStress": 0,
+        "maxAdversity": 0.16072944910437972,
+        "maxInflammation": 0
+      },
+      {
+        "time": 6035,
+        "normal": 108,
+        "tumor": 0,
+        "initiations": 0,
+        "deaths": 0,
+        "maxStress": 0,
+        "maxAdversity": 0.15677951646573615,
+        "maxInflammation": 0
+      }
+    ]
+  },
+  {
+    "size": 240,
+    "metabolism": 0.85,
+    "supply": 2.8,
+    "initial": 170,
+    "samples": [
+      {
+        "time": 1035,
+        "normal": 170,
+        "tumor": 0,
+        "initiations": 0,
+        "deaths": 0,
+        "maxStress": 0.04159130907834589,
+        "maxAdversity": 0.17644117809777393,
+        "maxInflammation": 0
+      },
+      {
+        "time": 2035,
+        "normal": 170,
+        "tumor": 0,
+        "initiations": 0,
+        "deaths": 0,
+        "maxStress": 0.16630471570640173,
+        "maxAdversity": 0.17833396751210437,
+        "maxInflammation": 0.02555519230088589
+      },
+      {
+        "time": 3035,
+        "normal": 170,
+        "tumor": 0,
+        "initiations": 0,
+        "deaths": 0,
+        "maxStress": 0.2899842478861663,
+        "maxAdversity": 0.17809952463626147,
+        "maxInflammation": 0.08647458372557937
+      },
+      {
+        "time": 4035,
+        "normal": 168,
+        "tumor": 1,
+        "initiations": 2,
+        "deaths": 0,
+        "maxStress": 0.4285391946070096,
+        "maxAdversity": 0.20303075006513885,
+        "maxInflammation": 0.1531238049886955
+      },
+      {
+        "time": 5035,
+        "normal": 166,
+        "tumor": 2,
+        "initiations": 4,
+        "deaths": 0,
+        "maxStress": 0.4626250498627396,
+        "maxAdversity": 0.22293246995622865,
+        "maxInflammation": 0.24500106333868216
+      },
+      {
+        "time": 6035,
+        "normal": 166,
+        "tumor": 2,
+        "initiations": 4,
+        "deaths": 0,
+        "maxStress": 0.6802197287485544,
+        "maxAdversity": 0.23700416188793844,
+        "maxInflammation": 0.27604023383477583
+      }
+    ]
+  },
+  {
+    "size": 192,
+    "metabolism": 1,
+    "supply": 2.7,
+    "initial": 108,
+    "samples": [
+      {
+        "time": 1035,
+        "normal": 108,
+        "tumor": 0,
+        "initiations": 0,
+        "deaths": 0,
+        "maxStress": 0.12424795940226092,
+        "maxAdversity": 0.20958884421623114,
+        "maxInflammation": 0.01233815634373846
+      },
+      {
+        "time": 2035,
+        "normal": 107,
+        "tumor": 0,
+        "initiations": 1,
+        "deaths": 0,
+        "maxStress": 0.3249293615651052,
+        "maxAdversity": 0.21337796145484159,
+        "maxInflammation": 0.14529185525925942
+      },
+      {
+        "time": 3035,
+        "normal": 103,
+        "tumor": 3,
+        "initiations": 5,
+        "deaths": 0,
+        "maxStress": 0.4459321166961609,
+        "maxAdversity": 0.25667812728881834,
+        "maxInflammation": 0.18424344202974227
+      },
+      {
+        "time": 4035,
+        "normal": 102,
+        "tumor": 6,
+        "initiations": 6,
+        "deaths": 1,
+        "maxStress": 0.3506548630710247,
+        "maxAdversity": 0.23336982449819876,
+        "maxInflammation": 0.21454739313052915
+      },
+      {
+        "time": 5035,
+        "normal": 100,
+        "tumor": 1,
+        "initiations": 8,
+        "deaths": 6,
+        "maxStress": 0.5609817051049576,
+        "maxAdversity": 0.2026898666827177,
+        "maxInflammation": 0.2135821974571993
+      },
+      {
+        "time": 6035,
+        "normal": 99,
+        "tumor": 2,
+        "initiations": 9,
+        "deaths": 7,
+        "maxStress": 0.2956627570826113,
+        "maxAdversity": 0.2058552987698658,
+        "maxInflammation": 0.19484868754449908
+      }
+    ]
+  },
+  {
+    "size": 192,
+    "metabolism": 1.1,
+    "supply": 2.7,
+    "initial": 108,
+    "samples": [
+      {
+        "time": 1035,
+        "normal": 108,
+        "tumor": 0,
+        "initiations": 0,
+        "deaths": 0,
+        "maxStress": 0.17589135232058548,
+        "maxAdversity": 0.24060459108954835,
+        "maxInflammation": 0.03682968648307465
+      },
+      {
+        "time": 2035,
+        "normal": 106,
+        "tumor": 0,
+        "initiations": 2,
+        "deaths": 0,
+        "maxStress": 0.448799566753835,
+        "maxAdversity": 0.25026818891633607,
+        "maxInflammation": 0.23589371189028743
+      },
+      {
+        "time": 3035,
+        "normal": 100,
+        "tumor": 4,
+        "initiations": 8,
+        "deaths": 0,
+        "maxStress": 0.8468619532455128,
+        "maxAdversity": 0.33872117688522224,
+        "maxInflammation": 0.2590829049397322
+      },
+      {
+        "time": 4035,
+        "normal": 96,
+        "tumor": 6,
+        "initiations": 12,
+        "deaths": 6,
+        "maxStress": 0.5227904239825014,
+        "maxAdversity": 0.3274948553791369,
+        "maxInflammation": 0.23858509193891247
+      },
+      {
+        "time": 5035,
+        "normal": 96,
+        "tumor": 4,
+        "initiations": 12,
+        "deaths": 11,
+        "maxStress": 0.8995926503066626,
+        "maxAdversity": 0.2574336670003496,
+        "maxInflammation": 0.26142049313973076
+      },
+      {
+        "time": 6035,
+        "normal": 95,
+        "tumor": 3,
+        "initiations": 13,
+        "deaths": 13,
+        "maxStress": 0.008295734952668788,
+        "maxAdversity": 0.18802095894351575,
+        "maxInflammation": 0.11974294242402657
+      }
+    ]
+  },
+  {
+    "size": 240,
+    "metabolism": 1,
+    "supply": 2.7,
+    "initial": 170,
+    "samples": [
+      {
+        "time": 1035,
+        "normal": 170,
+        "tumor": 0,
+        "initiations": 0,
+        "deaths": 0,
+        "maxStress": 0.1559766733197639,
+        "maxAdversity": 0.23521856377432657,
+        "maxInflammation": 0.030434928616830885
+      },
+      {
+        "time": 2035,
+        "normal": 165,
+        "tumor": 1,
+        "initiations": 5,
+        "deaths": 0,
+        "maxStress": 0.41079818559035464,
+        "maxAdversity": 0.24242789886735225,
+        "maxInflammation": 0.21753312361598648
+      },
+      {
+        "time": 3035,
+        "normal": 160,
+        "tumor": 5,
+        "initiations": 10,
+        "deaths": 0,
+        "maxStress": 0.7516617720770211,
+        "maxAdversity": 0.315989699959755,
+        "maxInflammation": 0.2688369659849843
+      },
+      {
+        "time": 4035,
+        "normal": 156,
+        "tumor": 7,
+        "initiations": 14,
+        "deaths": 7,
+        "maxStress": 0.485786870887285,
+        "maxAdversity": 0.32914977745134005,
+        "maxInflammation": 0.2689743259444779
+      },
+      {
+        "time": 5035,
+        "normal": 154,
+        "tumor": 4,
+        "initiations": 16,
+        "deaths": 12,
+        "maxStress": 0.629947368981927,
+        "maxAdversity": 0.22838150409757257,
+        "maxInflammation": 0.2429718502824207
+      },
+      {
+        "time": 6035,
+        "normal": 154,
+        "tumor": 4,
+        "initiations": 16,
+        "deaths": 13,
+        "maxStress": 0.42488177836068947,
+        "maxAdversity": 0.2167559509548715,
+        "maxInflammation": 0.22786072913330105
+      }
+    ]
+  }
+]

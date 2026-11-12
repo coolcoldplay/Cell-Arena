@@ -5,7 +5,7 @@ import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 const baseline=process.argv[2]||'HEAD',steps=Number(process.argv[3]||40),pairs=Number(process.argv[4]||6);
-const files=['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js'];
+const files=['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js'];
 const models=[];
 vm.runInThisContext(await readFile(files[0],'utf8'),{filename:files[0]});
 for(const revision of [baseline,null]){

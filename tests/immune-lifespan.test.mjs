@@ -1,11 +1,12 @@
+import {cognateCulture,peptide,receptor,trait} from './cognate-fixture.mjs';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js','src/experiment.js','src/display-fields.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
-const make=limit=>new CellLab.Simulation({width:96,height:72,scene:'empty',seed:17,warmup:0,sectionModel:false,settings:{immuneKillLimit:limit,metabolism:0,apoptosis:0,growth:0,immuneGrowth:0,antigen:100,kill:2,normalMutationGain:0,tumorMutationGain:0,antigenStressGain:0,contactEscape:0,signalEscape:0}});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js','src/experiment.js','src/display-fields.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+const make=limit=>cognateCulture(new CellLab.Simulation({width:96,height:72,scene:'empty',seed:17,warmup:0,sectionModel:false,settings:{immuneKillLimit:limit,metabolism:0,apoptosis:0,growth:0,immuneGrowth:0,antigen:100,kill:2,normalMutationGain:0,tumorMutationGain:0,antigenStressGain:0,contactEscape:0,signalEscape:0}}));
 function body(s,kind,x,y,w=10,h=12){const id=s.C.makeNewCellID(kind);for(let xx=x;xx<x+w;xx++)for(let yy=y;yy<y+h;yy++)s.C.setpix([xx,yy],id);s.refreshPositions();s.scanContacts();return s.cells[id];}
-function target(s,kind=2,x=30,y=24){const m=body(s,kind,x,y);if(kind===1)s.beginAbnormal(m.id);m.antigen=true;m.antigenLevel=1;m.damage=.99;return m;}
+function target(s,kind=2,x=30,y=24){const m=body(s,kind,x,y);if(kind===1)s.beginAbnormal(m.id);peptide(s,m,1);m.damage=.99;return m;}
 function deliver(s,ctl,t){s.histories.set(ctl.id+':'+t.id,{ctl:ctl.id,target:t.id,dwell:20,recognized:true});s.immuneInteractions(1);}
 
 test('the actual lethal contact credits one tumor and triggers immune shrinking at the limit',()=>{
@@ -26,7 +27,7 @@ test('two immune cells cannot count the same lethal target twice or repeat credi
 test('no contact, antigen loss, abnormal-cell clearance and environmental death consume no tumor-kill budget',()=>{
   for(const mode of ['no-contact','antigen-negative','abnormal','environment']){
     const s=make(1),ctl=body(s,3,20,24),t=target(s,mode==='abnormal'?1:2,mode==='no-contact'?55:30);
-    if(mode==='antigen-negative'){t.antigen=false;t.antigenLevel=.01;}if(mode==='environment')s.beginDeath(t.id,'environment');deliver(s,ctl,t);
+    if(mode==='antigen-negative'){peptide(s,t,.01);}if(mode==='environment')s.beginDeath(t.id,'environment');deliver(s,ctl,t);
     assert.equal(ctl.tumorKills,0,mode);assert.equal(ctl.dying,false,mode);
   }
 });

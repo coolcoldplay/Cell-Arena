@@ -1,9 +1,10 @@
+import {cognateCulture,peptide,receptor,trait} from './cognate-fixture.mjs';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
-const make=(settings={},options={})=>new CellLab.Simulation({width:96,height:72,scene:'empty',warmup:0,seed:17,settings:{growth:0,apoptosis:0,progression:0,...settings},...options});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+const make=(settings={},options={})=>cognateCulture(new CellLab.Simulation({width:96,height:72,scene:'empty',warmup:0,seed:17,settings:{growth:0,apoptosis:0,progression:0,...settings},...options}));
 const adverse=s=>{s.fields.oxygen.values.fill(.01);s.fields.glucose.values.fill(.01);s.fields.acid.values.fill(.99);};
 const checkOccupancy=s=>{const expected=s.occupancy.map(a=>a&&new Float32Array(a.length));for(const [p,id] of s.C.pixels())if(s.cells[id])expected[s.cells[id].kind][s.fieldIndex(...p)]++;for(let k=1;k<=3;k++)assert.deepEqual(s.occupancy[k],expected[k]);};
 
@@ -16,7 +17,7 @@ test('normal cells survive short exposure but die under sustained stress, with a
 test('healthy and briefly stressed normal cells cannot initiate; abnormal cells retain normal mechanics and do not divide',()=>{
   const s=make(),id=s.seed(1,30,30,7),m=s.cells[id],drive=m.drive,base=m.base;const random=s.C.random;s.C.random=()=>0;
   s.transformation(m,1000);assert.equal(m.state,'normal');m.adversity=1;m.stress=.01;s.transformation(m,4);assert.equal(m.state,'normal');
-  m.stress=.4;s.transformation(m,1);assert.equal(m.state,'abnormal');assert.equal(m.kind,1);assert.equal(m.genome,null);assert.ok(m.antigen);assert.equal(m.drive,drive);assert.equal(m.base,base);
+  m.stress=.4;s.transformation(m,1);assert.equal(m.state,'abnormal');assert.equal(m.kind,1);assert.equal(m.genome,null);assert.ok(m.geneClone);assert.equal(m.drive,drive);assert.equal(m.base,base);
   s.C.random=random;s.biology(1000);assert.equal(m.kind,1);assert.equal(s.live().length,1);assert.equal(s.divide(id),0);assert.equal(m.target,base);
 });
 test('progression has a real intermediate dwell, preserves occupied geometry, injury, target mass and nucleus, and reassigns metabolism',()=>{
@@ -32,13 +33,13 @@ test('stress-associated initiation is stochastic, seed-reproducible and switchab
 });
 test('immune surveillance recognizes only antigen-positive abnormal contact, recruits, stops on detachment and clears the abnormal cell',()=>{
   const s=make({kill:2}),target=s.seed(1,30,24,5),ctl=s.seed(3,40,24,4),healthy=s.seed(1,40,34,5),remote=s.seed(1,14,12,4);
-  s.beginAbnormal(target);s.beginAbnormal(remote);s.cells[target].antigenLevel=.5;s.updateLocal(120);assert.equal(s.cells[ctl].phase,'kill');assert.ok(s.cells[ctl].recruitment>0);assert.ok(s.cells[target].damage>0);
+  s.beginAbnormal(target);s.beginAbnormal(remote);peptide(s,s.cells[target],.5);s.updateLocal(120);assert.equal(s.cells[ctl].phase,'kill');assert.ok(s.cells[ctl].recruitment>0);assert.ok(s.cells[target].damage>0);
   s.updateSignals(4);assert.ok(s.fields.trail.values.some(v=>v>0));const damage=s.cells[target].damage;s.moveCell(ctl,58,24);s.updateLocal(100);assert.equal(s.cells[ctl].targetID,0);assert.ok(s.cells[target].damage<=damage);
   s.moveCell(ctl,40,24);for(let n=0;n<180;n++)s.updateLocal(4);assert.equal(s.cells[target].deathCause,'kill');assert.equal(s.cells[healthy].damage,0);assert.equal(s.cells[remote].damage,0);
   for(const [p,id] of [...s.C.pixels()])if(id===target)s.C.setpix(p,0);s.cleanup();assert.equal(s.counters.abnormalKills,1);assert.equal(s.counters.kills,1);
 });
 test('antigen-negative abnormal cells are not attacked and lethal environment prevents transformation',()=>{
-  const s=make({progression:4}),id=s.seed(1,30,24,5),ctl=s.seed(3,40,24,4);s.beginAbnormal(id);s.cells[id].antigen=false;
+  const s=make({progression:4}),id=s.seed(1,30,24,5),ctl=s.seed(3,40,24,4);s.beginAbnormal(id);peptide(s,s.cells[id],0);
   s.updateLocal(1000);assert.equal(s.cells[id].damage,0);assert.equal(s.cells[ctl].targetID,0);assert.equal(s.counters.recognitions,0);
   s.cells[id].stress=.999;adverse(s);s.updateMetabolism(4);s.C.random=()=>0;s.transformation(s.cells[id],2000);assert.equal(s.cells[id].state,'abnormal');assert.equal(s.cells[id].deathCause,'environment');
 });

@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const make=extra=>new CellLab.Simulation({width:64,height:48,scene:'empty',warmup:0,settings:{growth:0,metabolism:0,apoptosis:0,immuneGrowth:0},...extra});
 
 test('population history starts at zero before mechanical settling and preserves initial populations',()=>{

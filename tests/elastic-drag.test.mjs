@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/insertion.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/insertion.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const make=(boundary='solid')=>new CellLab.Simulation({width:80,height:60,scene:'empty',warmup:0,boundary,seed:17,settings:{growth:0,immuneGrowth:0,apoptosis:0,metabolism:0}});
 function intact(s){for(const m of s.live()){assert.equal(s.components(m.id).length,1);assert.ok(s.section.fits(m,m.nucleusX,m.nucleusY),`nucleus #${m.id} remains in its cell`);assert.ok(m.sectionFraction>=1-s.settings.sectionYield-1e-9);}assert.equal(s.snapshot().orphans,0);}
 

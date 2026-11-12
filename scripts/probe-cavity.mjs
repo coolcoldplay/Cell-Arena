@@ -5,7 +5,7 @@ import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 const args=Object.fromEntries(process.argv.slice(2).map(a=>a.replace(/^--/,'').split('=')));
 const section=args.section||'src/section-mechanics.js';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js',section,'src/wasm-cpm.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js',section,'src/wasm-cpm.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm'));
 const quiet={vesselCount:0,metabolism:0,stressMutation:0,inflammation:0,apoptosis:0,kill:0,normalRepair:0,growth:0,immuneGrowth:0,normalMutationGain:0,tumorMutationGain:0};
 const cases=[

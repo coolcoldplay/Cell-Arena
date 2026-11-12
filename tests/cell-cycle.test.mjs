@@ -1,9 +1,10 @@
+import {cognateCulture,peptide,receptor,trait} from './cognate-fixture.mjs';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
-for (const file of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/model.js','src/experiment.js']) vm.runInThisContext(await readFile(file,'utf8'),{filename:file});
-const make=(settings={},options={})=>new CellLab.Simulation({width:96,height:72,scene:'empty',warmup:0,seed:17,sectionModel:false,settings:{growth:1,apoptosis:0,metabolism:0,kill:0,immuneGrowth:1,mutation:0,...settings},...options});
+for (const file of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/immune-genetics.js','src/model.js','src/experiment.js']) vm.runInThisContext(await readFile(file,'utf8'),{filename:file});
+const make=(settings={},options={})=>cognateCulture(new CellLab.Simulation({width:96,height:72,scene:'empty',warmup:0,seed:17,sectionModel:false,settings:{growth:1,apoptosis:0,metabolism:0,kill:0,immuneGrowth:1,mutation:0,...settings},...options}));
 function body(s,kind,x,y,w,h){const id=s.C.makeNewCellID(kind);for(let xx=x;xx<x+w;xx++)for(let yy=y;yy<y+h;yy++)s.C.setpix([xx,yy],id);s.refreshPositions();s.scanContacts();return s.cells[id];}
 function nutrients(s,value=1){s.fields.oxygen.values.fill(value);s.fields.glucose.values.fill(value);s.fields.acid.values.fill(value?0:.8);s.updateMetabolism(0);}
 function contactPair(settings={}){const s=make({antigen:100,immuneGrowth:0,...settings}),t=body(s,2,35,25,18,18),m=body(s,3,53,27,12,14);return {s,t,m};}

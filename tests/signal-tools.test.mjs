@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/model.js','src/experiment.js','src/signal-gesture.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/immune-genetics.js','src/model.js','src/experiment.js','src/signal-gesture.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 function clock(){let time=0,id=0;const jobs=new Map(),events=[];const gesture=new CellLabSignalGesture({emit:(mode,payload)=>events.push({mode,...payload}),now:()=>time,setTimer:(fn,ms)=>{jobs.set(++id,{at:time+ms,fn});return id;},clearTimer:key=>jobs.delete(key)});return{gesture,events,tick(ms){const end=time+ms;while(true){const next=[...jobs].filter(([,v])=>v.at<=end).sort((a,b)=>a[1].at-b[1].at)[0];if(!next)break;time=next[1].at;jobs.delete(next[0]);next[1].fn();}time=end;}};}
 const point=(x=20,type='trail')=>({point:[x,20],screen:[x,20],type,radius:10});
 test('a tap emits one finite pulse; a double tap emits exactly one source and no pulses',()=>{

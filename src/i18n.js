@@ -1025,6 +1025,43 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
 存活分化肿瘤在持续局部低氧生态位中有概率重新获得干性；0 关闭。Li 2009／Chaffer 2013 启发的代理模型|Viable differentiated tumors may reacquire stemness in a sustained local hypoxic niche; 0 disables. Proxy inspired by Li 2009 and Chaffer 2013.
 0 保持无限分裂；大于 0 启用有限扩增层级；干性自我更新不受此限。依据：Chen 2012|0 retains unlimited tumor divisions; positive values enable a finite progeny hierarchy. Stem renewal is unlimited. Chen 2012.
 `);
+  add(`
+抗原与克隆演化|Antigens and clonal evolution
+克隆占比|Clone fractions
+主要遗传克隆占比历史|Major genetic clone frequency history
+新加入免疫细胞的响应资格|Response competence of new immune cells
+后台抗原启动速度|Background antigen priming
+免疫刹车效力|Checkpoint brake strength
+环境表达响应|Environmental expression response
+接触相关呈递下调|Contact-associated presentation downregulation
+炎性暴露呈递下调|Inflammatory presentation downregulation
+初始高抗原表达比例|Initial high-antigen expression fraction
+子代遗传突变机会|Mutation opportunity per daughter
+只影响新加入的细胞；仍需匹配抗原并实际接触|Affects newly added cells only; matching antigen and membrane contact are still required.
+有限候选谱、局部暴露、延迟和宿主支持；不改写已有识别码|Finite candidates, local exposure, delay and host support; existing receptors are never rewritten.
+独立于抗原与呈递的执行抑制|Execution brake independent of antigen identity and presentation.
+放大每个抗原自身的正或负环境响应；表达可恢复|Amplifies each antigen's positive or negative environmental response; expression can recover.
+可逆调控，不再直接产生遗传抗原丢失|Reversible regulation; does not directly produce inherited antigen loss.
+可逆调控，遗传缺失独立记录|Reversible regulation; genetic loss is recorded independently.
+当前抗原呈递|Current antigen presentation
+识别取决于克隆匹配|Recognition depends on clone matching
+存在非自身呈递|Non-self presentation present
+当前呈递低|Low current presentation
+旧实验已迁移至特异识别规则；种子与参数保留，演化轨迹会变化。|Legacy experiment migrated to specific recognition; seed and parameters retained, trajectories change.
+`);
+  add(`
+非自身呈递高|High non-self presentation
+非自身呈递低|Low non-self presentation
+抗原／呈递遗传丢失|Antigen / presentation genetic loss
+分裂遗传改变|Division genetic changes
+遗传改变|Genetic changes
+序列替换|Sequence substitutions
+免疫启动|Immune priming
+表达干预|Expression intervention
+选中细胞的识别关系|Selected-cell recognition links
+红线深浅表示当前非自身抗原呈递强度，不保证识别匹配|Outline intensity shows current non-self presentation, not receptor matching
+抗原红线：浅 → 深，呈递弱 → 强。追踪后：✓ 已识别 · ≈ 接触扫描 · × 不匹配 · ! 受限。|Antigen outline: pale → dark, weak → strong presentation. Track: ✓ recognized · ≈ scanning · × mismatch · ! limited.
+`);
   function mount(control){
     let language='zh';try{if(localStorage.getItem('cell-arena-language')==='en')language='en';}catch{}
     const texts=new WeakMap(),attributes=new WeakMap(),names=['title','aria-label','placeholder'];

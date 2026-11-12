@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'));
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'));
 const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm'));
 const quiet={growth:0,apoptosis:0,metabolism:0,immuneGrowth:0,normalMotility:0,noise:0,alignment:0,cohesion:0,repulsion:0,chemotaxis:3};
 async function sim(extra={}){const s=new CellLab.Simulation({width:96,height:72,warmup:0,scene:'empty',settings:quiet,...extra});await CellLabWasm.install(s,module);return s;}

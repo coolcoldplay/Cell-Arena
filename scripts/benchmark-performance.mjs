@@ -8,7 +8,7 @@ const label=process.argv[2]||'current',size=Number(process.argv[3]||384),steps=N
 const revision=process.argv.find(a=>a.startsWith('--baseline='))?.slice(11);
 const source=async file=>revision?execFileSync('git',['show',revision+':'+file],{maxBuffer:16*1024*1024}):readFile(file);
 await mkdir('output/performance',{recursive:true});
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js'])vm.runInThisContext((await source(f)).toString('utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js',...(revision?[]:['src/immune-genetics.js']),'src/model.js'])vm.runInThisContext((await source(f)).toString('utf8'),{filename:f});
 const module=await CellLabWasm.load(await source('build/cpm-kernel.wasm'));
 const start=performance.now(),s=new CellLab.Simulation({scene:'hot',seed:29,worldWidth:size,worldHeight:size*.75,refinement:2,warmup:0});
 await CellLabWasm.install(s,module);s.advance(16);

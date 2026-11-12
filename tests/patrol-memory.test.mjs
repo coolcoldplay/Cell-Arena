@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm'));
 const make=()=>new CellLab.Simulation({width:80,height:60,scene:'empty',warmup:0,seed:17,settings:{metabolism:0,growth:0,apoptosis:0,immuneGrowth:0,chemotaxis:0,repulsion:0,immuneSeparation:0}});
 function fill(s,kind,x,y,w,h){const id=s.C.makeNewCellID(kind),points=[];for(let a=x;a<x+w;a++)for(let b=y;b<y+h;b++){s.C.setpix([a,b],id);points.push(s.C.grid.p2i([a,b]));}s.refreshPositions();assert.ok(s.section.initialize(s.cells[id],points));s.updateMechanics(s.cells[id]);return id;}

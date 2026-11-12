@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/model.js','src/experiment.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/immune-genetics.js','src/model.js','src/experiment.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const make=(settings={})=>new CellLab.Simulation({width:96,height:72,scene:'empty',warmup:0,seed:17,sectionModel:false,settings:{apoptosis:0,metabolism:0,mutation:0,normalMutationGain:0,tumorMutationGain:0,stressMutation:0,inflammation:0,normalRepair:0,...settings}});
 function body(s,kind,x=30,y=22,w=20,h=20){const id=s.C.makeNewCellID(kind);for(let xx=x;xx<x+w;xx++)for(let yy=y;yy<y+h;yy++)s.C.setpix([xx,yy],id);s.refreshPositions();s.scanContacts();return s.cells[id];}
 function environment(s,o=1,g=1,a=0){s.fields.oxygen.values.fill(o);s.fields.glucose.values.fill(g);s.fields.acid.values.fill(a);s.updateMetabolism(0);}

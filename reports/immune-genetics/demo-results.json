@@ -1,0 +1,4044 @@
+[
+  {
+    "name": "01-specific-recognition",
+    "samples": [
+      {
+        "time": 0,
+        "tumor": 2,
+        "immune": 2,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 0,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 0,
+          "recognitions": 0,
+          "mutations": 0,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 0,
+          "cacheMisses": 0,
+          "cacheEntries": 0
+        },
+        "geneticCounts": {
+          "2": 1,
+          "4": 1
+        },
+        "tumors": [
+          {
+            "id": 1,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 2,
+            "geneClone": 4,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      },
+      {
+        "time": 200,
+        "tumor": 1,
+        "immune": 2,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 0,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 1,
+          "environmentStarted": 0,
+          "recognitions": 1,
+          "mutations": 0,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 2,
+          "cacheMisses": 27,
+          "cacheEntries": 27
+        },
+        "geneticCounts": {
+          "4": 1
+        },
+        "tumors": [
+          {
+            "id": 2,
+            "geneClone": 4,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      },
+      {
+        "time": 600,
+        "tumor": 1,
+        "immune": 2,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 0,
+          "immuneDivisions": 0,
+          "kills": 1,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 1,
+          "environmentStarted": 0,
+          "recognitions": 1,
+          "mutations": 0,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 2,
+          "cacheMisses": 27,
+          "cacheEntries": 27
+        },
+        "geneticCounts": {
+          "4": 1
+        },
+        "tumors": [
+          {
+            "id": 2,
+            "geneClone": 4,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      },
+      {
+        "time": 1500,
+        "tumor": 1,
+        "immune": 2,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 0,
+          "immuneDivisions": 0,
+          "kills": 1,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 1,
+          "environmentStarted": 0,
+          "recognitions": 1,
+          "mutations": 0,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 3,
+          "reinforcements": 0,
+          "exposureRecords": 2,
+          "cacheMisses": 27,
+          "cacheEntries": 27
+        },
+        "geneticCounts": {
+          "4": 1
+        },
+        "tumors": [
+          {
+            "id": 2,
+            "geneClone": 4,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      },
+      {
+        "time": 4000,
+        "tumor": 1,
+        "immune": 2,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 0,
+          "immuneDivisions": 0,
+          "kills": 1,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 1,
+          "environmentStarted": 0,
+          "recognitions": 1,
+          "mutations": 0,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 3,
+          "reinforcements": 0,
+          "exposureRecords": 2,
+          "cacheMisses": 27,
+          "cacheEntries": 27
+        },
+        "geneticCounts": {
+          "4": 1
+        },
+        "tumors": [
+          {
+            "id": 2,
+            "geneClone": 4,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "02-reversible-hiding",
+    "samples": [
+      {
+        "time": 0,
+        "tumor": 1,
+        "immune": 1,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 0,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 0,
+          "recognitions": 0,
+          "mutations": 0,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 0,
+          "cacheMisses": 0,
+          "cacheEntries": 0
+        },
+        "geneticCounts": {
+          "2": 1
+        },
+        "tumors": [
+          {
+            "id": 1,
+            "geneClone": 2,
+            "expression": [
+              0.01,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      },
+      {
+        "time": 200,
+        "tumor": 1,
+        "immune": 1,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 0,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 0,
+          "recognitions": 0,
+          "mutations": 0,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 0,
+          "cacheMisses": 1,
+          "cacheEntries": 1
+        },
+        "geneticCounts": {
+          "2": 1
+        },
+        "tumors": [
+          {
+            "id": 1,
+            "geneClone": 2,
+            "expression": [
+              0.003291929878079055,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      },
+      {
+        "time": 600,
+        "tumor": 1,
+        "immune": 1,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 0,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 0,
+          "recognitions": 1,
+          "mutations": 0,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 2,
+          "cacheMisses": 26,
+          "cacheEntries": 26
+        },
+        "geneticCounts": {
+          "2": 1
+        },
+        "tumors": [
+          {
+            "id": 1,
+            "geneClone": 2,
+            "expression": [
+              0.8028255190337659,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0.18550591999181942
+          }
+        ]
+      },
+      {
+        "time": 1500,
+        "tumor": 1,
+        "immune": 1,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 0,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 0,
+          "recognitions": 1,
+          "mutations": 0,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 10,
+          "cacheMisses": 26,
+          "cacheEntries": 26
+        },
+        "geneticCounts": {
+          "2": 1
+        },
+        "tumors": [
+          {
+            "id": 1,
+            "geneClone": 2,
+            "expression": [
+              0.8993452434975857,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0.5543767189718766
+          }
+        ]
+      },
+      {
+        "time": 4000,
+        "tumor": 0,
+        "immune": 1,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 0,
+          "immuneDivisions": 0,
+          "kills": 1,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 1,
+          "environmentStarted": 0,
+          "recognitions": 1,
+          "mutations": 0,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 3,
+          "reinforcements": 0,
+          "exposureRecords": 25,
+          "cacheMisses": 26,
+          "cacheEntries": 26
+        },
+        "geneticCounts": {},
+        "tumors": []
+      }
+    ],
+    "intervention": "At 200 MCS, set antigenStressGain=0; same gene remains."
+  },
+  {
+    "name": "03-heritable-escape",
+    "samples": [
+      {
+        "time": 0,
+        "tumor": 4,
+        "immune": 3,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 0,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 0,
+          "recognitions": 0,
+          "mutations": 0,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 0,
+          "cacheMisses": 0,
+          "cacheEntries": 0
+        },
+        "geneticCounts": {
+          "2": 3,
+          "6": 1
+        },
+        "tumors": [
+          {
+            "id": 1,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 2,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 3,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 4,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      },
+      {
+        "time": 200,
+        "tumor": 1,
+        "immune": 3,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 0,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 3,
+          "environmentStarted": 0,
+          "recognitions": 3,
+          "mutations": 0,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 6,
+          "cacheMisses": 26,
+          "cacheEntries": 26
+        },
+        "geneticCounts": {
+          "6": 1
+        },
+        "tumors": [
+          {
+            "id": 4,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      },
+      {
+        "time": 600,
+        "tumor": 2,
+        "immune": 3,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 1,
+          "immuneDivisions": 0,
+          "kills": 3,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 3,
+          "environmentStarted": 0,
+          "recognitions": 3,
+          "mutations": 0,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 2,
+          "reinforcements": 0,
+          "exposureRecords": 6,
+          "cacheMisses": 26,
+          "cacheEntries": 26
+        },
+        "geneticCounts": {
+          "6": 2
+        },
+        "tumors": [
+          {
+            "id": 4,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 8,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      },
+      {
+        "time": 1500,
+        "tumor": 16,
+        "immune": 3,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 15,
+          "immuneDivisions": 0,
+          "kills": 3,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 3,
+          "environmentStarted": 0,
+          "recognitions": 3,
+          "mutations": 3,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 3,
+          "substitutions": 2,
+          "losses": 0,
+          "primed": 3,
+          "reinforcements": 0,
+          "exposureRecords": 6,
+          "cacheMisses": 26,
+          "cacheEntries": 26
+        },
+        "geneticCounts": {
+          "6": 7,
+          "11": 4,
+          "12": 4,
+          "13": 1
+        },
+        "tumors": [
+          {
+            "id": 4,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 8,
+            "geneClone": 11,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 9,
+            "geneClone": 12,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 10,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 11,
+            "geneClone": 13,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 12,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 13,
+            "geneClone": 12,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 14,
+            "geneClone": 11,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 15,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 16,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 17,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 18,
+            "geneClone": 12,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 19,
+            "geneClone": 11,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 20,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 22,
+            "geneClone": 11,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 23,
+            "geneClone": 12,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      },
+      {
+        "time": 4000,
+        "tumor": 131,
+        "immune": 3,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 130,
+          "immuneDivisions": 0,
+          "kills": 3,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 3,
+          "environmentStarted": 0,
+          "recognitions": 3,
+          "mutations": 27,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 27,
+          "substitutions": 14,
+          "losses": 0,
+          "primed": 3,
+          "reinforcements": 0,
+          "exposureRecords": 6,
+          "cacheMisses": 31,
+          "cacheEntries": 31
+        },
+        "geneticCounts": {
+          "6": 34,
+          "11": 21,
+          "12": 30,
+          "13": 4,
+          "14": 4,
+          "15": 3,
+          "16": 4,
+          "17": 4,
+          "18": 3,
+          "19": 2,
+          "20": 2,
+          "21": 2,
+          "22": 2,
+          "23": 2,
+          "24": 1,
+          "25": 1,
+          "26": 1,
+          "27": 1,
+          "28": 1,
+          "29": 1,
+          "30": 1,
+          "31": 1,
+          "32": 1,
+          "33": 1,
+          "34": 1,
+          "35": 1,
+          "36": 1,
+          "37": 1
+        },
+        "tumors": [
+          {
+            "id": 4,
+            "geneClone": 18,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 8,
+            "geneClone": 11,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 9,
+            "geneClone": 12,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 10,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 11,
+            "geneClone": 20,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 12,
+            "geneClone": 23,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 13,
+            "geneClone": 12,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 14,
+            "geneClone": 11,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 15,
+            "geneClone": 14,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 16,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 17,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 18,
+            "geneClone": 12,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 19,
+            "geneClone": 17,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 20,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 22,
+            "geneClone": 11,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 23,
+            "geneClone": 12,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 24,
+            "geneClone": 19,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 25,
+            "geneClone": 13,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 26,
+            "geneClone": 34,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 27,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 28,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 29,
+            "geneClone": 30,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 30,
+            "geneClone": 16,
+            "expression": [
+              0,
+              0.9999996738532574,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 31,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 32,
+            "geneClone": 11,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 33,
+            "geneClone": 11,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 34,
+            "geneClone": 11,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 35,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 36,
+            "geneClone": 11,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 37,
+            "geneClone": 12,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 38,
+            "geneClone": 12,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 39,
+            "geneClone": 12,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "03-control-kill-off",
+    "samples": [
+      {
+        "time": 0,
+        "tumor": 4,
+        "immune": 3,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 0,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 0,
+          "recognitions": 0,
+          "mutations": 0,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 0,
+          "cacheMisses": 0,
+          "cacheEntries": 0
+        },
+        "geneticCounts": {
+          "2": 3,
+          "6": 1
+        },
+        "tumors": [
+          {
+            "id": 1,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 2,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 3,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 4,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      },
+      {
+        "time": 200,
+        "tumor": 4,
+        "immune": 3,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 0,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 0,
+          "recognitions": 3,
+          "mutations": 0,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 0,
+          "cacheMisses": 1,
+          "cacheEntries": 1
+        },
+        "geneticCounts": {
+          "2": 3,
+          "6": 1
+        },
+        "tumors": [
+          {
+            "id": 1,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 2,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 3,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 4,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      },
+      {
+        "time": 600,
+        "tumor": 8,
+        "immune": 3,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 4,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 0,
+          "recognitions": 8,
+          "mutations": 3,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 1,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 3,
+          "substitutions": 2,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 0,
+          "cacheMisses": 2,
+          "cacheEntries": 2
+        },
+        "geneticCounts": {
+          "2": 3,
+          "6": 2,
+          "11": 1,
+          "12": 1,
+          "13": 1
+        },
+        "tumors": [
+          {
+            "id": 1,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 2,
+            "geneClone": 11,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 3,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 4,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 8,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 9,
+            "geneClone": 12,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 10,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 11,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      },
+      {
+        "time": 1500,
+        "tumor": 58,
+        "immune": 3,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 54,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 0,
+          "recognitions": 28,
+          "mutations": 17,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 3,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 17,
+          "substitutions": 6,
+          "losses": 1,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 0,
+          "cacheMisses": 4,
+          "cacheEntries": 4
+        },
+        "geneticCounts": {
+          "2": 12,
+          "6": 11,
+          "11": 6,
+          "12": 6,
+          "13": 3,
+          "14": 2,
+          "15": 2,
+          "16": 2,
+          "17": 2,
+          "18": 2,
+          "19": 2,
+          "20": 1,
+          "21": 1,
+          "22": 1,
+          "23": 1,
+          "24": 1,
+          "25": 1,
+          "26": 1,
+          "27": 1
+        },
+        "tumors": [
+          {
+            "id": 1,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 2,
+            "geneClone": 11,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 3,
+            "geneClone": 18,
+            "expression": [
+              0.9,
+              0.9921045922175225,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 4,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 8,
+            "geneClone": 25,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 9,
+            "geneClone": 12,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 10,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 11,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 12,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 14,
+            "geneClone": 22,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 15,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 16,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 17,
+            "geneClone": 12,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 18,
+            "geneClone": 17,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 19,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 20,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 21,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 22,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 23,
+            "geneClone": 11,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 24,
+            "geneClone": 11,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 25,
+            "geneClone": 16,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 26,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 27,
+            "geneClone": 12,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 28,
+            "geneClone": 15,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 29,
+            "geneClone": 26,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 30,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 31,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 32,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 33,
+            "geneClone": 19,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 35,
+            "geneClone": 20,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 36,
+            "geneClone": 21,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 37,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      },
+      {
+        "time": 4000,
+        "tumor": 131,
+        "immune": 3,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 127,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 0,
+          "recognitions": 103,
+          "mutations": 32,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 3,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 1,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 32,
+          "substitutions": 14,
+          "losses": 1,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 0,
+          "cacheMisses": 8,
+          "cacheEntries": 8
+        },
+        "geneticCounts": {
+          "2": 26,
+          "6": 21,
+          "11": 11,
+          "12": 10,
+          "13": 8,
+          "14": 4,
+          "15": 4,
+          "16": 2,
+          "17": 3,
+          "18": 4,
+          "19": 4,
+          "20": 3,
+          "21": 4,
+          "22": 2,
+          "23": 2,
+          "24": 2,
+          "25": 1,
+          "26": 2,
+          "27": 2,
+          "28": 1,
+          "29": 1,
+          "30": 1,
+          "31": 1,
+          "32": 1,
+          "33": 1,
+          "34": 2,
+          "35": 1,
+          "36": 1,
+          "37": 1,
+          "38": 1,
+          "39": 1,
+          "40": 1,
+          "41": 1,
+          "42": 1
+        },
+        "tumors": [
+          {
+            "id": 1,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 2,
+            "geneClone": 41,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 3,
+            "geneClone": 18,
+            "expression": [
+              0.9,
+              0.9999999926631986,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 4,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 8,
+            "geneClone": 25,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 9,
+            "geneClone": 29,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 10,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 11,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 12,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 14,
+            "geneClone": 22,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 15,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 16,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 17,
+            "geneClone": 12,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 18,
+            "geneClone": 17,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 19,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 20,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 21,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 22,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 23,
+            "geneClone": 11,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 24,
+            "geneClone": 11,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 25,
+            "geneClone": 16,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 26,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 27,
+            "geneClone": 12,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 28,
+            "geneClone": 15,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 29,
+            "geneClone": 26,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 30,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 31,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 32,
+            "geneClone": 2,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 33,
+            "geneClone": 19,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 35,
+            "geneClone": 20,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 36,
+            "geneClone": 21,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 37,
+            "geneClone": 6,
+            "expression": [
+              0,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "04-clonal-replacement",
+    "samples": [
+      {
+        "time": 0,
+        "tumor": 4,
+        "immune": 2,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 0,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 0,
+          "recognitions": 0,
+          "mutations": 0,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 0,
+          "cacheMisses": 0,
+          "cacheEntries": 0
+        },
+        "geneticCounts": {
+          "10": 2,
+          "13": 2
+        },
+        "tumors": [
+          {
+            "id": 9,
+            "geneClone": 10,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 10,
+            "geneClone": 10,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 11,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 12,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      },
+      {
+        "time": 200,
+        "tumor": 2,
+        "immune": 3,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 0,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 2,
+          "environmentStarted": 0,
+          "recognitions": 3,
+          "mutations": 0,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 1,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 4,
+          "cacheMisses": 26,
+          "cacheEntries": 26
+        },
+        "geneticCounts": {
+          "13": 2
+        },
+        "tumors": [
+          {
+            "id": 11,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 12,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      },
+      {
+        "time": 600,
+        "tumor": 4,
+        "immune": 6,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 4,
+          "immuneDivisions": 2,
+          "kills": 2,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 2,
+          "environmentStarted": 0,
+          "recognitions": 3,
+          "mutations": 0,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 2,
+          "extravasations": 1,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 3,
+          "reinforcements": 0,
+          "exposureRecords": 4,
+          "cacheMisses": 26,
+          "cacheEntries": 26
+        },
+        "geneticCounts": {
+          "13": 4
+        },
+        "tumors": [
+          {
+            "id": 11,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 12,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 16,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 17,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      },
+      {
+        "time": 1500,
+        "tumor": 29,
+        "immune": 10,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 30,
+          "immuneDivisions": 2,
+          "kills": 2,
+          "apoptosis": 1,
+          "environment": 0,
+          "apoptosisStarted": 1,
+          "killStarted": 2,
+          "environmentStarted": 0,
+          "recognitions": 3,
+          "mutations": 6,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 6,
+          "extravasations": 5,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 6,
+          "substitutions": 3,
+          "losses": 0,
+          "primed": 3,
+          "reinforcements": 0,
+          "exposureRecords": 5,
+          "cacheMisses": 54,
+          "cacheEntries": 54
+        },
+        "geneticCounts": {
+          "13": 20,
+          "20": 2,
+          "23": 2,
+          "24": 2,
+          "25": 1,
+          "28": 1,
+          "29": 1
+        },
+        "tumors": [
+          {
+            "id": 11,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 12,
+            "geneClone": 23,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 16,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 17,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 21,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 22,
+            "geneClone": 25,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 23,
+            "geneClone": 24,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 24,
+            "geneClone": 28,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 27,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 28,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 29,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 31,
+            "geneClone": 29,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 32,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 33,
+            "geneClone": 20,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 34,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 37,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 38,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 39,
+            "geneClone": 24,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 40,
+            "geneClone": 23,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 41,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 42,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 43,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 44,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 45,
+            "geneClone": 20,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 46,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 47,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 48,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 49,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 50,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      },
+      {
+        "time": 4000,
+        "tumor": 106,
+        "immune": 15,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 140,
+          "immuneDivisions": 5,
+          "kills": 22,
+          "apoptosis": 11,
+          "environment": 0,
+          "apoptosisStarted": 11,
+          "killStarted": 22,
+          "environmentStarted": 0,
+          "recognitions": 54,
+          "mutations": 28,
+          "abnormalInitiations": 0,
+          "malignantTransitions": 0,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 0,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 0,
+          "vascularArrivals": 8,
+          "extravasations": 6,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 28,
+          "substitutions": 14,
+          "losses": 1,
+          "primed": 14,
+          "reinforcements": 2,
+          "exposureRecords": 102,
+          "cacheMisses": 211,
+          "cacheEntries": 211
+        },
+        "geneticCounts": {
+          "13": 72,
+          "20": 3,
+          "23": 4,
+          "24": 1,
+          "25": 2,
+          "28": 2,
+          "30": 1,
+          "31": 3,
+          "32": 2,
+          "33": 2,
+          "34": 1,
+          "37": 1,
+          "41": 2,
+          "43": 1,
+          "44": 1,
+          "45": 1,
+          "46": 1,
+          "47": 1,
+          "51": 1,
+          "52": 1,
+          "53": 1,
+          "54": 1,
+          "55": 1
+        },
+        "tumors": [
+          {
+            "id": 11,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 12,
+            "geneClone": 34,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 16,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 17,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0.020911050581520527
+          },
+          {
+            "id": 21,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 24,
+            "geneClone": 28,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 27,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 28,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 29,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 32,
+            "geneClone": 45,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 34,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 37,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 38,
+            "geneClone": 53,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 40,
+            "geneClone": 23,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 42,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 43,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 44,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 46,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 47,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 49,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 50,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 53,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 54,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 55,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 56,
+            "geneClone": 28,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 57,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 58,
+            "geneClone": 46,
+            "expression": [
+              0.9,
+              0.8807554884636107,
+              0.9,
+              0.8063172562665928
+            ],
+            "damage": 0
+          },
+          {
+            "id": 59,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 60,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 61,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 63,
+            "geneClone": 32,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          },
+          {
+            "id": 64,
+            "geneClone": 13,
+            "expression": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ],
+            "damage": 0
+          }
+        ]
+      }
+    ]
+  }
+]

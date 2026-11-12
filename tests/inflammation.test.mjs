@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const make=(inflammation=10)=>new CellLab.Simulation({width:128,height:96,scene:'empty',warmup:0,seed:17,settings:{inflammation,stressMutation:0,progression:0,growth:0,immuneGrowth:0,metabolism:0,apoptosis:0}});
 test('inflammatory exposure reads only the occupied local signal field, accumulates and resolves without advancing on pause',()=>{
   const s=make(),near=s.seed(1,25,40,7),far=s.seed(1,90,40,7),a=s.cells[near],b=s.cells[far];
@@ -14,7 +14,7 @@ test('chronic inflammation adds a reproducible, switchable initiation risk while
     assert.deepEqual(s.C.grid._pixels,grid);assert.ok(s.live().every(m=>m.kind===1&&m.stress===0));assert.equal(s.counters.malignantTransitions,0);return s;};
   const zero=run(0),low=run(1),high=run(10),repeat=run(10);
   assert.equal(zero.counters.abnormalInitiations,0);assert.ok(high.counters.abnormalInitiations>low.counters.abnormalInitiations);assert.ok(high.counters.abnormalInitiations>10);
-  assert.deepEqual(high.snapshot().cells,repeat.snapshot().cells);assert.ok(high.live().filter(m=>m.state==='abnormal').every(m=>m.antigen&&high.divide(m.id)===0));
+  assert.deepEqual(high.snapshot().cells,repeat.snapshot().cells);assert.ok(high.live().filter(m=>m.state==='abnormal').every(m=>m.geneClone&&high.divide(m.id)===0));
 });
 test('cohesion and remote inflammation cannot cause local initiation; zero strength does not consume new random draws',()=>{
   const s=make(),id=s.seed(1,20,40,7),m=s.cells[id];s.fields.cohesion.values.fill(30);s.fields.trail.deposit(26,10,30);

@@ -1,0 +1,3007 @@
+[
+  {
+    "seed": 17,
+    "metabolism": 0.85,
+    "samples": [
+      {
+        "time": 3000,
+        "normal": 169,
+        "tumor": 1,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 4,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 0,
+          "recognitions": 0,
+          "mutations": 0,
+          "abnormalInitiations": 1,
+          "malignantTransitions": 1,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 1,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 4,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 0,
+          "cacheMisses": 3,
+          "cacheEntries": 3
+        },
+        "tumors": [
+          {
+            "id": 100,
+            "age": 304,
+            "antigen": true,
+            "fitness": 0.3859808279551323,
+            "stress": 0.24715404965202797,
+            "oxygen": 0.5245483140332983,
+            "glucose": 0.42623417530584773,
+            "acid": 0.9845397064992047,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 305,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          }
+        ]
+      },
+      {
+        "time": 6000,
+        "normal": 162,
+        "tumor": 4,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 4,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 4,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 4,
+          "recognitions": 0,
+          "mutations": 0,
+          "abnormalInitiations": 8,
+          "malignantTransitions": 5,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 1,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 5,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 4,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 72,
+          "cacheMisses": 125,
+          "cacheEntries": 125
+        },
+        "tumors": [
+          {
+            "id": 72,
+            "age": 1467,
+            "antigen": false,
+            "fitness": 0.3316554211564185,
+            "stress": 0.8061253613094508,
+            "oxygen": 0.5120780999356128,
+            "glucose": 0.378937677246459,
+            "acid": 0.9848963577696618,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1468,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 88,
+            "age": 1054,
+            "antigen": true,
+            "fitness": 0.30273480964027777,
+            "stress": 0.6667028477094814,
+            "oxygen": 0.5026217375946517,
+            "glucose": 0.3397025142860885,
+            "acid": 0.9964945537619071,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1055,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 100,
+            "age": 3304,
+            "antigen": true,
+            "fitness": 0.334480888854804,
+            "stress": 0.8524168152053934,
+            "oxygen": 0.5149081511262023,
+            "glucose": 0.3735362434828723,
+            "acid": 0.99364008947655,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 3305,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 101,
+            "age": 1335,
+            "antigen": true,
+            "fitness": 0.35846642327596473,
+            "stress": 0.750980652210873,
+            "oxygen": 0.5143887362326963,
+            "glucose": 0.3790388193475195,
+            "acid": 0.9886541194226368,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1336,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          }
+        ]
+      },
+      {
+        "time": 12000,
+        "normal": 159,
+        "tumor": 2,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 4,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 13,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 13,
+          "recognitions": 0,
+          "mutations": 0,
+          "abnormalInitiations": 11,
+          "malignantTransitions": 10,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 1,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 7,
+          "suppressiveRecoveries": 3,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 4,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 132,
+          "cacheMisses": 125,
+          "cacheEntries": 125
+        },
+        "tumors": [
+          {
+            "id": 85,
+            "age": 2425,
+            "antigen": false,
+            "fitness": 0.5916798049885885,
+            "stress": 0.7277183193421461,
+            "oxygen": 0.6707869515198619,
+            "glucose": 0.5309541505925796,
+            "acid": 0.7497449517250061,
+            "reserve": {
+              "energy": 0.6879427112958367,
+              "precursor": 0.9992146620168818,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G1",
+              "progress": 0.3016262932242859,
+              "entry": 0,
+              "blockedFor": 0,
+              "arrest": "",
+              "drive": 0.18469023382494956,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 115,
+            "age": 5018,
+            "antigen": false,
+            "fitness": 0.5085172069307156,
+            "stress": 0.8984115055617117,
+            "oxygen": 0.6557699254309514,
+            "glucose": 0.5408616797382613,
+            "acid": 0.8156168054774463,
+            "reserve": {
+              "energy": 1,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 3881,
+              "arrest": "nutrients",
+              "drive": 0.06645474043046634,
+              "pressure": 0,
+              "retry": 0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "seed": 77,
+    "metabolism": 0.85,
+    "samples": [
+      {
+        "time": 3000,
+        "normal": 169,
+        "tumor": 1,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 5,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 0,
+          "recognitions": 0,
+          "mutations": 2,
+          "abnormalInitiations": 2,
+          "malignantTransitions": 1,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 1,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 5,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 2,
+          "substitutions": 1,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 5,
+          "cacheMisses": 27,
+          "cacheEntries": 27
+        },
+        "tumors": [
+          {
+            "id": 101,
+            "age": 40,
+            "antigen": false,
+            "fitness": 0.49031632551413223,
+            "stress": 0.17920954005702222,
+            "oxygen": 0.5440948452769208,
+            "glucose": 0.4972862110418432,
+            "acid": 0.8659947136370074,
+            "reserve": {
+              "energy": 0.01784045406534669,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 41,
+              "arrest": "nutrients",
+              "drive": 0.03728699686908895,
+              "pressure": 0,
+              "retry": 0
+            }
+          }
+        ]
+      },
+      {
+        "time": 6000,
+        "normal": 162,
+        "tumor": 5,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 7,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 1,
+          "environment": 2,
+          "apoptosisStarted": 1,
+          "killStarted": 0,
+          "environmentStarted": 2,
+          "recognitions": 0,
+          "mutations": 4,
+          "abnormalInitiations": 9,
+          "malignantTransitions": 7,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 6,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 7,
+          "vascularArrivals": 2,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 4,
+          "substitutions": 2,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 89,
+          "cacheMisses": 162,
+          "cacheEntries": 162
+        },
+        "tumors": [
+          {
+            "id": 73,
+            "age": 551,
+            "antigen": true,
+            "fitness": 0.31427142141626274,
+            "stress": 0.9282059149794681,
+            "oxygen": 0.5122904648429237,
+            "glucose": 0.3684438293980014,
+            "acid": 0.9931404826827862,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 552,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 87,
+            "age": 890,
+            "antigen": true,
+            "fitness": 0.316736217396005,
+            "stress": 0.9539272818614952,
+            "oxygen": 0.5130384868324394,
+            "glucose": 0.359250672677956,
+            "acid": 0.993185533745454,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 891,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 89,
+            "age": 1296,
+            "antigen": true,
+            "fitness": 0.3547571844963133,
+            "stress": 0.7552062306786543,
+            "oxygen": 0.513882149543081,
+            "glucose": 0.3787686223075503,
+            "acid": 0.9813084809553055,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1297,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 101,
+            "age": 3040,
+            "antigen": false,
+            "fitness": 0.2906195296328015,
+            "stress": 0.8524049629743742,
+            "oxygen": 0.5059994106718119,
+            "glucose": 0.3461855674680338,
+            "acid": 0.9911038497176903,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 3041,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 102,
+            "age": 1220,
+            "antigen": false,
+            "fitness": 0.30157002635600433,
+            "stress": 0.7253144348330541,
+            "oxygen": 0.5042472857496013,
+            "glucose": 0.3392487656811009,
+            "acid": 0.9928421321122542,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1221,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          }
+        ]
+      },
+      {
+        "time": 12000,
+        "normal": 156,
+        "tumor": 5,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 8,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 2,
+          "environment": 14,
+          "apoptosisStarted": 2,
+          "killStarted": 0,
+          "environmentStarted": 14,
+          "recognitions": 0,
+          "mutations": 6,
+          "abnormalInitiations": 16,
+          "malignantTransitions": 16,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 1,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 6,
+          "suppressiveRecoveries": 3,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 7,
+          "vascularArrivals": 2,
+          "extravasations": 1,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 6,
+          "substitutions": 3,
+          "losses": 0,
+          "primed": 2,
+          "reinforcements": 0,
+          "exposureRecords": 260,
+          "cacheMisses": 297,
+          "cacheEntries": 297
+        },
+        "tumors": [
+          {
+            "id": 58,
+            "age": 948,
+            "antigen": true,
+            "fitness": 0.4679268115755941,
+            "stress": 0.4823235604942923,
+            "oxygen": 0.5945064631210366,
+            "glucose": 0.4709923597156699,
+            "acid": 0.9282366742337416,
+            "reserve": {
+              "energy": 0.0011363648371019506,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 949,
+              "arrest": "nutrients",
+              "drive": 0.001498940665503697,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 61,
+            "age": 2247,
+            "antigen": false,
+            "fitness": 0.4142917810409741,
+            "stress": 0.750010029223047,
+            "oxygen": 0.5644949234534646,
+            "glucose": 0.426827097468287,
+            "acid": 0.9798549213142038,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 2248,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 75,
+            "age": 3157,
+            "antigen": true,
+            "fitness": 0.33320564969895683,
+            "stress": 0.7885637579147351,
+            "oxygen": 0.5209274169348885,
+            "glucose": 0.35834891254028667,
+            "acid": 0.9680688344402077,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 3158,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 90,
+            "age": 95,
+            "antigen": true,
+            "fitness": 0.48305021940089227,
+            "stress": 0.1332626210569717,
+            "oxygen": 0.5455987977259087,
+            "glucose": 0.42343823115030926,
+            "acid": 0.7808357185615605,
+            "reserve": {
+              "energy": 0.06928937770191274,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 96,
+              "arrest": "nutrients",
+              "drive": 0.1469851596609332,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 103,
+            "age": 4840,
+            "antigen": true,
+            "fitness": 0.4481217428684017,
+            "stress": 0.8653318958992927,
+            "oxygen": 0.6076515434758937,
+            "glucose": 0.4444538510364035,
+            "acid": 0.9199544495273485,
+            "reserve": {
+              "energy": 0.24891342230325694,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 3761,
+              "arrest": "nutrients",
+              "drive": 0.07021655962655,
+              "pressure": 0,
+              "retry": 0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "seed": 17,
+    "metabolism": 0.95,
+    "samples": [
+      {
+        "time": 3000,
+        "normal": 160,
+        "tumor": 8,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 5,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 1,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 1,
+          "recognitions": 0,
+          "mutations": 0,
+          "abnormalInitiations": 10,
+          "malignantTransitions": 8,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 1,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 5,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 39,
+          "cacheMisses": 126,
+          "cacheEntries": 126
+        },
+        "tumors": [
+          {
+            "id": 71,
+            "age": 153,
+            "antigen": true,
+            "fitness": 0.29599335819757394,
+            "stress": 0.4714617829701871,
+            "oxygen": 0.4729372034425693,
+            "glucose": 0.3358095559571356,
+            "acid": 0.985051783211028,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 154,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 72,
+            "age": 52,
+            "antigen": false,
+            "fitness": 0.2556531683102614,
+            "stress": 0.6530963388016824,
+            "oxygen": 0.4689931962878919,
+            "glucose": 0.3232939577153824,
+            "acid": 0.9969767621146762,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 53,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 73,
+            "age": 985,
+            "antigen": true,
+            "fitness": 0.3041038467556244,
+            "stress": 0.5920436502067106,
+            "oxygen": 0.47508036619008975,
+            "glucose": 0.35869956460109975,
+            "acid": 0.9899945572365162,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 986,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 85,
+            "age": 508,
+            "antigen": true,
+            "fitness": 0.2901031625467386,
+            "stress": 0.3632499403734035,
+            "oxygen": 0.4709866264420098,
+            "glucose": 0.33448117081587914,
+            "acid": 0.9798587035228856,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 509,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 86,
+            "age": 642,
+            "antigen": true,
+            "fitness": 0.23533271196828268,
+            "stress": 0.6158179880183996,
+            "oxygen": 0.4495708392661752,
+            "glucose": 0.27094938237111543,
+            "acid": 0.9999669576154172,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 643,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 87,
+            "age": 1763,
+            "antigen": true,
+            "fitness": 0.22976191822527553,
+            "stress": 0.6517363299376345,
+            "oxygen": 0.4473520675047631,
+            "glucose": 0.2665661554700056,
+            "acid": 1,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1764,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 100,
+            "age": 481,
+            "antigen": false,
+            "fitness": 0.26455798242593087,
+            "stress": 0.5611072939637314,
+            "oxygen": 0.4532590714501746,
+            "glucose": 0.2936366025680377,
+            "acid": 0.9959055322678492,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 482,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 101,
+            "age": 745,
+            "antigen": false,
+            "fitness": 0.27696797083723074,
+            "stress": 0.5692602882145504,
+            "oxygen": 0.4663925360873401,
+            "glucose": 0.33026438767454064,
+            "acid": 0.9912575920264559,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 746,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          }
+        ]
+      },
+      {
+        "time": 6000,
+        "normal": 155,
+        "tumor": 4,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 5,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 13,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 13,
+          "recognitions": 0,
+          "mutations": 0,
+          "abnormalInitiations": 15,
+          "malignantTransitions": 13,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 1,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 2,
+          "suppressiveRecoveries": 1,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 5,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 1,
+          "reinforcements": 0,
+          "exposureRecords": 152,
+          "cacheMisses": 250,
+          "cacheEntries": 250
+        },
+        "tumors": [
+          {
+            "id": 59,
+            "age": 2268,
+            "antigen": true,
+            "fitness": 0.6444252859170334,
+            "stress": 0.8169816645076863,
+            "oxygen": 0.7046120037971917,
+            "glucose": 0.6053405452077671,
+            "acid": 0.6673189354902607,
+            "reserve": {
+              "energy": 0.1328407790665302,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 2269,
+              "arrest": "nutrients",
+              "drive": 0.06898242574380059,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 74,
+            "age": 1531,
+            "antigen": true,
+            "fitness": 0.46955403716927624,
+            "stress": 0.37332171364981176,
+            "oxygen": 0.6366610739490773,
+            "glucose": 0.47507474814901257,
+            "acid": 0.9250916434396611,
+            "reserve": {
+              "energy": 0.41406795097279026,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 225,
+              "arrest": "acid",
+              "drive": 0.3656613382933247,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 102,
+            "age": 58,
+            "antigen": true,
+            "fitness": 0.5342084136652105,
+            "stress": 0.13194998722218726,
+            "oxygen": 0.5814566709727884,
+            "glucose": 0.47631739873752416,
+            "acid": 0.7344894854821892,
+            "reserve": {
+              "energy": 0.06507975978097519,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 59,
+              "arrest": "nutrients",
+              "drive": 0.17215394141919296,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 115,
+            "age": 1222,
+            "antigen": true,
+            "fitness": 0.42523892521574025,
+            "stress": 0.26507276773517696,
+            "oxygen": 0.5603282472325696,
+            "glucose": 0.42369011137634516,
+            "acid": 0.8575154698143402,
+            "reserve": {
+              "energy": 0.2656701538950818,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 445,
+              "arrest": "acid",
+              "drive": 0.4678707124748909,
+              "pressure": 0,
+              "retry": 0
+            }
+          }
+        ]
+      },
+      {
+        "time": 12000,
+        "normal": 155,
+        "tumor": 1,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 5,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 1,
+          "environment": 20,
+          "apoptosisStarted": 1,
+          "killStarted": 0,
+          "environmentStarted": 20,
+          "recognitions": 0,
+          "mutations": 0,
+          "abnormalInitiations": 15,
+          "malignantTransitions": 14,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 1,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 2,
+          "suppressiveRecoveries": 1,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 5,
+          "vascularArrivals": 0,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 3,
+          "reinforcements": 0,
+          "exposureRecords": 250,
+          "cacheMisses": 250,
+          "cacheEntries": 250
+        },
+        "tumors": [
+          {
+            "id": 58,
+            "age": 3281,
+            "antigen": false,
+            "fitness": 0.42533539973640033,
+            "stress": 0.05254263919397844,
+            "oxygen": 0.5580359398418323,
+            "glucose": 0.4445337359638733,
+            "acid": 0.9321618263815105,
+            "reserve": {
+              "energy": 0.9507732318936292,
+              "precursor": 0.9999363169864433,
+              "dnaDamage": 0.6025519982597477
+            },
+            "cycle": {
+              "phase": "S",
+              "progress": 0.6124168799710077,
+              "entry": 0,
+              "blockedFor": 2575,
+              "arrest": "acid",
+              "drive": 0.5781608714331481,
+              "pressure": 0,
+              "retry": 0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "seed": 77,
+    "metabolism": 0.95,
+    "samples": [
+      {
+        "time": 3000,
+        "normal": 162,
+        "tumor": 7,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 2,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 0,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 0,
+          "recognitions": 0,
+          "mutations": 0,
+          "abnormalInitiations": 9,
+          "malignantTransitions": 7,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 1,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 2,
+          "vascularArrivals": 2,
+          "extravasations": 2,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 34,
+          "cacheMisses": 162,
+          "cacheEntries": 162
+        },
+        "tumors": [
+          {
+            "id": 72,
+            "age": 1124,
+            "antigen": true,
+            "fitness": 0.28559042134283075,
+            "stress": 0.5509280466548195,
+            "oxygen": 0.4594291311938588,
+            "glucose": 0.32397361179677453,
+            "acid": 0.9955667548063325,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1125,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 74,
+            "age": 677,
+            "antigen": true,
+            "fitness": 0.32223416369689306,
+            "stress": 0.4497069490734284,
+            "oxygen": 0.4816719401611511,
+            "glucose": 0.35849197527727183,
+            "acid": 0.9736782252528261,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 678,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 87,
+            "age": 739,
+            "antigen": true,
+            "fitness": 0.2216484133698237,
+            "stress": 0.6436739059393606,
+            "oxygen": 0.4382046242554983,
+            "glucose": 0.2661010010120196,
+            "acid": 1,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 740,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 88,
+            "age": 759,
+            "antigen": false,
+            "fitness": 0.2151040468496984,
+            "stress": 0.6623445481821186,
+            "oxygen": 0.445270785468114,
+            "glucose": 0.2609687962256144,
+            "acid": 1,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 760,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 89,
+            "age": 228,
+            "antigen": false,
+            "fitness": 0.2763473482487406,
+            "stress": 0.5807521036129777,
+            "oxygen": 0.46200348881748615,
+            "glucose": 0.3127101182372649,
+            "acid": 0.9905875585090492,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 229,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 101,
+            "age": 139,
+            "antigen": false,
+            "fitness": 0.2682904466781163,
+            "stress": 0.6021882116844164,
+            "oxygen": 0.45142830172833454,
+            "glucose": 0.29223228338706136,
+            "acid": 0.9982039923320001,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 140,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 102,
+            "age": 907,
+            "antigen": true,
+            "fitness": 0.2980936871590823,
+            "stress": 0.49014932028836866,
+            "oxygen": 0.4615452339691398,
+            "glucose": 0.31469963926129635,
+            "acid": 0.9926151016117197,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 908,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          }
+        ]
+      },
+      {
+        "time": 6000,
+        "normal": 153,
+        "tumor": 8,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 4,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 15,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 15,
+          "recognitions": 0,
+          "mutations": 1,
+          "abnormalInitiations": 18,
+          "malignantTransitions": 17,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 6,
+          "suppressiveRecoveries": 1,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 4,
+          "vascularArrivals": 5,
+          "extravasations": 5,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 1,
+          "substitutions": 0,
+          "losses": 1,
+          "primed": 3,
+          "reinforcements": 0,
+          "exposureRecords": 158,
+          "cacheMisses": 270,
+          "cacheEntries": 270
+        },
+        "tumors": [
+          {
+            "id": 58,
+            "age": 453,
+            "antigen": false,
+            "fitness": 0.348994744816023,
+            "stress": 0.3581546819445925,
+            "oxygen": 0.5101103525438744,
+            "glucose": 0.35091155260430335,
+            "acid": 0.9436105296819537,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 454,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 60,
+            "age": 1129,
+            "antigen": true,
+            "fitness": 0.5309193870167956,
+            "stress": 0.4501665697003752,
+            "oxygen": 0.6700131025740771,
+            "glucose": 0.538332429600925,
+            "acid": 0.826016393618855,
+            "reserve": {
+              "energy": 0.1903457199746579,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1130,
+              "arrest": "acid",
+              "drive": 0.3082865137074095,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 71,
+            "age": 347,
+            "antigen": true,
+            "fitness": 0.3241835214754298,
+            "stress": 0.3446208044749838,
+            "oxygen": 0.4930693277468284,
+            "glucose": 0.33909088584283986,
+            "acid": 0.9677304175992807,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 348,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 75,
+            "age": 967,
+            "antigen": true,
+            "fitness": 0.4429539866390233,
+            "stress": 0.18780908345931643,
+            "oxygen": 0.5601028696724654,
+            "glucose": 0.42920471754745454,
+            "acid": 0.8798589738697782,
+            "reserve": {
+              "energy": 0.3124943107565473,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 325,
+              "arrest": "acid",
+              "drive": 0.4544315331149553,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 86,
+            "age": 2324,
+            "antigen": false,
+            "fitness": 0.4435239503743728,
+            "stress": 0.8654568296129094,
+            "oxygen": 0.6089719384908676,
+            "glucose": 0.46120662757983577,
+            "acid": 0.9014393085470567,
+            "reserve": {
+              "energy": 0.004459382757347188,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 2325,
+              "arrest": "nutrients",
+              "drive": 0.0014491657518466297,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 103,
+            "age": 1127,
+            "antigen": true,
+            "fitness": 0.445236240831992,
+            "stress": 0.5064731936254453,
+            "oxygen": 0.5783056223756882,
+            "glucose": 0.4306083594867756,
+            "acid": 0.9213249261722815,
+            "reserve": {
+              "energy": 0.2356024069236424,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 685,
+              "arrest": "acid",
+              "drive": 0.24361466865674783,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 116,
+            "age": 1397,
+            "antigen": true,
+            "fitness": 0.4179417938774509,
+            "stress": 0.6523615633796815,
+            "oxygen": 0.5823772396861004,
+            "glucose": 0.43559149521238666,
+            "acid": 0.8943538861114437,
+            "reserve": {
+              "energy": 0.1601920920286561,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1398,
+              "arrest": "nutrients",
+              "drive": 0.1275528769240023,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 117,
+            "age": 358,
+            "antigen": false,
+            "fitness": 0.3784174800831955,
+            "stress": 0.07727490535689065,
+            "oxygen": 0.5210026052913496,
+            "glucose": 0.3672870768766318,
+            "acid": 0.8856242184660265,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 359,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          }
+        ]
+      },
+      {
+        "time": 12000,
+        "normal": 152,
+        "tumor": 3,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 4,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 1,
+          "environment": 25,
+          "apoptosisStarted": 1,
+          "killStarted": 0,
+          "environmentStarted": 25,
+          "recognitions": 1,
+          "mutations": 1,
+          "abnormalInitiations": 19,
+          "malignantTransitions": 19,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 6,
+          "suppressiveRecoveries": 3,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 4,
+          "vascularArrivals": 7,
+          "extravasations": 7,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 1,
+          "substitutions": 0,
+          "losses": 1,
+          "primed": 6,
+          "reinforcements": 0,
+          "exposureRecords": 264,
+          "cacheMisses": 297,
+          "cacheEntries": 297
+        },
+        "tumors": [
+          {
+            "id": 59,
+            "age": 3401,
+            "antigen": false,
+            "fitness": 0.3603812776516183,
+            "stress": 0.7194589838122313,
+            "oxygen": 0.5496334019004268,
+            "glucose": 0.40391872292158926,
+            "acid": 0.9382971362259148,
+            "reserve": {
+              "energy": 0.20157807591117796,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1453,
+              "arrest": "nutrients",
+              "drive": 0.11929252651849101,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 90,
+            "age": 4708,
+            "antigen": false,
+            "fitness": 0.5594856916699842,
+            "stress": 0.7216253507359245,
+            "oxygen": 0.6020334242459606,
+            "glucose": 0.49057853890254216,
+            "acid": 0.7360423880026621,
+            "reserve": {
+              "energy": 1,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 97,
+              "arrest": "nutrients",
+              "drive": 0.17434131781945308,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 117,
+            "age": 6358,
+            "antigen": false,
+            "fitness": 0.39521108517311726,
+            "stress": 0.8153843728583263,
+            "oxygen": 0.5627187440638941,
+            "glucose": 0.4011676486800699,
+            "acid": 0.9268619929304802,
+            "reserve": {
+              "energy": 0.39774102700077424,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1821,
+              "arrest": "nutrients",
+              "drive": 0.10392393264162036,
+              "pressure": 0,
+              "retry": 0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "seed": 17,
+    "metabolism": 1.05,
+    "samples": [
+      {
+        "time": 3000,
+        "normal": 155,
+        "tumor": 7,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 2,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 1,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 1,
+          "recognitions": 0,
+          "mutations": 0,
+          "abnormalInitiations": 15,
+          "malignantTransitions": 7,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 7,
+          "suppressiveRecoveries": 1,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 2,
+          "vascularArrivals": 1,
+          "extravasations": 1,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 76,
+          "cacheMisses": 225,
+          "cacheEntries": 225
+        },
+        "tumors": [
+          {
+            "id": 72,
+            "age": 278,
+            "antigen": true,
+            "fitness": 0.22480426787881805,
+            "stress": 0.7886472230571396,
+            "oxygen": 0.41208313475862596,
+            "glucose": 0.2584565852333036,
+            "acid": 0.9997996437191452,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 279,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 73,
+            "age": 277,
+            "antigen": false,
+            "fitness": 0.1790102532877819,
+            "stress": 0.8172752929666481,
+            "oxygen": 0.40833535620517897,
+            "glucose": 0.23561310369456023,
+            "acid": 0.9995865879351633,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 278,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 74,
+            "age": 148,
+            "antigen": true,
+            "fitness": 0.3024295179580277,
+            "stress": 0.3266923210751626,
+            "oxygen": 0.4498925339114868,
+            "glucose": 0.32329410819684046,
+            "acid": 0.9134172092554933,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 149,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 87,
+            "age": 667,
+            "antigen": false,
+            "fitness": 0.17717413191642323,
+            "stress": 0.8546825127663786,
+            "oxygen": 0.3920976029115942,
+            "glucose": 0.2183819751301154,
+            "acid": 1,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 668,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 88,
+            "age": 1276,
+            "antigen": true,
+            "fitness": 0.21486582703323598,
+            "stress": 0.6433100302411925,
+            "oxygen": 0.4103884881523055,
+            "glucose": 0.2543076261651092,
+            "acid": 0.9980709492252563,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1277,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 100,
+            "age": 1270,
+            "antigen": true,
+            "fitness": 0.257993713658675,
+            "stress": 0.6798827912056892,
+            "oxygen": 0.41872261638442676,
+            "glucose": 0.29049693687508504,
+            "acid": 0.9991906012097994,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1271,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 101,
+            "age": 11,
+            "antigen": true,
+            "fitness": 0.28221234106378074,
+            "stress": 0.8359811871115251,
+            "oxygen": 0.4262603814563444,
+            "glucose": 0.3277357835923472,
+            "acid": 0.9940107695518001,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 12,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          }
+        ]
+      },
+      {
+        "time": 6000,
+        "normal": 150,
+        "tumor": 3,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 2,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 1,
+          "environment": 18,
+          "apoptosisStarted": 1,
+          "killStarted": 0,
+          "environmentStarted": 18,
+          "recognitions": 0,
+          "mutations": 0,
+          "abnormalInitiations": 20,
+          "malignantTransitions": 16,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 2,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 8,
+          "suppressiveRecoveries": 4,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 2,
+          "vascularArrivals": 1,
+          "extravasations": 1,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 4,
+          "reinforcements": 0,
+          "exposureRecords": 269,
+          "cacheMisses": 275,
+          "cacheEntries": 275
+        },
+        "tumors": [
+          {
+            "id": 74,
+            "age": 3148,
+            "antigen": true,
+            "fitness": 0.33843962657334753,
+            "stress": 0.8812663503201976,
+            "oxygen": 0.5391739012112263,
+            "glucose": 0.3779822232681591,
+            "acid": 0.9480043334731889,
+            "reserve": {
+              "energy": 0.02340258092467893,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 3149,
+              "arrest": "nutrients",
+              "drive": 0.0060849271387642245,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 89,
+            "age": 757,
+            "antigen": false,
+            "fitness": 0.40430420408233836,
+            "stress": 0.18665745997697125,
+            "oxygen": 0.5236205430328846,
+            "glucose": 0.38358565703034403,
+            "acid": 0.8909402990341186,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 758,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 114,
+            "age": 2999,
+            "antigen": true,
+            "fitness": 0.34719298128544623,
+            "stress": 0.8977562080531339,
+            "oxygen": 0.5087147217188308,
+            "glucose": 0.3705921911481601,
+            "acid": 0.9143591191045087,
+            "reserve": {
+              "energy": 0.4890813238630512,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 3000,
+              "arrest": "nutrients",
+              "drive": 0.059933103598433964,
+              "pressure": 0,
+              "retry": 0
+            }
+          }
+        ]
+      },
+      {
+        "time": 12000,
+        "normal": 150,
+        "tumor": 1,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 3,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 1,
+          "environment": 25,
+          "apoptosisStarted": 1,
+          "killStarted": 0,
+          "environmentStarted": 25,
+          "recognitions": 0,
+          "mutations": 0,
+          "abnormalInitiations": 21,
+          "malignantTransitions": 18,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 2,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 1,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 10,
+          "suppressiveRecoveries": 5,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 2,
+          "vascularArrivals": 1,
+          "extravasations": 1,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 0,
+          "substitutions": 0,
+          "losses": 0,
+          "primed": 10,
+          "reinforcements": 0,
+          "exposureRecords": 309,
+          "cacheMisses": 300,
+          "cacheEntries": 300
+        },
+        "tumors": [
+          {
+            "id": 57,
+            "age": 3695,
+            "antigen": false,
+            "fitness": 0.4926080806307125,
+            "stress": 0.7553589174169082,
+            "oxygen": 0.597773511428386,
+            "glucose": 0.47558049228973687,
+            "acid": 0.8996360967867076,
+            "reserve": {
+              "energy": 0.01104089141519616,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 3696,
+              "arrest": "nutrients",
+              "drive": 0.005822750115143278,
+              "pressure": 0,
+              "retry": 0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "seed": 77,
+    "metabolism": 1.05,
+    "samples": [
+      {
+        "time": 3000,
+        "normal": 155,
+        "tumor": 10,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 2,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 3,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 4,
+          "recognitions": 1,
+          "mutations": 1,
+          "abnormalInitiations": 16,
+          "malignantTransitions": 12,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 2,
+          "suppressiveRecoveries": 0,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 2,
+          "vascularArrivals": 1,
+          "extravasations": 0,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 1,
+          "substitutions": 1,
+          "losses": 0,
+          "primed": 0,
+          "reinforcements": 0,
+          "exposureRecords": 67,
+          "cacheMisses": 243,
+          "cacheEntries": 243
+        },
+        "tumors": [
+          {
+            "id": 72,
+            "age": 1064,
+            "antigen": true,
+            "fitness": 0.24859266814560974,
+            "stress": 0.7179000084304057,
+            "oxygen": 0.43355430321673216,
+            "glucose": 0.3054329756710489,
+            "acid": 0.9942694844330772,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1065,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 74,
+            "age": 272,
+            "antigen": false,
+            "fitness": 0.18458418302859894,
+            "stress": 0.8107788685628813,
+            "oxygen": 0.4098235344098619,
+            "glucose": 0.24894199434144437,
+            "acid": 0.9996022739686257,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 273,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 75,
+            "age": 185,
+            "antigen": false,
+            "fitness": 0.26656416676050987,
+            "stress": 0.27610535075728293,
+            "oxygen": 0.4457699002260231,
+            "glucose": 0.301104278322235,
+            "acid": 0.950481689308744,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 186,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 87,
+            "age": 1698,
+            "antigen": true,
+            "fitness": 0.19105048701818395,
+            "stress": 0.8421463687941376,
+            "oxygen": 0.40821077703845265,
+            "glucose": 0.2389986413512744,
+            "acid": 1,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1699,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 88,
+            "age": 1293,
+            "antigen": false,
+            "fitness": 0.15299842596659488,
+            "stress": 0.9392124774948595,
+            "oxygen": 0.3839279754364744,
+            "glucose": 0.18990550491404026,
+            "acid": 1,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1294,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 89,
+            "age": 984,
+            "antigen": true,
+            "fitness": 0.15491786346714473,
+            "stress": 0.8936059624055094,
+            "oxygen": 0.397926136294258,
+            "glucose": 0.20611659806465435,
+            "acid": 1,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 985,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 90,
+            "age": 831,
+            "antigen": true,
+            "fitness": 0.18191882902305936,
+            "stress": 0.46722937795687564,
+            "oxygen": 0.40000304193408404,
+            "glucose": 0.21709084910926996,
+            "acid": 1,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 832,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 102,
+            "age": 1301,
+            "antigen": false,
+            "fitness": 0.192871476590993,
+            "stress": 0.794535525090362,
+            "oxygen": 0.40638989070032394,
+            "glucose": 0.2265430958225177,
+            "acid": 1,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1302,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 103,
+            "age": 405,
+            "antigen": true,
+            "fitness": 0.2617063561596464,
+            "stress": 0.6210280331313323,
+            "oxygen": 0.4509291442127915,
+            "glucose": 0.3113321250489166,
+            "acid": 0.9714937148330448,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 406,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 116,
+            "age": 285,
+            "antigen": false,
+            "fitness": 0.315396415464754,
+            "stress": 0.3853963924018898,
+            "oxygen": 0.45821803286671636,
+            "glucose": 0.3314006603012482,
+            "acid": 0.9225308525065581,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 286,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          }
+        ]
+      },
+      {
+        "time": 6000,
+        "normal": 151,
+        "tumor": 6,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 2,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 0,
+          "environment": 21,
+          "apoptosisStarted": 0,
+          "killStarted": 0,
+          "environmentStarted": 21,
+          "recognitions": 1,
+          "mutations": 1,
+          "abnormalInitiations": 20,
+          "malignantTransitions": 19,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 3,
+          "suppressiveRecoveries": 1,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 2,
+          "vascularArrivals": 1,
+          "extravasations": 1,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 1,
+          "substitutions": 1,
+          "losses": 0,
+          "primed": 6,
+          "reinforcements": 0,
+          "exposureRecords": 184,
+          "cacheMisses": 270,
+          "cacheEntries": 270
+        },
+        "tumors": [
+          {
+            "id": 61,
+            "age": 1421,
+            "antigen": false,
+            "fitness": 0.44506017777348317,
+            "stress": 0.524614570574465,
+            "oxygen": 0.5939453005241359,
+            "glucose": 0.46285941578825496,
+            "acid": 0.8745917219170777,
+            "reserve": {
+              "energy": 0.0023592340960485922,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1413,
+              "arrest": "nutrients",
+              "drive": 0.0029866183312878547,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 71,
+            "age": 1646,
+            "antigen": false,
+            "fitness": 0.4504211990380254,
+            "stress": 0.7304614499874575,
+            "oxygen": 0.5659556680537284,
+            "glucose": 0.430055899315692,
+            "acid": 0.8794103363727002,
+            "reserve": {
+              "energy": 0.0018832314223996905,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1647,
+              "arrest": "nutrients",
+              "drive": 0.0013557791598120066,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 75,
+            "age": 3185,
+            "antigen": false,
+            "fitness": 0.425792346399034,
+            "stress": 0.990527682080005,
+            "oxygen": 0.5760568774515583,
+            "glucose": 0.44646992714655015,
+            "acid": 0.8989354619576085,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 3186,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 86,
+            "age": 2900,
+            "antigen": true,
+            "fitness": 0.43261272938866135,
+            "stress": 0.9331811963409424,
+            "oxygen": 0.5731933795664299,
+            "glucose": 0.425338257585416,
+            "acid": 0.9343375184319236,
+            "reserve": {
+              "energy": 0.41903626343517775,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1433,
+              "arrest": "nutrients",
+              "drive": 0.03711565168831359,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 116,
+            "age": 3285,
+            "antigen": false,
+            "fitness": 0.5059529413136175,
+            "stress": 0.7570916389972234,
+            "oxygen": 0.5964443767798766,
+            "glucose": 0.4635528271434871,
+            "acid": 0.7995372298564619,
+            "reserve": {
+              "energy": 0.5061853475649752,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 405,
+              "arrest": "nutrients",
+              "drive": 0.13902493182298498,
+              "pressure": 0,
+              "retry": 0
+            }
+          },
+          {
+            "id": 118,
+            "age": 1614,
+            "antigen": true,
+            "fitness": 0.28811224264244756,
+            "stress": 0.7581247447226359,
+            "oxygen": 0.5022784502943978,
+            "glucose": 0.30292212520726025,
+            "acid": 0.936111370800063,
+            "reserve": {
+              "energy": 0,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 1615,
+              "arrest": "nutrients",
+              "drive": 0,
+              "pressure": 0,
+              "retry": 0
+            }
+          }
+        ]
+      },
+      {
+        "time": 12000,
+        "normal": 151,
+        "tumor": 1,
+        "counters": {
+          "manualRemoved": 0,
+          "divisions": 2,
+          "immuneDivisions": 0,
+          "kills": 0,
+          "apoptosis": 1,
+          "environment": 28,
+          "apoptosisStarted": 1,
+          "killStarted": 0,
+          "environmentStarted": 28,
+          "recognitions": 1,
+          "mutations": 1,
+          "abnormalInitiations": 20,
+          "malignantTransitions": 20,
+          "abnormalKills": 0,
+          "normalEnvironmentDeaths": 0,
+          "abnormalEnvironmentDeaths": 0,
+          "lifespan": 0,
+          "lifespanStarted": 0,
+          "normalDivisions": 0,
+          "replicationDeaths": 0,
+          "stemAsymmetric": 0,
+          "stemSelfRenewal": 0,
+          "stemDifferentiation": 0,
+          "stemReversions": 0,
+          "normalTraitMutations": 0,
+          "stressMutations": 0,
+          "antigenExposures": 0,
+          "antigenEscapes": 0,
+          "suppressiveTransitions": 3,
+          "suppressiveRecoveries": 1,
+          "injuryDeactivations": 0,
+          "signalDeactivations": 0,
+          "endothelialDeaths": 0,
+          "endothelialDivisions": 2,
+          "vascularArrivals": 1,
+          "extravasations": 1,
+          "circulationReturns": 0,
+          "intravasations": 0,
+          "bloodstreamExports": 0
+        },
+        "immunity": {
+          "geneticChanges": 1,
+          "substitutions": 1,
+          "losses": 0,
+          "primed": 6,
+          "reinforcements": 0,
+          "exposureRecords": 198,
+          "cacheMisses": 270,
+          "cacheEntries": 270
+        },
+        "tumors": [
+          {
+            "id": 116,
+            "age": 9285,
+            "antigen": false,
+            "fitness": 0.5651517031544442,
+            "stress": 0.9777829119216899,
+            "oxygen": 0.6588403364174239,
+            "glucose": 0.5369344393488105,
+            "acid": 0.7653605828758414,
+            "reserve": {
+              "energy": 1,
+              "precursor": 1,
+              "dnaDamage": 0
+            },
+            "cycle": {
+              "phase": "G0",
+              "progress": 0,
+              "entry": 0,
+              "blockedFor": 6405,
+              "arrest": "nutrients",
+              "drive": 0.013168051288870053,
+              "pressure": 0,
+              "retry": 0
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,59 @@
+{
+  "label": "before",
+  "revision": "49951e23f23479490258b63abfa016ed00469598",
+  "codeHash": "9b4d11ba9ec4f487df352af7ab573a51ba77203908145f47722f294c2825c7b9",
+  "node": "v24.15.0",
+  "cpu": "13th Gen Intel(R) Core(TM) i5-13500H",
+  "logicalCPUs": 16,
+  "notes": "Fixed population: growth, killing, apoptosis and vascular arrivals disabled identically in both versions. Mechanics, geometry/contact scans, nutrient fields and recognition remain active. Fresh process; three repeats; heap is process JS memory, not whole-browser/GPU RAM.",
+  "rows": [
+    {
+      "repeat": 0,
+      "cells": 483,
+      "lattice": [
+        768,
+        576
+      ],
+      "steps": 160,
+      "elapsedMs": 2718.2891,
+      "stepMs": 16.989306875,
+      "mcsPerSecond": 58.860553132483226,
+      "snapshotMs": 6.572037500000079,
+      "heapMiB": 288.4374542236328,
+      "arrayBufferMiB": 44.52638912200928,
+      "heapDeltaMiB": 0.491058349609375
+    },
+    {
+      "repeat": 1,
+      "cells": 483,
+      "lattice": [
+        768,
+        576
+      ],
+      "steps": 160,
+      "elapsedMs": 3025.5239999999994,
+      "stepMs": 18.909524999999995,
+      "mcsPerSecond": 52.88340135460834,
+      "snapshotMs": 5.852999999999838,
+      "heapMiB": 288.7909851074219,
+      "arrayBufferMiB": 30.129904747009277,
+      "heapDeltaMiB": 0.31926727294921875
+    },
+    {
+      "repeat": 2,
+      "cells": 483,
+      "lattice": [
+        768,
+        576
+      ],
+      "steps": 160,
+      "elapsedMs": 2782.810300000001,
+      "stepMs": 17.392564375000006,
+      "mcsPerSecond": 57.495834336965025,
+      "snapshotMs": 5.477862499999674,
+      "heapMiB": 287.82047271728516,
+      "arrayBufferMiB": 34.73757076263428,
+      "heapDeltaMiB": 0.32354736328125
+    }
+  ]
+}

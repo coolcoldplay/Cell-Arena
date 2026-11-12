@@ -34,7 +34,7 @@ test('CSV includes every parameter and counter, keeps quotes safe and includes a
   assert.equal(csv.trim().split('\r\n').length,3);assert.match(csv,/""mcs""|parameter_changes/);
 });
 test('lock import validates booleans and all model parameters survive a fixed random seed override',async()=>{
-  for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js','src/experiment.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+  for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js','src/experiment.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
   const data={scene:'random',seed:17,boundary:'wrap',refinement:1,worldWidth:96,worldHeight:72,settings:{},display:{parameterLocks:{growth:true,kill:false}}};
   assert.deepEqual(CellLabExperiment.parse(data).display.parameterLocks,{growth:true,kill:false});assert.throws(()=>CellLabExperiment.parse({...data,display:{parameterLocks:{growth:'true'}}}),/parameterLocks/);
   const locks=new CellLabRounds.Locks(Object.keys(CellLabExperiment.ranges));locks.all(true);const original=new CellLab.Simulation({scene:'hot',width:240,height:180,warmup:0});

@@ -1,6 +1,6 @@
 import vm from 'node:vm';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
-for(const file of ['vendor/artistoo.js','src/model.js'])vm.runInThisContext(await readFile(file,'utf8'));
+for(const file of ['vendor/artistoo.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(file,'utf8'));
 const results=[];
 for(const scene of ['ecosystem','collective','invasion','maze']){
   const s=new CellLab.Simulation({scene}),start=performance.now(),initial=s.snapshot().cells;

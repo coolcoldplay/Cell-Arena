@@ -1,10 +1,11 @@
+import {cognateCulture,peptide,receptor,trait} from './cognate-fixture.mjs';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js','src/display-fields.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js','src/display-fields.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm'));
-const make=(extra={})=>new CellLab.Simulation({width:200,height:150,scene:'empty',warmup:0,settings:{capacity:40,growth:0,apoptosis:0,metabolism:0,immuneGrowth:0},...extra});
+const make=(extra={})=>cognateCulture(new CellLab.Simulation({width:200,height:150,scene:'empty',warmup:0,settings:{capacity:40,growth:0,apoptosis:0,metabolism:0,immuneGrowth:0},...extra}));
 
 test('legacy population budgets do not restrict additions; failed geometry still leaves the tissue intact',()=>{
   const s=make();for(let i=0;i<40;i++)assert.ok(s.seed(i?3:1,12+(i%10)*18,12+Math.floor(i/10)*20,i?3:7));
@@ -44,7 +45,7 @@ test('1024x768 padded lattice stays within WASM storage and matches JS at wrappi
 
 test('immune color tracks genuine recognition and activation expiry, never signal attraction or the scanning phase',()=>{
   const s=make({width:80,height:60,settings:{kill:0,antigen:100,metabolism:0,growth:0,apoptosis:0,immuneGrowth:0}}),target=s.seed(2,30,25,5),ctl=s.seed(3,40,25,4),peer=s.seed(3,49,25,4);
-  s.cells[target].genome.antigen=1;s.applyGenome(s.cells[target]);s.pulse(60,25,'trail');s.updateLocal(1);
+  peptide(s,s.cells[target],1);s.pulse(60,25,'trail');s.updateLocal(1);
   assert.equal(s.cells[ctl].phase,'scan');assert.deepEqual(CellLabDisplay.bodyColor(s.cells[ctl]),[233,154,154]);
   for(let n=0;n<40;n++)s.updateLocal(4);
   assert.ok(s.counters.recognitions>0);assert.equal(s.cells[ctl].kind,3);assert.deepEqual(CellLabDisplay.bodyColor(s.cells[ctl]),[153,0,0]);assert.deepEqual(CellLabDisplay.bodyColor(s.cells[peer]),[233,154,154]);
@@ -56,6 +57,6 @@ test('tumor gray encodes inherited proliferation on a fixed monotone scale and i
   const sample=proliferation=>({kind:2,genome:{proliferation}}),values=[.25,.5,1,1.5,2,2.5,3].map(p=>CellLabDisplay.bodyColor(sample(p))[0]);
   assert.equal(values[0],88);assert.equal(values.at(-1),0);for(let i=1;i<values.length;i++)assert.ok(values[i]<values[i-1]);
   const m=sample(1.5),before=structuredClone(m);CellLabDisplay.bodyColor(m);assert.deepEqual(m,before);assert.deepEqual(CellLabDisplay.bodyColor({...m,fitness:0,stress:1}),CellLabDisplay.bodyColor(m));
-  const s=make({settings:{mutation:0}}),id=s.seed(2,50,50,10);s.cells[id].genome.proliferation=2;const child=s.divide(id);assert.ok(child);assert.deepEqual(CellLabDisplay.bodyColor(s.cells[id]),CellLabDisplay.bodyColor(s.cells[child]));
-  s.cells[child].genome.proliferation=3;assert.ok(CellLabDisplay.bodyColor(s.cells[child])[0]<CellLabDisplay.bodyColor(s.cells[id])[0]);
+  const s=make({settings:{mutation:0}}),id=s.seed(2,50,50,10);trait(s,s.cells[id],'proliferation',2);const child=s.divide(id);assert.ok(child);assert.deepEqual(CellLabDisplay.bodyColor(s.cells[id]),CellLabDisplay.bodyColor(s.cells[child]));
+  trait(s,s.cells[child],'proliferation',3);assert.ok(CellLabDisplay.bodyColor(s.cells[child])[0]<CellLabDisplay.bodyColor(s.cells[id])[0]);
 });

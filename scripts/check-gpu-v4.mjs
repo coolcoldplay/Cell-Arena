@@ -19,7 +19,7 @@ try{
   // The command queue must not mutate a grid while a field readback is pending.
   const serialized=await evaluate(`(async()=>{const t=artistooLab.snapshot.time;await Promise.all([artistooLab.rpc('advance',{steps:16}),artistooLab.rpc('set',{name:'supply',value:1.25}),artistooLab.rpc('backend',{mode:'cpu'})]);return {delta:artistooLab.snapshot.time-t,supply:artistooLab.snapshot.settings.supply,active:artistooLab.snapshot.compute.active};})()`);
   check(serialized.delta===16&&serialized.supply===1.25&&serialized.active==='cpu','Commands serialize across asynchronous GPU steps',serialized);
-  const sources=await Promise.all(['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/model.js','src/gpu-fields.js'].map(f=>readFile(f,'utf8')));await evaluate(sources.join('\n'));
+  const sources=await Promise.all(['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/immune-genetics.js','src/model.js','src/gpu-fields.js'].map(f=>readFile(f,'utf8')));await evaluate(sources.join('\n'));
   const parity=await evaluate(`(async()=>{
     const results=[];for(const boundary of ['solid','wrap']){const opts={width:80,height:56,scene:'empty',warmup:0,boundary},a=new CellLab.Simulation(opts),b=new CellLab.Simulation(opts);
       for(const s of [a,b]){s.seed(2,24,25,8);s.seed(3,45,25,4);for(let y=0;y<56;y++)s.paint(38,y,0,false,false);s.rebuildMask();for(const key of ['oxygen','glucose','acid'])for(let i=0;i<s.fields[key].values.length;i++)s.fields[key].values[i]=s.fields[key].blocked[i]?0:.1+((i*17)%67)/80;s.prepareEnvironment();}

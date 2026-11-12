@@ -1,0 +1,84 @@
+[
+  {
+    "fixedPopulation": true,
+    "speed": 1,
+    "lattice": [
+      768,
+      576
+    ],
+    "display": [
+      1920,
+      1440
+    ],
+    "antigen": true,
+    "cells": 483,
+    "elapsed": 10002.699999988079,
+    "renderedFPS": 30.091875193733564,
+    "snapshotFPS": 29.99190218644541,
+    "mcsPerSecond": 29.99190218644541,
+    "frameGapP95": 42.200000047683716,
+    "longTasks": 0,
+    "maxLongTask": 0,
+    "renderer": {
+      "gpu": true,
+      "device": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4050 Laptop GPU (0x000028E1) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "error": "",
+      "ms": 0.40000003576278687,
+      "fps": 30.535855004298675,
+      "renderMs": 6.699999988079071,
+      "snapshotMs": 5.199999988079071
+    },
+    "compute": {
+      "mode": "cpu",
+      "active": "cpu",
+      "reason": "已选择 CPU 微环境；GPU 绘图独立运行。",
+      "cpuMs": 0.3999999910593033,
+      "gpuMs": 3.2749999910593033,
+      "adapter": {
+        "vendor": "nvidia",
+        "fallback": false
+      }
+    }
+  },
+  {
+    "fixedPopulation": true,
+    "speed": 8,
+    "lattice": [
+      768,
+      576
+    ],
+    "display": [
+      1920,
+      1440
+    ],
+    "antigen": true,
+    "cells": 483,
+    "elapsed": 10019.300000011921,
+    "renderedFPS": 31.239707364748796,
+    "snapshotFPS": 31.439322108293513,
+    "mcsPerSecond": 35.73103909450501,
+    "frameGapP95": 45.299999952316284,
+    "longTasks": 0,
+    "maxLongTask": 0,
+    "renderer": {
+      "gpu": true,
+      "device": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4050 Laptop GPU (0x000028E1) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "error": "",
+      "ms": 1,
+      "fps": 25.388145688306512,
+      "renderMs": 6.800000011920929,
+      "snapshotMs": 6.399999976158142
+    },
+    "compute": {
+      "mode": "cpu",
+      "active": "cpu",
+      "reason": "已选择 CPU 微环境；GPU 绘图独立运行。",
+      "cpuMs": 0.3999999910593033,
+      "gpuMs": 3.2749999910593033,
+      "adapter": {
+        "vendor": "nvidia",
+        "fallback": false
+      }
+    }
+  }
+]

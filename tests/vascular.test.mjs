@@ -1,8 +1,9 @@
+import {peptide,trait} from './cognate-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
-for(const file of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js'])vm.runInThisContext(await readFile(file,'utf8'),{filename:file});
+for(const file of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(file,'utf8'),{filename:file});
 const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm'));
 const options={width:100,height:80,scene:'empty',warmup:0,seed:31,vessels:[{x:50,y:40,radius:11}],settings:{vesselImmuneRate:0,vesselLifespan:0,normalRepair:0,apoptosis:0}};
 const create=extra=>new CellLab.Simulation({...options,...extra,settings:{...options.settings,...extra?.settings}});
@@ -52,7 +53,7 @@ test('immune exits and tumor entry require continuous bodies and nuclei, never t
     // polarity happens to bring the tumor back from the far side of the dish.
     // Only its initial direction is prescribed; contact, passage permission
     // and every subsequent membrane/nuclear step remain part of the model.
-    if(kind===3)s.addSource(78,45,'trail',12);else{m.genome.invasion=2.8;m.px=-1;m.py=0;s.updateMechanics(m);}
+    if(kind===3)s.addSource(78,45,'trail',12);else{trait(s,m,'invasion',2.8);m.px=-1;m.py=0;s.updateMechanics(m);}
     let previous=[m.nucleusX,m.nucleusY],seenTransit=false,seenInside=false;
     for(let t=0;t<1200&&!(kind===3?s.counters.extravasations:s.counters.bloodstreamExports);t++){
       s.advance(1);if(!s.cells[id])break;
@@ -68,12 +69,12 @@ test('immune exits and tumor entry require continuous bodies and nuclei, never t
 
 test('noninvasive tumors cannot enter; no-contact geometry never licenses intravasation',async()=>{
   const s=create({settings:{tumorIntravasation:3,metabolism:0,growth:0}});await CellLabWasm.install(s,module);
-  const id=s.seed(2,76,40,6),m=s.cells[id];m.genome.invasion=.4;s.updateMechanics(m);s.advance(800);
+  const id=s.seed(2,76,40,6),m=s.cells[id];trait(s,m,'invasion',.4);s.updateMechanics(m);s.advance(800);
   assert.equal(s.counters.intravasations,0);assert.equal(m.vascularPhase||0,0);
   const center=s.C.grid.p2i([50,40]);assert.equal(s.vascular.allowed(0,center,id,0),false);
   // Even an artificially high inherited contact counter cannot replace a
   // current geometric contact. Clearing it resets the encounter.
-  m.genome.invasion=3;m.vascularContact=1000;s.contacts.set(id,new Map());s.vascular.tick(100);assert.equal(m.vascularPhase||0,0);assert.equal(m.vascularContact,0);
+  trait(s,m,'invasion',3);m.vascularContact=1000;s.contacts.set(id,new Map());s.vascular.tick(100);assert.equal(m.vascularPhase||0,0);assert.equal(m.vascularContact,0);
 });
 
 test('local endothelial gaps trigger finite repair; exhausted lineages can shrink without dividing',async()=>{
@@ -106,7 +107,7 @@ test('health loss reduces immune availability; recruitable vessels defer no-immu
 
 test('WASM tumor crossing retains the JavaScript lattice and seeded random trajectory',async()=>{
   const a=create({settings:{tumorIntravasation:3,metabolism:0,growth:0}}),b=create({settings:{tumorIntravasation:3,metabolism:0,growth:0}});await CellLabWasm.install(b,module);
-  for(const s of [a,b]){const id=s.seed(2,76,40,6);s.cells[id].genome.invasion=2.8;s.updateMechanics(s.cells[id]);}
+  for(const s of [a,b]){const id=s.seed(2,76,40,6);trait(s,s.cells[id],'invasion',2.8);s.updateMechanics(s.cells[id]);}
   for(let n=0;n<400;n++){a.advance(1);b.advance(1);assert.deepEqual(b.C.grid._pixels,a.C.grid._pixels,'crossing lattice '+n);}
   assert.deepEqual(b.counters,a.counters);assert.deepEqual(Uint32Array.from(b.C.mt.mt),Uint32Array.from(a.C.mt.mt));
 });

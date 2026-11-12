@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm'));
 function fixture(boundary='solid'){
  const s=new CellLab.Simulation({width:64,height:48,scene:'empty',warmup:0,boundary,seed:23,settings:{growth:0,apoptosis:0,metabolism:0,tumorMotility:0,noise:0}}),C=s.C,id=C.makeNewCellID(2),at=(x,y)=>C.grid.p2i([x,y]);

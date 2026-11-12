@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
-for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm'));
 test('WASM trap falls back before committing changes or consuming JS random numbers',async()=>{
   const options={width:80,height:60,warmup:0,seed:17},a=new CellLab.Simulation(options),b=new CellLab.Simulation(options),w=await CellLabWasm.install(b,module),run=w.e.run;w.e={...w.e,run(...args){run(...args);throw Error('injected trap after computation');}};a.advance(1);b.advance(1);assert.equal(b.kernel,'fast');assert.deepEqual(b.C.grid._pixels,a.C.grid._pixels);assert.deepEqual(b.snapshot().cells,a.snapshot().cells);

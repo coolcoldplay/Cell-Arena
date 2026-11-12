@@ -1,0 +1,59 @@
+{
+  "label": "after",
+  "revision": "2026-11-specific-immune-genetics-1",
+  "codeHash": "ed862452c0cc248339d7b0091c79b6a459c7219ab120cfe9398266197786b498",
+  "node": "v24.15.0",
+  "cpu": "13th Gen Intel(R) Core(TM) i5-13500H",
+  "logicalCPUs": 16,
+  "notes": "Fixed population: growth, killing, apoptosis and vascular arrivals disabled identically in both versions. Mechanics, geometry/contact scans, nutrient fields and recognition remain active. Fresh process; three repeats; heap is process JS memory, not whole-browser/GPU RAM.",
+  "rows": [
+    {
+      "repeat": 0,
+      "cells": 483,
+      "lattice": [
+        768,
+        576
+      ],
+      "steps": 160,
+      "elapsedMs": 2848.0114,
+      "stepMs": 17.80007125,
+      "mcsPerSecond": 56.17955040488953,
+      "snapshotMs": 8.95682499999998,
+      "heapMiB": 290.26058197021484,
+      "arrayBufferMiB": 32.78294658660889,
+      "heapDeltaMiB": 0.8117446899414062
+    },
+    {
+      "repeat": 1,
+      "cells": 483,
+      "lattice": [
+        768,
+        576
+      ],
+      "steps": 160,
+      "elapsedMs": 2985.3985999999995,
+      "stepMs": 18.65874125,
+      "mcsPerSecond": 53.594183369684714,
+      "snapshotMs": 8.342662500000415,
+      "heapMiB": 290.82376861572266,
+      "arrayBufferMiB": 31.220690727233887,
+      "heapDeltaMiB": 0.5335769653320312
+    },
+    {
+      "repeat": 2,
+      "cells": 483,
+      "lattice": [
+        768,
+        576
+      ],
+      "steps": 160,
+      "elapsedMs": 2793.3768,
+      "stepMs": 17.458605,
+      "mcsPerSecond": 57.27834497658891,
+      "snapshotMs": 7.635774999999967,
+      "heapMiB": 289.6565628051758,
+      "arrayBufferMiB": 36.69847393035889,
+      "heapDeltaMiB": 0.23543548583984375
+    }
+  ]
+}
