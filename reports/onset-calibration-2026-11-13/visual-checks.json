@@ -1,0 +1,130 @@
+{
+  "fixture": {
+    "gpu": true,
+    "errors": [],
+    "immuneArcs": [
+      {
+        "id": 5,
+        "keys": [
+          "0:AAAAAA",
+          "0:AAAAAC"
+        ],
+        "colors": [
+          "#4e25bb",
+          "#a211b6"
+        ]
+      },
+      {
+        "id": 6,
+        "keys": [
+          "1:AAAAAA"
+        ],
+        "colors": [
+          "#1fb292"
+        ]
+      }
+    ],
+    "tumorSegments": [
+      {
+        "id": 1,
+        "colors": [
+          "#4e25bb"
+        ]
+      },
+      {
+        "id": 2,
+        "colors": [
+          "#4e25bb"
+        ]
+      },
+      {
+        "id": 3,
+        "colors": [
+          "#a211b6"
+        ]
+      },
+      {
+        "id": 4,
+        "colors": [
+          "#1fb292"
+        ]
+      }
+    ],
+    "initialUnprimed": true
+  },
+  "fallback": {
+    "cpuFallback": true,
+    "unchanged": true,
+    "errors": []
+  },
+  "cpuPixels": {
+    "gpu": false,
+    "rings": [
+      {
+        "id": 5,
+        "expectedColors": [
+          "#4e25bb",
+          "#a211b6"
+        ],
+        "pixels": [
+          130,
+          137
+        ]
+      },
+      {
+        "id": 6,
+        "expectedColors": [
+          "#1fb292"
+        ],
+        "pixels": [
+          280
+        ]
+      },
+      {
+        "id": 7,
+        "expectedColors": [],
+        "pixels": []
+      }
+    ],
+    "errors": []
+  },
+  "gpuPixels": {
+    "gpu": true,
+    "rings": [
+      {
+        "id": 5,
+        "expectedColors": [
+          "#4e25bb",
+          "#a211b6"
+        ],
+        "pixels": [
+          130,
+          137
+        ]
+      },
+      {
+        "id": 6,
+        "expectedColors": [
+          "#1fb292"
+        ],
+        "pixels": [
+          280
+        ]
+      },
+      {
+        "id": 7,
+        "expectedColors": [],
+        "pixels": []
+      }
+    ],
+    "errors": []
+  },
+  "inspector": {
+    "chips": 2,
+    "text": "抗原—免疫\nG9 · 独立起源\n\nimported founder · 0 MCS · 第 0 代\n\n核轮廓等分显示可匹配的当前抗原；不代表已激活。\n\nA-bb2c07c5\nA-b92c049f\n稳定识别码\nA\nA\nA\nA\nA\nA\nC1\n\n等待抗原特异性启动\n\n启动进度\n0%\n刺激记忆\n0%\n耗竭\n0%\n实际接触中的识别\n\n当前没有免疫—肿瘤／癌前膜接触；核弧仅表示受体潜力，尚无实际识别刺激。"
+  },
+  "english": {
+    "chips": 2,
+    "text": "Antigen & immunity\nG9 · Founder\n\nimported founder · 0 MCS · Generation 0\n\nEqual nuclear arcs show compatible current antigens, not activation.\n\nA-bb2c07c5\nA-b92c049f\nStable receptor\nA\nA\nA\nA\nA\nA\nC1\n\nAwaiting antigen-specific priming\n\nPriming\n0%\nMemory\n0%\nExhaustion\n0%\nRecognition at actual contacts\n\nNo current immune–tumor/precancer contact; nuclear arcs indicate receptor potential, not actual stimulation."
+  }
+}

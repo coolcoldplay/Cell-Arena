@@ -8,7 +8,7 @@
   Object.assign(DEFAULTS,{normalSupport:0,immuneKillLimit:10});
   Object.assign(DEFAULTS,{cycleCoupling:1,reserveCapacity:80,replicationStress:1,dnaRepair:1,checkpointIntegrity:1,traitCost:.45,normalRepair:.25,normalDivisions:4});
   Object.assign(DEFAULTS,{stemFraction:20,stemSymmetry:30,stemRenewal:60,stemCycleSlowdown:1.35,stemRepair:1.4,stemPlasticity:.25,tumorProgenyLimit:0});
-  const MODEL_REVISION='2026-11-specific-immune-genetics-1';
+  const MODEL_REVISION='2026-11-onset-calibration-antigen-visuals-2';
   Object.assign(DEFAULTS,{antigenLength:6,initialImmuneReady:65,primingRate:1,checkpointStrength:1});
   // Vascular parameters are phenomenological MCS rates, not clinical estimates.
   Object.assign(DEFAULTS,{vesselCount:0,vesselRadius:11,vesselSupply:1,vesselDependence:45,vesselImmuneRate:1,vesselImmuneHealth:60,vesselPassage:1,vesselRepair:1,vesselDivisions:4,vesselLifespan:18000,vesselInflammation:1,tumorIntravasation:1});
@@ -38,6 +38,9 @@
   // Let initiated clones leave a hostile niche before their own acid production
   // overwhelms it. Physical passage, resource gates and death stay unchanged.
   Object.assign(RANDOM_RANGES,{metabolism:[.9,1,.05],progression:[3,5,.5],normalMotility:[.15,.25,.05],cohesion:[.35,.6,.05],sectionYield:[.38,.42,.01],tumorMotility:[1.25,1.5,.05],tumorMorphology:[1,1,1],escape:[3.5,4.5,.25],chemotaxis:[2.2,2.8,.1]});
+  // Onset calibration: avoid making the abstract injury-to-suppression route
+  // dominate before antigen-specific surveillance. This is not a Treg census.
+  Object.assign(RANDOM_RANGES,{damagePolarization:[.5,1.5,.25],damageDeactivation:[.7,1.3,.1],suppressiveSecretion:[.75,1.25,.25],suppressionStrength:[.8,1.2,.1],immuneRegulationMemory:[400,800,100]});
   function randomSettings(seed){
     let state=seed>>>0;
     const random=()=>{state=(state+0x6d2b79f5)>>>0;let n=Math.imul(state^(state>>>15),1|state);n^=n+Math.imul(n^(n>>>7),61|n);return ((n^(n>>>14))>>>0)/4294967296;};
@@ -97,6 +100,7 @@
   Object.assign(PRESETS.hot.settings,{normalSupport:15,initialImmuneReady:95,primingRate:1.4});
   Object.assign(PRESETS.maze.settings,{initialImmuneReady:100});
   Object.assign(PRESETS.oncogenesis.settings,{vesselCount:2,vesselDependence:20});
+  Object.assign(PRESETS.oncogenesis.settings,{damagePolarization:1,damageDeactivation:1,suppressiveSecretion:1,suppressionStrength:1,immuneRegulationMemory:600});
   Object.assign(PRESETS.cold.settings,{vesselCount:2,vesselImmuneRate:.35,vesselPassage:.65,vesselDependence:25,tumorIntravasation:1.3});
   Object.assign(PRESETS.hot.settings,{vesselCount:2,vesselImmuneRate:1.3,vesselPassage:1.4,vesselDependence:25,tumorIntravasation:.6});
   const ringOffsets=[[-1,-1],[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0]];

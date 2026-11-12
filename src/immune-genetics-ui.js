@@ -14,6 +14,19 @@
     fill.style.width=Math.max(0,Math.min(100,(value||0)*100))+'%';track.append(fill);row.append(name,number,track);return row;
   }
   function sequence(code){const el=node('code','immune-sequence');for(const base of code||'')el.append(node('span','base-'+base,base));return el;}
+  function profileChip(key,count){
+    const style=CellLabDisplay.antigenProfileStyle(key),chip=node('span','antigen-profile-chip'),swatch=node('i');swatch.style.borderColor=style.color;
+    chip.title=key.split('|').map(p=>{const [channel,sequence]=p.split(':');return 'C'+(+channel+1)+' '+sequence;}).join(' / ');
+    chip.append(swatch,node('span','',style.label+(count===undefined?'':' · '+count)));return chip;
+  }
+  function legend(s,visible=true){
+    const root=document.getElementById('antigen-lineage-legend');if(!root)return;root.hidden=!visible;if(!visible)return;
+    const profiles=s.immunity?.visuals?.profiles||[],stamp=JSON.stringify([english(),profiles.map(p=>[p.key,p.count])]);if(root.dataset.stamp===stamp)return;root.dataset.stamp=stamp;root.replaceChildren();
+    root.append(node('p','immune-note',t('同一抗原序列与通道保持同色；多抗原肿瘤的外轮廓分段。免疫核弧等分显示可匹配的抗原；仍需呈递、启动与接触才能激活。','The same antigen sequence and channel keep one color; tumors with several antigens have segmented outlines. Equal nuclear arcs show compatible antigens; activation still requires presentation, priming and contact.')));
+    if(!profiles.length){root.append(node('p','immune-note',t('尚无非自身抗原谱。癌前或肿瘤产生抗原变异后显示谱系颜色。','No non-self antigen profile yet. Colors appear after antigen variation in precancer or tumor cells.')));return;}
+    const row=node('div','antigen-profile-list');for(const p of [...profiles].sort((a,b)=>b.count-a.count||a.key.localeCompare(b.key)).slice(0,8))row.append(profileChip(p.key,p.count));root.append(row);
+    if(profiles.length>8)root.append(node('p','immune-note',t('另有 '+(profiles.length-8)+' 种抗原谱；追踪细胞查看对应颜色。',(profiles.length-8)+' more profiles; select a cell to inspect its color.')));
+  }
   function eventLabel(event='founder'){
     if(english())return event;
     return event.replace(/^founder$/,'创始基因').replace(/^precancer alteration$/,'癌前局部改变').replace(/^malignant transition$/,'恶性转变').replace(/^intervention$/,'实验干预').replace(/^division mutation$/,'分裂突变').replace(/^peptide loss (\d+)/,'P$1 遗传缺失').replace(/^presentation loss (\d+)/,'C$1 遗传失效').replace(/^expression regulation (\d+)/,'P$1 表达调控改变').replace(/^checkpoint regulation$/,'免疫刹车改变').replace(/^surface target (\d+)/,'S$1 表面靶标改变').replace(/^peptide (\d+) /,'P$1 ').replace('>',' → ').replace(/^trait tolerance$/,'耐受性状改变').replace(/^trait proliferation$/,'增殖性状改变').replace(/^trait invasion$/,'侵袭性状改变').replace(/^trait repair$/,'修复性状改变');
@@ -22,12 +35,15 @@
     const root=document.getElementById('immune-system-inspector'),a=s.immunity,g=cell&&a?.selectedGene?.id===cell.geneClone?a.selectedGene.genes:null;
     root.hidden=!cell||!g;if(root.hidden){root.replaceChildren();return;}
     // This is an observer. It never queries distant pairs or changes model RNG.
-    const stamp=JSON.stringify([english(),cell.id,cell.geneClone,cell.expression,cell.primed,cell.primingProgress,cell.antigenMemory,cell.exhaustion,a.contacts]);
+    const profileKeys=cell.kind===3?(a.visuals?.immuneMatches[cell.geneClone]||[]):(a.visuals?.cloneProfiles[cell.geneClone]||[]);
+    const stamp=JSON.stringify([english(),cell.id,cell.geneClone,cell.expression,cell.primed,cell.primingProgress,cell.antigenMemory,cell.exhaustion,a.contacts,profileKeys]);
     if(root.dataset.stamp===stamp)return;root.dataset.stamp=stamp;
     const openSurface=!!root.querySelector('.immune-surface')?.open;root.replaceChildren();
     const clone=a.clones.find(c=>c.id===cell.geneClone),header=node('div','immune-genotype-head');
     header.append(node('b','',t('抗原—免疫','Antigen & immunity')),node('span','','G'+cell.geneClone+(clone?.parent?' ← G'+clone.parent:' · '+t('独立起源','Founder'))));root.append(header);
     if(clone)root.append(node('p','immune-note',eventLabel(clone.event)+' · '+clone.time+' MCS · '+t('第 ','Generation ')+clone.generation+(english()?'':' 代')));
+    if(profileKeys.length){const row=node('div','antigen-profile-list');for(const key of profileKeys)row.append(profileChip(key));root.append(node('p','immune-note',cell.kind===3?t('核轮廓等分显示可匹配的当前抗原；不代表已激活。','Equal nuclear arcs show compatible current antigens, not activation.'):t('每种遗传抗原对应一种颜色；表达变化只改变深浅，序列改变换色，遗传缺失移除该色段。','Each inherited antigen has one color. Expression changes intensity, sequence mutations change color, and genetic loss removes that segment.')),row);}
+    else if(cell.kind===3)root.append(node('p','immune-note',t('当前没有可匹配的非自身抗原谱，胞核保持状态配色。','No compatible current non-self profile; the nucleus keeps its state color.')));
     if(cell.kind===3){
       const receptor=node('div','immune-receptor');receptor.append(node('span','',t('稳定识别码','Stable receptor')),sequence(g.receptor?.sequence),node('b','','C'+((g.receptor?.channel??0)+1)));root.append(receptor);
       root.append(node('p','immune-status',cell.primed?t('✓ 已具备响应资格；仍需匹配并实际接触','✓ Response competent; still requires a matching contact'):t('等待抗原特异性启动','Awaiting antigen-specific priming')));
@@ -42,11 +58,11 @@
       });root.append(slots);
       const channels=node('div','immune-meter-grid');g.presentation.forEach((p,i)=>{const row=bar('C'+(i+1)+' '+t('通道能力','channel'),cell.expression.presentation[i],'presentation');if(p===0)row.append(node('small','',t('遗传失效','Genetically lost')));channels.append(row);});channels.append(bar(t('免疫刹车','Checkpoint brake'),cell.expression.checkpoint,'brake'));root.append(channels);
       const details=node('details','immune-surface');details.open=openSurface;details.append(node('summary','',t('独立表面靶标 · 预留','Surface targets · reserved')));g.surface.forEach((p,i)=>{const row=node('div','immune-receptor');row.append(node('b','','S'+(i+1)),sequence(p.sequence),node('span','',p.present?percent(p.base):t('遗传缺失','Genetic loss')));details.append(row);});root.append(details);
-      root.append(node('p','immune-note',t('红线深浅表示当前非自身抗原呈递强度，不等于免疫匹配。','Outline intensity shows non-self presentation, not receptor matching.')));
+      root.append(node('p','immune-note',t('轮廓深浅表示当前非自身抗原呈递强度；浅色仍保留遗传身份，不保证足够刺激。','Outline intensity shows current non-self presentation. Dim profiles retain their genetic identity but may provide insufficient stimulus.')));
     }
     const heading=node('h3','',t('实际接触中的识别','Recognition at actual contacts'));root.append(heading);
     const contacts=a.selectedID===cell.id?a.contacts:[];
-    if(!contacts.length)root.append(node('p','immune-note',t('当前没有免疫—肿瘤／癌前膜接触；不推测远处目标。','No current immune–tumor/precancer membrane contact; distant targets are not assessed.')));
+    if(!contacts.length)root.append(node('p','immune-note',t('当前没有免疫—肿瘤／癌前膜接触；核弧仅表示受体潜力，尚无实际识别刺激。','No current immune–tumor/precancer contact; nuclear arcs indicate receptor potential, not actual stimulation.')));
     for(const r of contacts){
       const card=node('div','immune-contact'),status=assessment(r),head=node('div','immune-contact-head');head.style.color=status.color;
       head.append(node('b','',status.symbol+' '+status.label),node('span','','#'+r.immune+' → #'+r.target));card.append(head);
@@ -78,7 +94,7 @@
       g.peptides.forEach((p,i)=>out.push('P'+(i+1)+' '+p.sequence+' · '+t('通道','channel')+' '+(p.channel+1)+' · '+(!p.present?t('遗传缺失','Genetic loss'):t('表达 ','Expression ')+percent(cell.expression.peptides[i])+(cell.expression.peptides[i]<.08?t('（暂时低表达）',' (low expression)'):''))));
       out.push(t('呈递通道：','Presentation: ')+g.presentation.map((v,i)=>'C'+(i+1)+' '+(v===0?t('遗传缺失','Genetic loss'):percent(cell.expression.presentation[i]))).join(' / '),t('免疫刹车：','Checkpoint brake: ')+percent(cell.expression.checkpoint));
       out.push(t('独立表面靶标：','Independent surface targets: ')+g.surface.map((p,i)=>'S'+(i+1)+' '+p.sequence+' '+(p.present?percent(p.base):t('缺失','absent'))).join(' / '));
-      out.push(t('抗原红线表示非自身抗原的当前呈递，不保证被某个免疫克隆识别。','A red outline marks current non-self presentation, not guaranteed recognition by a particular clone.'));
+      out.push(t('外轮廓颜色表示遗传抗原谱，深浅表示当前呈递；同色免疫核弧表示受体匹配潜力，不保证激活。','Outline color marks the inherited antigen profile and intensity marks presentation; matching nuclear arcs show receptor potential, not guaranteed activation.'));
     }
     return out;
   }
@@ -94,5 +110,5 @@
     ctx.clearRect(0,0,w,h);ctx.font='10px monospace';ctx.fillStyle='#6f624d';ctx.strokeStyle='#c8b999';ctx.beginPath();ctx.moveTo(left,top);ctx.lineTo(left,bottom);ctx.lineTo(right,bottom);ctx.stroke();ctx.fillText('100%',0,top+5);ctx.fillText('0',12,bottom);ctx.fillText('0 MCS',left,h-3);ctx.textAlign='right';ctx.fillText(s.time+' MCS',right,h-3);ctx.textAlign='left';
     for(let k=0;k<ids.length;k++){ctx.strokeStyle=colors[k];ctx.lineWidth=1.6;ctx.beginPath();a.history.forEach((r,i)=>{let total=0;for(const [id,n]of Object.entries(r.counts))if(r.states[id]===type)total+=n;const x=left+(right-left)*r.time/Math.max(1,s.time),y=bottom-(bottom-top)*(r.counts[ids[k]]||0)/Math.max(1,total);if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y);});ctx.stroke();}
   }
-  globalThis.CellLabImmuneUI={inspect,stats,selection,links,assessment};
+  globalThis.CellLabImmuneUI={inspect,stats,selection,links,assessment,legend};
 })();

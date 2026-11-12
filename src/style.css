@@ -98,7 +98,7 @@ dialog{max-width:700px;width:calc(100% - 32px);max-height:86dvh;overflow:auto;ov
 .maze-diffusion{position:absolute;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:4;max-width:calc(100% - 24px);min-height:36px;padding:7px 10px;background:#f7f0e3eb;box-shadow:2px 2px 0 #a7917099;font-size:12px}
 .patrol-metrics{padding:7px 0;border-top:0}.patrol-current{font:12px Consolas,monospace;margin:6px 0}.patrol-definition{font-size:12px;color:var(--muted);line-height:1.6}.patrol-definition summary{cursor:pointer}.patrol-definition p{margin:6px 0}
 .cycle-summary{margin:8px 0;padding:8px 0;border-block:1px solid var(--line);font-size:12px;line-height:1.5}.cycle-summary p{margin:3px 0;overflow-wrap:anywhere}
-.antigen-key i{width:12px;height:9px;background:transparent;border:1px solid #d12f39}
+.antigen-key i{width:12px;height:9px;border-radius:50%;background:transparent;border:2px solid #248ba8;border-right-color:#bd4e90;border-bottom-color:#d09a23}
 
 /* A dashboard in the existing sidebar; the arena keeps its full height. */
 .statistics-actions{display:flex;gap:5px;padding:5px 0}.statistics-actions button{flex:1;white-space:nowrap;font-size:12px}
@@ -251,3 +251,5 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
 
 /* Clonal observer panel: independent of population count scale. */
 #clone-history{width:100%;height:auto;background:#f7f0e2}.clone-legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;margin:6px 0}#genetics-summary{white-space:pre-line;line-height:1.5}
+
+.antigen-profile-list{display:flex;flex-wrap:wrap;gap:6px 10px;margin:6px 0}.antigen-profile-chip{display:inline-flex;align-items:center;gap:5px;font:11px Consolas,monospace;color:var(--ink);white-space:nowrap}.antigen-profile-chip i{width:11px;height:11px;flex:none;border:3px solid;border-radius:50%;background:var(--paper,#fffaf0)}#antigen-lineage-legend .immune-note{font-size:11px;line-height:1.55;margin:5px 0}

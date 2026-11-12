@@ -15,12 +15,13 @@
       void main(){vec2 p=vec2((gl_VertexID<<1)&2,gl_VertexID&2);gl_Position=vec4(p*2.-1.,0,1);}`;
       const fragment=`#version 300 es
       precision highp float;precision highp int;precision highp usampler2D;
-      uniform usampler2D ids,activity,walls,metadata;uniform sampler2D environment,palette,signalLayer,bodySignalLayer,interior;
+      uniform usampler2D ids,activity,walls,metadata;uniform sampler2D environment,palette,signalLayer,bodySignalLayer,interior,antigenColors,antigenCenters;
       uniform vec3 bodyColors[9];uniform int showSignals,proliferationShading;uniform float environmentOpacity,bodyEnvironmentOpacity,pixelRatio;
       uniform ivec2 lattice;uniform vec2 viewport;uniform int fieldScale,fieldMode,seams,selected,wrap,smoothWall,antigen;
       uniform ivec4 actFlags;uniform float edgeFade;uniform int appearanceScale;out vec4 color;
       uint idAt(ivec2 p){if(wrap==1)p=(p+lattice)%lattice;else if(any(lessThan(p,ivec2(0)))||any(greaterThanEqual(p,lattice)))return 0u;return texelFetch(ids,p,0).r;}
-      float antigenEdge(uint id,ivec2 p,float level){uint other=idAt(p);if(other==id)return 0.;uvec4 n=texelFetch(metadata,ivec2(int(other)&255,int(other)>>8),0);float strength=max(level,(n.g&8u)>0u?float(n.a)/255.:0.);return strength>0.?.25+.75*strength:0.;}
+      vec4 antigenColor(uint id,vec2 xy){ivec2 at=ivec2(int(id)&255,int(id)>>8);vec3 c=texelFetch(antigenCenters,at,0).rgb;if(c.z<1.)return vec4(0);vec2 d=xy-c.xy;if(wrap==1)d=mod(d+vec2(lattice)*.5,vec2(lattice))-vec2(lattice)*.5;int slot=0;if(c.z>1.&&dot(d,d)>0.)slot=clamp(int(floor((atan(d.y,d.x)+3.14159265359)/6.28318530718*c.z)),0,int(c.z)-1);return texelFetch(antigenColors,ivec2(at.x*4+slot,at.y),0);}
+      void antigenEdge(inout vec4 edge,uint id,ivec2 p,vec2 xy,vec4 own,float coverage){uint other=idAt(p);if(other==id)return;vec4 ink=own.a>0.?own:antigenColor(other,xy);ink.a*=coverage;if(ink.a>edge.a)edge=ink;}
       vec3 body(int kind){return bodyColors[kind];}
       float insideAt(ivec2 p,uint id){if(idAt(p*appearanceScale+ivec2(appearanceScale/2))!=id)return 0.;ivec2 size=lattice/appearanceScale;if(wrap==1)p=(p+size)%size;return texelFetch(interior,p,0).r;}
       float interiorAt(vec2 xy,uint id){vec2 at=xy/float(appearanceScale)-.5;ivec2 p=ivec2(floor(at));vec2 f=fract(at);float v=mix(mix(insideAt(p,id),insideAt(p+ivec2(1,0),id),f.x),mix(insideAt(p+ivec2(0,1),id),insideAt(p+ivec2(1,1),id),f.x),f.y);
@@ -37,20 +38,20 @@
           if(death==0u&&actFlags[physicalKind]>0){float a=float(texelFetch(activity,p,0).r);if(a>0.)rgb=vec3(min(255.,a*2.),min(255.,(255.-a)*2.),0.)/255.;}
           if(seams==1||int(id)==selected){vec2 f=fract(xy),thin=min(vec2(.32),vec2(lattice)/viewport*.55*pixelRatio);bool edge=(f.x>1.-thin.x&&idAt(p+ivec2(1,0))!=id)||(f.x<thin.x&&idAt(p-ivec2(1,0))!=id)||(f.y>1.-thin.y&&idAt(p+ivec2(0,1))!=id)||(f.y<thin.y&&idAt(p-ivec2(0,1))!=id);if(edge)rgb=mix(rgb,physicalKind==1?vec3(98,110,109)/255.:kind==7?vec3(26,69,107)/255.:kind==3?vec3(128,61,70)/255.:vec3(225,230,225)/255.,mix(.9,.25,edgeFade));}
         }
-        if(antigen==1){vec2 f=fract(xy),stepSize=vec2(lattice)/viewport;float limit=.5*pixelRatio+.5,coverage=0.,level=(m.g&8u)>0u?float(m.a)/255.:0.;
-          float d=(1.-f.x)/stepSize.x;if(d<limit)coverage=max(coverage,min(1.,limit-d)*antigenEdge(id,p+ivec2(1,0),level));
-          d=f.x/stepSize.x;if(d<limit)coverage=max(coverage,min(1.,limit-d)*antigenEdge(id,p-ivec2(1,0),level));
-          d=(1.-f.y)/stepSize.y;if(d<limit)coverage=max(coverage,min(1.,limit-d)*antigenEdge(id,p+ivec2(0,1),level));
-          d=f.y/stepSize.y;if(d<limit)coverage=max(coverage,min(1.,limit-d)*antigenEdge(id,p-ivec2(0,1),level));
-          rgb=mix(rgb,vec3(209,47,57)/255.,min(1.,coverage));
+        if(antigen==1){vec2 f=fract(xy),stepSize=vec2(lattice)/viewport;float limit=.65*pixelRatio+.5;vec4 edge=vec4(0),own=antigenColor(id,xy);
+          float d=(1.-f.x)/stepSize.x;if(d<limit)antigenEdge(edge,id,p+ivec2(1,0),xy,own,min(1.,limit-d));
+          d=f.x/stepSize.x;if(d<limit)antigenEdge(edge,id,p-ivec2(1,0),xy,own,min(1.,limit-d));
+          d=(1.-f.y)/stepSize.y;if(d<limit)antigenEdge(edge,id,p+ivec2(0,1),xy,own,min(1.,limit-d));
+          d=f.y/stepSize.y;if(d<limit)antigenEdge(edge,id,p-ivec2(0,1),xy,own,min(1.,limit-d));
+          rgb=mix(rgb,edge.rgb,edge.a);
         }color=vec4(rgb,1);
       }`;
       const compile=(type,source)=>{const sh=gl.createShader(type);gl.shaderSource(sh,source);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(sh));return sh;};
       const program=this.program=gl.createProgram();gl.attachShader(program,compile(gl.VERTEX_SHADER,vertex));gl.attachShader(program,compile(gl.FRAGMENT_SHADER,fragment));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));
       gl.useProgram(program);gl.uniform3fv(gl.getUniformLocation(program,'bodyColors[0]'),Float32Array.from(CellLabDisplay.BODY_COLORS.flat(),v=>v/255));
       this.uniforms={};for(const key of ['lattice','viewport','fieldScale','fieldMode','seams','selected','wrap','smoothWall','antigen','actFlags','showSignals','environmentOpacity','bodyEnvironmentOpacity','pixelRatio','bodyColors[0]','proliferationShading','edgeFade','appearanceScale'])this.uniforms[key]=gl.getUniformLocation(program,key);
-      this.textures=[];for(const [i,key] of ['ids','activity','walls','metadata','environment','palette','signalLayer','bodySignalLayer','interior'].entries()){const t=gl.createTexture();this.textures.push(t);gl.activeTexture(gl.TEXTURE0+i);gl.bindTexture(gl.TEXTURE_2D,t);for(const p of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,p,gl.NEAREST);for(const p of [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T])gl.texParameteri(gl.TEXTURE_2D,p,gl.CLAMP_TO_EDGE);gl.uniform1i(gl.getUniformLocation(program,key),i);}
-      this.meta=new Uint8Array(256*256*4);this.palettes=new WeakMap();this.textureSizes=[];
+      this.textures=[];for(const [i,key] of ['ids','activity','walls','metadata','environment','palette','signalLayer','bodySignalLayer','interior','antigenColors','antigenCenters'].entries()){const t=gl.createTexture();this.textures.push(t);gl.activeTexture(gl.TEXTURE0+i);gl.bindTexture(gl.TEXTURE_2D,t);for(const p of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,p,gl.NEAREST);for(const p of [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T])gl.texParameteri(gl.TEXTURE_2D,p,gl.CLAMP_TO_EDGE);gl.uniform1i(gl.getUniformLocation(program,key),i);}
+      this.meta=new Uint8Array(256*256*4);this.antigenMeta=new Uint8Array(256*256*16);this.antigenCenters=new Float32Array(256*256*4);this.palettes=new WeakMap();this.textureSizes=[];
       const ext=gl.getExtension('WEBGL_debug_renderer_info');this.device=ext?gl.getParameter(ext.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER);
       this.hardware=ext?!/swiftshader|llvmpipe|software/i.test(this.device):null;
     }
@@ -58,7 +59,7 @@
       const old=this.textureSizes[unit];if(old&&old[0]===w&&old[1]===h&&old[2]===internal)g.texSubImage2D(g.TEXTURE_2D,0,0,0,w,h,format,type,data);
       else{g.texImage2D(g.TEXTURE_2D,0,internal,w,h,0,format,type,data);this.textureSizes[unit]=[w,h,internal];}
     }
-    draw(ctx,s,{actFlags,seams,selected,showAntigen=false,field,info,signal,bodySignal=signal,environmentOpacity=1,bodyEnvironmentOpacity=environmentOpacity,pixelRatio=1,cellColors=null,surface=null,edgeFade=0}){
+    draw(ctx,s,{actFlags,seams,selected,showAntigen=false,antigenStyles=null,field,info,signal,bodySignal=signal,environmentOpacity=1,bodyEnvironmentOpacity=environmentOpacity,pixelRatio=1,cellColors=null,surface=null,edgeFade=0}){
       if(this.lost||this.gl.isContextLost())return false;
       const g=this.gl,u=this.uniforms,c=this.canvas;const start=performance.now();
       if(c.width!==ctx.canvas.width||c.height!==ctx.canvas.height){c.width=ctx.canvas.width;c.height=ctx.canvas.height;}
@@ -67,7 +68,8 @@
       if(this.cellColors!==cellColors){g.uniform3fv(u['bodyColors[0]'],Float32Array.from((cellColors?CellLabDisplay.paletteBodies(cellColors):CellLabDisplay.BODY_COLORS).flat(),v=>v/255));this.cellColors=cellColors;}
       g.uniform1i(u.proliferationShading,cellColors?.proliferationShading===false?0:1);
       if(this.snapshot!==s){this.upload(0,s.width,s.height,g.R16UI,g.RED_INTEGER,g.UNSIGNED_SHORT,s.grid);this.upload(1,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.activity);this.upload(2,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.walls);
-        this.meta.fill(0);for(const m of s.cells){this.meta[m.id*4]=CellLabDisplay.displayKind(m);this.meta[m.id*4+1]=CellLabDisplay.deathCode(m)|(CellLabDisplay.antigenMarked(m)?8:0);this.meta[m.id*4+2]=m.kind===2?CellLabDisplay.tumorShade(m):0;this.meta[m.id*4+3]=Math.round((m.dying?Math.max(0,Math.min(1,m.deathProgress||0)):CellLabDisplay.antigenStrength(m))*255);}this.upload(3,256,256,g.RGBA8UI,g.RGBA_INTEGER,g.UNSIGNED_BYTE,this.meta);this.snapshot=s;this.field=null;}
+        this.meta.fill(0);for(const m of s.cells){this.meta[m.id*4]=CellLabDisplay.displayKind(m);this.meta[m.id*4+1]=CellLabDisplay.deathCode(m)|(CellLabDisplay.antigenMarked(m)?8:0);this.meta[m.id*4+2]=m.kind===2?CellLabDisplay.tumorShade(m):0;this.meta[m.id*4+3]=Math.round((m.dying?Math.max(0,Math.min(1,m.deathProgress||0)):CellLabDisplay.antigenStrength(m))*255);}this.upload(3,256,256,g.RGBA8UI,g.RGBA_INTEGER,g.UNSIGNED_BYTE,this.meta);
+        this.antigenMeta.fill(0);this.antigenCenters.fill(0);for(const [id,style]of (antigenStyles||CellLabDisplay.antigenVisuals(s)).outlines){this.antigenCenters.set([style.x,style.y,style.segments.length,0],id*4);style.segments.forEach((segment,i)=>{const at=id*16+i*4;this.antigenMeta.set(segment.rgb,at);this.antigenMeta[at+3]=Math.round(segment.alpha*255);});}this.upload(9,1024,256,g.RGBA8,g.RGBA,g.UNSIGNED_BYTE,this.antigenMeta);this.upload(10,256,256,g.RGBA32F,g.RGBA,g.FLOAT,this.antigenCenters);this.snapshot=s;this.field=null;}
       if(this.field!==field){if(field)this.upload(4,field.width,field.height,g.R32F,g.RED,g.FLOAT,field.values);else this.upload(4,1,1,g.R32F,g.RED,g.FLOAT,new Float32Array(1));this.field=field;}
       if(info!==this.info||!this.paletteReady){let p=this.palettes.get(info);if(!p&&info){p=Uint8Array.from(info.palette.flat(2));this.palettes.set(info,p);}this.upload(5,256,9,g.RGB8,g.RGB,g.UNSIGNED_BYTE,p||new Uint8Array(256*9*3));this.info=info;this.paletteReady=true;}
       if(this.signal!==signal||!this.signalReady){this.upload(6,signal?.width||1,signal?.height||1,g.RGBA8,g.RGBA,g.UNSIGNED_BYTE,signal?.rgba||new Uint8Array(4));this.signal=signal;this.signalReady=true;}

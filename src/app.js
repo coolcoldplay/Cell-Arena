@@ -102,7 +102,7 @@
     ['il2Secretion','识别后 IL-2 分泌',0,3,.1,'真实抗原刺激后短时分泌；IL-2 支持扩增，不作为趋化或抗原替代',''],
     ['il2HalfLife','IL-2 半衰期',20,800,20,'独立扩散、衰减和摄取；可用持续场源外源补充',' MCS'],
     ['exhaustionRate','慢性刺激耗竭速率',0,3,.1,'持续抗原刺激逐渐降低扩增和杀伤；补足营养不会立即清空耗竭',''],
-    ['damagePolarization','损伤暴露转抑制态',0,5,.1,'正常细胞损伤信号暴露越强、越久，粉色巡逻细胞转蓝概率越高；0 关闭转变','×'],
+    ['damagePolarization','损伤暴露转抑制态',0,5,.1,'存活正常细胞的持续压力或损伤也可触发；不必先死亡。暴露越强、越久转蓝概率越高；0 关闭','×'],
     ['suppressionRecovery','抑制态恢复速度',0,5,.1,'当前正常损伤信号和累计暴露均降低后，蓝色细胞按概率恢复粉色；越大恢复越快，0 关闭恢复','×'],
     ['damageDeactivation','损伤暴露退激活',0,5,.1,'持续正常细胞损伤信号提高红色免疫细胞退回粉色的概率','×'],
     ['suppressiveSecretion','抑制态信号分泌',0,5,.1,'蓝色细胞沿自身胞体分泌独立免疫抑制信号，随局部代谢效能变化','×'],
@@ -467,21 +467,20 @@
   let mazeWallCache=null,antigenOutlineCache=null;
   function drawAntigenOutlines(s,scale,pixelRatio){
     if(antigenOutlineCache?.snapshot!==s){
-      const paths=Array.from({length:8},()=>new Path2D()),marked=new Uint8Array(65536),w=s.width,h=s.height,grid=s.grid,wrap=s.boundary==='wrap';
-      for(const m of s.cells)if(CellLabDisplay.antigenMarked(m))marked[m.id]=Math.max(1,Math.round(CellLabDisplay.antigenStrength(m)*7));
-      const line=(a,b,x,y,xx,yy)=>{if(a===b)return;const level=Math.max(marked[a],marked[b]);if(!level)return;paths[level].moveTo(x,y);paths[level].lineTo(xx,yy);};
-      // Trace shared membrane edges once, including medium and periodic seams.
-      // Cache in lattice coordinates so zoom and video resolution reuse it.
+      const paths=new Map(),styles=displayCache.antigens(s).outlines,w=s.width,h=s.height,grid=s.grid,wrap=s.boundary==='wrap';
+      const line=(id,other,x,y,xx,yy)=>{if(id===other)return;const outline=styles.get(id);if(!outline)return;const style=CellLabDisplay.antigenSegment(outline,(x+xx)/2,(y+yy)/2,s),alpha=Math.round(style.alpha*8)/8,key=style.color+':'+alpha;let batch=paths.get(key);if(!batch){batch={color:style.color,alpha,path:new Path2D()};paths.set(key,batch);}batch.path.moveTo(x,y);batch.path.lineTo(xx,yy);};
+      // Each side of a shared membrane retains its own lineage color. Cache in
+      // lattice coordinates; use the same genotype/color table as WebGL.
       for(let y=0;y<h;y++)for(let x=0;x<w;x++){
-        const q=y*w+x,id=grid[q],right=x<w-1?grid[q+1]:wrap?grid[y*w]:0,down=y<h-1?grid[q+w]:wrap?grid[x]:0;
-        line(id,right,x+1,y,x+1,y+1);
-        line(id,down,x,y+1,x+1,y+1);
-        if(x===0)line(id,wrap?grid[q+w-1]:0,0,y,0,y+1);
-        if(y===0)line(id,wrap?grid[(h-1)*w+x]:0,x,0,x+1,0);
+        const q=y*w+x,id=grid[q];if(!styles.has(id))continue;
+        line(id,x<w-1?grid[q+1]:wrap?grid[y*w]:0,x+.82,y,x+.82,y+1);
+        line(id,x>0?grid[q-1]:wrap?grid[q+w-1]:0,x+.18,y,x+.18,y+1);
+        line(id,y<h-1?grid[q+w]:wrap?grid[x]:0,x,y+.82,x+1,y+.82);
+        line(id,y>0?grid[q-w]:wrap?grid[(h-1)*w+x]:0,x,y+.18,x+1,y+.18);
       }
-      antigenOutlineCache={snapshot:s,paths};
+      antigenOutlineCache={snapshot:s,paths:[...paths.values()]};
     }
-    ctx.save();ctx.scale(scale,scale);ctx.lineWidth=pixelRatio/scale;ctx.strokeStyle='#d12f39';ctx.lineJoin='miter';ctx.lineCap='butt';for(let i=1;i<8;i++){ctx.globalAlpha=.25+.75*i/7;ctx.stroke(antigenOutlineCache.paths[i]);}ctx.restore();
+    ctx.save();ctx.scale(scale,scale);ctx.lineWidth=1.3*pixelRatio/scale;ctx.lineJoin='miter';ctx.lineCap='butt';for(const batch of antigenOutlineCache.paths){ctx.strokeStyle=batch.color;ctx.globalAlpha=batch.alpha;ctx.stroke(batch.path);}ctx.restore();
   }
   function drawMazeWalls(ctx,s,scale){
     const m=s.maze;if(!m?.curves?.length)return;
@@ -537,7 +536,8 @@
     document.querySelector('.cycle-key').hidden=!showCycle;
     }
     const edgeFade=Number($('body-feather').value)/100,surface=edgeFade>0?surfaceCache.get(s):null;
-    let gpu=false;if(gpuRenderer)try{gpu=gpuRenderer.draw(ctx,s,{actFlags,seams,selected,showAntigen,field,info,signal,bodySignal,environmentOpacity,bodyEnvironmentOpacity,pixelRatio,cellColors,surface,edgeFade});}catch(e){rendererFailure=String(e);gpuRenderer.lost=true;}
+    CellLabImmuneUI.legend(s,showAntigen);
+    let gpu=false;if(gpuRenderer)try{gpu=gpuRenderer.draw(ctx,s,{actFlags,seams,selected,showAntigen,antigenStyles:displayCache.antigens(s),field,info,signal,bodySignal,environmentOpacity,bodyEnvironmentOpacity,pixelRatio,cellColors,surface,edgeFade});}catch(e){rendererFailure=String(e);gpuRenderer.lost=true;}
     if(!gpu){
     const bodySurface=surface?.scale>1?surfaceCache.full(s):surface;
     for(let q=0;q<grid.length;q++){
@@ -573,6 +573,7 @@
     if(showAntigen&&!gpu)drawAntigenOutlines(s,scale,pixelRatio);
     drawVessels(s,scale,pixelRatio);
     if(showNuclei){ctx.save();ctx.scale(scale,scale);ctx.lineWidth=1.5*pixelRatio/scale;for(const batch of displayCache.nucleusBatches(s,cellColors)){ctx.fillStyle=batch.fill;ctx.strokeStyle=batch.stroke;ctx.fill(batch.path);ctx.stroke(batch.path);}ctx.restore();}
+    if(showNuclei&&showAntigen){ctx.save();ctx.scale(scale,scale);ctx.lineWidth=2*pixelRatio/scale;ctx.lineCap='butt';ctx.lineJoin='round';for(const batch of displayCache.nucleusArcBatches(s)){ctx.strokeStyle=batch.stroke;ctx.stroke(batch.path);}ctx.restore();}
     // Post-clearance membrane fragments are cosmetic, never extra cells.
     // Their age uses model time, so pausing also freezes the rupture effect.
     ctx.save();ctx.lineWidth=Math.max(1,pixelRatio);

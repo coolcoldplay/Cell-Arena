@@ -1,0 +1,30 @@
+{
+  "checkedAt": "2026-11-12T20:14:03.134Z",
+  "baseCommit": "2a55e9e4b16a408025ea05381359df58c032673c",
+  "modelRevision": "2026-11-onset-calibration-antigen-visuals-2",
+  "tests": {
+    "command": "node --test tests/*.test.mjs",
+    "total": 392,
+    "passed": 392,
+    "failed": 0
+  },
+  "build": {
+    "command": "node scripts/build.mjs && node scripts/verify-build.mjs",
+    "htmlSHA256": "6c9f5d3f2c6d6d94ba6791f4b17d5a977a62e02f5c599544413ab0590c3cbd43",
+    "bytes": 1098339,
+    "verified": true
+  },
+  "sourceSHA256": {
+    "src/model.js": "86ec5fc5ba359174cf3a2911119cb1f1803de234dd0ba92214539c9cc5538a1e",
+    "src/immune-genetics.js": "89ec672b92cbb3685086c8fddca5348dd9cac26d165e24f55340421294342d90",
+    "src/display-fields.js": "055be102f216c5d031b62812e37cd3d7ea7d52d02f464466c4f6497dc88dce7f",
+    "src/gpu-renderer.js": "9993ac67f0225f591163c5f80f8833573f918bed22f3c9c54d51d32b6f948931",
+    "src/immune-genetics-ui.js": "cbb3a8271c1636fc7ce49d30976ef6b917431c08bff123793265bebe7a44d953",
+    "src/app.js": "11fc7b078eef52072c2a908cf447128643babc54650466390a0240622f699e1b",
+    "src/experiment.js": "0d37072c59dea84d8e71811071d6e9298e4913ae70c8e7dd4d34c963049188df",
+    "src/round-history.js": "2c77adbc5f2bbeabea066de8e13f7dad74436e8873602c95c7bec00b33629e9c",
+    "scripts/probe-onset-immunity.mjs": "9748ee5e836976def061322ffef77cfab2a8e912bc8288812d119eb72c7d4fd0"
+  },
+  "visualChecks": "visual-checks.json",
+  "baselineReplay": "baseline-replay-check.json"
+}

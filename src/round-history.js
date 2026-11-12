@@ -31,7 +31,7 @@
     constructor(){this.active=null;this.serial=0;}
     begin(s,now,iso=new Date().toISOString(),locks={},display={},replayOf=null){
       this.active={id:iso+'-'+s.seed+'-'+(++this.serial),scene:s.scene,seed:s.seed,startedAt:iso,endedAt:null,lastSeenAt:iso,reason:'running',worldWidth:s.worldWidth,worldHeight:s.worldHeight,refinement:s.refinement,boundary:s.boundary,initialMCS:s.time,simulatedMCS:s.time,runningMs:0,initialSettings:{...s.settings},finalSettings:{...s.settings},initialLocks:{...locks},finalLocks:{...locks},parameterChanges:[],population:population(s),initialPopulation:population(s),cycles:copy(s.cycles||{}),sources:copy(s.sources||[]),counters:{...s.counters}};
-      Object.assign(this.active,{modelRevision:s.modelRevision||null,initialCells:copy(s.initialCells||[]),initialWarmup:s.warmup,initialKernel:s.kernel,initialVessels:s.vascular?.initial?copy(s.vascular.initial):undefined,vascular:copy(s.vascular||{}),initialCompute:s.compute?.active,initialSpeed:s.speed||1,initialDisplay:copy(display),initialSources:(s.sources||[]).map(v=>({type:v.type,x:v.x/s.refinement,y:v.y/s.refinement,radius:v.radius/s.refinement})),initialMaze:s.maze?{signalThroughWalls:!!s.maze.signalThroughWalls}:null,replayOf});
+      Object.assign(this.active,{schemaVersion:s.immunity?2:1,modelRevision:s.modelRevision||null,initialCells:copy(s.initialCells||[]),initialWarmup:s.warmup,initialKernel:s.kernel,initialVessels:s.vascular?.initial?copy(s.vascular.initial):undefined,vascular:copy(s.vascular||{}),initialCompute:s.compute?.active,initialSpeed:s.speed||1,initialDisplay:copy(display),initialSources:(s.sources||[]).map(v=>({type:v.type,x:v.x/s.refinement,y:v.y/s.refinement,radius:v.radius/s.refinement})),initialMaze:s.maze?{signalThroughWalls:!!s.maze.signalThroughWalls}:null,replayOf});
       this.epoch=s.revision+':'+s.seed;this.lastTick=now;this.running=!!s.playing;return this.current();
     }
     observe(s,now,running=true){
@@ -62,7 +62,7 @@
     return records.filter(r=>chosen.has(r.id)!==keepSelected).map(r=>r.id);
   }
   function replayExperiment(r){
-    return copy({format:'cell-arena-experiment',schemaVersion:r.modelRevision==='2026-11-specific-immune-genetics-1'?2:1,modelRevision:r.modelRevision,initialCells:r.initialCells||[],version:'4.0.0',scene:r.scene,seed:r.seed,boundary:r.boundary,worldWidth:r.worldWidth,worldHeight:r.worldHeight,refinement:r.refinement,settings:r.initialSettings,warmup:r.initialWarmup,sources:r.initialSources,vessels:r.initialVessels,maze:r.initialMaze,speed:r.initialSpeed||1,display:{...(r.initialDisplay||{}),autoRandomMinutes:0}});
+    return copy({format:'cell-arena-experiment',schemaVersion:r.schemaVersion??(r.modelRevision==='2026-11-specific-immune-genetics-1'?2:1),modelRevision:r.modelRevision,initialCells:r.initialCells||[],version:'4.0.0',scene:r.scene,seed:r.seed,boundary:r.boundary,worldWidth:r.worldWidth,worldHeight:r.worldHeight,refinement:r.refinement,settings:r.initialSettings,warmup:r.initialWarmup,sources:r.initialSources,vessels:r.initialVessels,maze:r.initialMaze,speed:r.initialSpeed||1,display:{...(r.initialDisplay||{}),autoRandomMinutes:0}});
   }
   function csv(records){
     records=numbered(records);

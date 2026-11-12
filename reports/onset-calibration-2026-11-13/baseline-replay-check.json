@@ -1,0 +1,19 @@
+{
+  "seed": 17,
+  "until": 6000,
+  "checks": {
+    "seed": true,
+    "settings": true,
+    "first": true,
+    "events": true,
+    "contactChecks": true,
+    "contactReasons": true,
+    "stimulatingChecks": true,
+    "activeCellMcs": true,
+    "suppressiveCellMcs": true,
+    "immuneCellMcs": true,
+    "peakActive": true,
+    "peakSuppressive": true,
+    "samples": true
+  }
+}

@@ -1,5 +1,7 @@
 # Cell-Arena · 细胞生态竞技场
 
+2026-11-13：新增[抗原谱系轮廓与免疫核匹配色弧](reports/onset-calibration-2026-11-13/README.md)，并根据多种子对照收窄发生发展的损伤抑制范围。仍存在有限受体匹配与低氧区免疫低响应的模型限制。[性能路线讨论已归档并暂缓](reports/parallel-cpm/decisions-2026-11-13.md)。
+
 
 本轮更新：**特异抗原、独立呈递、有限免疫启动、遗传克隆演化**，以及等比旋转的手机全屏与侧边统计。见 [机制、参数迁移、实测与文献](IMMUNE-GENETICS.md) 和 [五个可导入演示](experiments/immune-genetics/README.md)。
 

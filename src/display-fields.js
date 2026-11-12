@@ -85,6 +85,50 @@
   }
   const antigenMarked=m=>!!m&&!m.dying&&(m.kind===2||m.state==='abnormal')&&m.antigen;
   const antigenStrength=m=>antigenMarked(m)?Math.max(0,Math.min(1,m.antigenLevel??1)):0;
+  function antigenProfileStyle(key){
+    let hash=2166136261;for(let i=0;i<key.length;i++)hash=Math.imul(hash^key.charCodeAt(i),16777619)>>>0;
+    const h=(hash%3600)/600,s=.67+((hash>>>12)%18)/100,l=.38+((hash>>>20)%9)/100;
+    const c=(1-Math.abs(2*l-1))*s,x=c*(1-Math.abs(h%2-1)),m=l-c/2;
+    const rgb=(h<1?[c,x,0]:h<2?[x,c,0]:h<3?[0,c,x]:h<4?[0,x,c]:h<5?[x,0,c]:[c,0,x]).map(v=>Math.round((v+m)*255));
+    return {key,label:'A-'+hash.toString(16).padStart(8,'0'),rgb,color:'#'+rgb.map(v=>v.toString(16).padStart(2,'0')).join('')};
+  }
+  function antigenVisuals(s){
+    const data=s.immunity?.visuals,profiles=new Map((data?.profiles||[]).map(p=>[p.key,{...p,...antigenProfileStyle(p.key)}])),outlines=new Map(),nuclei=new Map();
+    for(const m of s.cells){
+      if(m.dying)continue;
+      const entries=(data?.cloneProfiles[m.geneClone]||[]).map(key=>profiles.get(key)).filter(Boolean);
+      if(entries.length&&(m.kind===2||m.state==='abnormal')){
+        const levels=s.immunity?.visuals?.presentation?.[m.id]||{};
+        outlines.set(m.id,{x:m.x,y:m.y,segments:entries.map(p=>({...p,alpha:.35+.65*clamp(levels[p.key]??m.antigenLevel??0)}))});
+      }else if(!data&&antigenMarked(m))outlines.set(m.id,{x:m.x,y:m.y,segments:[{key:'legacy',color:'#d12f39',rgb:[209,47,57],alpha:.25+.75*antigenStrength(m)}]});
+      if(m.kind===3){const matches=(data?.immuneMatches[m.geneClone]||[]).map(key=>profiles.get(key)).filter(Boolean);if(matches.length)nuclei.set(m.id,matches);}
+    }
+    return {profiles,outlines,nuclei};
+  }
+  function antigenSegment(style,x,y,s){
+    if(style.segments.length===1)return style.segments[0];let dx=x-style.x,dy=y-style.y;
+    if(s.boundary==='wrap'){dx-=Math.round(dx/s.width)*s.width;dy-=Math.round(dy/s.height)*s.height;}
+    const angle=Math.atan2(dy,dx)+Math.PI,index=Math.min(style.segments.length-1,Math.floor(angle/(2*Math.PI)*style.segments.length));return style.segments[index];
+  }
+  // Partition the actual (possibly deformed) closed nuclear contour by arc
+  // length, not angle; a multicolor ring therefore gives every match equal space.
+  function equalContourArcs(contour,count){
+    if(!count||contour.length<2)return [];
+    const lengths=contour.map((p,i)=>Math.hypot(contour[(i+1)%contour.length][0]-p[0],contour[(i+1)%contour.length][1]-p[1])),total=lengths.reduce((a,b)=>a+b,0);
+    if(!total)return [];
+    const arcs=Array.from({length:count},()=>[]);let at=0,part=0;
+    for(let i=0;i<contour.length;i++){
+      const a=contour[i],b=contour[(i+1)%contour.length],length=lengths[i];if(!length)continue;
+      let used=0;if(!arcs[part].length)arcs[part].push([...a]);
+      while(part<count-1&&(part+1)*total/count<at+length-1e-10){
+        const end=(part+1)*total/count,ratio=(end-at)/length,p=[a[0]+(b[0]-a[0])*ratio,a[1]+(b[1]-a[1])*ratio];
+        arcs[part].push(p);arcs[++part].push([...p]);used=end-at;
+      }
+      if(length>used)arcs[part].push([...b]);at+=length;
+      if(part<count-1&&Math.abs(at-(part+1)*total/count)<1e-10)arcs[++part].push([...b]);
+    }
+    return arcs;
+  }
   // Smallest occupied interval on each periodic axis. A cell crossing a seam
   // gets a local box repeated at the edges, never a box spanning the dish.
   function occupiedInterval(axis,wrap){
@@ -143,6 +187,17 @@
     return {width:f.width,height:f.height,rgba};
   }
   class Cache {
+    antigens(s){if(this.antigenSnapshot!==s){this.antigenSnapshot=s;this.antigenData=antigenVisuals(s);}return this.antigenData;}
+    nucleusArcBatches(s){
+      if(this.arcSnapshot===s)return this.arcPaths;
+      const groups=new Map(),batches=[],contours=this.nuclei(s),wrap=s.boundary==='wrap';
+      for(const m of s.cells){const matches=this.antigens(s).nuclei.get(m.id),contour=contours.get(m.id);if(!matches?.length||!contour)continue;
+        const arcs=equalContourArcs(contour,matches.length),cx=m.nucleusX+.5,cy=m.nucleusY+.5,r=Math.max(...contour.map(p=>Math.max(Math.abs(p[0]),Math.abs(p[1]))))+1,xs=[0],ys=[0];
+        if(wrap){if(cx-r<0)xs.push(s.width);if(cx+r>s.width)xs.push(-s.width);if(cy-r<0)ys.push(s.height);if(cy+r>s.height)ys.push(-s.height);}
+        arcs.forEach((arc,i)=>{const color=matches[i].color;for(const dx of xs)for(const dy of ys){let batch=groups.get(color);if(!batch||batch.count===32){batch={stroke:color,path:new Path2D(),count:0};groups.set(color,batch);batches.push(batch);}arc.forEach(([x,y],j)=>j?batch.path.lineTo(cx+dx+x,cy+dy+y):batch.path.moveTo(cx+dx+x,cy+dy+y));batch.count++;}});
+      }
+      this.arcSnapshot=s;return this.arcPaths=batches;
+    }
     nuclei(s){
       if(this.nuclearSnapshot!==s){this.nuclearSnapshot=s;this.nuclearContours=new Map();for(const m of s.cells)if(m.hasNucleus&&(!m.dying||m.deathIntact))this.nuclearContours.set(m.id,nucleusContour(m,s));}
       return this.nuclearContours;
@@ -184,5 +239,5 @@
     const wall=!!s.walls[q],blocked=wall||!!s.fieldMask?.[bin];
     return {x,y,bin,time:s.time,cell:s.cells.find(m=>m.id===s.grid[q])||null,wall,blocked,values:blocked?null:Object.fromEntries(['oxygen','glucose','acid',...Object.keys(SIGNALS)].map(key=>[key,s.fields[key]?.values[bin]??0]))};
   }
-  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,immuneSuppressive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,cycleColor,antigenMarked,antigenStrength,selectionBounds,selectionBoxes,bodyOpacity,adversity,signals,sample,Cache};
+  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,immuneSuppressive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,cycleColor,antigenMarked,antigenStrength,antigenProfileStyle,antigenVisuals,antigenSegment,equalContourArcs,selectionBounds,selectionBoxes,bodyOpacity,adversity,signals,sample,Cache};
 })();

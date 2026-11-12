@@ -100,7 +100,7 @@ dialog{max-width:700px;width:calc(100% - 32px);max-height:86dvh;overflow:auto;ov
 .maze-diffusion{position:absolute;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:4;max-width:calc(100% - 24px);min-height:36px;padding:7px 10px;background:#f7f0e3eb;box-shadow:2px 2px 0 #a7917099;font-size:12px}
 .patrol-metrics{padding:7px 0;border-top:0}.patrol-current{font:12px Consolas,monospace;margin:6px 0}.patrol-definition{font-size:12px;color:var(--muted);line-height:1.6}.patrol-definition summary{cursor:pointer}.patrol-definition p{margin:6px 0}
 .cycle-summary{margin:8px 0;padding:8px 0;border-block:1px solid var(--line);font-size:12px;line-height:1.5}.cycle-summary p{margin:3px 0;overflow-wrap:anywhere}
-.antigen-key i{width:12px;height:9px;background:transparent;border:1px solid #d12f39}
+.antigen-key i{width:12px;height:9px;border-radius:50%;background:transparent;border:2px solid #248ba8;border-right-color:#bd4e90;border-bottom-color:#d09a23}
 
 /* A dashboard in the existing sidebar; the arena keeps its full height. */
 .statistics-actions{display:flex;gap:5px;padding:5px 0}.statistics-actions button{flex:1;white-space:nowrap;font-size:12px}
@@ -253,6 +253,8 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
 
 /* Clonal observer panel: independent of population count scale. */
 #clone-history{width:100%;height:auto;background:#f7f0e2}.clone-legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;margin:6px 0}#genetics-summary{white-space:pre-line;line-height:1.5}
+
+.antigen-profile-list{display:flex;flex-wrap:wrap;gap:6px 10px;margin:6px 0}.antigen-profile-chip{display:inline-flex;align-items:center;gap:5px;font:11px Consolas,monospace;color:var(--ink);white-space:nowrap}.antigen-profile-chip i{width:11px;height:11px;flex:none;border:3px solid;border-radius:50%;background:var(--paper,#fffaf0)}#antigen-lineage-legend .immune-note{font-size:11px;line-height:1.55;margin:5px 0}
 </style></head>
 <body>
 <main class="workspace">
@@ -294,7 +296,7 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
         <label class="select-row">画面放大<select id="zoom"><option value="100">100%</option><option value="150">150%</option><option value="200">200%</option><option value="300">300%</option></select><button id="fullscreen" class="quiet">全屏 ↗</button></label>
       </div></details><details class="subsection" id="module-markings"><summary>细胞与热图 <span>Act · 标记 · 环境分量</span></summary><div class="section-body">
         <label class="select-row">环境热图<select id="field-view"><option value="none" selected>关闭</option><option value="adversity">综合恶劣度</option><option value="oxygen">氧可用量</option><option value="glucose">葡萄糖可用量</option><option value="acid">酸负荷</option><option value="density">局部细胞密度</option></select></label>
-        <div class="checks" role="group" aria-label="细胞标记"><label><input id="nuclei" type="checkbox" checked>显示细胞核</label><label title="红线深浅表示当前非自身抗原呈递强度，不保证识别匹配"><input id="antigen-marks" type="checkbox" checked>抗原轮廓</label><label><input title="红色周期文字表示肿瘤干性细胞" id="cycle-marks" type="checkbox">周期文字</label><label><input id="immune-links" type="checkbox" checked>选中细胞的识别关系</label></div><p class="hint immune-key">抗原红线：浅 → 深，呈递弱 → 强。追踪后：✓ 已识别 · ≈ 接触扫描 · × 不匹配 · ! 受限。</p>
+        <div class="checks" role="group" aria-label="细胞标记"><label><input id="nuclei" type="checkbox" checked>显示细胞核</label><label title="颜色表示遗传抗原谱；同色免疫核弧表示受体匹配潜力"><input id="antigen-marks" type="checkbox" checked>抗原谱系轮廓</label><label><input title="红色周期文字表示肿瘤干性细胞" id="cycle-marks" type="checkbox">周期文字</label><label><input id="immune-links" type="checkbox" checked>选中细胞的识别关系</label></div><div id="antigen-lineage-legend" data-no-i18n></div><p class="hint immune-key">追踪后：✓ 已识别 · ≈ 接触扫描 · × 不匹配 · ! 受限。</p>
         <div class="checks"><label><input id="show-tracks" type="checkbox">显示运动轨迹</label></div><label class="slider"><span>轨迹保留时长<output id="track-duration-out">400 MCS</output></span><input id="track-duration" type="range" min="20" max="2000" value="400" step="20"></label><p class="hint">开启后记录；按模拟时间保留，暂停时不消退。</p><div class="checks"><label><input id="edge-activity" type="checkbox" checked>启用所选类型的 Act 显示</label><label><input id="normal-activity" type="checkbox">正常细胞 Act</label><label><input id="tumor-activity" type="checkbox">肿瘤细胞 Act</label><label><input id="immune-activity" type="checkbox">免疫细胞 Act</label><label><input id="cell-seams" type="checkbox" checked>细分界线</label><label><input id="arrows" type="checkbox">极性箭头</label></div>
         <p class="hint">默认配色：免疫未激活淡红，实际识别后激活深红；肿瘤遗传增殖性状越高越黑，范围 0.25–3。核区默认用深蓝、深红或浅金。可在「细胞配色」分别修改；各类 Act 独立开启，开启后覆盖局部胞体色。</p>
       </div></details><details class="subsection" id="module-colors"><summary>细胞配色 <span>预设 · 胞体 · 胞核</span></summary><div class="section-body">
@@ -343,7 +345,7 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
         <details class="stats-detail death-ledger" id="death-ledger"><summary>死亡明细</summary><div class="death-detail-rows"><p>免疫杀伤 <span id="kill-progress"></span></p><p>环境死亡 <span id="environment-death-progress"></span></p><p>自发凋亡 <span id="death-progress"></span></p><p>寿命凋亡 <span id="lifespan-death-progress"></span></p></div><p id="environment-count"></p><p>手动擦除 <b id="manual-removal-count">0</b></p><p class="hint">存活数不含死亡过程中的胞体；死亡清除在胞体消失时计数。寿命凋亡独立于肿瘤自发凋亡。</p><h3>最近从画面清除</h3><ol id="recent-clearances"></ol><details><summary>最近触发死亡</summary><ol id="recent-deaths"></ol></details></details>
         <details class="stats-detail" id="statistics-scenario"><summary>运行与开局</summary><div class="performance-line"><span>实际 MCS / 秒 <b id="rate">—</b></span><span id="performance"></span><span id="seed-label"></span><span id="grid-info"></span><span id="order"></span></div>
           <section id="scenario-guide" class="scenario-guide" aria-label="情境设定与实际进度"><div class="scenario-heading"><span id="scenario-configuration"></span><button id="restore-scenario" class="quiet" title="恢复情境参数、本次开局种子及默认显示，保留区域与精细度">恢复情境设定 ↺</button></div><p id="scenario-description"></p><div id="scenario-metrics"></div><small id="scenario-setup"></small></section>
-          <div class="legend stats-key"><span><i class="medium"></i>培养液</span><span class="proliferation-key"><i></i>肿瘤：灰 → 黑，增殖能力低 → 高</span><span class="edge-key"><i></i>Act：绿＝衰减中 → 红＝新生突起</span><span class="antigen-key"><i></i>红色轮廓：抗原可识别</span><span class="cycle-key" hidden>G0 静息 · G1 生长 · S 复制 · G2 准备 · M 分裂</span></div>
+          <div class="legend stats-key"><span><i class="medium"></i>培养液</span><span class="proliferation-key"><i></i>肿瘤：灰 → 黑，增殖能力低 → 高</span><span class="edge-key"><i></i>Act：绿＝衰减中 → 红＝新生突起</span><span class="antigen-key"><i></i>外轮廓／核弧：抗原谱系与匹配</span><span class="cycle-key" hidden>G0 静息 · G1 生长 · S 复制 · G2 准备 · M 分裂</span></div>
         </details>
       </details>
       <details id="mobile-tools" class="panel-details mobile-only"><summary>画布工具</summary><div id="mobile-tools-host"></div></details><details id="mobile-session" class="panel-details mobile-only"><summary>场景与开局</summary><div id="mobile-scenes-host"></div><div id="mobile-session-actions"></div></details>
@@ -385,7 +387,7 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
   </ol>
   <p>「统计」查看全程曲线和带序号、种子的历局结果，可按初始参数再次模拟（不重放手动操作）；顶部文件图标导出／导入参数、保存画面或导出历局 CSV，录制图标开始／停止视频。导入参数会重新开局，不恢复中途状态。</p>
   <p>「肿瘤细胞／免疫细胞 → 细胞周期」调整周期参数；「追踪」查看阶段及阻滞原因。双击「信号」可添加持续 IL-2 场源，并在「显示 → 观察图层」查看其分布。</p>
-  <p>「追踪 → 选中」查看抗原序列、当前表达／呈递与识别限制；「统计 → 抗原与克隆演化」查看主要克隆占比及实际接触覆盖。抗原红线并不保证所有免疫克隆都能识别。旧实验保留种子及兼容参数后迁移到新规则，演化轨迹会改变。</p>
+  <p>「追踪 → 选中」查看抗原序列、当前表达／呈递与识别限制；「统计 → 抗原与克隆演化」查看主要克隆占比及实际接触覆盖。同一抗原序列与通道使用同色外轮廓；免疫核以等长色弧显示受体能匹配的抗原，仍需呈递、启动与实际接触才能激活。旧实验保留种子及兼容参数后迁移到新规则，演化轨迹会改变。</p>
   <p class="hint">这是未经实验标定的二维切面演示，MCS 为模拟步数，不等同于真实时间或完整三维肿瘤。<a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MODEL.md" target="_blank" rel="noreferrer">详细模型与机制参考</a> · <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MORPHOLOGY.md" target="_blank" rel="noreferrer">形态模型</a></p>
   </div><div data-language="en" hidden><h2>Model &amp; sources</h2>
 <p>Cell-Arena is built on <a href="https://doi.org/10.7554/eLife.61288" target="_blank" rel="noreferrer"><strong>Artistoo</strong> (Wortel &amp; Textor, eLife, 2021)</a>, an open-source JavaScript library for simulating cells and tissues in the browser. This page uses its Cellular Potts Model (CPM) for cell deformation and interactions, and its Act activity colors. The <a href="https://artistoo.net/examples/CancerInvasion.html" target="_blank" rel="noreferrer">Cancer Invasion example</a> informed the visualization. Artistoo uses the MIT license; code credits and full licenses are preserved below.</p>
@@ -410,7 +412,7 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
 </ol>
 <p>Statistics shows the full population history and numbered past-round results with saved seeds. Re-simulate their initial configurations; manual interventions are not replayed. The top file icon offers image, parameter and round-CSV export plus parameter import; the recording icon starts or stops video. Importing parameters starts a fresh run; it does not restore a checkpoint.</p>
 <p>Open Tumor or Immune → Cell cycle to adjust cycle parameters. Track a cell for its phase and arrest reason. Double-tapping Signal creates a persistent IL-2 source; Display → Observation layers shows its distribution.</p>
-<p>Track → Selected shows epitope sequences, expression, presentation and actual recognition limits. Statistics → Antigens and clonal evolution shows major clone fractions and actual encounter coverage. A red outline does not guarantee recognition by every immune clone. Old experiments retain their seed and compatible settings under the new rules, with changed trajectories.</p>
+<p>Track → Selected shows epitope sequences, expression, presentation and actual recognition limits. Statistics → Antigens and clonal evolution shows major clone fractions and actual encounter coverage. The same antigen sequence and channel share an outline color. Equal nuclear arcs show antigens a receptor can match; activation still requires presentation, priming and actual contact. Old experiments retain their seed and compatible settings under the new rules, with changed trajectories.</p>
 <p class="hint">This is an uncalibrated 2D section demo. MCS counts simulation steps, not real time or full 3D tumor dynamics. <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MODEL.md" target="_blank" rel="noreferrer">Detailed model and references</a> · <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MORPHOLOGY.md" target="_blank" rel="noreferrer">Morphology model</a></p>
 </div>
   <details id="code-credits"><summary>代码来源、版本与许可</summary><p>Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定提交 e997d81213a5dcdfc40ad976a18958f412f00cc9 的官方文件原样内嵌。优化 JS 约束与 WebAssembly 内核包含对 Artistoo 顺序 CPM 与约束代码的专门化／移植，Act 配色沿用其 Canvas.drawActivityValues。</p><p>随 Artistoo 带入的 MT19937 随机数实现由 Makoto Matsumoto 与 Takuji Nishimura 编写，包内另保留 Sean McCullough 的 JavaScript 封装署名，采用 BSD 三条款许可；WASM 随机数部分移植同一实现。两个完整许可证均保留在本页面。</p><p>逐文件范围见 <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/THIRD_PARTY_NOTICES.md" target="_blank" rel="noreferrer">代码来源与第三方声明</a>。通讯、代谢、遗传、切面约束和交互为本网页的模型扩展；详细机制参考见模型文档。</p><details><summary>Artistoo · MIT 完整许可证</summary><pre id="license-artistoo">MIT License
@@ -12399,6 +12401,25 @@ var CPM = (function (exports, module$1) {
         result.push({...r,immune:ctl.id,immuneClone:ctl.geneClone,targetClone:target.geneClone,receptor,primed:ctl.primed,contactLength:edge.length/this.s.scale,dwell:h?.dwell||0,recognized:!!h?.recognized&&r.stimulus>0,slots:g.peptides.map((p,i)=>({sequence:p.sequence,channel:p.channel,present:p.present,self:this.self.includes(p.sequence),expression:target.expression.peptides[i],presentation:target.expression.presentation[p.channel],affinity:receptor&&receptor.channel===p.channel?affinity(receptor.sequence,p.sequence):0}))});
       }return result;
     }
+    visualReport(){
+      // Observer-only genotype groups. Expression, cell IDs and non-antigen
+      // mutations never recolor a profile; no receptor or model RNG is changed.
+      const live=this.s.live().filter(m=>!m.dying),profiles=new Map(),cloneProfiles={},immuneMatches={},presentation={};
+      for(const m of live)if(m.kind===2||m.state==='abnormal'){
+        const peptides=[...new Map(this.genes(m).peptides.filter(p=>p.present&&!this.self.includes(p.sequence)).map(p=>[p.channel+':'+p.sequence,{channel:p.channel,sequence:p.sequence}])).values()].sort((a,b)=>a.channel-b.channel||a.sequence.localeCompare(b.sequence));
+        if(!peptides.length)continue;
+        const levels=presentation[m.id]={};this.genes(m).peptides.forEach((p,i)=>{if(p.present&&!this.self.includes(p.sequence)){const key=p.channel+':'+p.sequence;levels[key]=Math.max(levels[key]||0,m.expression.peptides[i]*m.expression.presentation[p.channel]);}});
+        cloneProfiles[m.geneClone]=peptides.map(p=>p.channel+':'+p.sequence);
+        for(const peptide of peptides){const key=peptide.channel+':'+peptide.sequence;let profile=profiles.get(key);if(!profile){profile={key,peptides:[peptide],count:0,clones:[]};profiles.set(key,profile);}profile.count++;if(!profile.clones.includes(m.geneClone))profile.clones.push(m.geneClone);}
+      }
+      const receptors=new Map();
+      for(const m of live)if(m.kind===3&&!Object.hasOwn(immuneMatches,m.geneClone)){
+        const r=this.genes(m).receptor,key=r?r.channel+':'+r.sequence:'';
+        if(!receptors.has(key))receptors.set(key,r?[...profiles.values()].filter(p=>p.peptides.some(p=>r.channel===p.channel&&affinity(r.sequence,p.sequence)>=threshold)).map(p=>p.key).sort():[]);
+        immuneMatches[m.geneClone]=receptors.get(key);
+      }
+      return {profiles:[...profiles.values()].sort((a,b)=>a.key.localeCompare(b.key)),cloneProfiles,immuneMatches,presentation};
+    }
     report(full=false){
       const counts={};for(const m of this.s.live())if(!m.dying)counts[m.geneClone]=(counts[m.geneClone]||0)+1;
       const selected=this.s.cells[this.s.observation?.rootID],selectedGene=selected?{id:selected.geneClone,genes:this.genes(selected)}:null;
@@ -12406,7 +12427,7 @@ var CPM = (function (exports, module$1) {
       const clones=Object.keys(counts).filter(id=>!visible||visible.has(+id)).map(id=>{const {genes,...c}=this.clones.get(+id);return {...c,live:counts[id],...(full?{genes}:{})};});
       const variants=new Set(),presented=new Set(),receptors=new Set();let primedCells=0;
       for(const m of this.s.live())if(!m.dying){const g=this.genes(m);if(m.kind===3){if(g.receptor)receptors.add(g.receptor.channel+':'+g.receptor.sequence);primedCells+=Number(m.primed);}else if(m.kind===2||m.state==='abnormal')g.peptides.forEach((p,i)=>{if(p.present&&!this.self.includes(p.sequence)){const k=p.channel+':'+p.sequence;variants.add(k);if(m.expression.peptides[i]*m.expression.presentation[p.channel]>=.18)presented.add(k);}});}
-      return {length:this.length,threshold,self:this.self,clones,selectedGene,contacts:this.contactReport(selected),selectedID:selected?.id||0,history:full?this.history:this.compactHistory(),coverage:{variants:variants.size,presented:presented.size,receptors:receptors.size,primedCells},metrics:{...this.metrics,cacheEntries:this.cache.size},repertoire:this.repertoire.map(r=>({...r})),queue:this.queue.length,exposures:this.exposures.slice(-16),encounters:[...this.encounters.values()].slice(-64),...(full?{lineage:[...this.clones.values()].map(({archivedGenes,...c})=>({...c,genes:c.genes||(archivedGenes?JSON.parse(archivedGenes):null)}))}:{})};
+      return {length:this.length,threshold,self:this.self,clones,selectedGene,visuals:this.visualReport(),contacts:this.contactReport(selected),selectedID:selected?.id||0,history:full?this.history:this.compactHistory(),coverage:{variants:variants.size,presented:presented.size,receptors:receptors.size,primedCells},metrics:{...this.metrics,cacheEntries:this.cache.size},repertoire:this.repertoire.map(r=>({...r})),queue:this.queue.length,exposures:this.exposures.slice(-16),encounters:[...this.encounters.values()].slice(-64),...(full?{lineage:[...this.clones.values()].map(({archivedGenes,...c})=>({...c,genes:c.genes||(archivedGenes?JSON.parse(archivedGenes):null)}))}:{})};
     }
     definitions(m){const g=this.genes(m);return {kind:m.kind,x:m.x/this.s.scale,y:m.y/this.s.scale,radius:Math.sqrt(this.s.C.getVolume(m.id)/Math.PI)/this.s.scale,genes:structuredClone(g),primed:m.primed,state:m.state};}
     initialize(definitions){
@@ -12434,7 +12455,7 @@ var CPM = (function (exports, module$1) {
   Object.assign(DEFAULTS,{normalSupport:0,immuneKillLimit:10});
   Object.assign(DEFAULTS,{cycleCoupling:1,reserveCapacity:80,replicationStress:1,dnaRepair:1,checkpointIntegrity:1,traitCost:.45,normalRepair:.25,normalDivisions:4});
   Object.assign(DEFAULTS,{stemFraction:20,stemSymmetry:30,stemRenewal:60,stemCycleSlowdown:1.35,stemRepair:1.4,stemPlasticity:.25,tumorProgenyLimit:0});
-  const MODEL_REVISION='2026-11-specific-immune-genetics-1';
+  const MODEL_REVISION='2026-11-onset-calibration-antigen-visuals-2';
   Object.assign(DEFAULTS,{antigenLength:6,initialImmuneReady:65,primingRate:1,checkpointStrength:1});
   // Vascular parameters are phenomenological MCS rates, not clinical estimates.
   Object.assign(DEFAULTS,{vesselCount:0,vesselRadius:11,vesselSupply:1,vesselDependence:45,vesselImmuneRate:1,vesselImmuneHealth:60,vesselPassage:1,vesselRepair:1,vesselDivisions:4,vesselLifespan:18000,vesselInflammation:1,tumorIntravasation:1});
@@ -12464,6 +12485,9 @@ var CPM = (function (exports, module$1) {
   // Let initiated clones leave a hostile niche before their own acid production
   // overwhelms it. Physical passage, resource gates and death stay unchanged.
   Object.assign(RANDOM_RANGES,{metabolism:[.9,1,.05],progression:[3,5,.5],normalMotility:[.15,.25,.05],cohesion:[.35,.6,.05],sectionYield:[.38,.42,.01],tumorMotility:[1.25,1.5,.05],tumorMorphology:[1,1,1],escape:[3.5,4.5,.25],chemotaxis:[2.2,2.8,.1]});
+  // Onset calibration: avoid making the abstract injury-to-suppression route
+  // dominate before antigen-specific surveillance. This is not a Treg census.
+  Object.assign(RANDOM_RANGES,{damagePolarization:[.5,1.5,.25],damageDeactivation:[.7,1.3,.1],suppressiveSecretion:[.75,1.25,.25],suppressionStrength:[.8,1.2,.1],immuneRegulationMemory:[400,800,100]});
   function randomSettings(seed){
     let state=seed>>>0;
     const random=()=>{state=(state+0x6d2b79f5)>>>0;let n=Math.imul(state^(state>>>15),1|state);n^=n+Math.imul(n^(n>>>7),61|n);return ((n^(n>>>14))>>>0)/4294967296;};
@@ -12523,6 +12547,7 @@ var CPM = (function (exports, module$1) {
   Object.assign(PRESETS.hot.settings,{normalSupport:15,initialImmuneReady:95,primingRate:1.4});
   Object.assign(PRESETS.maze.settings,{initialImmuneReady:100});
   Object.assign(PRESETS.oncogenesis.settings,{vesselCount:2,vesselDependence:20});
+  Object.assign(PRESETS.oncogenesis.settings,{damagePolarization:1,damageDeactivation:1,suppressiveSecretion:1,suppressionStrength:1,immuneRegulationMemory:600});
   Object.assign(PRESETS.cold.settings,{vesselCount:2,vesselImmuneRate:.35,vesselPassage:.65,vesselDependence:25,tumorIntravasation:1.3});
   Object.assign(PRESETS.hot.settings,{vesselCount:2,vesselImmuneRate:1.3,vesselPassage:1.4,vesselDependence:25,tumorIntravasation:.6});
   const ringOffsets=[[-1,-1],[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0]];
@@ -12804,8 +12829,24 @@ var CPM = (function (exports, module$1) {
     }
     report(){const s=this.s,active=this.vessels.filter(v=>v.active),health=1-s.settings.vesselImmuneHealth/100*(1-this.hostHealth);return {vessels:this.vessels.map(v=>({id:v.id,x:v.x,y:v.y,radius:v.radius,wall:v.wall,initialRadius:v.initialRadius,coverage:v.coverage,perfusion:v.perfusion,patency:v.patency,area:v.area,active:v.active})),initial:this.initial.map(v=>({...v})),endothelial:s.live().filter(m=>m.vesselID).length,functional:active.filter(v=>v.perfusion>.05).length,immuneAvailability:health,canRecruit:s.settings.vesselImmuneRate>0&&health>0&&active.some(v=>v.perfusion>.05&&v.radius>5*s.scale),area:active.reduce((n,v)=>n+v.area,0),meanPerfusion:active.reduce((n,v)=>n+v.perfusion,0)/Math.max(1,active.length)};}
   }
+  // Opt-in performance prototype. Membership updates are O(1); only an event's
+  // target body is sorted, in the exact x-major order of Artistoo's pixels().
+  // Keeping that order preserves centroid sums, relabelling and RNG trajectories.
+  class CellPixelIndex {
+    constructor(size){this.members=[];this.slots=new Uint32Array(size);}
+    update(i,old,id){
+      if(old===id)return;
+      if(old){
+        const body=this.members[old],slot=this.slots[i],last=body.pop();
+        if(last!==i){body[slot]=last;this.slots[last]=slot;}
+        if(!body.length)delete this.members[old];
+      }
+      if(id){const body=this.members[id]||(this.members[id]=[]);this.slots[i]=body.length;body.push(i);}
+    }
+    indices(id){return (this.members[id]||[]).slice().sort((a,b)=>a-b);}
+  }
   class Simulation {
-    constructor({width,height,worldWidth=240,worldHeight=180,refinement,scene='ecosystem',seed=17,boundary='solid',settings={},sources,vessels,initialCells=[],mazeSignalThroughWalls=false,warmup=35,kernel='fast',sectionModel=true}={}){
+    constructor({width,height,worldWidth=240,worldHeight=180,refinement,scene='ecosystem',seed=17,boundary='solid',settings={},sources,vessels,initialCells=[],mazeSignalThroughWalls=false,warmup=35,kernel='fast',sectionModel=true,pixelIndex=false}={}){
       this.scale=refinement??(width===undefined?1.5:1);
       if(![1,1.5,2,3,4].includes(this.scale))throw Error('Unsupported lattice refinement');
       width=width??Math.round(worldWidth*this.scale);height=height??Math.round(worldHeight*this.scale);
@@ -12861,6 +12902,10 @@ var CPM = (function (exports, module$1) {
         if(this.trackPatrol){if(this.cells[id]?.kind===IMMUNE&&!this.cells[id].dying)this.patrol.visited[i]=1;}
         else if(this.cells[old]?.kind===IMMUNE||this.cells[id]?.kind===IMMUNE)this.patrol.needsSeed=true;
       });
+      // Register before fast/WASM capture the known listeners so bulk commit,
+      // reference JS, user edits and trapped-WASM fallback all maintain it.
+      this.pixelIndex=pixelIndex?new CellPixelIndex(size):null;
+      if(this.pixelIndex)C.post_setpix_listeners.push(this.pixelIndex.update.bind(this.pixelIndex));
       this.act=C.getConstraint('ActivityConstraint');
       this.act.cellParameter=(parameter,id)=>parameter==='LAMBDA_ACT'?(this.cells[id]?.activity||0):C.conf[parameter][C.cellKind(id)];
       const p=C.getConstraint('PerimeterConstraint');p.cellParameter=(parameter,id)=>parameter==='P'?(this.cells[id]?.perimeter||0):parameter==='LAMBDA_P'?(this.cells[id]?.lambdaP||0):C.conf[parameter][C.cellKind(id)];
@@ -13634,7 +13679,8 @@ var CPM = (function (exports, module$1) {
       if(manual&&!m)return;
       if(m?.dying)m.deathFinalArea=this.C.getVolume(id);
       this.section?.forget(id);
-      const occupied=points||[...this.C.pixels()].filter(([,cid])=>cid===id).map(([p])=>p);for(const p of occupied)this.C.setpix(p,0);
+      if(this.pixelIndex&&!points){for(const i of this.pixelIndex.indices(id))this.C.setpixi(i,0);}
+      else {const occupied=points||[...this.C.pixels()].filter(([,cid])=>cid===id).map(([p])=>p);for(const p of occupied)this.C.setpix(p,0);}
       // Both zero-pixel cleanup and small-remnant removal converge here.
       // Administrative removal of a healthy cell is not a biological death.
       if(manual){
@@ -13914,7 +13960,8 @@ var CPM = (function (exports, module$1) {
         if(this.C.getVolume(m.id)>maximum)pending.set(m.id,{m,maximum,points:[]});
       }
       if(!pending.size)return;
-      for(const [p,id]of this.C.pixels())pending.get(id)?.points.push(this.C.grid.p2i(p));
+      if(this.pixelIndex){for(const [id,body]of pending)body.points=this.pixelIndex.indices(id);}
+      else for(const [p,id]of this.C.pixels())pending.get(id)?.points.push(this.C.grid.p2i(p));
       const grid=this.C.grid._pixels;
       for(const [id,{m,maximum,points}]of pending){
         const radius=i=>{let dx=this.xs[i]-m.x,dy=this.ys[i]-m.y;if(this.wrap){dx-=Math.round(dx/this.width)*this.width;dy-=Math.round(dy/this.height)*this.height;}return dx*dx+dy*dy;};
@@ -13929,22 +13976,38 @@ var CPM = (function (exports, module$1) {
       }
     }
     components(id){
-      const remaining=new Set();for(const [p,cid] of this.C.pixels())if(cid===id)remaining.add(this.C.grid.p2i(p));
+      const remaining=new Set(this.pixelIndex?this.pixelIndex.indices(id):[]);
+      if(!this.pixelIndex)for(const [p,cid] of this.C.pixels())if(cid===id)remaining.add(this.C.grid.p2i(p));
       const parts=[];while(remaining.size){const seed=remaining.values().next().value,queue=[seed],part=[];remaining.delete(seed);while(queue.length){const i=queue.pop();part.push(i);for(const n of (this.section?this.faces[i]:this.neighbors[i]))if(remaining.delete(n))queue.push(n);}parts.push(part);}return parts;
     }
     divide(id){
       const m=this.cells[id];if(!m||m.dying||m.state==='abnormal'||(m.kind===TUMOR&&!m.isStem&&m.tumorDivisionsLeft===0)||this.C.getVolume(id)<80*this.scale*this.scale||(m.kind===NORMAL&&m.divisionsLeft<=0)||(m.kind===IMMUNE&&(m.divisionsLeft<=0||(this.settings.immuneKillLimit>0&&m.tumorKills>=this.settings.immuneKillLimit))))return 0;
       // Relabelling existing cytoplasm is not a new protrusion. Preserve its Act
       // age instead of letting GridManipulator turn the whole daughter red.
-      const activity=[];for(const [p,cid] of this.C.pixels())if(cid===id){const i=this.C.grid.p2i(p);activity.push([i,this.act.pxact(i)]);}
+      const activity=this.pixelIndex?this.pixelIndex.indices(id).map(i=>[i,this.act.pxact(i)]):[];
+      if(!this.pixelIndex)for(const [p,cid] of this.C.pixels())if(cid===id){const i=this.C.grid.p2i(p);activity.push([i,this.act.pxact(i)]);}
       const restoreActivity=()=>{for(const [i,a] of activity)this.act.setActivity(i,a);};
       const parentTarget=m.target,parentFraction=m.sectionFraction,parentArea=this.C.getVolume(id),divisionX=m.x,divisionY=m.y;
       const parentStem=m.isStem,parentBudget=m.tumorDivisionsLeft;
       const parentBase=m.base,parentResources={...m.resources},parentAmounts=this.reserveAmounts(m);
-      this.C.stat_values={};this.divisionParent=m;let child;try{child=this.wrap?this.gm.divideCellTorus(id):this.gm.divideCell(id);}finally{this.divisionParent=null;}
+      this.C.stat_values={};this.divisionParent=m;let child;
+      try{
+        if(this.pixelIndex){
+          // Feed the unchanged upstream division algorithm exactly the pixels
+          // and centroid it reads. Do not compute unrelated cells' statistics.
+          // These private, target-only caches must not escape this call.
+          const pixels={[id]:activity.map(([i])=>[this.xs[i],this.ys[i]])};
+          const Type=this.wrap?CPM.CentroidsWithTorusCorrection:CPM.Centroids,stat=new Type();stat.model=this.C;
+          this.C.stat_values.PixelsByCell=pixels;
+          this.C.stat_values[Type.name]={[id]:stat.computeCentroidOfCell(id,pixels)};
+        }
+        child=this.wrap?this.gm.divideCellTorus(id):this.gm.divideCell(id);
+      }finally{this.divisionParent=null;if(this.pixelIndex)this.C.stat_values={};}
       this.refreshPositions();const daughter=this.cells[child],nuclei=this.section&&daughter?[this.section.findNucleus(m,activity.map(x=>x[0])),this.section.findNucleus(daughter,activity.map(x=>x[0]))]:null;
       if(!this.C.getVolume(child)||this.components(id).length!==1||this.components(child).length!==1||(nuclei&&nuclei.some(p=>!p))){
-        const points=[...this.C.pixels()].filter(([,cid])=>cid===child).map(([p])=>p);for(const p of points)this.C.setpix(p,id);delete this.cells[child];this.contacts.delete(child);restoreActivity();this.C.stat_values={};this.refreshPositions();return 0;
+        if(this.pixelIndex){for(const i of this.pixelIndex.indices(child))this.C.setpixi(i,id);}
+        else {const points=[...this.C.pixels()].filter(([,cid])=>cid===child).map(([p])=>p);for(const p of points)this.C.setpix(p,id);}
+        delete this.cells[child];this.contacts.delete(child);restoreActivity();this.C.stat_values={};this.refreshPositions();return 0;
       }
       restoreActivity();
       this.section?.forget(id);
@@ -14266,7 +14329,7 @@ var CPM = (function (exports, module$1) {
     if(input.opacity!==undefined){if(!object(input.opacity))invalid('opacity');display.opacity={};for(const [k,v]of Object.entries(input.opacity))if(['adversity','oxygen','glucose','acid','density',...signals].includes(k))display.opacity[k]=number(v,0,1,'opacity.'+k);}
     if(input.flags!==undefined){if(!object(input.flags))invalid('flags');display.flags={};for(const [k,v]of Object.entries(input.flags))if(flags.includes(k)){if(typeof v!=='boolean')invalid(k);display.flags[k]=v;}}
     for(const [key,options]of [['zoom',['100','150','200','300']],['fit',['cover','contain']],['renderResolution',['auto','1920','2560','3840']]])if(input[key]!==undefined)display[key]=choice(input[key],options,key);
-    const migration=data.schemaVersion!==2||!!(data.modelRevision&&data.modelRevision!==(globalThis.CellLab?.MODEL_REVISION||'2026-11-specific-immune-genetics-1'));
+    const migration=data.schemaVersion!==2||!!(data.modelRevision&&data.modelRevision!==(globalThis.CellLab?.MODEL_REVISION||'2026-11-onset-calibration-antigen-visuals-2'));
     return {mode:'parameters',migration,warnings:migration?['旧实验已迁移至特异识别规则；种子与参数保留，演化轨迹会变化。']:[],config:{initialCells:cleanCells,scene:data.scene,mazeSignalThroughWalls:!!data.maze?.signalThroughWalls,seed,boundary,worldWidth,worldHeight,refinement,settings,...(vessels?{vessels:vessels.map(v=>({x:v.x,y:v.y,radius:v.radius}))}:{}),...(sources?{sources:sources.map(s=>({type:s.type,x:s.x,y:s.y,radius:s.radius}))}:{}),warmup:data.warmup===undefined?(data.scene==='empty'?0:35):number(data.warmup,0,200,'warmup')},display,speed:data.speed===undefined?1:number(data.speed,.25,8,'speed'),sourceTime:Number.isFinite(data.time)?data.time:0,ignored};
   }
   globalThis.CellLabExperiment={parse,ranges,scenes,flags};
@@ -14830,7 +14893,7 @@ globalThis.CellLabSignalGesture=class {
     constructor(){this.active=null;this.serial=0;}
     begin(s,now,iso=new Date().toISOString(),locks={},display={},replayOf=null){
       this.active={id:iso+'-'+s.seed+'-'+(++this.serial),scene:s.scene,seed:s.seed,startedAt:iso,endedAt:null,lastSeenAt:iso,reason:'running',worldWidth:s.worldWidth,worldHeight:s.worldHeight,refinement:s.refinement,boundary:s.boundary,initialMCS:s.time,simulatedMCS:s.time,runningMs:0,initialSettings:{...s.settings},finalSettings:{...s.settings},initialLocks:{...locks},finalLocks:{...locks},parameterChanges:[],population:population(s),initialPopulation:population(s),cycles:copy(s.cycles||{}),sources:copy(s.sources||[]),counters:{...s.counters}};
-      Object.assign(this.active,{modelRevision:s.modelRevision||null,initialCells:copy(s.initialCells||[]),initialWarmup:s.warmup,initialKernel:s.kernel,initialVessels:s.vascular?.initial?copy(s.vascular.initial):undefined,vascular:copy(s.vascular||{}),initialCompute:s.compute?.active,initialSpeed:s.speed||1,initialDisplay:copy(display),initialSources:(s.sources||[]).map(v=>({type:v.type,x:v.x/s.refinement,y:v.y/s.refinement,radius:v.radius/s.refinement})),initialMaze:s.maze?{signalThroughWalls:!!s.maze.signalThroughWalls}:null,replayOf});
+      Object.assign(this.active,{schemaVersion:s.immunity?2:1,modelRevision:s.modelRevision||null,initialCells:copy(s.initialCells||[]),initialWarmup:s.warmup,initialKernel:s.kernel,initialVessels:s.vascular?.initial?copy(s.vascular.initial):undefined,vascular:copy(s.vascular||{}),initialCompute:s.compute?.active,initialSpeed:s.speed||1,initialDisplay:copy(display),initialSources:(s.sources||[]).map(v=>({type:v.type,x:v.x/s.refinement,y:v.y/s.refinement,radius:v.radius/s.refinement})),initialMaze:s.maze?{signalThroughWalls:!!s.maze.signalThroughWalls}:null,replayOf});
       this.epoch=s.revision+':'+s.seed;this.lastTick=now;this.running=!!s.playing;return this.current();
     }
     observe(s,now,running=true){
@@ -14861,7 +14924,7 @@ globalThis.CellLabSignalGesture=class {
     return records.filter(r=>chosen.has(r.id)!==keepSelected).map(r=>r.id);
   }
   function replayExperiment(r){
-    return copy({format:'cell-arena-experiment',schemaVersion:r.modelRevision==='2026-11-specific-immune-genetics-1'?2:1,modelRevision:r.modelRevision,initialCells:r.initialCells||[],version:'4.0.0',scene:r.scene,seed:r.seed,boundary:r.boundary,worldWidth:r.worldWidth,worldHeight:r.worldHeight,refinement:r.refinement,settings:r.initialSettings,warmup:r.initialWarmup,sources:r.initialSources,vessels:r.initialVessels,maze:r.initialMaze,speed:r.initialSpeed||1,display:{...(r.initialDisplay||{}),autoRandomMinutes:0}});
+    return copy({format:'cell-arena-experiment',schemaVersion:r.schemaVersion??(r.modelRevision==='2026-11-specific-immune-genetics-1'?2:1),modelRevision:r.modelRevision,initialCells:r.initialCells||[],version:'4.0.0',scene:r.scene,seed:r.seed,boundary:r.boundary,worldWidth:r.worldWidth,worldHeight:r.worldHeight,refinement:r.refinement,settings:r.initialSettings,warmup:r.initialWarmup,sources:r.initialSources,vessels:r.initialVessels,maze:r.initialMaze,speed:r.initialSpeed||1,display:{...(r.initialDisplay||{}),autoRandomMinutes:0}});
   }
   function csv(records){
     records=numbered(records);
@@ -15652,6 +15715,11 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
 细胞内标记|Cell markers
 细胞标记|Cell markings
 抗原轮廓|Antigen outline
+抗原谱系轮廓|Antigen lineage outlines
+存活正常细胞的持续压力或损伤也可触发；不必先死亡。暴露越强、越久转蓝概率越高；0 关闭|Sustained stress or injury in living normal cells can also trigger this; prior death is not required. Stronger and longer exposure increases switching; 0 disables it.
+颜色表示遗传抗原谱；同色免疫核弧表示受体匹配潜力|Colors show inherited antigen profiles; matching nuclear arcs show receptor compatibility
+外轮廓／核弧：抗原谱系与匹配|Outlines / nuclear arcs: antigen profiles and matching
+追踪后：✓ 已识别 · ≈ 接触扫描 · × 不匹配 · ! 受限。|Track: ✓ recognized · ≈ scanning · × mismatch · ! limited.
 周期文字|Cycle labels
 红色轮廓：抗原可识别|Red outline: recognizable antigen
 红色细线标出可识别抗原的肿瘤和癌前细胞|Thin red outlines mark tumor and precancerous cells with recognizable antigen
@@ -16078,6 +16146,50 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
   }
   const antigenMarked=m=>!!m&&!m.dying&&(m.kind===2||m.state==='abnormal')&&m.antigen;
   const antigenStrength=m=>antigenMarked(m)?Math.max(0,Math.min(1,m.antigenLevel??1)):0;
+  function antigenProfileStyle(key){
+    let hash=2166136261;for(let i=0;i<key.length;i++)hash=Math.imul(hash^key.charCodeAt(i),16777619)>>>0;
+    const h=(hash%3600)/600,s=.67+((hash>>>12)%18)/100,l=.38+((hash>>>20)%9)/100;
+    const c=(1-Math.abs(2*l-1))*s,x=c*(1-Math.abs(h%2-1)),m=l-c/2;
+    const rgb=(h<1?[c,x,0]:h<2?[x,c,0]:h<3?[0,c,x]:h<4?[0,x,c]:h<5?[x,0,c]:[c,0,x]).map(v=>Math.round((v+m)*255));
+    return {key,label:'A-'+hash.toString(16).padStart(8,'0'),rgb,color:'#'+rgb.map(v=>v.toString(16).padStart(2,'0')).join('')};
+  }
+  function antigenVisuals(s){
+    const data=s.immunity?.visuals,profiles=new Map((data?.profiles||[]).map(p=>[p.key,{...p,...antigenProfileStyle(p.key)}])),outlines=new Map(),nuclei=new Map();
+    for(const m of s.cells){
+      if(m.dying)continue;
+      const entries=(data?.cloneProfiles[m.geneClone]||[]).map(key=>profiles.get(key)).filter(Boolean);
+      if(entries.length&&(m.kind===2||m.state==='abnormal')){
+        const levels=s.immunity?.visuals?.presentation?.[m.id]||{};
+        outlines.set(m.id,{x:m.x,y:m.y,segments:entries.map(p=>({...p,alpha:.35+.65*clamp(levels[p.key]??m.antigenLevel??0)}))});
+      }else if(!data&&antigenMarked(m))outlines.set(m.id,{x:m.x,y:m.y,segments:[{key:'legacy',color:'#d12f39',rgb:[209,47,57],alpha:.25+.75*antigenStrength(m)}]});
+      if(m.kind===3){const matches=(data?.immuneMatches[m.geneClone]||[]).map(key=>profiles.get(key)).filter(Boolean);if(matches.length)nuclei.set(m.id,matches);}
+    }
+    return {profiles,outlines,nuclei};
+  }
+  function antigenSegment(style,x,y,s){
+    if(style.segments.length===1)return style.segments[0];let dx=x-style.x,dy=y-style.y;
+    if(s.boundary==='wrap'){dx-=Math.round(dx/s.width)*s.width;dy-=Math.round(dy/s.height)*s.height;}
+    const angle=Math.atan2(dy,dx)+Math.PI,index=Math.min(style.segments.length-1,Math.floor(angle/(2*Math.PI)*style.segments.length));return style.segments[index];
+  }
+  // Partition the actual (possibly deformed) closed nuclear contour by arc
+  // length, not angle; a multicolor ring therefore gives every match equal space.
+  function equalContourArcs(contour,count){
+    if(!count||contour.length<2)return [];
+    const lengths=contour.map((p,i)=>Math.hypot(contour[(i+1)%contour.length][0]-p[0],contour[(i+1)%contour.length][1]-p[1])),total=lengths.reduce((a,b)=>a+b,0);
+    if(!total)return [];
+    const arcs=Array.from({length:count},()=>[]);let at=0,part=0;
+    for(let i=0;i<contour.length;i++){
+      const a=contour[i],b=contour[(i+1)%contour.length],length=lengths[i];if(!length)continue;
+      let used=0;if(!arcs[part].length)arcs[part].push([...a]);
+      while(part<count-1&&(part+1)*total/count<at+length-1e-10){
+        const end=(part+1)*total/count,ratio=(end-at)/length,p=[a[0]+(b[0]-a[0])*ratio,a[1]+(b[1]-a[1])*ratio];
+        arcs[part].push(p);arcs[++part].push([...p]);used=end-at;
+      }
+      if(length>used)arcs[part].push([...b]);at+=length;
+      if(part<count-1&&Math.abs(at-(part+1)*total/count)<1e-10)arcs[++part].push([...b]);
+    }
+    return arcs;
+  }
   // Smallest occupied interval on each periodic axis. A cell crossing a seam
   // gets a local box repeated at the edges, never a box spanning the dish.
   function occupiedInterval(axis,wrap){
@@ -16136,6 +16248,17 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     return {width:f.width,height:f.height,rgba};
   }
   class Cache {
+    antigens(s){if(this.antigenSnapshot!==s){this.antigenSnapshot=s;this.antigenData=antigenVisuals(s);}return this.antigenData;}
+    nucleusArcBatches(s){
+      if(this.arcSnapshot===s)return this.arcPaths;
+      const groups=new Map(),batches=[],contours=this.nuclei(s),wrap=s.boundary==='wrap';
+      for(const m of s.cells){const matches=this.antigens(s).nuclei.get(m.id),contour=contours.get(m.id);if(!matches?.length||!contour)continue;
+        const arcs=equalContourArcs(contour,matches.length),cx=m.nucleusX+.5,cy=m.nucleusY+.5,r=Math.max(...contour.map(p=>Math.max(Math.abs(p[0]),Math.abs(p[1]))))+1,xs=[0],ys=[0];
+        if(wrap){if(cx-r<0)xs.push(s.width);if(cx+r>s.width)xs.push(-s.width);if(cy-r<0)ys.push(s.height);if(cy+r>s.height)ys.push(-s.height);}
+        arcs.forEach((arc,i)=>{const color=matches[i].color;for(const dx of xs)for(const dy of ys){let batch=groups.get(color);if(!batch||batch.count===32){batch={stroke:color,path:new Path2D(),count:0};groups.set(color,batch);batches.push(batch);}arc.forEach(([x,y],j)=>j?batch.path.lineTo(cx+dx+x,cy+dy+y):batch.path.moveTo(cx+dx+x,cy+dy+y));batch.count++;}});
+      }
+      this.arcSnapshot=s;return this.arcPaths=batches;
+    }
     nuclei(s){
       if(this.nuclearSnapshot!==s){this.nuclearSnapshot=s;this.nuclearContours=new Map();for(const m of s.cells)if(m.hasNucleus&&(!m.dying||m.deathIntact))this.nuclearContours.set(m.id,nucleusContour(m,s));}
       return this.nuclearContours;
@@ -16177,7 +16300,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     const wall=!!s.walls[q],blocked=wall||!!s.fieldMask?.[bin];
     return {x,y,bin,time:s.time,cell:s.cells.find(m=>m.id===s.grid[q])||null,wall,blocked,values:blocked?null:Object.fromEntries(['oxygen','glucose','acid',...Object.keys(SIGNALS)].map(key=>[key,s.fields[key]?.values[bin]??0]))};
   }
-  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,immuneSuppressive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,cycleColor,antigenMarked,antigenStrength,selectionBounds,selectionBoxes,bodyOpacity,adversity,signals,sample,Cache};
+  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,immuneSuppressive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,cycleColor,antigenMarked,antigenStrength,antigenProfileStyle,antigenVisuals,antigenSegment,equalContourArcs,selectionBounds,selectionBoxes,bodyOpacity,adversity,signals,sample,Cache};
 })();
 
 /* Display-only WebGL2 rasterizer. All cell copies and contacts stay in the
@@ -16197,12 +16320,13 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
       void main(){vec2 p=vec2((gl_VertexID<<1)&2,gl_VertexID&2);gl_Position=vec4(p*2.-1.,0,1);}`;
       const fragment=`#version 300 es
       precision highp float;precision highp int;precision highp usampler2D;
-      uniform usampler2D ids,activity,walls,metadata;uniform sampler2D environment,palette,signalLayer,bodySignalLayer,interior;
+      uniform usampler2D ids,activity,walls,metadata;uniform sampler2D environment,palette,signalLayer,bodySignalLayer,interior,antigenColors,antigenCenters;
       uniform vec3 bodyColors[9];uniform int showSignals,proliferationShading;uniform float environmentOpacity,bodyEnvironmentOpacity,pixelRatio;
       uniform ivec2 lattice;uniform vec2 viewport;uniform int fieldScale,fieldMode,seams,selected,wrap,smoothWall,antigen;
       uniform ivec4 actFlags;uniform float edgeFade;uniform int appearanceScale;out vec4 color;
       uint idAt(ivec2 p){if(wrap==1)p=(p+lattice)%lattice;else if(any(lessThan(p,ivec2(0)))||any(greaterThanEqual(p,lattice)))return 0u;return texelFetch(ids,p,0).r;}
-      float antigenEdge(uint id,ivec2 p,float level){uint other=idAt(p);if(other==id)return 0.;uvec4 n=texelFetch(metadata,ivec2(int(other)&255,int(other)>>8),0);float strength=max(level,(n.g&8u)>0u?float(n.a)/255.:0.);return strength>0.?.25+.75*strength:0.;}
+      vec4 antigenColor(uint id,vec2 xy){ivec2 at=ivec2(int(id)&255,int(id)>>8);vec3 c=texelFetch(antigenCenters,at,0).rgb;if(c.z<1.)return vec4(0);vec2 d=xy-c.xy;if(wrap==1)d=mod(d+vec2(lattice)*.5,vec2(lattice))-vec2(lattice)*.5;int slot=0;if(c.z>1.&&dot(d,d)>0.)slot=clamp(int(floor((atan(d.y,d.x)+3.14159265359)/6.28318530718*c.z)),0,int(c.z)-1);return texelFetch(antigenColors,ivec2(at.x*4+slot,at.y),0);}
+      void antigenEdge(inout vec4 edge,uint id,ivec2 p,vec2 xy,vec4 own,float coverage){uint other=idAt(p);if(other==id)return;vec4 ink=own.a>0.?own:antigenColor(other,xy);ink.a*=coverage;if(ink.a>edge.a)edge=ink;}
       vec3 body(int kind){return bodyColors[kind];}
       float insideAt(ivec2 p,uint id){if(idAt(p*appearanceScale+ivec2(appearanceScale/2))!=id)return 0.;ivec2 size=lattice/appearanceScale;if(wrap==1)p=(p+size)%size;return texelFetch(interior,p,0).r;}
       float interiorAt(vec2 xy,uint id){vec2 at=xy/float(appearanceScale)-.5;ivec2 p=ivec2(floor(at));vec2 f=fract(at);float v=mix(mix(insideAt(p,id),insideAt(p+ivec2(1,0),id),f.x),mix(insideAt(p+ivec2(0,1),id),insideAt(p+ivec2(1,1),id),f.x),f.y);
@@ -16219,20 +16343,20 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
           if(death==0u&&actFlags[physicalKind]>0){float a=float(texelFetch(activity,p,0).r);if(a>0.)rgb=vec3(min(255.,a*2.),min(255.,(255.-a)*2.),0.)/255.;}
           if(seams==1||int(id)==selected){vec2 f=fract(xy),thin=min(vec2(.32),vec2(lattice)/viewport*.55*pixelRatio);bool edge=(f.x>1.-thin.x&&idAt(p+ivec2(1,0))!=id)||(f.x<thin.x&&idAt(p-ivec2(1,0))!=id)||(f.y>1.-thin.y&&idAt(p+ivec2(0,1))!=id)||(f.y<thin.y&&idAt(p-ivec2(0,1))!=id);if(edge)rgb=mix(rgb,physicalKind==1?vec3(98,110,109)/255.:kind==7?vec3(26,69,107)/255.:kind==3?vec3(128,61,70)/255.:vec3(225,230,225)/255.,mix(.9,.25,edgeFade));}
         }
-        if(antigen==1){vec2 f=fract(xy),stepSize=vec2(lattice)/viewport;float limit=.5*pixelRatio+.5,coverage=0.,level=(m.g&8u)>0u?float(m.a)/255.:0.;
-          float d=(1.-f.x)/stepSize.x;if(d<limit)coverage=max(coverage,min(1.,limit-d)*antigenEdge(id,p+ivec2(1,0),level));
-          d=f.x/stepSize.x;if(d<limit)coverage=max(coverage,min(1.,limit-d)*antigenEdge(id,p-ivec2(1,0),level));
-          d=(1.-f.y)/stepSize.y;if(d<limit)coverage=max(coverage,min(1.,limit-d)*antigenEdge(id,p+ivec2(0,1),level));
-          d=f.y/stepSize.y;if(d<limit)coverage=max(coverage,min(1.,limit-d)*antigenEdge(id,p-ivec2(0,1),level));
-          rgb=mix(rgb,vec3(209,47,57)/255.,min(1.,coverage));
+        if(antigen==1){vec2 f=fract(xy),stepSize=vec2(lattice)/viewport;float limit=.65*pixelRatio+.5;vec4 edge=vec4(0),own=antigenColor(id,xy);
+          float d=(1.-f.x)/stepSize.x;if(d<limit)antigenEdge(edge,id,p+ivec2(1,0),xy,own,min(1.,limit-d));
+          d=f.x/stepSize.x;if(d<limit)antigenEdge(edge,id,p-ivec2(1,0),xy,own,min(1.,limit-d));
+          d=(1.-f.y)/stepSize.y;if(d<limit)antigenEdge(edge,id,p+ivec2(0,1),xy,own,min(1.,limit-d));
+          d=f.y/stepSize.y;if(d<limit)antigenEdge(edge,id,p-ivec2(0,1),xy,own,min(1.,limit-d));
+          rgb=mix(rgb,edge.rgb,edge.a);
         }color=vec4(rgb,1);
       }`;
       const compile=(type,source)=>{const sh=gl.createShader(type);gl.shaderSource(sh,source);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(sh));return sh;};
       const program=this.program=gl.createProgram();gl.attachShader(program,compile(gl.VERTEX_SHADER,vertex));gl.attachShader(program,compile(gl.FRAGMENT_SHADER,fragment));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));
       gl.useProgram(program);gl.uniform3fv(gl.getUniformLocation(program,'bodyColors[0]'),Float32Array.from(CellLabDisplay.BODY_COLORS.flat(),v=>v/255));
       this.uniforms={};for(const key of ['lattice','viewport','fieldScale','fieldMode','seams','selected','wrap','smoothWall','antigen','actFlags','showSignals','environmentOpacity','bodyEnvironmentOpacity','pixelRatio','bodyColors[0]','proliferationShading','edgeFade','appearanceScale'])this.uniforms[key]=gl.getUniformLocation(program,key);
-      this.textures=[];for(const [i,key] of ['ids','activity','walls','metadata','environment','palette','signalLayer','bodySignalLayer','interior'].entries()){const t=gl.createTexture();this.textures.push(t);gl.activeTexture(gl.TEXTURE0+i);gl.bindTexture(gl.TEXTURE_2D,t);for(const p of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,p,gl.NEAREST);for(const p of [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T])gl.texParameteri(gl.TEXTURE_2D,p,gl.CLAMP_TO_EDGE);gl.uniform1i(gl.getUniformLocation(program,key),i);}
-      this.meta=new Uint8Array(256*256*4);this.palettes=new WeakMap();this.textureSizes=[];
+      this.textures=[];for(const [i,key] of ['ids','activity','walls','metadata','environment','palette','signalLayer','bodySignalLayer','interior','antigenColors','antigenCenters'].entries()){const t=gl.createTexture();this.textures.push(t);gl.activeTexture(gl.TEXTURE0+i);gl.bindTexture(gl.TEXTURE_2D,t);for(const p of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,p,gl.NEAREST);for(const p of [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T])gl.texParameteri(gl.TEXTURE_2D,p,gl.CLAMP_TO_EDGE);gl.uniform1i(gl.getUniformLocation(program,key),i);}
+      this.meta=new Uint8Array(256*256*4);this.antigenMeta=new Uint8Array(256*256*16);this.antigenCenters=new Float32Array(256*256*4);this.palettes=new WeakMap();this.textureSizes=[];
       const ext=gl.getExtension('WEBGL_debug_renderer_info');this.device=ext?gl.getParameter(ext.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER);
       this.hardware=ext?!/swiftshader|llvmpipe|software/i.test(this.device):null;
     }
@@ -16240,7 +16364,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
       const old=this.textureSizes[unit];if(old&&old[0]===w&&old[1]===h&&old[2]===internal)g.texSubImage2D(g.TEXTURE_2D,0,0,0,w,h,format,type,data);
       else{g.texImage2D(g.TEXTURE_2D,0,internal,w,h,0,format,type,data);this.textureSizes[unit]=[w,h,internal];}
     }
-    draw(ctx,s,{actFlags,seams,selected,showAntigen=false,field,info,signal,bodySignal=signal,environmentOpacity=1,bodyEnvironmentOpacity=environmentOpacity,pixelRatio=1,cellColors=null,surface=null,edgeFade=0}){
+    draw(ctx,s,{actFlags,seams,selected,showAntigen=false,antigenStyles=null,field,info,signal,bodySignal=signal,environmentOpacity=1,bodyEnvironmentOpacity=environmentOpacity,pixelRatio=1,cellColors=null,surface=null,edgeFade=0}){
       if(this.lost||this.gl.isContextLost())return false;
       const g=this.gl,u=this.uniforms,c=this.canvas;const start=performance.now();
       if(c.width!==ctx.canvas.width||c.height!==ctx.canvas.height){c.width=ctx.canvas.width;c.height=ctx.canvas.height;}
@@ -16249,7 +16373,8 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
       if(this.cellColors!==cellColors){g.uniform3fv(u['bodyColors[0]'],Float32Array.from((cellColors?CellLabDisplay.paletteBodies(cellColors):CellLabDisplay.BODY_COLORS).flat(),v=>v/255));this.cellColors=cellColors;}
       g.uniform1i(u.proliferationShading,cellColors?.proliferationShading===false?0:1);
       if(this.snapshot!==s){this.upload(0,s.width,s.height,g.R16UI,g.RED_INTEGER,g.UNSIGNED_SHORT,s.grid);this.upload(1,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.activity);this.upload(2,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.walls);
-        this.meta.fill(0);for(const m of s.cells){this.meta[m.id*4]=CellLabDisplay.displayKind(m);this.meta[m.id*4+1]=CellLabDisplay.deathCode(m)|(CellLabDisplay.antigenMarked(m)?8:0);this.meta[m.id*4+2]=m.kind===2?CellLabDisplay.tumorShade(m):0;this.meta[m.id*4+3]=Math.round((m.dying?Math.max(0,Math.min(1,m.deathProgress||0)):CellLabDisplay.antigenStrength(m))*255);}this.upload(3,256,256,g.RGBA8UI,g.RGBA_INTEGER,g.UNSIGNED_BYTE,this.meta);this.snapshot=s;this.field=null;}
+        this.meta.fill(0);for(const m of s.cells){this.meta[m.id*4]=CellLabDisplay.displayKind(m);this.meta[m.id*4+1]=CellLabDisplay.deathCode(m)|(CellLabDisplay.antigenMarked(m)?8:0);this.meta[m.id*4+2]=m.kind===2?CellLabDisplay.tumorShade(m):0;this.meta[m.id*4+3]=Math.round((m.dying?Math.max(0,Math.min(1,m.deathProgress||0)):CellLabDisplay.antigenStrength(m))*255);}this.upload(3,256,256,g.RGBA8UI,g.RGBA_INTEGER,g.UNSIGNED_BYTE,this.meta);
+        this.antigenMeta.fill(0);this.antigenCenters.fill(0);for(const [id,style]of (antigenStyles||CellLabDisplay.antigenVisuals(s)).outlines){this.antigenCenters.set([style.x,style.y,style.segments.length,0],id*4);style.segments.forEach((segment,i)=>{const at=id*16+i*4;this.antigenMeta.set(segment.rgb,at);this.antigenMeta[at+3]=Math.round(segment.alpha*255);});}this.upload(9,1024,256,g.RGBA8,g.RGBA,g.UNSIGNED_BYTE,this.antigenMeta);this.upload(10,256,256,g.RGBA32F,g.RGBA,g.FLOAT,this.antigenCenters);this.snapshot=s;this.field=null;}
       if(this.field!==field){if(field)this.upload(4,field.width,field.height,g.R32F,g.RED,g.FLOAT,field.values);else this.upload(4,1,1,g.R32F,g.RED,g.FLOAT,new Float32Array(1));this.field=field;}
       if(info!==this.info||!this.paletteReady){let p=this.palettes.get(info);if(!p&&info){p=Uint8Array.from(info.palette.flat(2));this.palettes.set(info,p);}this.upload(5,256,9,g.RGB8,g.RGB,g.UNSIGNED_BYTE,p||new Uint8Array(256*9*3));this.info=info;this.paletteReady=true;}
       if(this.signal!==signal||!this.signalReady){this.upload(6,signal?.width||1,signal?.height||1,g.RGBA8,g.RGBA,g.UNSIGNED_BYTE,signal?.rgba||new Uint8Array(4));this.signal=signal;this.signalReady=true;}
@@ -16336,7 +16461,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     if(input.opacity!==undefined){if(!object(input.opacity))invalid('opacity');display.opacity={};for(const [k,v]of Object.entries(input.opacity))if(['adversity','oxygen','glucose','acid','density',...signals].includes(k))display.opacity[k]=number(v,0,1,'opacity.'+k);}
     if(input.flags!==undefined){if(!object(input.flags))invalid('flags');display.flags={};for(const [k,v]of Object.entries(input.flags))if(flags.includes(k)){if(typeof v!=='boolean')invalid(k);display.flags[k]=v;}}
     for(const [key,options]of [['zoom',['100','150','200','300']],['fit',['cover','contain']],['renderResolution',['auto','1920','2560','3840']]])if(input[key]!==undefined)display[key]=choice(input[key],options,key);
-    const migration=data.schemaVersion!==2||!!(data.modelRevision&&data.modelRevision!==(globalThis.CellLab?.MODEL_REVISION||'2026-11-specific-immune-genetics-1'));
+    const migration=data.schemaVersion!==2||!!(data.modelRevision&&data.modelRevision!==(globalThis.CellLab?.MODEL_REVISION||'2026-11-onset-calibration-antigen-visuals-2'));
     return {mode:'parameters',migration,warnings:migration?['旧实验已迁移至特异识别规则；种子与参数保留，演化轨迹会变化。']:[],config:{initialCells:cleanCells,scene:data.scene,mazeSignalThroughWalls:!!data.maze?.signalThroughWalls,seed,boundary,worldWidth,worldHeight,refinement,settings,...(vessels?{vessels:vessels.map(v=>({x:v.x,y:v.y,radius:v.radius}))}:{}),...(sources?{sources:sources.map(s=>({type:s.type,x:s.x,y:s.y,radius:s.radius}))}:{}),warmup:data.warmup===undefined?(data.scene==='empty'?0:35):number(data.warmup,0,200,'warmup')},display,speed:data.speed===undefined?1:number(data.speed,.25,8,'speed'),sourceTime:Number.isFinite(data.time)?data.time:0,ignored};
   }
   globalThis.CellLabExperiment={parse,ranges,scenes,flags};
@@ -16686,6 +16811,19 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     fill.style.width=Math.max(0,Math.min(100,(value||0)*100))+'%';track.append(fill);row.append(name,number,track);return row;
   }
   function sequence(code){const el=node('code','immune-sequence');for(const base of code||'')el.append(node('span','base-'+base,base));return el;}
+  function profileChip(key,count){
+    const style=CellLabDisplay.antigenProfileStyle(key),chip=node('span','antigen-profile-chip'),swatch=node('i');swatch.style.borderColor=style.color;
+    chip.title=key.split('|').map(p=>{const [channel,sequence]=p.split(':');return 'C'+(+channel+1)+' '+sequence;}).join(' / ');
+    chip.append(swatch,node('span','',style.label+(count===undefined?'':' · '+count)));return chip;
+  }
+  function legend(s,visible=true){
+    const root=document.getElementById('antigen-lineage-legend');if(!root)return;root.hidden=!visible;if(!visible)return;
+    const profiles=s.immunity?.visuals?.profiles||[],stamp=JSON.stringify([english(),profiles.map(p=>[p.key,p.count])]);if(root.dataset.stamp===stamp)return;root.dataset.stamp=stamp;root.replaceChildren();
+    root.append(node('p','immune-note',t('同一抗原序列与通道保持同色；多抗原肿瘤的外轮廓分段。免疫核弧等分显示可匹配的抗原；仍需呈递、启动与接触才能激活。','The same antigen sequence and channel keep one color; tumors with several antigens have segmented outlines. Equal nuclear arcs show compatible antigens; activation still requires presentation, priming and contact.')));
+    if(!profiles.length){root.append(node('p','immune-note',t('尚无非自身抗原谱。癌前或肿瘤产生抗原变异后显示谱系颜色。','No non-self antigen profile yet. Colors appear after antigen variation in precancer or tumor cells.')));return;}
+    const row=node('div','antigen-profile-list');for(const p of [...profiles].sort((a,b)=>b.count-a.count||a.key.localeCompare(b.key)).slice(0,8))row.append(profileChip(p.key,p.count));root.append(row);
+    if(profiles.length>8)root.append(node('p','immune-note',t('另有 '+(profiles.length-8)+' 种抗原谱；追踪细胞查看对应颜色。',(profiles.length-8)+' more profiles; select a cell to inspect its color.')));
+  }
   function eventLabel(event='founder'){
     if(english())return event;
     return event.replace(/^founder$/,'创始基因').replace(/^precancer alteration$/,'癌前局部改变').replace(/^malignant transition$/,'恶性转变').replace(/^intervention$/,'实验干预').replace(/^division mutation$/,'分裂突变').replace(/^peptide loss (\d+)/,'P$1 遗传缺失').replace(/^presentation loss (\d+)/,'C$1 遗传失效').replace(/^expression regulation (\d+)/,'P$1 表达调控改变').replace(/^checkpoint regulation$/,'免疫刹车改变').replace(/^surface target (\d+)/,'S$1 表面靶标改变').replace(/^peptide (\d+) /,'P$1 ').replace('>',' → ').replace(/^trait tolerance$/,'耐受性状改变').replace(/^trait proliferation$/,'增殖性状改变').replace(/^trait invasion$/,'侵袭性状改变').replace(/^trait repair$/,'修复性状改变');
@@ -16694,12 +16832,15 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     const root=document.getElementById('immune-system-inspector'),a=s.immunity,g=cell&&a?.selectedGene?.id===cell.geneClone?a.selectedGene.genes:null;
     root.hidden=!cell||!g;if(root.hidden){root.replaceChildren();return;}
     // This is an observer. It never queries distant pairs or changes model RNG.
-    const stamp=JSON.stringify([english(),cell.id,cell.geneClone,cell.expression,cell.primed,cell.primingProgress,cell.antigenMemory,cell.exhaustion,a.contacts]);
+    const profileKeys=cell.kind===3?(a.visuals?.immuneMatches[cell.geneClone]||[]):(a.visuals?.cloneProfiles[cell.geneClone]||[]);
+    const stamp=JSON.stringify([english(),cell.id,cell.geneClone,cell.expression,cell.primed,cell.primingProgress,cell.antigenMemory,cell.exhaustion,a.contacts,profileKeys]);
     if(root.dataset.stamp===stamp)return;root.dataset.stamp=stamp;
     const openSurface=!!root.querySelector('.immune-surface')?.open;root.replaceChildren();
     const clone=a.clones.find(c=>c.id===cell.geneClone),header=node('div','immune-genotype-head');
     header.append(node('b','',t('抗原—免疫','Antigen & immunity')),node('span','','G'+cell.geneClone+(clone?.parent?' ← G'+clone.parent:' · '+t('独立起源','Founder'))));root.append(header);
     if(clone)root.append(node('p','immune-note',eventLabel(clone.event)+' · '+clone.time+' MCS · '+t('第 ','Generation ')+clone.generation+(english()?'':' 代')));
+    if(profileKeys.length){const row=node('div','antigen-profile-list');for(const key of profileKeys)row.append(profileChip(key));root.append(node('p','immune-note',cell.kind===3?t('核轮廓等分显示可匹配的当前抗原；不代表已激活。','Equal nuclear arcs show compatible current antigens, not activation.'):t('每种遗传抗原对应一种颜色；表达变化只改变深浅，序列改变换色，遗传缺失移除该色段。','Each inherited antigen has one color. Expression changes intensity, sequence mutations change color, and genetic loss removes that segment.')),row);}
+    else if(cell.kind===3)root.append(node('p','immune-note',t('当前没有可匹配的非自身抗原谱，胞核保持状态配色。','No compatible current non-self profile; the nucleus keeps its state color.')));
     if(cell.kind===3){
       const receptor=node('div','immune-receptor');receptor.append(node('span','',t('稳定识别码','Stable receptor')),sequence(g.receptor?.sequence),node('b','','C'+((g.receptor?.channel??0)+1)));root.append(receptor);
       root.append(node('p','immune-status',cell.primed?t('✓ 已具备响应资格；仍需匹配并实际接触','✓ Response competent; still requires a matching contact'):t('等待抗原特异性启动','Awaiting antigen-specific priming')));
@@ -16714,11 +16855,11 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
       });root.append(slots);
       const channels=node('div','immune-meter-grid');g.presentation.forEach((p,i)=>{const row=bar('C'+(i+1)+' '+t('通道能力','channel'),cell.expression.presentation[i],'presentation');if(p===0)row.append(node('small','',t('遗传失效','Genetically lost')));channels.append(row);});channels.append(bar(t('免疫刹车','Checkpoint brake'),cell.expression.checkpoint,'brake'));root.append(channels);
       const details=node('details','immune-surface');details.open=openSurface;details.append(node('summary','',t('独立表面靶标 · 预留','Surface targets · reserved')));g.surface.forEach((p,i)=>{const row=node('div','immune-receptor');row.append(node('b','','S'+(i+1)),sequence(p.sequence),node('span','',p.present?percent(p.base):t('遗传缺失','Genetic loss')));details.append(row);});root.append(details);
-      root.append(node('p','immune-note',t('红线深浅表示当前非自身抗原呈递强度，不等于免疫匹配。','Outline intensity shows non-self presentation, not receptor matching.')));
+      root.append(node('p','immune-note',t('轮廓深浅表示当前非自身抗原呈递强度；浅色仍保留遗传身份，不保证足够刺激。','Outline intensity shows current non-self presentation. Dim profiles retain their genetic identity but may provide insufficient stimulus.')));
     }
     const heading=node('h3','',t('实际接触中的识别','Recognition at actual contacts'));root.append(heading);
     const contacts=a.selectedID===cell.id?a.contacts:[];
-    if(!contacts.length)root.append(node('p','immune-note',t('当前没有免疫—肿瘤／癌前膜接触；不推测远处目标。','No current immune–tumor/precancer membrane contact; distant targets are not assessed.')));
+    if(!contacts.length)root.append(node('p','immune-note',t('当前没有免疫—肿瘤／癌前膜接触；核弧仅表示受体潜力，尚无实际识别刺激。','No current immune–tumor/precancer contact; nuclear arcs indicate receptor potential, not actual stimulation.')));
     for(const r of contacts){
       const card=node('div','immune-contact'),status=assessment(r),head=node('div','immune-contact-head');head.style.color=status.color;
       head.append(node('b','',status.symbol+' '+status.label),node('span','','#'+r.immune+' → #'+r.target));card.append(head);
@@ -16750,7 +16891,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
       g.peptides.forEach((p,i)=>out.push('P'+(i+1)+' '+p.sequence+' · '+t('通道','channel')+' '+(p.channel+1)+' · '+(!p.present?t('遗传缺失','Genetic loss'):t('表达 ','Expression ')+percent(cell.expression.peptides[i])+(cell.expression.peptides[i]<.08?t('（暂时低表达）',' (low expression)'):''))));
       out.push(t('呈递通道：','Presentation: ')+g.presentation.map((v,i)=>'C'+(i+1)+' '+(v===0?t('遗传缺失','Genetic loss'):percent(cell.expression.presentation[i]))).join(' / '),t('免疫刹车：','Checkpoint brake: ')+percent(cell.expression.checkpoint));
       out.push(t('独立表面靶标：','Independent surface targets: ')+g.surface.map((p,i)=>'S'+(i+1)+' '+p.sequence+' '+(p.present?percent(p.base):t('缺失','absent'))).join(' / '));
-      out.push(t('抗原红线表示非自身抗原的当前呈递，不保证被某个免疫克隆识别。','A red outline marks current non-self presentation, not guaranteed recognition by a particular clone.'));
+      out.push(t('外轮廓颜色表示遗传抗原谱，深浅表示当前呈递；同色免疫核弧表示受体匹配潜力，不保证激活。','Outline color marks the inherited antigen profile and intensity marks presentation; matching nuclear arcs show receptor potential, not guaranteed activation.'));
     }
     return out;
   }
@@ -16766,7 +16907,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     ctx.clearRect(0,0,w,h);ctx.font='10px monospace';ctx.fillStyle='#6f624d';ctx.strokeStyle='#c8b999';ctx.beginPath();ctx.moveTo(left,top);ctx.lineTo(left,bottom);ctx.lineTo(right,bottom);ctx.stroke();ctx.fillText('100%',0,top+5);ctx.fillText('0',12,bottom);ctx.fillText('0 MCS',left,h-3);ctx.textAlign='right';ctx.fillText(s.time+' MCS',right,h-3);ctx.textAlign='left';
     for(let k=0;k<ids.length;k++){ctx.strokeStyle=colors[k];ctx.lineWidth=1.6;ctx.beginPath();a.history.forEach((r,i)=>{let total=0;for(const [id,n]of Object.entries(r.counts))if(r.states[id]===type)total+=n;const x=left+(right-left)*r.time/Math.max(1,s.time),y=bottom-(bottom-top)*(r.counts[ids[k]]||0)/Math.max(1,total);if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y);});ctx.stroke();}
   }
-  globalThis.CellLabImmuneUI={inspect,stats,selection,links,assessment};
+  globalThis.CellLabImmuneUI={inspect,stats,selection,links,assessment,legend};
 })();
 
 /* Display-only mobile framing. Rotation never changes the lattice or model. */
@@ -16915,7 +17056,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     ['il2Secretion','识别后 IL-2 分泌',0,3,.1,'真实抗原刺激后短时分泌；IL-2 支持扩增，不作为趋化或抗原替代',''],
     ['il2HalfLife','IL-2 半衰期',20,800,20,'独立扩散、衰减和摄取；可用持续场源外源补充',' MCS'],
     ['exhaustionRate','慢性刺激耗竭速率',0,3,.1,'持续抗原刺激逐渐降低扩增和杀伤；补足营养不会立即清空耗竭',''],
-    ['damagePolarization','损伤暴露转抑制态',0,5,.1,'正常细胞损伤信号暴露越强、越久，粉色巡逻细胞转蓝概率越高；0 关闭转变','×'],
+    ['damagePolarization','损伤暴露转抑制态',0,5,.1,'存活正常细胞的持续压力或损伤也可触发；不必先死亡。暴露越强、越久转蓝概率越高；0 关闭','×'],
     ['suppressionRecovery','抑制态恢复速度',0,5,.1,'当前正常损伤信号和累计暴露均降低后，蓝色细胞按概率恢复粉色；越大恢复越快，0 关闭恢复','×'],
     ['damageDeactivation','损伤暴露退激活',0,5,.1,'持续正常细胞损伤信号提高红色免疫细胞退回粉色的概率','×'],
     ['suppressiveSecretion','抑制态信号分泌',0,5,.1,'蓝色细胞沿自身胞体分泌独立免疫抑制信号，随局部代谢效能变化','×'],
@@ -17280,21 +17421,20 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
   let mazeWallCache=null,antigenOutlineCache=null;
   function drawAntigenOutlines(s,scale,pixelRatio){
     if(antigenOutlineCache?.snapshot!==s){
-      const paths=Array.from({length:8},()=>new Path2D()),marked=new Uint8Array(65536),w=s.width,h=s.height,grid=s.grid,wrap=s.boundary==='wrap';
-      for(const m of s.cells)if(CellLabDisplay.antigenMarked(m))marked[m.id]=Math.max(1,Math.round(CellLabDisplay.antigenStrength(m)*7));
-      const line=(a,b,x,y,xx,yy)=>{if(a===b)return;const level=Math.max(marked[a],marked[b]);if(!level)return;paths[level].moveTo(x,y);paths[level].lineTo(xx,yy);};
-      // Trace shared membrane edges once, including medium and periodic seams.
-      // Cache in lattice coordinates so zoom and video resolution reuse it.
+      const paths=new Map(),styles=displayCache.antigens(s).outlines,w=s.width,h=s.height,grid=s.grid,wrap=s.boundary==='wrap';
+      const line=(id,other,x,y,xx,yy)=>{if(id===other)return;const outline=styles.get(id);if(!outline)return;const style=CellLabDisplay.antigenSegment(outline,(x+xx)/2,(y+yy)/2,s),alpha=Math.round(style.alpha*8)/8,key=style.color+':'+alpha;let batch=paths.get(key);if(!batch){batch={color:style.color,alpha,path:new Path2D()};paths.set(key,batch);}batch.path.moveTo(x,y);batch.path.lineTo(xx,yy);};
+      // Each side of a shared membrane retains its own lineage color. Cache in
+      // lattice coordinates; use the same genotype/color table as WebGL.
       for(let y=0;y<h;y++)for(let x=0;x<w;x++){
-        const q=y*w+x,id=grid[q],right=x<w-1?grid[q+1]:wrap?grid[y*w]:0,down=y<h-1?grid[q+w]:wrap?grid[x]:0;
-        line(id,right,x+1,y,x+1,y+1);
-        line(id,down,x,y+1,x+1,y+1);
-        if(x===0)line(id,wrap?grid[q+w-1]:0,0,y,0,y+1);
-        if(y===0)line(id,wrap?grid[(h-1)*w+x]:0,x,0,x+1,0);
+        const q=y*w+x,id=grid[q];if(!styles.has(id))continue;
+        line(id,x<w-1?grid[q+1]:wrap?grid[y*w]:0,x+.82,y,x+.82,y+1);
+        line(id,x>0?grid[q-1]:wrap?grid[q+w-1]:0,x+.18,y,x+.18,y+1);
+        line(id,y<h-1?grid[q+w]:wrap?grid[x]:0,x,y+.82,x+1,y+.82);
+        line(id,y>0?grid[q-w]:wrap?grid[(h-1)*w+x]:0,x,y+.18,x+1,y+.18);
       }
-      antigenOutlineCache={snapshot:s,paths};
+      antigenOutlineCache={snapshot:s,paths:[...paths.values()]};
     }
-    ctx.save();ctx.scale(scale,scale);ctx.lineWidth=pixelRatio/scale;ctx.strokeStyle='#d12f39';ctx.lineJoin='miter';ctx.lineCap='butt';for(let i=1;i<8;i++){ctx.globalAlpha=.25+.75*i/7;ctx.stroke(antigenOutlineCache.paths[i]);}ctx.restore();
+    ctx.save();ctx.scale(scale,scale);ctx.lineWidth=1.3*pixelRatio/scale;ctx.lineJoin='miter';ctx.lineCap='butt';for(const batch of antigenOutlineCache.paths){ctx.strokeStyle=batch.color;ctx.globalAlpha=batch.alpha;ctx.stroke(batch.path);}ctx.restore();
   }
   function drawMazeWalls(ctx,s,scale){
     const m=s.maze;if(!m?.curves?.length)return;
@@ -17350,7 +17490,8 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     document.querySelector('.cycle-key').hidden=!showCycle;
     }
     const edgeFade=Number($('body-feather').value)/100,surface=edgeFade>0?surfaceCache.get(s):null;
-    let gpu=false;if(gpuRenderer)try{gpu=gpuRenderer.draw(ctx,s,{actFlags,seams,selected,showAntigen,field,info,signal,bodySignal,environmentOpacity,bodyEnvironmentOpacity,pixelRatio,cellColors,surface,edgeFade});}catch(e){rendererFailure=String(e);gpuRenderer.lost=true;}
+    CellLabImmuneUI.legend(s,showAntigen);
+    let gpu=false;if(gpuRenderer)try{gpu=gpuRenderer.draw(ctx,s,{actFlags,seams,selected,showAntigen,antigenStyles:displayCache.antigens(s),field,info,signal,bodySignal,environmentOpacity,bodyEnvironmentOpacity,pixelRatio,cellColors,surface,edgeFade});}catch(e){rendererFailure=String(e);gpuRenderer.lost=true;}
     if(!gpu){
     const bodySurface=surface?.scale>1?surfaceCache.full(s):surface;
     for(let q=0;q<grid.length;q++){
@@ -17386,6 +17527,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     if(showAntigen&&!gpu)drawAntigenOutlines(s,scale,pixelRatio);
     drawVessels(s,scale,pixelRatio);
     if(showNuclei){ctx.save();ctx.scale(scale,scale);ctx.lineWidth=1.5*pixelRatio/scale;for(const batch of displayCache.nucleusBatches(s,cellColors)){ctx.fillStyle=batch.fill;ctx.strokeStyle=batch.stroke;ctx.fill(batch.path);ctx.stroke(batch.path);}ctx.restore();}
+    if(showNuclei&&showAntigen){ctx.save();ctx.scale(scale,scale);ctx.lineWidth=2*pixelRatio/scale;ctx.lineCap='butt';ctx.lineJoin='round';for(const batch of displayCache.nucleusArcBatches(s)){ctx.strokeStyle=batch.stroke;ctx.stroke(batch.path);}ctx.restore();}
     // Post-clearance membrane fragments are cosmetic, never extra cells.
     // Their age uses model time, so pausing also freezes the rupture effect.
     ctx.save();ctx.lineWidth=Math.max(1,pixelRatio);
