@@ -1,0 +1,52 @@
+{
+  "date": "2026-11-13",
+  "branch": "codex/cell-pixel-index-prototype",
+  "baseline": "2a55e9e4b16a408025ea05381359df58c032673c",
+  "defaultEnabled": false,
+  "originalTests": 372,
+  "prototypeTests": 11,
+  "fullSuite": {
+    "command": "node --test --test-concurrency=2 tests/*.test.mjs",
+    "tests": 382,
+    "passed": 382,
+    "failed": 0,
+    "skipped": 0,
+    "logTail": [
+      "✔ deadline pacing retains backpressure and never serializes unchanged model time (0.348166ms)",
+      "ℹ tests 382",
+      "ℹ suites 0",
+      "ℹ pass 382",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0",
+      "ℹ todo 0",
+      "ℹ duration_ms 93462.431625"
+    ]
+  },
+  "additionalTargetedRun": {
+    "command": "node --test tests/pixel-index.test.mjs",
+    "tests": 11,
+    "passed": 11,
+    "failed": 0,
+    "skipped": 0,
+    "logTail": [
+      "✔ elastic insertion and rejected wall insertion do not desynchronize membership (28.820959ms)",
+      "ℹ tests 11",
+      "ℹ suites 0",
+      "ℹ pass 11",
+      "ℹ fail 0",
+      "ℹ cancelled 0",
+      "ℹ skipped 0",
+      "ℹ todo 0",
+      "ℹ duration_ms 735.585417"
+    ]
+  },
+  "modelSHA256": "391e88c54f294a10d8aa75b54530172c2087cad695a2d86b853e769c429c9e68",
+  "nodeBenchmarkSHA256": "c6b477c75d03154c07eef5faf83048a157901e92f575e9a9be115716daf58640",
+  "testsSHA256": "7c13f93b87a1032efe6cb726f18d8f089a375d000edae68602889912afa6d0b7",
+  "buildVerified": true,
+  "htmlSHA256": "79c95f7771205c74ca8d937bfc8a75ec8b027060ba322649be6047019c73728f",
+  "htmlBytes": 1085419,
+  "wasmUnchanged": true,
+  "browserFrameValidation": "not established: background/occlusion throttling; all browser FPS results rejected"
+}

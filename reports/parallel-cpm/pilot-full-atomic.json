@@ -1,0 +1,1183 @@
+[
+  {
+    "seed": 17,
+    "batch": 16,
+    "steps": 60,
+    "warmup": 24,
+    "config": {},
+    "lattice": [
+      384,
+      288
+    ],
+    "adapter": {
+      "vendor": "apple",
+      "architecture": "metal-3",
+      "device": "",
+      "description": "",
+      "isFallbackAdapter": false
+    },
+    "baseline": {
+      "wallMs": {
+        "n": 58,
+        "mean": 2.9224137930713336,
+        "p50": 2.5,
+        "p95": 4.900000000372529,
+        "p99": 5.099999999627471,
+        "max": 5.099999999627471
+      },
+      "mechanicalMs": {
+        "n": 58,
+        "mean": 2.277586206793785,
+        "p50": 2.199999999254942,
+        "p95": 2.800000000745058,
+        "p99": 3,
+        "max": 3
+      }
+    },
+    "candidate": {
+      "wallMs": {
+        "n": 59,
+        "mean": 15.555932203402458,
+        "p50": 15.400000000372529,
+        "p95": 18,
+        "p99": 18.700000001117587,
+        "max": 18.700000001117587
+      },
+      "packingMs": {
+        "n": 59,
+        "mean": 1.0491525423160548,
+        "p50": 1,
+        "p95": 1.199999999254942,
+        "p99": 1.299999998882413,
+        "max": 1.299999998882413
+      },
+      "computeReadbackMs": {
+        "n": 59,
+        "mean": 12.554237288154535,
+        "p50": 12.399999998509884,
+        "p95": 14.400000000372529,
+        "p99": 15.699999999254942,
+        "max": 15.699999999254942
+      },
+      "replayMs": {
+        "n": 59,
+        "mean": 0.6305084745952133,
+        "p50": 0.599999999627471,
+        "p95": 0.8000000007450581,
+        "p99": 0.8000000007450581,
+        "max": 0.8000000007450581
+      },
+      "biologyMs": {
+        "n": 59,
+        "mean": 1.322033898336655,
+        "p50": 0.900000000372529,
+        "p95": 3.300000000745058,
+        "p99": 3.600000001490116,
+        "max": 3.600000001490116
+      },
+      "gpuMs": {
+        "n": 59,
+        "mean": 11.044482169491523,
+        "p50": 10.944512,
+        "p95": 12.45184,
+        "p99": 13.1072,
+        "max": 13.1072
+      },
+      "accepted": {
+        "n": 59,
+        "mean": 948.7457627118644,
+        "p50": 945,
+        "p95": 1036,
+        "p99": 1051,
+        "max": 1051
+      },
+      "deferred": {
+        "n": 59,
+        "mean": 4.016949152542373,
+        "p50": 4,
+        "p95": 9,
+        "p99": 12,
+        "max": 12
+      },
+      "bfs": {
+        "n": 59,
+        "mean": 3.610169491525424,
+        "p50": 4,
+        "p95": 8,
+        "p99": 12,
+        "max": 12
+      }
+    },
+    "speedup": 0.18786490933871075,
+    "invariantAudits": [
+      {
+        "volumeMismatches": 0,
+        "perimeterMismatches": 0,
+        "disconnected": 0,
+        "minAreaViolations": 0,
+        "nuclearLosses": 0,
+        "walls": 0,
+        "ok": true,
+        "errors": [],
+        "replayMismatches": 0,
+        "activityMismatches": 0
+      }
+    ],
+    "series": [
+      {
+        "baseline": {
+          "time": 84,
+          "cells": 217,
+          "groups": {
+            "1": {
+              "count": 162,
+              "area": 519.1172839506173,
+              "perimeter": 260.41975308641975,
+              "msd": 1.755719912868622
+            },
+            "2": {
+              "count": 33,
+              "area": 600.7878787878788,
+              "perimeter": 285.2121212121212,
+              "msd": 7.6296200432840555
+            },
+            "3": {
+              "count": 18,
+              "area": 159.72222222222223,
+              "perimeter": 167,
+              "msd": 56.13326160074509
+            }
+          },
+          "counters": {
+            "manualRemoved": 0,
+            "divisions": 0,
+            "immuneDivisions": 0,
+            "kills": 0,
+            "apoptosis": 0,
+            "environment": 0,
+            "apoptosisStarted": 0,
+            "killStarted": 4,
+            "environmentStarted": 0,
+            "recognitions": 13,
+            "mutations": 0,
+            "abnormalInitiations": 0,
+            "malignantTransitions": 0,
+            "abnormalKills": 0,
+            "normalEnvironmentDeaths": 0,
+            "abnormalEnvironmentDeaths": 0,
+            "lifespan": 0,
+            "lifespanStarted": 0,
+            "normalDivisions": 0,
+            "replicationDeaths": 0,
+            "stemAsymmetric": 0,
+            "stemSelfRenewal": 0,
+            "stemDifferentiation": 0,
+            "stemReversions": 0,
+            "normalTraitMutations": 0,
+            "stressMutations": 0,
+            "antigenExposures": 0,
+            "antigenEscapes": 0,
+            "suppressiveTransitions": 0,
+            "suppressiveRecoveries": 0,
+            "injuryDeactivations": 0,
+            "signalDeactivations": 0,
+            "endothelialDeaths": 0,
+            "endothelialDivisions": 0,
+            "vascularArrivals": 0,
+            "extravasations": 0,
+            "circulationReturns": 0,
+            "intravasations": 0,
+            "bloodstreamExports": 0
+          },
+          "contactLength": 23540,
+          "vascular": 0.9039022617893189
+        },
+        "candidate": {
+          "time": 84,
+          "cells": 217,
+          "groups": {
+            "1": {
+              "count": 162,
+              "area": 519.6666666666666,
+              "perimeter": 259.6296296296296,
+              "msd": 1.647696532977876
+            },
+            "2": {
+              "count": 34,
+              "area": 595.2941176470588,
+              "perimeter": 283.29411764705884,
+              "msd": 6.227518424629221
+            },
+            "3": {
+              "count": 18,
+              "area": 159.33333333333334,
+              "perimeter": 164.77777777777777,
+              "msd": 47.759160474234754
+            }
+          },
+          "counters": {
+            "manualRemoved": 0,
+            "divisions": 0,
+            "immuneDivisions": 0,
+            "kills": 0,
+            "apoptosis": 0,
+            "environment": 0,
+            "apoptosisStarted": 0,
+            "killStarted": 3,
+            "environmentStarted": 0,
+            "recognitions": 13,
+            "mutations": 0,
+            "abnormalInitiations": 0,
+            "malignantTransitions": 0,
+            "abnormalKills": 0,
+            "normalEnvironmentDeaths": 0,
+            "abnormalEnvironmentDeaths": 0,
+            "lifespan": 0,
+            "lifespanStarted": 0,
+            "normalDivisions": 0,
+            "replicationDeaths": 0,
+            "stemAsymmetric": 0,
+            "stemSelfRenewal": 0,
+            "stemDifferentiation": 0,
+            "stemReversions": 0,
+            "normalTraitMutations": 0,
+            "stressMutations": 0,
+            "antigenExposures": 0,
+            "antigenEscapes": 0,
+            "suppressiveTransitions": 0,
+            "suppressiveRecoveries": 0,
+            "injuryDeactivations": 0,
+            "signalDeactivations": 0,
+            "endothelialDeaths": 0,
+            "endothelialDivisions": 0,
+            "vascularArrivals": 0,
+            "extravasations": 0,
+            "circulationReturns": 0,
+            "intravasations": 0,
+            "bloodstreamExports": 0
+          },
+          "contactLength": 23486,
+          "vascular": 0.910894068942285
+        }
+      }
+    ],
+    "raw": {
+      "baseline": [
+        {
+          "wallMs": 3.299999998882413,
+          "mechanicalMs": 2.900000000372529
+        },
+        {
+          "wallMs": 2.799999998882413,
+          "mechanicalMs": 2.599999999627471
+        },
+        {
+          "wallMs": 2.599999999627471,
+          "mechanicalMs": 2.300000000745058
+        },
+        {
+          "wallMs": 4.299999998882413,
+          "mechanicalMs": 2.599999999627471
+        },
+        {
+          "wallMs": 2.5,
+          "mechanicalMs": 2.300000000745058
+        },
+        {
+          "wallMs": 2.5,
+          "mechanicalMs": 2.199999999254942
+        },
+        {
+          "wallMs": 2.300000000745058,
+          "mechanicalMs": 2.099999999627471
+        },
+        {
+          "wallMs": 4.399999998509884,
+          "mechanicalMs": 2.599999999627471
+        },
+        {
+          "wallMs": 2.5,
+          "mechanicalMs": 2.200000001117587
+        },
+        {
+          "wallMs": 2.5,
+          "mechanicalMs": 2.199999999254942
+        },
+        {
+          "wallMs": 2.199999999254942,
+          "mechanicalMs": 2
+        },
+        {
+          "wallMs": 4.800000000745058,
+          "mechanicalMs": 2.800000000745058
+        },
+        {
+          "wallMs": 2.599999999627471,
+          "mechanicalMs": 2.299999998882413
+        },
+        {
+          "wallMs": 2.699999999254942,
+          "mechanicalMs": 2.5
+        },
+        {
+          "wallMs": 2.099999999627471,
+          "mechanicalMs": 2
+        },
+        {
+          "wallMs": 5,
+          "mechanicalMs": 3
+        },
+        {
+          "wallMs": 2.5,
+          "mechanicalMs": 2.199999999254942
+        },
+        {
+          "wallMs": 2.5,
+          "mechanicalMs": 2.200000001117587
+        },
+        {
+          "wallMs": 2.400000000372529,
+          "mechanicalMs": 2.099999999627471
+        },
+        {
+          "wallMs": 4.399999998509884,
+          "mechanicalMs": 2.699999999254942
+        },
+        {
+          "wallMs": 2.5,
+          "mechanicalMs": 2.200000001117587
+        },
+        {
+          "wallMs": 2.5,
+          "mechanicalMs": 2.199999999254942
+        },
+        {
+          "wallMs": 2.400000000372529,
+          "mechanicalMs": 2.099999999627471
+        },
+        {
+          "wallMs": 4.900000000372529,
+          "mechanicalMs": 3
+        },
+        {
+          "wallMs": 2.800000000745058,
+          "mechanicalMs": 2.300000000745058
+        },
+        {
+          "wallMs": 2.599999999627471,
+          "mechanicalMs": 2.299999998882413
+        },
+        {
+          "wallMs": 2.5,
+          "mechanicalMs": 2.199999999254942
+        },
+        {
+          "wallMs": 4.099999999627471,
+          "mechanicalMs": 2.599999999627471
+        },
+        {
+          "wallMs": 2.300000000745058,
+          "mechanicalMs": 2.099999999627471
+        },
+        {
+          "wallMs": 2.399999998509884,
+          "mechanicalMs": 2.099999999627471
+        },
+        {
+          "wallMs": 2.200000001117587,
+          "mechanicalMs": 2
+        },
+        {
+          "wallMs": 4.299999998882413,
+          "mechanicalMs": 2.599999999627471
+        },
+        {
+          "wallMs": 2.200000001117587,
+          "mechanicalMs": 2
+        },
+        {
+          "wallMs": 2.599999999627471,
+          "mechanicalMs": 2.300000000745058
+        },
+        {
+          "wallMs": 2.200000001117587,
+          "mechanicalMs": 2
+        },
+        {
+          "wallMs": 5.099999999627471,
+          "mechanicalMs": 2.799999998882413
+        },
+        {
+          "wallMs": 2.699999999254942,
+          "mechanicalMs": 2.199999999254942
+        },
+        {
+          "wallMs": 2.599999999627471,
+          "mechanicalMs": 2.300000000745058
+        },
+        {
+          "wallMs": 2.200000001117587,
+          "mechanicalMs": 2
+        },
+        {
+          "wallMs": 4.200000001117587,
+          "mechanicalMs": 2.5
+        },
+        {
+          "wallMs": 2.199999999254942,
+          "mechanicalMs": 2
+        },
+        {
+          "wallMs": 2.5,
+          "mechanicalMs": 2.299999998882413
+        },
+        {
+          "wallMs": 2.400000000372529,
+          "mechanicalMs": 2.099999999627471
+        },
+        {
+          "wallMs": 4.5,
+          "mechanicalMs": 2.599999999627471
+        },
+        {
+          "wallMs": 2.399999998509884,
+          "mechanicalMs": 2.099999999627471
+        },
+        {
+          "wallMs": 2.800000000745058,
+          "mechanicalMs": 2.5
+        },
+        {
+          "wallMs": 2.400000000372529,
+          "mechanicalMs": 2.099999999627471
+        },
+        {
+          "wallMs": 4.200000001117587,
+          "mechanicalMs": 2.600000001490116
+        },
+        {
+          "wallMs": 2.199999999254942,
+          "mechanicalMs": 1.900000000372529
+        },
+        {
+          "wallMs": 2.5,
+          "mechanicalMs": 2.200000001117587
+        },
+        {
+          "wallMs": 2.200000001117587,
+          "mechanicalMs": 1.900000000372529
+        },
+        {
+          "wallMs": 4.199999999254942,
+          "mechanicalMs": 2.699999999254942
+        },
+        {
+          "wallMs": 2.200000001117587,
+          "mechanicalMs": 2
+        },
+        {
+          "wallMs": 2.5,
+          "mechanicalMs": 2.199999999254942
+        },
+        {
+          "wallMs": 2.199999999254942,
+          "mechanicalMs": 1.799999998882413
+        },
+        {
+          "wallMs": 4.200000001117587,
+          "mechanicalMs": 2.5
+        },
+        {
+          "wallMs": 2.199999999254942,
+          "mechanicalMs": 2
+        },
+        {
+          "wallMs": 2.300000000745058,
+          "mechanicalMs": 2
+        },
+        {
+          "wallMs": 2.5,
+          "mechanicalMs": 1.900000000372529
+        },
+        {
+          "wallMs": 4.299999998882413,
+          "mechanicalMs": 2.599999999627471
+        }
+      ],
+      "candidate": [
+        {
+          "wallMs": 37.29999999888241,
+          "packingMs": 1,
+          "computeReadbackMs": 24.09999999962747,
+          "replayMs": 1,
+          "biologyMs": 11.199999999254942,
+          "gpuMs": 19.857408,
+          "accepted": 942,
+          "deferred": 7,
+          "bfs": 6,
+          "validation": {
+            "volumeMismatches": 0,
+            "perimeterMismatches": 0,
+            "disconnected": 0,
+            "minAreaViolations": 0,
+            "nuclearLosses": 0,
+            "walls": 0,
+            "ok": true,
+            "errors": [],
+            "replayMismatches": 0,
+            "activityMismatches": 0
+          }
+        },
+        {
+          "wallMs": 15.100000001490116,
+          "packingMs": 1,
+          "computeReadbackMs": 12.300000000745058,
+          "replayMs": 0.6999999992549419,
+          "biologyMs": 1.1000000014901161,
+          "gpuMs": 10.944512,
+          "accepted": 984,
+          "deferred": 4,
+          "bfs": 4
+        },
+        {
+          "wallMs": 15.5,
+          "packingMs": 1.200000001117587,
+          "computeReadbackMs": 12.900000000372529,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 0.7999999988824129,
+          "gpuMs": 11.337728,
+          "accepted": 1019,
+          "deferred": 5,
+          "bfs": 5
+        },
+        {
+          "wallMs": 18,
+          "packingMs": 1.099999999627471,
+          "computeReadbackMs": 12.900000000372529,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 3.400000000372529,
+          "gpuMs": 10.81344,
+          "accepted": 939,
+          "deferred": 3,
+          "bfs": 3
+        },
+        {
+          "wallMs": 17.09999999962747,
+          "packingMs": 1.099999999627471,
+          "computeReadbackMs": 14.5,
+          "replayMs": 0.8000000007450581,
+          "biologyMs": 0.6999999992549419,
+          "gpuMs": 12.45184,
+          "accepted": 948,
+          "deferred": 3,
+          "bfs": 3
+        },
+        {
+          "wallMs": 15.199999999254942,
+          "packingMs": 1,
+          "computeReadbackMs": 12.799999998882413,
+          "replayMs": 0.7000000011175871,
+          "biologyMs": 0.6999999992549419,
+          "gpuMs": 10.944512,
+          "accepted": 949,
+          "deferred": 2,
+          "bfs": 2
+        },
+        {
+          "wallMs": 13.899999998509884,
+          "packingMs": 0.8999999985098839,
+          "computeReadbackMs": 11.600000001490116,
+          "replayMs": 0.6999999992549419,
+          "biologyMs": 0.6999999992549419,
+          "gpuMs": 9.8304,
+          "accepted": 983,
+          "deferred": 1,
+          "bfs": 1
+        },
+        {
+          "wallMs": 16.600000001490116,
+          "packingMs": 1.1000000014901161,
+          "computeReadbackMs": 12.199999999254942,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 2.700000001117587,
+          "gpuMs": 10.747904,
+          "accepted": 989,
+          "deferred": 2,
+          "bfs": 0
+        },
+        {
+          "wallMs": 13.600000001490116,
+          "packingMs": 1.1000000014901161,
+          "computeReadbackMs": 11.099999999627471,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 0.8000000007450581,
+          "gpuMs": 10.15808,
+          "accepted": 911,
+          "deferred": 1,
+          "bfs": 1
+        },
+        {
+          "wallMs": 14.199999999254942,
+          "packingMs": 1,
+          "computeReadbackMs": 11.799999998882413,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 0.8000000007450581,
+          "gpuMs": 10.092544,
+          "accepted": 1036,
+          "deferred": 2,
+          "bfs": 1
+        },
+        {
+          "wallMs": 14,
+          "packingMs": 1.1000000014901161,
+          "computeReadbackMs": 11.5,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 0.7999999988824129,
+          "gpuMs": 10.354688,
+          "accepted": 1036,
+          "deferred": 4,
+          "bfs": 4
+        },
+        {
+          "wallMs": 16.800000000745058,
+          "packingMs": 1,
+          "computeReadbackMs": 12.300000000745058,
+          "replayMs": 0.5,
+          "biologyMs": 3,
+          "gpuMs": 11.206656,
+          "accepted": 909,
+          "deferred": 2,
+          "bfs": 2
+        },
+        {
+          "wallMs": 15.299999998882413,
+          "packingMs": 1,
+          "computeReadbackMs": 12.900000000372529,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 0.7999999988824129,
+          "gpuMs": 11.14112,
+          "accepted": 938,
+          "deferred": 3,
+          "bfs": 3
+        },
+        {
+          "wallMs": 14.600000001490116,
+          "packingMs": 1.1000000014901161,
+          "computeReadbackMs": 12.299999998882413,
+          "replayMs": 0.5,
+          "biologyMs": 0.7000000011175871,
+          "gpuMs": 10.682368,
+          "accepted": 1017,
+          "deferred": 3,
+          "bfs": 3
+        },
+        {
+          "wallMs": 16,
+          "packingMs": 1.099999999627471,
+          "computeReadbackMs": 13.5,
+          "replayMs": 0.7000000011175871,
+          "biologyMs": 0.6999999992549419,
+          "gpuMs": 11.927552,
+          "accepted": 949,
+          "deferred": 9,
+          "bfs": 8
+        },
+        {
+          "wallMs": 16.800000000745058,
+          "packingMs": 1,
+          "computeReadbackMs": 11.900000000372529,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 3.300000000745058,
+          "gpuMs": 10.81344,
+          "accepted": 965,
+          "deferred": 2,
+          "bfs": 2
+        },
+        {
+          "wallMs": 15.199999999254942,
+          "packingMs": 1.199999999254942,
+          "computeReadbackMs": 12.5,
+          "replayMs": 0.7000000011175871,
+          "biologyMs": 0.7999999988824129,
+          "gpuMs": 10.354688,
+          "accepted": 1001,
+          "deferred": 4,
+          "bfs": 4
+        },
+        {
+          "wallMs": 15.5,
+          "packingMs": 1.099999999627471,
+          "computeReadbackMs": 12.700000001117587,
+          "replayMs": 0.7999999988824129,
+          "biologyMs": 0.900000000372529,
+          "gpuMs": 11.14112,
+          "accepted": 1023,
+          "deferred": 6,
+          "bfs": 4
+        },
+        {
+          "wallMs": 14.400000000372529,
+          "packingMs": 1,
+          "computeReadbackMs": 11.699999999254942,
+          "replayMs": 0.8000000007450581,
+          "biologyMs": 0.900000000372529,
+          "gpuMs": 10.223616,
+          "accepted": 967,
+          "deferred": 2,
+          "bfs": 1
+        },
+        {
+          "wallMs": 17.40000000037253,
+          "packingMs": 1.099999999627471,
+          "computeReadbackMs": 12.599999999627471,
+          "replayMs": 0.7000000011175871,
+          "biologyMs": 3,
+          "gpuMs": 10.944512,
+          "accepted": 1051,
+          "deferred": 5,
+          "bfs": 5
+        },
+        {
+          "wallMs": 14.200000001117587,
+          "packingMs": 1.1000000014901161,
+          "computeReadbackMs": 11.599999999627471,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 0.900000000372529,
+          "gpuMs": 10.223616,
+          "accepted": 967,
+          "deferred": 0,
+          "bfs": 0
+        },
+        {
+          "wallMs": 14.5,
+          "packingMs": 1.199999999254942,
+          "computeReadbackMs": 11.800000000745058,
+          "replayMs": 0.6999999992549419,
+          "biologyMs": 0.8000000007450581,
+          "gpuMs": 10.027008,
+          "accepted": 977,
+          "deferred": 3,
+          "bfs": 2
+        },
+        {
+          "wallMs": 14.099999999627471,
+          "packingMs": 1,
+          "computeReadbackMs": 11.5,
+          "replayMs": 0.6999999992549419,
+          "biologyMs": 0.900000000372529,
+          "gpuMs": 10.223616,
+          "accepted": 968,
+          "deferred": 0,
+          "bfs": 0
+        },
+        {
+          "wallMs": 16.799999998882413,
+          "packingMs": 1.199999999254942,
+          "computeReadbackMs": 11.800000000745058,
+          "replayMs": 0.7999999988824129,
+          "biologyMs": 3,
+          "gpuMs": 9.764864,
+          "accepted": 1018,
+          "deferred": 2,
+          "bfs": 2
+        },
+        {
+          "wallMs": 16,
+          "packingMs": 1.299999998882413,
+          "computeReadbackMs": 13,
+          "replayMs": 0.7000000011175871,
+          "biologyMs": 1,
+          "gpuMs": 11.599872,
+          "accepted": 959,
+          "deferred": 4,
+          "bfs": 4
+        },
+        {
+          "wallMs": 15.400000000372529,
+          "packingMs": 1.199999999254942,
+          "computeReadbackMs": 12.5,
+          "replayMs": 0.7000000011175871,
+          "biologyMs": 1,
+          "gpuMs": 10.878976,
+          "accepted": 946,
+          "deferred": 0,
+          "bfs": 0
+        },
+        {
+          "wallMs": 16.09999999962747,
+          "packingMs": 1.099999999627471,
+          "computeReadbackMs": 13.699999999254942,
+          "replayMs": 0.6000000014901161,
+          "biologyMs": 0.6999999992549419,
+          "gpuMs": 11.862016,
+          "accepted": 941,
+          "deferred": 6,
+          "bfs": 5
+        },
+        {
+          "wallMs": 15.900000000372529,
+          "packingMs": 1,
+          "computeReadbackMs": 11.800000000745058,
+          "replayMs": 0.6999999992549419,
+          "biologyMs": 2.400000000372529,
+          "gpuMs": 10.289152,
+          "accepted": 945,
+          "deferred": 2,
+          "bfs": 2
+        },
+        {
+          "wallMs": 14.699999999254942,
+          "packingMs": 1.099999999627471,
+          "computeReadbackMs": 12.199999999254942,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 0.8000000007450581,
+          "gpuMs": 10.48576,
+          "accepted": 904,
+          "deferred": 1,
+          "bfs": 1
+        },
+        {
+          "wallMs": 18.300000000745058,
+          "packingMs": 1,
+          "computeReadbackMs": 15.699999999254942,
+          "replayMs": 0.7000000011175871,
+          "biologyMs": 0.900000000372529,
+          "gpuMs": 13.1072,
+          "accepted": 1013,
+          "deferred": 12,
+          "bfs": 12
+        },
+        {
+          "wallMs": 14.400000000372529,
+          "packingMs": 1.099999999627471,
+          "computeReadbackMs": 11.900000000372529,
+          "replayMs": 0.6999999992549419,
+          "biologyMs": 0.7000000011175871,
+          "gpuMs": 10.878976,
+          "accepted": 949,
+          "deferred": 3,
+          "bfs": 3
+        },
+        {
+          "wallMs": 16.5,
+          "packingMs": 1,
+          "computeReadbackMs": 12.399999998509884,
+          "replayMs": 0.6000000014901161,
+          "biologyMs": 2.5,
+          "gpuMs": 11.337728,
+          "accepted": 926,
+          "deferred": 4,
+          "bfs": 4
+        },
+        {
+          "wallMs": 16.59999999962747,
+          "packingMs": 1.099999999627471,
+          "computeReadbackMs": 14,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 0.900000000372529,
+          "gpuMs": 12.12416,
+          "accepted": 972,
+          "deferred": 4,
+          "bfs": 4
+        },
+        {
+          "wallMs": 15.699999999254942,
+          "packingMs": 1,
+          "computeReadbackMs": 13.400000000372529,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 0.6999999992549419,
+          "gpuMs": 11.4688,
+          "accepted": 935,
+          "deferred": 3,
+          "bfs": 2
+        },
+        {
+          "wallMs": 14.699999999254942,
+          "packingMs": 1,
+          "computeReadbackMs": 12.199999999254942,
+          "replayMs": 0.7000000011175871,
+          "biologyMs": 0.7999999988824129,
+          "gpuMs": 10.944512,
+          "accepted": 942,
+          "deferred": 4,
+          "bfs": 4
+        },
+        {
+          "wallMs": 18.700000001117587,
+          "packingMs": 1.099999999627471,
+          "computeReadbackMs": 13.300000000745058,
+          "replayMs": 0.6999999992549419,
+          "biologyMs": 3.600000001490116,
+          "gpuMs": 11.665408,
+          "accepted": 1010,
+          "deferred": 5,
+          "bfs": 5
+        },
+        {
+          "wallMs": 15.5,
+          "packingMs": 1.099999999627471,
+          "computeReadbackMs": 12.800000000745058,
+          "replayMs": 0.8000000007450581,
+          "biologyMs": 0.7999999988824129,
+          "gpuMs": 11.534336,
+          "accepted": 946,
+          "deferred": 4,
+          "bfs": 4
+        },
+        {
+          "wallMs": 15.900000000372529,
+          "packingMs": 1,
+          "computeReadbackMs": 13.400000000372529,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 0.900000000372529,
+          "gpuMs": 12.12416,
+          "accepted": 953,
+          "deferred": 10,
+          "bfs": 7
+        },
+        {
+          "wallMs": 16.799999998882413,
+          "packingMs": 1.099999999627471,
+          "computeReadbackMs": 14.400000000372529,
+          "replayMs": 0.5,
+          "biologyMs": 0.7999999988824129,
+          "gpuMs": 12.517376,
+          "accepted": 913,
+          "deferred": 8,
+          "bfs": 8
+        },
+        {
+          "wallMs": 17.5,
+          "packingMs": 1.099999999627471,
+          "computeReadbackMs": 13.100000001490116,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 2.699999999254942,
+          "gpuMs": 11.337728,
+          "accepted": 931,
+          "deferred": 6,
+          "bfs": 6
+        },
+        {
+          "wallMs": 14.599999999627471,
+          "packingMs": 1.099999999627471,
+          "computeReadbackMs": 12.099999999627471,
+          "replayMs": 0.5,
+          "biologyMs": 0.900000000372529,
+          "gpuMs": 10.747904,
+          "accepted": 904,
+          "deferred": 7,
+          "bfs": 6
+        },
+        {
+          "wallMs": 15.300000000745058,
+          "packingMs": 0.900000000372529,
+          "computeReadbackMs": 12.900000000372529,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 0.900000000372529,
+          "gpuMs": 11.010048,
+          "accepted": 900,
+          "deferred": 4,
+          "bfs": 4
+        },
+        {
+          "wallMs": 13.599999999627471,
+          "packingMs": 0.8999999985098839,
+          "computeReadbackMs": 11.5,
+          "replayMs": 0.5,
+          "biologyMs": 0.7000000011175871,
+          "gpuMs": 10.223616,
+          "accepted": 882,
+          "deferred": 3,
+          "bfs": 2
+        },
+        {
+          "wallMs": 17.40000000037253,
+          "packingMs": 1,
+          "computeReadbackMs": 13.299999998882413,
+          "replayMs": 0.7000000011175871,
+          "biologyMs": 2.400000000372529,
+          "gpuMs": 11.730944,
+          "accepted": 956,
+          "deferred": 8,
+          "bfs": 8
+        },
+        {
+          "wallMs": 15.600000001490116,
+          "packingMs": 1.1000000014901161,
+          "computeReadbackMs": 12.799999998882413,
+          "replayMs": 0.8000000007450581,
+          "biologyMs": 0.900000000372529,
+          "gpuMs": 11.4688,
+          "accepted": 902,
+          "deferred": 6,
+          "bfs": 5
+        },
+        {
+          "wallMs": 14.899999998509884,
+          "packingMs": 1,
+          "computeReadbackMs": 12.399999998509884,
+          "replayMs": 0.7000000011175871,
+          "biologyMs": 0.7999999988824129,
+          "gpuMs": 10.81344,
+          "accepted": 905,
+          "deferred": 5,
+          "bfs": 5
+        },
+        {
+          "wallMs": 15.900000000372529,
+          "packingMs": 0.900000000372529,
+          "computeReadbackMs": 13.599999999627471,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 0.8000000007450581,
+          "gpuMs": 11.599872,
+          "accepted": 917,
+          "deferred": 5,
+          "bfs": 4
+        },
+        {
+          "wallMs": 16.799999998882413,
+          "packingMs": 1,
+          "computeReadbackMs": 12.900000000372529,
+          "replayMs": 0.5,
+          "biologyMs": 2.399999998509884,
+          "gpuMs": 11.730944,
+          "accepted": 909,
+          "deferred": 5,
+          "bfs": 3
+        },
+        {
+          "wallMs": 15.300000000745058,
+          "packingMs": 1,
+          "computeReadbackMs": 12.900000000372529,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 0.8000000007450581,
+          "gpuMs": 10.944512,
+          "accepted": 885,
+          "deferred": 4,
+          "bfs": 4
+        },
+        {
+          "wallMs": 15.299999998882413,
+          "packingMs": 1.099999999627471,
+          "computeReadbackMs": 12.900000000372529,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 0.6999999992549419,
+          "gpuMs": 11.599872,
+          "accepted": 928,
+          "deferred": 5,
+          "bfs": 5
+        },
+        {
+          "wallMs": 15.599999999627471,
+          "packingMs": 1,
+          "computeReadbackMs": 13.099999999627471,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 0.900000000372529,
+          "gpuMs": 11.862016,
+          "accepted": 923,
+          "deferred": 8,
+          "bfs": 8
+        },
+        {
+          "wallMs": 15.900000000372529,
+          "packingMs": 1,
+          "computeReadbackMs": 11.900000000372529,
+          "replayMs": 0.6999999992549419,
+          "biologyMs": 2.300000000745058,
+          "gpuMs": 10.420224,
+          "accepted": 919,
+          "deferred": 4,
+          "bfs": 3
+        },
+        {
+          "wallMs": 14.399999998509884,
+          "packingMs": 1.099999999627471,
+          "computeReadbackMs": 12,
+          "replayMs": 0.5,
+          "biologyMs": 0.7999999988824129,
+          "gpuMs": 10.944512,
+          "accepted": 891,
+          "deferred": 4,
+          "bfs": 4
+        },
+        {
+          "wallMs": 13.700000001117587,
+          "packingMs": 0.900000000372529,
+          "computeReadbackMs": 11.5,
+          "replayMs": 0.5,
+          "biologyMs": 0.8000000007450581,
+          "gpuMs": 10.289152,
+          "accepted": 856,
+          "deferred": 4,
+          "bfs": 3
+        },
+        {
+          "wallMs": 15.200000001117587,
+          "packingMs": 1,
+          "computeReadbackMs": 12.800000000745058,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 0.8000000007450581,
+          "gpuMs": 11.993088,
+          "accepted": 938,
+          "deferred": 5,
+          "bfs": 5
+        },
+        {
+          "wallMs": 15.399999998509884,
+          "packingMs": 0.8999999985098839,
+          "computeReadbackMs": 11.600000001490116,
+          "replayMs": 0.5,
+          "biologyMs": 2.399999998509884,
+          "gpuMs": 10.616832,
+          "accepted": 967,
+          "deferred": 4,
+          "bfs": 4
+        },
+        {
+          "wallMs": 14.300000000745058,
+          "packingMs": 1.099999999627471,
+          "computeReadbackMs": 11.900000000372529,
+          "replayMs": 0.5,
+          "biologyMs": 0.8000000007450581,
+          "gpuMs": 10.48576,
+          "accepted": 941,
+          "deferred": 4,
+          "bfs": 3
+        },
+        {
+          "wallMs": 14.299999998882413,
+          "packingMs": 1,
+          "computeReadbackMs": 12,
+          "replayMs": 0.5,
+          "biologyMs": 0.7999999988824129,
+          "gpuMs": 10.878976,
+          "accepted": 919,
+          "deferred": 2,
+          "bfs": 2
+        },
+        {
+          "wallMs": 14.300000000745058,
+          "packingMs": 0.900000000372529,
+          "computeReadbackMs": 11.900000000372529,
+          "replayMs": 0.599999999627471,
+          "biologyMs": 0.900000000372529,
+          "gpuMs": 10.682368,
+          "accepted": 916,
+          "deferred": 1,
+          "bfs": 0
+        },
+        {
+          "wallMs": 16.5,
+          "packingMs": 1,
+          "computeReadbackMs": 12.199999999254942,
+          "replayMs": 0.5,
+          "biologyMs": 2.800000000745058,
+          "gpuMs": 11.075584,
+          "accepted": 889,
+          "deferred": 5,
+          "bfs": 4
+        }
+      ]
+    }
+  }
+]

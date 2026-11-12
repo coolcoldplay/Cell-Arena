@@ -1,0 +1,206 @@
+{
+  "validation": {
+    "config": {},
+    "count": 4096,
+    "tile": 4,
+    "batch": 4,
+    "scheduler": "boundary",
+    "energyTolerance": "abs <= 0.05 + 1e-5 * abs(reference)",
+    "energyFailures": 0,
+    "maxAbsoluteError": 0.0001586054530093861,
+    "maxRelativeError": 0.0000709674493868395,
+    "hardFailures": [
+      0,
+      0,
+      0
+    ],
+    "examples": [],
+    "baseline": {
+      "volumeMismatches": 0,
+      "perimeterMismatches": 0,
+      "disconnected": 0,
+      "minAreaViolations": 0,
+      "nuclearLosses": 0,
+      "walls": 0,
+      "ok": true,
+      "errors": []
+    },
+    "after": {
+      "volumeMismatches": 0,
+      "perimeterMismatches": 0,
+      "disconnected": 0,
+      "minAreaViolations": 0,
+      "nuclearLosses": 0,
+      "walls": 0,
+      "ok": true,
+      "errors": []
+    },
+    "accepted": 11450,
+    "bfs": 56,
+    "ok": true
+  },
+  "timings": [
+    {
+      "tile": 4,
+      "batch": 1,
+      "scheduler": "boundary",
+      "phases": 64,
+      "cells": 217,
+      "lattice": [
+        384,
+        288
+      ],
+      "wall": {
+        "n": 24,
+        "mean": 8.779166666635623,
+        "p50": 8.600000001490116,
+        "p95": 10.599999999627471,
+        "p99": 11.099999999627471,
+        "max": 11.099999999627471
+      },
+      "gpu": {
+        "n": 24,
+        "mean": 8.110080000000002,
+        "p50": 7.929856,
+        "p95": 9.961472,
+        "p99": 10.354688,
+        "max": 10.354688
+      },
+      "accepted": {
+        "n": 24,
+        "mean": 945.5416666666666,
+        "p50": 941,
+        "p95": 992,
+        "p99": 1038,
+        "max": 1038
+      },
+      "bfs": {
+        "n": 24,
+        "mean": 4.791666666666667,
+        "p50": 4,
+        "p95": 10,
+        "p99": 10,
+        "max": 10
+      },
+      "invariants": {
+        "volumeMismatches": 0,
+        "perimeterMismatches": 0,
+        "disconnected": 0,
+        "minAreaViolations": 0,
+        "nuclearLosses": 0,
+        "walls": 0,
+        "ok": true,
+        "errors": []
+      },
+      "bytes": 5582176
+    },
+    {
+      "tile": 4,
+      "batch": 4,
+      "scheduler": "boundary",
+      "phases": 16,
+      "cells": 217,
+      "lattice": [
+        384,
+        288
+      ],
+      "wall": {
+        "n": 24,
+        "mean": 5.420833333240201,
+        "p50": 5.300000000745058,
+        "p95": 6.400000000372529,
+        "p99": 6.5,
+        "max": 6.5
+      },
+      "gpu": {
+        "n": 24,
+        "mean": 4.923392,
+        "p50": 4.849664,
+        "p95": 5.832704,
+        "p99": 5.963776,
+        "max": 5.963776
+      },
+      "accepted": {
+        "n": 24,
+        "mean": 933.875,
+        "p50": 938,
+        "p95": 979,
+        "p99": 979,
+        "max": 979
+      },
+      "bfs": {
+        "n": 24,
+        "mean": 4.708333333333333,
+        "p50": 4,
+        "p95": 8,
+        "p99": 9,
+        "max": 9
+      },
+      "invariants": {
+        "volumeMismatches": 0,
+        "perimeterMismatches": 0,
+        "disconnected": 0,
+        "minAreaViolations": 0,
+        "nuclearLosses": 0,
+        "walls": 0,
+        "ok": true,
+        "errors": []
+      },
+      "bytes": 5569888
+    },
+    {
+      "tile": 4,
+      "batch": 16,
+      "scheduler": "boundary",
+      "phases": 4,
+      "cells": 217,
+      "lattice": [
+        384,
+        288
+      ],
+      "wall": {
+        "n": 24,
+        "mean": 4.0250000000620885,
+        "p50": 3.800000000745058,
+        "p95": 4.900000000372529,
+        "p99": 5.700000001117587,
+        "max": 5.700000001117587
+      },
+      "gpu": {
+        "n": 24,
+        "mean": 3.484330666666668,
+        "p50": 3.342336,
+        "p95": 4.390912,
+        "p99": 5.177344,
+        "max": 5.177344
+      },
+      "accepted": {
+        "n": 24,
+        "mean": 921.9583333333334,
+        "p50": 910,
+        "p95": 982,
+        "p99": 995,
+        "max": 995
+      },
+      "bfs": {
+        "n": 24,
+        "mean": 4.166666666666667,
+        "p50": 4,
+        "p95": 8,
+        "p99": 8,
+        "max": 8
+      },
+      "invariants": {
+        "volumeMismatches": 0,
+        "perimeterMismatches": 0,
+        "disconnected": 0,
+        "minAreaViolations": 0,
+        "nuclearLosses": 0,
+        "walls": 0,
+        "ok": true,
+        "errors": []
+      },
+      "bytes": 5566816
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "config": {},
+  "count": 4096,
+  "energyTolerance": "abs <= 0.05 + 1e-5 * abs(reference)",
+  "energyFailures": 0,
+  "maxAbsoluteError": 0.0001586054530093861,
+  "maxRelativeError": 0.0000709674493868395,
+  "hardFailures": [
+    0,
+    0,
+    0
+  ],
+  "examples": [],
+  "baseline": {
+    "volumeMismatches": 0,
+    "perimeterMismatches": 0,
+    "disconnected": 0,
+    "minAreaViolations": 0,
+    "nuclearLosses": 0,
+    "walls": 0,
+    "ok": true,
+    "errors": []
+  },
+  "after": {
+    "volumeMismatches": 0,
+    "perimeterMismatches": 0,
+    "disconnected": 0,
+    "minAreaViolations": 0,
+    "nuclearLosses": 0,
+    "walls": 0,
+    "ok": true,
+    "errors": []
+  },
+  "accepted": 11695,
+  "bfs": 38,
+  "ok": true
+}

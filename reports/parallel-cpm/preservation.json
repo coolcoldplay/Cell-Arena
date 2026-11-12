@@ -1,0 +1,14 @@
+{
+  "src/model.js": "391e88c54f294a10d8aa75b54530172c2087cad695a2d86b853e769c429c9e68",
+  "src/cpm-kernel.c": "2366e864674e30e64687ff5de574625e5e58c19314098098fe097bcd763905bc",
+  "src/wasm-cpm.js": "a78a0e3c48a2d887617313dff55b5d018a9df56ab45a16221eafb54d8847c195",
+  "build/cpm-kernel.wasm": "6647a5483533df72d9b9f9c12682596db56067dc7fbbb6a57e47ddcd043ed566",
+  "productionKernelDiff": "",
+  "nodeRegression": {
+    "pass": 383,
+    "fail": 0,
+    "newReplicationTests": 2,
+    "newReplicationFail": 0,
+    "log": "output/performance/parallel-cpm/node-tests.log"
+  }
+}

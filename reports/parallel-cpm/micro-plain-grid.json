@@ -1,0 +1,200 @@
+{
+  "validation": {
+    "config": {},
+    "count": 4096,
+    "energyTolerance": "abs <= 0.05 + 1e-5 * abs(reference)",
+    "energyFailures": 0,
+    "maxAbsoluteError": 0.0001586054530093861,
+    "maxRelativeError": 0.0000709674493868395,
+    "hardFailures": [
+      0,
+      0,
+      0
+    ],
+    "examples": [],
+    "baseline": {
+      "volumeMismatches": 0,
+      "perimeterMismatches": 0,
+      "disconnected": 0,
+      "minAreaViolations": 0,
+      "nuclearLosses": 0,
+      "walls": 0,
+      "ok": true,
+      "errors": []
+    },
+    "after": {
+      "volumeMismatches": 0,
+      "perimeterMismatches": 0,
+      "disconnected": 0,
+      "minAreaViolations": 0,
+      "nuclearLosses": 0,
+      "walls": 0,
+      "ok": true,
+      "errors": []
+    },
+    "accepted": 11719,
+    "bfs": 39,
+    "ok": true
+  },
+  "timings": [
+    {
+      "tile": 4,
+      "batch": 1,
+      "phases": 64,
+      "cells": 217,
+      "lattice": [
+        384,
+        288
+      ],
+      "wall": {
+        "n": 24,
+        "mean": 5.345833333364378,
+        "p50": 5.300000000745058,
+        "p95": 6.099999999627471,
+        "p99": 7.099999999627471,
+        "max": 7.099999999627471
+      },
+      "gpu": {
+        "n": 24,
+        "mean": 4.557482666666668,
+        "p50": 4.58752,
+        "p95": 5.308416,
+        "p99": 6.5536,
+        "max": 6.5536
+      },
+      "accepted": {
+        "n": 24,
+        "mean": 948.375,
+        "p50": 945,
+        "p95": 1003,
+        "p99": 1007,
+        "max": 1007
+      },
+      "bfs": {
+        "n": 24,
+        "mean": 4,
+        "p50": 3,
+        "p95": 8,
+        "p99": 8,
+        "max": 8
+      },
+      "invariants": {
+        "volumeMismatches": 0,
+        "perimeterMismatches": 0,
+        "disconnected": 0,
+        "minAreaViolations": 0,
+        "nuclearLosses": 0,
+        "walls": 0,
+        "ok": true,
+        "errors": []
+      },
+      "bytes": 5139808
+    },
+    {
+      "tile": 4,
+      "batch": 4,
+      "phases": 16,
+      "cells": 217,
+      "lattice": [
+        384,
+        288
+      ],
+      "wall": {
+        "n": 24,
+        "mean": 4.654166666635622,
+        "p50": 4.700000001117587,
+        "p95": 5.699999999254942,
+        "p99": 6.400000000372529,
+        "max": 6.400000000372529
+      },
+      "gpu": {
+        "n": 24,
+        "mean": 4.106922666666667,
+        "p50": 4.194304,
+        "p95": 5.111808,
+        "p99": 6.029312,
+        "max": 6.029312
+      },
+      "accepted": {
+        "n": 24,
+        "mean": 928.1666666666666,
+        "p50": 921,
+        "p95": 980,
+        "p99": 989,
+        "max": 989
+      },
+      "bfs": {
+        "n": 24,
+        "mean": 4.125,
+        "p50": 4,
+        "p95": 8,
+        "p99": 11,
+        "max": 11
+      },
+      "invariants": {
+        "volumeMismatches": 0,
+        "perimeterMismatches": 0,
+        "disconnected": 0,
+        "minAreaViolations": 0,
+        "nuclearLosses": 0,
+        "walls": 0,
+        "ok": true,
+        "errors": []
+      },
+      "bytes": 5127520
+    },
+    {
+      "tile": 4,
+      "batch": 16,
+      "phases": 4,
+      "cells": 217,
+      "lattice": [
+        384,
+        288
+      ],
+      "wall": {
+        "n": 24,
+        "mean": 4.291666666666667,
+        "p50": 4.100000001490116,
+        "p95": 5.199999999254942,
+        "p99": 5.599999999627471,
+        "max": 5.599999999627471
+      },
+      "gpu": {
+        "n": 24,
+        "mean": 3.7874346666666665,
+        "p50": 3.538944,
+        "p95": 4.718592,
+        "p99": 5.111808,
+        "max": 5.111808
+      },
+      "accepted": {
+        "n": 24,
+        "mean": 947.75,
+        "p50": 946,
+        "p95": 995,
+        "p99": 998,
+        "max": 998
+      },
+      "bfs": {
+        "n": 24,
+        "mean": 3.4166666666666665,
+        "p50": 3,
+        "p95": 6,
+        "p99": 8,
+        "max": 8
+      },
+      "invariants": {
+        "volumeMismatches": 0,
+        "perimeterMismatches": 0,
+        "disconnected": 0,
+        "minAreaViolations": 0,
+        "nuclearLosses": 0,
+        "walls": 0,
+        "ok": true,
+        "errors": []
+      },
+      "bytes": 5124448
+    }
+  ]
+}

@@ -1,0 +1,1210 @@
+[
+  {
+    "cells": 859,
+    "lattice": [
+      1024,
+      768
+    ],
+    "sites": 786432,
+    "occupiedPixels": 783296,
+    "replicas": [
+      1,
+      1
+    ],
+    "tile": 4,
+    "batch": 4,
+    "steps": 24,
+    "warmup": 6,
+    "allocatedBytes": 26797632,
+    "adapter": {
+      "vendor": "apple",
+      "architecture": "metal-3",
+      "device": "",
+      "description": "",
+      "isFallbackAdapter": false
+    },
+    "gpu": {
+      "wallMs": {
+        "n": 24,
+        "mean": 8.604166666744277,
+        "p50": 8.199999999254942,
+        "p95": 11.099999999627471,
+        "p99": 12.400000000372529,
+        "max": 12.400000000372529
+      },
+      "gpuMs": {
+        "n": 24,
+        "mean": 7.861589333333335,
+        "p50": 7.471104,
+        "p95": 10.15808,
+        "p99": 11.534336,
+        "max": 11.534336
+      },
+      "accepted": {
+        "n": 24,
+        "mean": 5561.25,
+        "p50": 5550,
+        "p95": 5722,
+        "p99": 5724,
+        "max": 5724
+      },
+      "bfs": {
+        "n": 24,
+        "mean": 5.541666666666667,
+        "p50": 5,
+        "p95": 9,
+        "p99": 11,
+        "max": 11
+      }
+    },
+    "cpu": {
+      "wallMs": {
+        "n": 24,
+        "mean": 6.524999999906868,
+        "p50": 6.5,
+        "p95": 6.800000000745058,
+        "p99": 7,
+        "max": 7
+      },
+      "kernelMs": {
+        "n": 24,
+        "mean": 6.145833333178113,
+        "p50": 6.099999999627471,
+        "p95": 6.400000000372529,
+        "p99": 6.700000001117587,
+        "max": 6.700000001117587
+      },
+      "accepted": {
+        "n": 24,
+        "mean": 5598.708333333333,
+        "p50": 5596,
+        "p95": 5753,
+        "p99": 5765,
+        "max": 5765
+      }
+    },
+    "cpuUnavailable": null,
+    "initial": {
+      "volumeMismatches": 0,
+      "perimeterMismatches": 0,
+      "disconnected": 0,
+      "minAreaViolations": 0,
+      "nuclearLosses": 0,
+      "walls": 0,
+      "ok": true,
+      "errors": []
+    },
+    "after": {
+      "volumeMismatches": 0,
+      "perimeterMismatches": 0,
+      "disconnected": 0,
+      "minAreaViolations": 0,
+      "nuclearLosses": 0,
+      "walls": 0,
+      "ok": true,
+      "errors": []
+    },
+    "cpuAfter": {
+      "volumeMismatches": 0,
+      "perimeterMismatches": 0,
+      "disconnected": 0,
+      "minAreaViolations": 0,
+      "nuclearLosses": 0,
+      "walls": 0,
+      "ok": true,
+      "errors": []
+    },
+    "raw": {
+      "gpu": [
+        {
+          "wallMs": 11.099999999627471,
+          "gpuMs": 10.15808,
+          "accepted": 5724,
+          "deferred": 9,
+          "bfs": 8,
+          "topologyRejected": 8,
+          "different": 37340,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 8.599999999627471,
+          "gpuMs": 8.060928,
+          "accepted": 5574,
+          "deferred": 5,
+          "bfs": 4,
+          "topologyRejected": 4,
+          "different": 37282,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 6.599999999627471,
+          "gpuMs": 5.701632,
+          "accepted": 5623,
+          "deferred": 1,
+          "bfs": 1,
+          "topologyRejected": 1,
+          "different": 37489,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 9.599999999627471,
+          "gpuMs": 8.978432,
+          "accepted": 5549,
+          "deferred": 8,
+          "bfs": 8,
+          "topologyRejected": 8,
+          "different": 37191,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 7.400000000372529,
+          "gpuMs": 6.5536,
+          "accepted": 5571,
+          "deferred": 4,
+          "bfs": 4,
+          "topologyRejected": 4,
+          "different": 37386,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 8.900000000372529,
+          "gpuMs": 8.323072,
+          "accepted": 5629,
+          "deferred": 4,
+          "bfs": 4,
+          "topologyRejected": 4,
+          "different": 37594,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 7.900000000372529,
+          "gpuMs": 6.619136,
+          "accepted": 5615,
+          "deferred": 4,
+          "bfs": 4,
+          "topologyRejected": 4,
+          "different": 37613,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 7.699999999254942,
+          "gpuMs": 6.946816,
+          "accepted": 5569,
+          "deferred": 8,
+          "bfs": 6,
+          "topologyRejected": 6,
+          "different": 37442,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 7.900000000372529,
+          "gpuMs": 6.88128,
+          "accepted": 5722,
+          "deferred": 4,
+          "bfs": 4,
+          "topologyRejected": 4,
+          "different": 37401,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 8.900000000372529,
+          "gpuMs": 8.388608,
+          "accepted": 5550,
+          "deferred": 5,
+          "bfs": 5,
+          "topologyRejected": 5,
+          "different": 37140,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 10,
+          "gpuMs": 9.17504,
+          "accepted": 5581,
+          "deferred": 9,
+          "bfs": 9,
+          "topologyRejected": 9,
+          "different": 37253,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 7.099999999627471,
+          "gpuMs": 6.488064,
+          "accepted": 5526,
+          "deferred": 5,
+          "bfs": 5,
+          "topologyRejected": 5,
+          "different": 37702,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 8.900000000372529,
+          "gpuMs": 8.192,
+          "accepted": 5580,
+          "deferred": 6,
+          "bfs": 6,
+          "topologyRejected": 6,
+          "different": 37156,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 7.300000000745058,
+          "gpuMs": 6.684672,
+          "accepted": 5667,
+          "deferred": 3,
+          "bfs": 3,
+          "topologyRejected": 3,
+          "different": 37318,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 8,
+          "gpuMs": 7.274496,
+          "accepted": 5600,
+          "deferred": 4,
+          "bfs": 4,
+          "topologyRejected": 4,
+          "different": 36993,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 10.200000001117587,
+          "gpuMs": 9.50272,
+          "accepted": 5516,
+          "deferred": 11,
+          "bfs": 9,
+          "topologyRejected": 9,
+          "different": 37296,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 9.199999999254942,
+          "gpuMs": 8.388608,
+          "accepted": 5494,
+          "deferred": 5,
+          "bfs": 5,
+          "topologyRejected": 5,
+          "different": 37252,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 6.100000001490116,
+          "gpuMs": 5.439488,
+          "accepted": 5531,
+          "deferred": 3,
+          "bfs": 3,
+          "topologyRejected": 3,
+          "different": 37410,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 9.400000000372529,
+          "gpuMs": 8.51968,
+          "accepted": 5489,
+          "deferred": 7,
+          "bfs": 7,
+          "topologyRejected": 7,
+          "different": 37067,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 7.5,
+          "gpuMs": 7.077888,
+          "accepted": 5497,
+          "deferred": 6,
+          "bfs": 6,
+          "topologyRejected": 6,
+          "different": 37142,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 12.400000000372529,
+          "gpuMs": 11.534336,
+          "accepted": 5520,
+          "deferred": 11,
+          "bfs": 11,
+          "topologyRejected": 11,
+          "different": 37060,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 8.099999999627471,
+          "gpuMs": 7.471104,
+          "accepted": 5518,
+          "deferred": 7,
+          "bfs": 7,
+          "topologyRejected": 7,
+          "different": 37417,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 8.199999999254942,
+          "gpuMs": 7.274496,
+          "accepted": 5456,
+          "deferred": 3,
+          "bfs": 3,
+          "topologyRejected": 3,
+          "different": 36948,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 9.5,
+          "gpuMs": 9.043968,
+          "accepted": 5369,
+          "deferred": 7,
+          "bfs": 7,
+          "topologyRejected": 7,
+          "different": 36826,
+          "minimumAreaRaces": 0,
+          "copies": null
+        }
+      ],
+      "cpu": [
+        {
+          "wallMs": 6.700000001117587,
+          "kernelMs": 6.300000000745058,
+          "accepted": 5753
+        },
+        {
+          "wallMs": 6.800000000745058,
+          "kernelMs": 6.400000000372529,
+          "accepted": 5613
+        },
+        {
+          "wallMs": 6.599999999627471,
+          "kernelMs": 6.299999998882413,
+          "accepted": 5765
+        },
+        {
+          "wallMs": 6.5,
+          "kernelMs": 6.099999999627471,
+          "accepted": 5514
+        },
+        {
+          "wallMs": 6.400000000372529,
+          "kernelMs": 6.099999999627471,
+          "accepted": 5672
+        },
+        {
+          "wallMs": 6.799999998882413,
+          "kernelMs": 6.399999998509884,
+          "accepted": 5537
+        },
+        {
+          "wallMs": 6.5,
+          "kernelMs": 6.099999999627471,
+          "accepted": 5682
+        },
+        {
+          "wallMs": 7,
+          "kernelMs": 6.700000001117587,
+          "accepted": 5682
+        },
+        {
+          "wallMs": 6.300000000745058,
+          "kernelMs": 6,
+          "accepted": 5682
+        },
+        {
+          "wallMs": 6.699999999254942,
+          "kernelMs": 6.299999998882413,
+          "accepted": 5601
+        },
+        {
+          "wallMs": 6.5,
+          "kernelMs": 6.099999999627471,
+          "accepted": 5594
+        },
+        {
+          "wallMs": 6.599999999627471,
+          "kernelMs": 6.099999999627471,
+          "accepted": 5691
+        },
+        {
+          "wallMs": 6.5,
+          "kernelMs": 6.100000001490116,
+          "accepted": 5629
+        },
+        {
+          "wallMs": 6.5,
+          "kernelMs": 6.199999999254942,
+          "accepted": 5552
+        },
+        {
+          "wallMs": 6.199999999254942,
+          "kernelMs": 5.799999998882413,
+          "accepted": 5470
+        },
+        {
+          "wallMs": 6.5,
+          "kernelMs": 6,
+          "accepted": 5572
+        },
+        {
+          "wallMs": 6.199999999254942,
+          "kernelMs": 5.699999999254942,
+          "accepted": 5702
+        },
+        {
+          "wallMs": 6.799999998882413,
+          "kernelMs": 6.399999998509884,
+          "accepted": 5605
+        },
+        {
+          "wallMs": 6.300000000745058,
+          "kernelMs": 6,
+          "accepted": 5563
+        },
+        {
+          "wallMs": 6.599999999627471,
+          "kernelMs": 6.199999999254942,
+          "accepted": 5404
+        },
+        {
+          "wallMs": 6.299999998882413,
+          "kernelMs": 5.900000000372529,
+          "accepted": 5487
+        },
+        {
+          "wallMs": 6.5,
+          "kernelMs": 6.200000001117587,
+          "accepted": 5596
+        },
+        {
+          "wallMs": 6.200000001117587,
+          "kernelMs": 5.900000000372529,
+          "accepted": 5427
+        },
+        {
+          "wallMs": 6.599999999627471,
+          "kernelMs": 6.200000001117587,
+          "accepted": 5576
+        }
+      ]
+    }
+  },
+  {
+    "cells": 3436,
+    "lattice": [
+      2048,
+      1536
+    ],
+    "sites": 3145728,
+    "occupiedPixels": 3133184,
+    "replicas": [
+      2,
+      2
+    ],
+    "tile": 4,
+    "batch": 4,
+    "steps": 24,
+    "warmup": 6,
+    "allocatedBytes": 103235400,
+    "adapter": {
+      "vendor": "apple",
+      "architecture": "metal-3",
+      "device": "",
+      "description": "",
+      "isFallbackAdapter": false
+    },
+    "gpu": {
+      "wallMs": {
+        "n": 24,
+        "mean": 26.566666666651145,
+        "p50": 26.199999999254942,
+        "p95": 31.40000000037253,
+        "p99": 34.40000000037253,
+        "max": 34.40000000037253
+      },
+      "gpuMs": {
+        "n": 24,
+        "mean": 25.960447999999996,
+        "p50": 25.690112,
+        "p95": 30.539776,
+        "p99": 33.816576,
+        "max": 33.816576
+      },
+      "accepted": {
+        "n": 24,
+        "mean": 22185.666666666668,
+        "p50": 22106,
+        "p95": 22621,
+        "p99": 22667,
+        "max": 22667
+      },
+      "bfs": {
+        "n": 24,
+        "mean": 21.75,
+        "p50": 21,
+        "p95": 30,
+        "p99": 33,
+        "max": 33
+      }
+    },
+    "cpu": null,
+    "cpuUnavailable": "Original WASM raw-site capacity exceeded; no extrapolated CPU speed is reported",
+    "initial": {
+      "volumeMismatches": 0,
+      "perimeterMismatches": 0,
+      "disconnected": 0,
+      "minAreaViolations": 0,
+      "nuclearLosses": 0,
+      "walls": 0,
+      "ok": true,
+      "errors": []
+    },
+    "after": {
+      "volumeMismatches": 0,
+      "perimeterMismatches": 0,
+      "disconnected": 0,
+      "minAreaViolations": 0,
+      "nuclearLosses": 0,
+      "walls": 0,
+      "ok": true,
+      "errors": []
+    },
+    "cpuAfter": null,
+    "raw": {
+      "gpu": [
+        {
+          "wallMs": 28.90000000037253,
+          "gpuMs": 28.377088,
+          "accepted": 22667,
+          "deferred": 27,
+          "bfs": 27,
+          "topologyRejected": 27,
+          "different": 149081,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 28.699999999254942,
+          "gpuMs": 28.18048,
+          "accepted": 22621,
+          "deferred": 23,
+          "bfs": 22,
+          "topologyRejected": 22,
+          "different": 148842,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 29.699999999254942,
+          "gpuMs": 29.229056,
+          "accepted": 22409,
+          "deferred": 29,
+          "bfs": 26,
+          "topologyRejected": 26,
+          "different": 148788,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 26.300000000745058,
+          "gpuMs": 25.690112,
+          "accepted": 22593,
+          "deferred": 22,
+          "bfs": 20,
+          "topologyRejected": 20,
+          "different": 148767,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 23.699999999254942,
+          "gpuMs": 23.26528,
+          "accepted": 22265,
+          "deferred": 17,
+          "bfs": 16,
+          "topologyRejected": 16,
+          "different": 148612,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 22.199999999254942,
+          "gpuMs": 21.692416,
+          "accepted": 22480,
+          "deferred": 16,
+          "bfs": 15,
+          "topologyRejected": 15,
+          "different": 149717,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 26,
+          "gpuMs": 25.362432,
+          "accepted": 22390,
+          "deferred": 21,
+          "bfs": 20,
+          "topologyRejected": 20,
+          "different": 149030,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 31.40000000037253,
+          "gpuMs": 30.539776,
+          "accepted": 22106,
+          "deferred": 32,
+          "bfs": 30,
+          "topologyRejected": 30,
+          "different": 148311,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 27.300000000745058,
+          "gpuMs": 26.804224,
+          "accepted": 22439,
+          "deferred": 25,
+          "bfs": 25,
+          "topologyRejected": 25,
+          "different": 148747,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 25.59999999962747,
+          "gpuMs": 23.92064,
+          "accepted": 21967,
+          "deferred": 28,
+          "bfs": 26,
+          "topologyRejected": 26,
+          "different": 148301,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 26.90000000037253,
+          "gpuMs": 26.411008,
+          "accepted": 22424,
+          "deferred": 24,
+          "bfs": 21,
+          "topologyRejected": 21,
+          "different": 149549,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 34.40000000037253,
+          "gpuMs": 33.816576,
+          "accepted": 22308,
+          "deferred": 36,
+          "bfs": 33,
+          "topologyRejected": 33,
+          "different": 148255,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 24.899999998509884,
+          "gpuMs": 24.379392,
+          "accepted": 22133,
+          "deferred": 27,
+          "bfs": 23,
+          "topologyRejected": 23,
+          "different": 148673,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 30.200000001117587,
+          "gpuMs": 29.622272,
+          "accepted": 22090,
+          "deferred": 31,
+          "bfs": 29,
+          "topologyRejected": 29,
+          "different": 148287,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 22.5,
+          "gpuMs": 21.95456,
+          "accepted": 21946,
+          "deferred": 16,
+          "bfs": 15,
+          "topologyRejected": 15,
+          "different": 149026,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 26.699999999254942,
+          "gpuMs": 26.148864,
+          "accepted": 22116,
+          "deferred": 29,
+          "bfs": 24,
+          "topologyRejected": 24,
+          "different": 149034,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 27.90000000037253,
+          "gpuMs": 27.131904,
+          "accepted": 21975,
+          "deferred": 21,
+          "bfs": 20,
+          "topologyRejected": 20,
+          "different": 148378,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 26.199999999254942,
+          "gpuMs": 25.690112,
+          "accepted": 21908,
+          "deferred": 27,
+          "bfs": 25,
+          "topologyRejected": 25,
+          "different": 148571,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 25.300000000745058,
+          "gpuMs": 24.838144,
+          "accepted": 21772,
+          "deferred": 20,
+          "bfs": 18,
+          "topologyRejected": 18,
+          "different": 148586,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 27.199999999254942,
+          "gpuMs": 26.607616,
+          "accepted": 21919,
+          "deferred": 15,
+          "bfs": 14,
+          "topologyRejected": 14,
+          "different": 148634,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 23.40000000037253,
+          "gpuMs": 22.806528,
+          "accepted": 22015,
+          "deferred": 23,
+          "bfs": 23,
+          "topologyRejected": 23,
+          "different": 148666,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 25.59999999962747,
+          "gpuMs": 24.969216,
+          "accepted": 21927,
+          "deferred": 21,
+          "bfs": 19,
+          "topologyRejected": 19,
+          "different": 149470,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 23.90000000037253,
+          "gpuMs": 23.330816,
+          "accepted": 21991,
+          "deferred": 15,
+          "bfs": 14,
+          "topologyRejected": 14,
+          "different": 148588,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 22.700000001117587,
+          "gpuMs": 22.28224,
+          "accepted": 21995,
+          "deferred": 17,
+          "bfs": 17,
+          "topologyRejected": 17,
+          "different": 148865,
+          "minimumAreaRaces": 0,
+          "copies": null
+        }
+      ],
+      "cpu": []
+    }
+  },
+  {
+    "cells": 10308,
+    "lattice": [
+      4096,
+      2304
+    ],
+    "sites": 9437184,
+    "occupiedPixels": 9399552,
+    "replicas": [
+      4,
+      3
+    ],
+    "tile": 4,
+    "batch": 4,
+    "steps": 24,
+    "warmup": 6,
+    "allocatedBytes": 307069448,
+    "adapter": {
+      "vendor": "apple",
+      "architecture": "metal-3",
+      "device": "",
+      "description": "",
+      "isFallbackAdapter": false
+    },
+    "gpu": {
+      "wallMs": {
+        "n": 24,
+        "mean": 75.50416666657354,
+        "p50": 74.59999999962747,
+        "p95": 84.10000000149012,
+        "p99": 84.69999999925494,
+        "max": 84.69999999925494
+      },
+      "gpuMs": {
+        "n": 24,
+        "mean": 74.94041600000001,
+        "p50": 73.990144,
+        "p95": 83.623936,
+        "p99": 84.148224,
+        "max": 84.148224
+      },
+      "accepted": {
+        "n": 24,
+        "mean": 66880.75,
+        "p50": 67062,
+        "p95": 67845,
+        "p99": 68225,
+        "max": 68225
+      },
+      "bfs": {
+        "n": 24,
+        "mean": 64.33333333333333,
+        "p50": 64,
+        "p95": 77,
+        "p99": 78,
+        "max": 78
+      }
+    },
+    "cpu": null,
+    "cpuUnavailable": "Original WASM raw-site capacity exceeded; no extrapolated CPU speed is reported",
+    "initial": {
+      "volumeMismatches": 0,
+      "perimeterMismatches": 0,
+      "disconnected": 0,
+      "minAreaViolations": 0,
+      "nuclearLosses": 0,
+      "walls": 0,
+      "ok": true,
+      "errors": []
+    },
+    "after": {
+      "volumeMismatches": 0,
+      "perimeterMismatches": 0,
+      "disconnected": 0,
+      "minAreaViolations": 0,
+      "nuclearLosses": 0,
+      "walls": 0,
+      "ok": true,
+      "errors": []
+    },
+    "cpuAfter": null,
+    "raw": {
+      "gpu": [
+        {
+          "wallMs": 68,
+          "gpuMs": 67.50208,
+          "accepted": 67791,
+          "deferred": 60,
+          "bfs": 58,
+          "topologyRejected": 58,
+          "different": 446979,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 75.30000000074506,
+          "gpuMs": 74.71104,
+          "accepted": 68225,
+          "deferred": 56,
+          "bfs": 50,
+          "topologyRejected": 50,
+          "different": 447092,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 74.5,
+          "gpuMs": 73.990144,
+          "accepted": 67845,
+          "deferred": 61,
+          "bfs": 56,
+          "topologyRejected": 56,
+          "different": 446763,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 71.69999999925494,
+          "gpuMs": 71.172096,
+          "accepted": 67548,
+          "deferred": 67,
+          "bfs": 61,
+          "topologyRejected": 61,
+          "different": 446845,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 66.40000000037253,
+          "gpuMs": 65.732608,
+          "accepted": 67619,
+          "deferred": 55,
+          "bfs": 51,
+          "topologyRejected": 51,
+          "different": 446531,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 77.29999999888241,
+          "gpuMs": 76.873728,
+          "accepted": 67567,
+          "deferred": 68,
+          "bfs": 64,
+          "topologyRejected": 64,
+          "different": 446478,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 78.69999999925494,
+          "gpuMs": 78.184448,
+          "accepted": 67620,
+          "deferred": 84,
+          "bfs": 78,
+          "topologyRejected": 78,
+          "different": 446496,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 70.40000000037253,
+          "gpuMs": 69.926912,
+          "accepted": 67378,
+          "deferred": 67,
+          "bfs": 60,
+          "topologyRejected": 60,
+          "different": 446173,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 84.69999999925494,
+          "gpuMs": 84.148224,
+          "accepted": 67137,
+          "deferred": 80,
+          "bfs": 77,
+          "topologyRejected": 77,
+          "different": 446116,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 69,
+          "gpuMs": 68.48512,
+          "accepted": 67313,
+          "deferred": 58,
+          "bfs": 53,
+          "topologyRejected": 53,
+          "different": 446759,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 70.09999999962747,
+          "gpuMs": 69.599232,
+          "accepted": 67364,
+          "deferred": 60,
+          "bfs": 57,
+          "topologyRejected": 57,
+          "different": 446860,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 84.10000000149012,
+          "gpuMs": 83.623936,
+          "accepted": 67171,
+          "deferred": 82,
+          "bfs": 73,
+          "topologyRejected": 73,
+          "different": 446796,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 76.29999999888241,
+          "gpuMs": 75.759616,
+          "accepted": 66720,
+          "deferred": 78,
+          "bfs": 73,
+          "topologyRejected": 73,
+          "different": 445071,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 79.80000000074506,
+          "gpuMs": 79.233024,
+          "accepted": 66686,
+          "deferred": 76,
+          "bfs": 68,
+          "topologyRejected": 68,
+          "different": 444984,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 73.90000000037253,
+          "gpuMs": 73.269248,
+          "accepted": 67062,
+          "deferred": 79,
+          "bfs": 75,
+          "topologyRejected": 75,
+          "different": 447288,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 79.29999999888241,
+          "gpuMs": 78.905344,
+          "accepted": 66431,
+          "deferred": 71,
+          "bfs": 66,
+          "topologyRejected": 66,
+          "different": 445159,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 81,
+          "gpuMs": 80.347136,
+          "accepted": 66331,
+          "deferred": 69,
+          "bfs": 64,
+          "topologyRejected": 64,
+          "different": 445752,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 70.40000000037253,
+          "gpuMs": 69.861376,
+          "accepted": 66708,
+          "deferred": 61,
+          "bfs": 55,
+          "topologyRejected": 55,
+          "different": 445921,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 80,
+          "gpuMs": 79.429632,
+          "accepted": 66416,
+          "deferred": 80,
+          "bfs": 77,
+          "topologyRejected": 77,
+          "different": 445304,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 80.30000000074506,
+          "gpuMs": 79.560704,
+          "accepted": 65933,
+          "deferred": 76,
+          "bfs": 72,
+          "topologyRejected": 72,
+          "different": 445223,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 74.59999999962747,
+          "gpuMs": 73.924608,
+          "accepted": 65945,
+          "deferred": 76,
+          "bfs": 69,
+          "topologyRejected": 69,
+          "different": 445754,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 73,
+          "gpuMs": 72.286208,
+          "accepted": 65799,
+          "deferred": 62,
+          "bfs": 54,
+          "topologyRejected": 54,
+          "different": 445656,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 74.09999999962747,
+          "gpuMs": 73.40032,
+          "accepted": 65391,
+          "deferred": 61,
+          "bfs": 56,
+          "topologyRejected": 56,
+          "different": 445208,
+          "minimumAreaRaces": 0,
+          "copies": null
+        },
+        {
+          "wallMs": 79.19999999925494,
+          "gpuMs": 78.6432,
+          "accepted": 65138,
+          "deferred": 82,
+          "bfs": 77,
+          "topologyRejected": 77,
+          "different": 444698,
+          "minimumAreaRaces": 0,
+          "copies": null
+        }
+      ],
+      "cpu": []
+    }
+  }
+]

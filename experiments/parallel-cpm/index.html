@@ -1,0 +1,13 @@
+<!doctype html><meta charset="utf-8"><title>Cell-Arena parallel CPM experiment</title>
+<style>body{font:16px system-ui;margin:24px;background:#101925;color:#dce8f4}canvas{max-width:80vw;image-rendering:pixelated}pre{white-space:pre-wrap}</style>
+<h1>并行 CPM 研究原型</h1><p>独立实验，不接管正式模拟。结果包含顺序 WASM 对照、机制检查与万细胞容量测试。</p>
+<button id="run" disabled>运行完整实验（约数分钟）</button> <button id="demo" disabled>万细胞机械演示</button> <button id="save" disabled>保存结果 JSON</button><pre id="status">Loading…</pre><canvas id="view" width="800" height="450"></canvas>
+<script src="/vendor/artistoo.js"></script><script src="/src/fast-cpm.js"></script><script src="/src/section-mechanics.js"></script><script src="/src/wasm-cpm.js"></script><script src="/src/immune-genetics.js"></script><script src="/src/model.js"></script>
+<script type="module">
+import * as lab from './harness.js'; window.lab=lab;
+const run=document.querySelector('#run'),demo=document.querySelector('#demo'),save=document.querySelector('#save'),status=document.querySelector('#status');
+run.disabled=demo.disabled=false;status.textContent='就绪。测试期间请避免同时运行其他高负载任务。FPS 不从后台标签页推断。';
+run.onclick=async()=>{run.disabled=demo.disabled=true;save.disabled=true;try{window.lastReport=await lab.runSuite();save.disabled=false;}catch(e){status.textContent=e.stack;}finally{run.disabled=demo.disabled=false;}};
+demo.onclick=async()=>{run.disabled=demo.disabled=true;try{await lab.demo();}catch(e){status.textContent=e.stack;}finally{run.disabled=demo.disabled=false;}};
+save.onclick=()=>{const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(window.lastReport,null,2)],{type:'application/json'}));a.href=url;a.download='parallel-cpm-results.json';a.click();URL.revokeObjectURL(url);};
+</script>

@@ -1,0 +1,19 @@
+The WGSL energy and constraint routines in kernel.wgsl adapt the existing
+Cell-Arena src/cpm-kernel.c, which in turn adapts Artistoo:
+
+Copyright (c) 2019 Johannes Textor & Inge Wortel.
+The complete MIT notice is retained at ../../vendor/LICENSE.
+Further provenance is at ../../src/cpm-kernel.NOTICE and
+../../THIRD_PARTY_NOTICES.md.
+
+The sequential reference loads the unchanged ../../build/cpm-kernel.wasm.
+Its MT19937 portions retain the BSD notice at
+../../vendor/MT19937-LICENSE.txt. No MT19937 implementation is copied into WGSL.
+
+Research inspiration (algorithmic ideas, not copied CUDA source):
+Shabaz Sultan, Sapna Devi, Scott N. Mueller, Johannes Textor.
+A parallelized cellular Potts model that enables simulations at tissue scale.
+arXiv:2312.09317v1 (2023). https://arxiv.org/abs/2312.09317
+
+This experimental implementation does not assert scientific equivalence to
+the paper's implementation, novelty, or endorsement by its authors.

@@ -1,0 +1,19 @@
+{
+  "cells": 10308,
+  "steps": 24,
+  "lattice": [
+    4096,
+    2304
+  ],
+  "compute": {
+    "n": 24,
+    "mean": 78.36249999965851,
+    "p50": 76.19999999925494,
+    "p95": 85.59999999962747,
+    "p99": 99.89999999850988,
+    "max": 99.89999999850988
+  },
+  "visibility": "visible",
+  "focused": false,
+  "note": "Visual inspection only; no claim about presented frame rate"
+}

@@ -1,0 +1,120 @@
+[
+  {
+    "config": {
+      "scene": "hot"
+    },
+    "count": 4096,
+    "energyTolerance": "abs <= 0.05 + 1e-5 * abs(reference)",
+    "energyFailures": 0,
+    "maxAbsoluteError": 0.0001586054530093861,
+    "maxRelativeError": 0.0000709674493868395,
+    "hardFailures": [
+      0,
+      0,
+      0
+    ],
+    "examples": [],
+    "baseline": {
+      "volumeMismatches": 0,
+      "perimeterMismatches": 0,
+      "disconnected": 0,
+      "minAreaViolations": 0,
+      "nuclearLosses": 0,
+      "walls": 0,
+      "ok": true,
+      "errors": []
+    },
+    "after": {
+      "volumeMismatches": 0,
+      "perimeterMismatches": 0,
+      "disconnected": 0,
+      "minAreaViolations": 0,
+      "nuclearLosses": 0,
+      "walls": 0,
+      "ok": true,
+      "errors": []
+    },
+    "accepted": 11687,
+    "bfs": 37,
+    "ok": true
+  },
+  {
+    "config": {
+      "scene": "network"
+    },
+    "count": 4096,
+    "energyTolerance": "abs <= 0.05 + 1e-5 * abs(reference)",
+    "energyFailures": 0,
+    "maxAbsoluteError": 0.00011876834247459556,
+    "maxRelativeError": 0.00003283855675306221,
+    "hardFailures": [
+      0,
+      0,
+      0
+    ],
+    "examples": [],
+    "baseline": {
+      "volumeMismatches": 0,
+      "perimeterMismatches": 0,
+      "disconnected": 0,
+      "minAreaViolations": 0,
+      "nuclearLosses": 0,
+      "walls": 0,
+      "ok": true,
+      "errors": []
+    },
+    "after": {
+      "volumeMismatches": 0,
+      "perimeterMismatches": 0,
+      "disconnected": 0,
+      "minAreaViolations": 0,
+      "nuclearLosses": 0,
+      "walls": 0,
+      "ok": true,
+      "errors": []
+    },
+    "accepted": 3861,
+    "bfs": 5,
+    "ok": true
+  },
+  {
+    "config": {
+      "scene": "cold",
+      "boundary": "solid"
+    },
+    "count": 4096,
+    "energyTolerance": "abs <= 0.05 + 1e-5 * abs(reference)",
+    "energyFailures": 0,
+    "maxAbsoluteError": 0.0002405939944480906,
+    "maxRelativeError": 0.00004744460044799172,
+    "hardFailures": [
+      0,
+      0,
+      0
+    ],
+    "examples": [],
+    "baseline": {
+      "volumeMismatches": 0,
+      "perimeterMismatches": 0,
+      "disconnected": 0,
+      "minAreaViolations": 0,
+      "nuclearLosses": 0,
+      "walls": 0,
+      "ok": true,
+      "errors": []
+    },
+    "after": {
+      "volumeMismatches": 0,
+      "perimeterMismatches": 0,
+      "disconnected": 0,
+      "minAreaViolations": 0,
+      "nuclearLosses": 0,
+      "walls": 0,
+      "ok": true,
+      "errors": []
+    },
+    "accepted": 12745,
+    "bfs": 67,
+    "ok": true
+  }
+]

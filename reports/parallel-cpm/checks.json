@@ -1,0 +1,64 @@
+{
+  "sourceManifestMatches": true,
+  "checks": [
+    {
+      "file": "vendor/artistoo.js",
+      "match": true
+    },
+    {
+      "file": "src/model.js",
+      "match": true
+    },
+    {
+      "file": "src/fast-cpm.js",
+      "match": true
+    },
+    {
+      "file": "src/section-mechanics.js",
+      "match": true
+    },
+    {
+      "file": "src/wasm-cpm.js",
+      "match": true
+    },
+    {
+      "file": "src/immune-genetics.js",
+      "match": true
+    },
+    {
+      "file": "build/cpm-kernel.wasm",
+      "match": true
+    },
+    {
+      "file": "experiments/parallel-cpm/kernel.wgsl",
+      "match": true
+    },
+    {
+      "file": "experiments/parallel-cpm/backend.js",
+      "match": true
+    },
+    {
+      "file": "experiments/parallel-cpm/harness.js",
+      "match": true
+    },
+    {
+      "file": "experiments/parallel-cpm/resident-reference.js",
+      "match": true
+    },
+    {
+      "file": "experiments/parallel-cpm/render.js",
+      "match": true
+    },
+    {
+      "file": "experiments/parallel-cpm/index.html",
+      "match": true
+    }
+  ],
+  "sourceSyntaxPassed": true,
+  "allGPUConstraintChecks": true,
+  "allTargetedChecks": true,
+  "allStateAudits": true,
+  "allCapacityChecks": true,
+  "existingTestsPassed": 383,
+  "newTestsPassed": 2
+}

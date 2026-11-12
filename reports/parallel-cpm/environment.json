@@ -1,0 +1,15 @@
+{
+  "system": "macOS-27.2.1-arm64-arm-64bit",
+  "chip": "Apple M5",
+  "memory": "32 GB",
+  "cores": "proc 10:4:0:6",
+  "gpu": [
+    {
+      "name": "Apple M5",
+      "cores": "10",
+      "metal": "spdisplays_metal4"
+    }
+  ],
+  "gitHead": "2a55e9e4b16a408025ea05381359df58c032673c",
+  "branch": "codex/cell-pixel-index-prototype"
+}

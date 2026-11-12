@@ -378,8 +378,24 @@
     }
     report(){const s=this.s,active=this.vessels.filter(v=>v.active),health=1-s.settings.vesselImmuneHealth/100*(1-this.hostHealth);return {vessels:this.vessels.map(v=>({id:v.id,x:v.x,y:v.y,radius:v.radius,wall:v.wall,initialRadius:v.initialRadius,coverage:v.coverage,perfusion:v.perfusion,patency:v.patency,area:v.area,active:v.active})),initial:this.initial.map(v=>({...v})),endothelial:s.live().filter(m=>m.vesselID).length,functional:active.filter(v=>v.perfusion>.05).length,immuneAvailability:health,canRecruit:s.settings.vesselImmuneRate>0&&health>0&&active.some(v=>v.perfusion>.05&&v.radius>5*s.scale),area:active.reduce((n,v)=>n+v.area,0),meanPerfusion:active.reduce((n,v)=>n+v.perfusion,0)/Math.max(1,active.length)};}
   }
+  // Opt-in performance prototype. Membership updates are O(1); only an event's
+  // target body is sorted, in the exact x-major order of Artistoo's pixels().
+  // Keeping that order preserves centroid sums, relabelling and RNG trajectories.
+  class CellPixelIndex {
+    constructor(size){this.members=[];this.slots=new Uint32Array(size);}
+    update(i,old,id){
+      if(old===id)return;
+      if(old){
+        const body=this.members[old],slot=this.slots[i],last=body.pop();
+        if(last!==i){body[slot]=last;this.slots[last]=slot;}
+        if(!body.length)delete this.members[old];
+      }
+      if(id){const body=this.members[id]||(this.members[id]=[]);this.slots[i]=body.length;body.push(i);}
+    }
+    indices(id){return (this.members[id]||[]).slice().sort((a,b)=>a-b);}
+  }
   class Simulation {
-    constructor({width,height,worldWidth=240,worldHeight=180,refinement,scene='ecosystem',seed=17,boundary='solid',settings={},sources,vessels,initialCells=[],mazeSignalThroughWalls=false,warmup=35,kernel='fast',sectionModel=true}={}){
+    constructor({width,height,worldWidth=240,worldHeight=180,refinement,scene='ecosystem',seed=17,boundary='solid',settings={},sources,vessels,initialCells=[],mazeSignalThroughWalls=false,warmup=35,kernel='fast',sectionModel=true,pixelIndex=false}={}){
       this.scale=refinement??(width===undefined?1.5:1);
       if(![1,1.5,2,3,4].includes(this.scale))throw Error('Unsupported lattice refinement');
       width=width??Math.round(worldWidth*this.scale);height=height??Math.round(worldHeight*this.scale);
@@ -435,6 +451,10 @@
         if(this.trackPatrol){if(this.cells[id]?.kind===IMMUNE&&!this.cells[id].dying)this.patrol.visited[i]=1;}
         else if(this.cells[old]?.kind===IMMUNE||this.cells[id]?.kind===IMMUNE)this.patrol.needsSeed=true;
       });
+      // Register before fast/WASM capture the known listeners so bulk commit,
+      // reference JS, user edits and trapped-WASM fallback all maintain it.
+      this.pixelIndex=pixelIndex?new CellPixelIndex(size):null;
+      if(this.pixelIndex)C.post_setpix_listeners.push(this.pixelIndex.update.bind(this.pixelIndex));
       this.act=C.getConstraint('ActivityConstraint');
       this.act.cellParameter=(parameter,id)=>parameter==='LAMBDA_ACT'?(this.cells[id]?.activity||0):C.conf[parameter][C.cellKind(id)];
       const p=C.getConstraint('PerimeterConstraint');p.cellParameter=(parameter,id)=>parameter==='P'?(this.cells[id]?.perimeter||0):parameter==='LAMBDA_P'?(this.cells[id]?.lambdaP||0):C.conf[parameter][C.cellKind(id)];
@@ -1208,7 +1228,8 @@
       if(manual&&!m)return;
       if(m?.dying)m.deathFinalArea=this.C.getVolume(id);
       this.section?.forget(id);
-      const occupied=points||[...this.C.pixels()].filter(([,cid])=>cid===id).map(([p])=>p);for(const p of occupied)this.C.setpix(p,0);
+      if(this.pixelIndex&&!points){for(const i of this.pixelIndex.indices(id))this.C.setpixi(i,0);}
+      else {const occupied=points||[...this.C.pixels()].filter(([,cid])=>cid===id).map(([p])=>p);for(const p of occupied)this.C.setpix(p,0);}
       // Both zero-pixel cleanup and small-remnant removal converge here.
       // Administrative removal of a healthy cell is not a biological death.
       if(manual){
@@ -1488,7 +1509,8 @@
         if(this.C.getVolume(m.id)>maximum)pending.set(m.id,{m,maximum,points:[]});
       }
       if(!pending.size)return;
-      for(const [p,id]of this.C.pixels())pending.get(id)?.points.push(this.C.grid.p2i(p));
+      if(this.pixelIndex){for(const [id,body]of pending)body.points=this.pixelIndex.indices(id);}
+      else for(const [p,id]of this.C.pixels())pending.get(id)?.points.push(this.C.grid.p2i(p));
       const grid=this.C.grid._pixels;
       for(const [id,{m,maximum,points}]of pending){
         const radius=i=>{let dx=this.xs[i]-m.x,dy=this.ys[i]-m.y;if(this.wrap){dx-=Math.round(dx/this.width)*this.width;dy-=Math.round(dy/this.height)*this.height;}return dx*dx+dy*dy;};
@@ -1503,22 +1525,38 @@
       }
     }
     components(id){
-      const remaining=new Set();for(const [p,cid] of this.C.pixels())if(cid===id)remaining.add(this.C.grid.p2i(p));
+      const remaining=new Set(this.pixelIndex?this.pixelIndex.indices(id):[]);
+      if(!this.pixelIndex)for(const [p,cid] of this.C.pixels())if(cid===id)remaining.add(this.C.grid.p2i(p));
       const parts=[];while(remaining.size){const seed=remaining.values().next().value,queue=[seed],part=[];remaining.delete(seed);while(queue.length){const i=queue.pop();part.push(i);for(const n of (this.section?this.faces[i]:this.neighbors[i]))if(remaining.delete(n))queue.push(n);}parts.push(part);}return parts;
     }
     divide(id){
       const m=this.cells[id];if(!m||m.dying||m.state==='abnormal'||(m.kind===TUMOR&&!m.isStem&&m.tumorDivisionsLeft===0)||this.C.getVolume(id)<80*this.scale*this.scale||(m.kind===NORMAL&&m.divisionsLeft<=0)||(m.kind===IMMUNE&&(m.divisionsLeft<=0||(this.settings.immuneKillLimit>0&&m.tumorKills>=this.settings.immuneKillLimit))))return 0;
       // Relabelling existing cytoplasm is not a new protrusion. Preserve its Act
       // age instead of letting GridManipulator turn the whole daughter red.
-      const activity=[];for(const [p,cid] of this.C.pixels())if(cid===id){const i=this.C.grid.p2i(p);activity.push([i,this.act.pxact(i)]);}
+      const activity=this.pixelIndex?this.pixelIndex.indices(id).map(i=>[i,this.act.pxact(i)]):[];
+      if(!this.pixelIndex)for(const [p,cid] of this.C.pixels())if(cid===id){const i=this.C.grid.p2i(p);activity.push([i,this.act.pxact(i)]);}
       const restoreActivity=()=>{for(const [i,a] of activity)this.act.setActivity(i,a);};
       const parentTarget=m.target,parentFraction=m.sectionFraction,parentArea=this.C.getVolume(id),divisionX=m.x,divisionY=m.y;
       const parentStem=m.isStem,parentBudget=m.tumorDivisionsLeft;
       const parentBase=m.base,parentResources={...m.resources},parentAmounts=this.reserveAmounts(m);
-      this.C.stat_values={};this.divisionParent=m;let child;try{child=this.wrap?this.gm.divideCellTorus(id):this.gm.divideCell(id);}finally{this.divisionParent=null;}
+      this.C.stat_values={};this.divisionParent=m;let child;
+      try{
+        if(this.pixelIndex){
+          // Feed the unchanged upstream division algorithm exactly the pixels
+          // and centroid it reads. Do not compute unrelated cells' statistics.
+          // These private, target-only caches must not escape this call.
+          const pixels={[id]:activity.map(([i])=>[this.xs[i],this.ys[i]])};
+          const Type=this.wrap?CPM.CentroidsWithTorusCorrection:CPM.Centroids,stat=new Type();stat.model=this.C;
+          this.C.stat_values.PixelsByCell=pixels;
+          this.C.stat_values[Type.name]={[id]:stat.computeCentroidOfCell(id,pixels)};
+        }
+        child=this.wrap?this.gm.divideCellTorus(id):this.gm.divideCell(id);
+      }finally{this.divisionParent=null;if(this.pixelIndex)this.C.stat_values={};}
       this.refreshPositions();const daughter=this.cells[child],nuclei=this.section&&daughter?[this.section.findNucleus(m,activity.map(x=>x[0])),this.section.findNucleus(daughter,activity.map(x=>x[0]))]:null;
       if(!this.C.getVolume(child)||this.components(id).length!==1||this.components(child).length!==1||(nuclei&&nuclei.some(p=>!p))){
-        const points=[...this.C.pixels()].filter(([,cid])=>cid===child).map(([p])=>p);for(const p of points)this.C.setpix(p,id);delete this.cells[child];this.contacts.delete(child);restoreActivity();this.C.stat_values={};this.refreshPositions();return 0;
+        if(this.pixelIndex){for(const i of this.pixelIndex.indices(child))this.C.setpixi(i,id);}
+        else {const points=[...this.C.pixels()].filter(([,cid])=>cid===child).map(([p])=>p);for(const p of points)this.C.setpix(p,id);}
+        delete this.cells[child];this.contacts.delete(child);restoreActivity();this.C.stat_values={};this.refreshPositions();return 0;
       }
       restoreActivity();
       this.section?.forget(id);

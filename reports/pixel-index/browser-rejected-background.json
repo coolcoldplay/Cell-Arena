@@ -1,0 +1,2854 @@
+{
+  "status": "complete",
+  "rows": [
+    {
+      "case": "maximum",
+      "pair": 1,
+      "mode": "baseline",
+      "seed": 29,
+      "startMCS": 64,
+      "endMCS": 1028,
+      "startCells": 859,
+      "endCells": 843,
+      "elapsedMs": 15453,
+      "mcsPerSecond": 62.38270885912121,
+      "newFrameFPS": 0.9706853038245001,
+      "frameGaps": {
+        "count": 14,
+        "p50Ms": 1031.300000000745,
+        "p95Ms": 1048.1000000014901,
+        "p99Ms": 1048.1000000014901,
+        "maxMs": 1048.1000000014901,
+        "over50ms": 14,
+        "over100ms": 14
+      },
+      "raf": {
+        "count": 30,
+        "p50Ms": 33.30000000000291,
+        "p95Ms": 1016.6999999999971,
+        "p99Ms": 1016.7000000000116,
+        "maxMs": 1016.7000000000116,
+        "over50ms": 14,
+        "over100ms": 14
+      },
+      "longTasks": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "p99Ms": null,
+        "maxMs": null,
+        "over50ms": 0,
+        "over100ms": 0
+      },
+      "visible": true,
+      "focused": true,
+      "schedulingValid": false,
+      "display": [
+        1920,
+        1440
+      ],
+      "lattice": [
+        1024,
+        768
+      ],
+      "dpr": 2,
+      "renderer": {
+        "gpu": true,
+        "device": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "error": "",
+        "ms": 0.30000000074505806,
+        "fps": 0,
+        "renderMs": 8.5,
+        "snapshotMs": 4.799999998882413
+      },
+      "presentation": {
+        "fps": 60,
+        "workMs": 8,
+        "idleMs": 0
+      },
+      "adaptive": {
+        "mode": "quality",
+        "resolutionLevel": 0,
+        "publicationLevel": 0,
+        "fps": 60,
+        "uiMs": 125,
+        "workMs": 8,
+        "idleMs": 0,
+        "scale": 1,
+        "bottleneck": "simulation",
+        "changes": 0,
+        "metrics": {},
+        "playing": true,
+        "hidden": false,
+        "recording": false,
+        "mobile": false,
+        "preview": false,
+        "manual": true,
+        "visiblePanels": []
+      },
+      "startCounters": {
+        "manualRemoved": 0,
+        "divisions": 0,
+        "immuneDivisions": 0,
+        "kills": 0,
+        "apoptosis": 0,
+        "environment": 0,
+        "apoptosisStarted": 0,
+        "killStarted": 0,
+        "environmentStarted": 0,
+        "recognitions": 1,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 0,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 0,
+        "vascularArrivals": 0,
+        "extravasations": 0,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "endCounters": {
+        "manualRemoved": 0,
+        "divisions": 2,
+        "immuneDivisions": 2,
+        "kills": 15,
+        "apoptosis": 0,
+        "environment": 3,
+        "apoptosisStarted": 0,
+        "killStarted": 16,
+        "environmentStarted": 4,
+        "recognitions": 25,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 4,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 0,
+        "vascularArrivals": 0,
+        "extravasations": 0,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "frames": [
+        {
+          "at": 1070.0999999996275,
+          "time": 66
+        },
+        {
+          "at": 2086.7999999988824,
+          "time": 137
+        },
+        {
+          "at": 3134.9000000003725,
+          "time": 205
+        },
+        {
+          "at": 4153.4000000003725,
+          "time": 278
+        },
+        {
+          "at": 5186.5,
+          "time": 347
+        },
+        {
+          "at": 6203.299999998882,
+          "time": 417
+        },
+        {
+          "at": 7220.299999998882,
+          "time": 485
+        },
+        {
+          "at": 8253.299999998882,
+          "time": 558
+        },
+        {
+          "at": 9286.599999999627,
+          "time": 628
+        },
+        {
+          "at": 10319.699999999255,
+          "time": 686
+        },
+        {
+          "at": 11353.099999999627,
+          "time": 756
+        },
+        {
+          "at": 12384.400000000373,
+          "time": 823
+        },
+        {
+          "at": 13418,
+          "time": 894
+        },
+        {
+          "at": 14436.400000000373,
+          "time": 961
+        },
+        {
+          "at": 15453,
+          "time": 1028
+        }
+      ],
+      "initialMedianOnlyGate": true
+    },
+    {
+      "case": "maximum",
+      "pair": 1,
+      "mode": "prototype",
+      "seed": 29,
+      "startMCS": 64,
+      "endMCS": 1056,
+      "startCells": 859,
+      "endCells": 844,
+      "elapsedMs": 15519.400000000373,
+      "mcsPerSecond": 63.91999690709539,
+      "newFrameFPS": 0.9665322112968053,
+      "frameGaps": {
+        "count": 14,
+        "p50Ms": 1033.300000000745,
+        "p95Ms": 1050.2000000011176,
+        "p99Ms": 1050.2000000011176,
+        "maxMs": 1050.2000000011176,
+        "over50ms": 14,
+        "over100ms": 14
+      },
+      "raf": {
+        "count": 30,
+        "p50Ms": 33.30000000000291,
+        "p95Ms": 1016.8000000000029,
+        "p99Ms": 1018.6999999999971,
+        "maxMs": 1018.6999999999971,
+        "over50ms": 14,
+        "over100ms": 14
+      },
+      "longTasks": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "p99Ms": null,
+        "maxMs": null,
+        "over50ms": 0,
+        "over100ms": 0
+      },
+      "visible": true,
+      "focused": true,
+      "schedulingValid": false,
+      "display": [
+        1920,
+        1440
+      ],
+      "lattice": [
+        1024,
+        768
+      ],
+      "dpr": 2,
+      "renderer": {
+        "gpu": true,
+        "device": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "error": "",
+        "ms": 0.2999999988824129,
+        "fps": 0,
+        "renderMs": 7.599999999627471,
+        "snapshotMs": 4.900000000372529
+      },
+      "presentation": {
+        "fps": 60,
+        "workMs": 8,
+        "idleMs": 0
+      },
+      "adaptive": {
+        "mode": "quality",
+        "resolutionLevel": 0,
+        "publicationLevel": 0,
+        "fps": 60,
+        "uiMs": 125,
+        "workMs": 8,
+        "idleMs": 0,
+        "scale": 1,
+        "bottleneck": "simulation",
+        "changes": 0,
+        "metrics": {},
+        "playing": true,
+        "hidden": false,
+        "recording": false,
+        "mobile": false,
+        "preview": false,
+        "manual": true,
+        "visiblePanels": []
+      },
+      "startCounters": {
+        "manualRemoved": 0,
+        "divisions": 0,
+        "immuneDivisions": 0,
+        "kills": 0,
+        "apoptosis": 0,
+        "environment": 0,
+        "apoptosisStarted": 0,
+        "killStarted": 0,
+        "environmentStarted": 0,
+        "recognitions": 1,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 0,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 0,
+        "vascularArrivals": 0,
+        "extravasations": 0,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "endCounters": {
+        "manualRemoved": 0,
+        "divisions": 3,
+        "immuneDivisions": 3,
+        "kills": 15,
+        "apoptosis": 0,
+        "environment": 3,
+        "apoptosisStarted": 0,
+        "killStarted": 16,
+        "environmentStarted": 4,
+        "recognitions": 25,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 4,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 0,
+        "vascularArrivals": 0,
+        "extravasations": 0,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "frames": [
+        {
+          "at": 1052.9000000003725,
+          "time": 67
+        },
+        {
+          "at": 2102.9000000003725,
+          "time": 139
+        },
+        {
+          "at": 3136.2000000011176,
+          "time": 210
+        },
+        {
+          "at": 4186.4000000003725,
+          "time": 279
+        },
+        {
+          "at": 5219.5,
+          "time": 351
+        },
+        {
+          "at": 6236.200000001118,
+          "time": 422
+        },
+        {
+          "at": 7269.4000000003725,
+          "time": 492
+        },
+        {
+          "at": 8319.60000000149,
+          "time": 563
+        },
+        {
+          "at": 9336.10000000149,
+          "time": 634
+        },
+        {
+          "at": 10352.800000000745,
+          "time": 703
+        },
+        {
+          "at": 11386.10000000149,
+          "time": 773
+        },
+        {
+          "at": 12419.5,
+          "time": 844
+        },
+        {
+          "at": 13452.800000000745,
+          "time": 916
+        },
+        {
+          "at": 14486,
+          "time": 985
+        },
+        {
+          "at": 15519.400000000373,
+          "time": 1056
+        }
+      ],
+      "initialMedianOnlyGate": true
+    },
+    {
+      "case": "maximum",
+      "pair": 2,
+      "mode": "prototype",
+      "seed": 29,
+      "startMCS": 64,
+      "endMCS": 1055,
+      "startCells": 859,
+      "endCells": 844,
+      "elapsedMs": 15769.300000000745,
+      "mcsPerSecond": 62.8436265401732,
+      "newFrameFPS": 1.3317014705788468,
+      "frameGaps": {
+        "count": 20,
+        "p50Ms": 1033.2999999988824,
+        "p95Ms": 1050.0999999996275,
+        "p99Ms": 1050.199999999255,
+        "maxMs": 1050.199999999255,
+        "over50ms": 14,
+        "over100ms": 14
+      },
+      "raf": {
+        "count": 36,
+        "p50Ms": 33.39999999999418,
+        "p95Ms": 1016.6999999999971,
+        "p99Ms": 1016.6999999999971,
+        "maxMs": 1016.6999999999971,
+        "over50ms": 14,
+        "over100ms": 14
+      },
+      "longTasks": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "p99Ms": null,
+        "maxMs": null,
+        "over50ms": 0,
+        "over100ms": 0
+      },
+      "visible": true,
+      "focused": true,
+      "schedulingValid": false,
+      "display": [
+        1920,
+        1440
+      ],
+      "lattice": [
+        1024,
+        768
+      ],
+      "dpr": 2,
+      "renderer": {
+        "gpu": true,
+        "device": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "error": "",
+        "ms": 0.2000000011175871,
+        "fps": 0,
+        "renderMs": 7.900000000372529,
+        "snapshotMs": 4.900000000372529
+      },
+      "presentation": {
+        "fps": 60,
+        "workMs": 8,
+        "idleMs": 0
+      },
+      "adaptive": {
+        "mode": "quality",
+        "resolutionLevel": 0,
+        "publicationLevel": 0,
+        "fps": 60,
+        "uiMs": 125,
+        "workMs": 8,
+        "idleMs": 0,
+        "scale": 1,
+        "bottleneck": "simulation",
+        "changes": 0,
+        "metrics": {
+          "renderMs": 8,
+          "snapshotMs": 5.599999999627471,
+          "stepMs": 15.92462421175098,
+          "gapMs": 34.69999999925494,
+          "inputMs": 0,
+          "rate": 69.93006993014428,
+          "targetRate": 240
+        },
+        "playing": true,
+        "hidden": false,
+        "recording": false,
+        "mobile": false,
+        "preview": false,
+        "manual": true,
+        "visiblePanels": []
+      },
+      "startCounters": {
+        "manualRemoved": 0,
+        "divisions": 0,
+        "immuneDivisions": 0,
+        "kills": 0,
+        "apoptosis": 0,
+        "environment": 0,
+        "apoptosisStarted": 0,
+        "killStarted": 0,
+        "environmentStarted": 0,
+        "recognitions": 1,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 0,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 0,
+        "vascularArrivals": 0,
+        "extravasations": 0,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "endCounters": {
+        "manualRemoved": 0,
+        "divisions": 3,
+        "immuneDivisions": 3,
+        "kills": 15,
+        "apoptosis": 0,
+        "environment": 3,
+        "apoptosisStarted": 0,
+        "killStarted": 16,
+        "environmentStarted": 4,
+        "recognitions": 25,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 4,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 0,
+        "vascularArrivals": 0,
+        "extravasations": 0,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "frames": [
+        {
+          "at": 1035.7000000011176,
+          "time": 66
+        },
+        {
+          "at": 2069.4000000003725,
+          "time": 133
+        },
+        {
+          "at": 3102.800000000745,
+          "time": 202
+        },
+        {
+          "at": 4136,
+          "time": 271
+        },
+        {
+          "at": 5186.0999999996275,
+          "time": 340
+        },
+        {
+          "at": 6235.9000000003725,
+          "time": 411
+        },
+        {
+          "at": 7286.0999999996275,
+          "time": 482
+        },
+        {
+          "at": 8319.400000000373,
+          "time": 554
+        },
+        {
+          "at": 9369.400000000373,
+          "time": 626
+        },
+        {
+          "at": 10419.400000000373,
+          "time": 695
+        },
+        {
+          "at": 11435.800000000745,
+          "time": 766
+        },
+        {
+          "at": 11469.900000000373,
+          "time": 834
+        },
+        {
+          "at": 11501.900000000373,
+          "time": 835
+        },
+        {
+          "at": 11535.400000000373,
+          "time": 836
+        },
+        {
+          "at": 11569.099999999627,
+          "time": 837
+        },
+        {
+          "at": 11600.5,
+          "time": 839
+        },
+        {
+          "at": 11618.900000000373,
+          "time": 840
+        },
+        {
+          "at": 12652.700000001118,
+          "time": 843
+        },
+        {
+          "at": 13686,
+          "time": 916
+        },
+        {
+          "at": 14736.099999999627,
+          "time": 984
+        },
+        {
+          "at": 15769.300000000745,
+          "time": 1055
+        }
+      ],
+      "initialMedianOnlyGate": true
+    },
+    {
+      "case": "maximum",
+      "pair": 2,
+      "mode": "baseline",
+      "seed": 29,
+      "startMCS": 64,
+      "endMCS": 1026,
+      "startCells": 859,
+      "endCells": 843,
+      "elapsedMs": 15536.200000001118,
+      "mcsPerSecond": 61.91990319382673,
+      "newFrameFPS": 1.0942186635083726,
+      "frameGaps": {
+        "count": 16,
+        "p50Ms": 1033.2999999988824,
+        "p95Ms": 1034,
+        "p99Ms": 1034,
+        "maxMs": 1034,
+        "over50ms": 14,
+        "over100ms": 14
+      },
+      "raf": {
+        "count": 32,
+        "p50Ms": 16.70000000001164,
+        "p95Ms": 1016.6999999999971,
+        "p99Ms": 1016.7999999999884,
+        "maxMs": 1016.7999999999884,
+        "over50ms": 14,
+        "over100ms": 14
+      },
+      "longTasks": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "p99Ms": null,
+        "maxMs": null,
+        "over50ms": 0,
+        "over100ms": 0
+      },
+      "visible": true,
+      "focused": true,
+      "schedulingValid": false,
+      "display": [
+        1920,
+        1440
+      ],
+      "lattice": [
+        1024,
+        768
+      ],
+      "dpr": 2,
+      "renderer": {
+        "gpu": true,
+        "device": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "error": "",
+        "ms": 0.2000000011175871,
+        "fps": 0,
+        "renderMs": 6.400000000372529,
+        "snapshotMs": 4.599999999627471
+      },
+      "presentation": {
+        "fps": 60,
+        "workMs": 8,
+        "idleMs": 0
+      },
+      "adaptive": {
+        "mode": "quality",
+        "resolutionLevel": 0,
+        "publicationLevel": 0,
+        "fps": 60,
+        "uiMs": 125,
+        "workMs": 8,
+        "idleMs": 0,
+        "scale": 1,
+        "bottleneck": "simulation",
+        "changes": 0,
+        "metrics": {
+          "renderMs": 6.199999999254942,
+          "snapshotMs": 5.199999999254942,
+          "stepMs": 14.935524095403302,
+          "gapMs": 35.40000000037253,
+          "inputMs": 0,
+          "rate": 70.95217823194673,
+          "targetRate": 240
+        },
+        "playing": true,
+        "hidden": false,
+        "recording": false,
+        "mobile": false,
+        "preview": false,
+        "manual": true,
+        "visiblePanels": []
+      },
+      "startCounters": {
+        "manualRemoved": 0,
+        "divisions": 0,
+        "immuneDivisions": 0,
+        "kills": 0,
+        "apoptosis": 0,
+        "environment": 0,
+        "apoptosisStarted": 0,
+        "killStarted": 0,
+        "environmentStarted": 0,
+        "recognitions": 1,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 0,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 0,
+        "vascularArrivals": 0,
+        "extravasations": 0,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "endCounters": {
+        "manualRemoved": 0,
+        "divisions": 2,
+        "immuneDivisions": 2,
+        "kills": 15,
+        "apoptosis": 0,
+        "environment": 3,
+        "apoptosisStarted": 0,
+        "killStarted": 16,
+        "environmentStarted": 4,
+        "recognitions": 25,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 4,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 0,
+        "vascularArrivals": 0,
+        "extravasations": 0,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "frames": [
+        {
+          "at": 1052.7000000011176,
+          "time": 66
+        },
+        {
+          "at": 2086.300000000745,
+          "time": 137
+        },
+        {
+          "at": 3119.300000000745,
+          "time": 206
+        },
+        {
+          "at": 4136.200000001118,
+          "time": 275
+        },
+        {
+          "at": 5169.4000000003725,
+          "time": 345
+        },
+        {
+          "at": 6186,
+          "time": 414
+        },
+        {
+          "at": 7219.4000000003725,
+          "time": 483
+        },
+        {
+          "at": 7254.0999999996275,
+          "time": 553
+        },
+        {
+          "at": 7285.5,
+          "time": 554
+        },
+        {
+          "at": 8319.5,
+          "time": 556
+        },
+        {
+          "at": 9352.800000000745,
+          "time": 626
+        },
+        {
+          "at": 10386.099999999627,
+          "time": 690
+        },
+        {
+          "at": 11419.599999999627,
+          "time": 758
+        },
+        {
+          "at": 12436.099999999627,
+          "time": 822
+        },
+        {
+          "at": 13469.5,
+          "time": 890
+        },
+        {
+          "at": 14502.800000000745,
+          "time": 957
+        },
+        {
+          "at": 15536.200000001118,
+          "time": 1026
+        }
+      ],
+      "initialMedianOnlyGate": true
+    },
+    {
+      "case": "maximum",
+      "pair": 3,
+      "mode": "baseline",
+      "seed": 29,
+      "startMCS": 64,
+      "endMCS": 1078,
+      "startCells": 859,
+      "endCells": 843,
+      "elapsedMs": 16767.699999999255,
+      "mcsPerSecond": 60.473410187446405,
+      "newFrameFPS": 1.4313233180460687,
+      "frameGaps": {
+        "count": 23,
+        "p50Ms": 1017.1999999992549,
+        "p95Ms": 1050.199999999255,
+        "p99Ms": 1050.2000000011176,
+        "maxMs": 1050.2000000011176,
+        "over50ms": 15,
+        "over100ms": 15
+      },
+      "raf": {
+        "count": 39,
+        "p50Ms": 33.30000000001746,
+        "p95Ms": 1016.7000000000116,
+        "p99Ms": 1016.7000000000116,
+        "maxMs": 1016.7000000000116,
+        "over50ms": 15,
+        "over100ms": 15
+      },
+      "longTasks": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "p99Ms": null,
+        "maxMs": null,
+        "over50ms": 0,
+        "over100ms": 0
+      },
+      "visible": true,
+      "focused": true,
+      "schedulingValid": false,
+      "display": [
+        1920,
+        1440
+      ],
+      "lattice": [
+        1024,
+        768
+      ],
+      "dpr": 2,
+      "renderer": {
+        "gpu": true,
+        "device": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "error": "",
+        "ms": 0.19999999925494194,
+        "fps": 0,
+        "renderMs": 6.400000000372529,
+        "snapshotMs": 5.299999998882413
+      },
+      "presentation": {
+        "fps": 60,
+        "workMs": 8,
+        "idleMs": 0
+      },
+      "adaptive": {
+        "mode": "quality",
+        "resolutionLevel": 0,
+        "publicationLevel": 0,
+        "fps": 60,
+        "uiMs": 125,
+        "workMs": 8,
+        "idleMs": 0,
+        "scale": 1,
+        "bottleneck": "simulation",
+        "changes": 0,
+        "metrics": {
+          "renderMs": 6.200000001117587,
+          "snapshotMs": 5.300000000745058,
+          "stepMs": 15.484125826988272,
+          "gapMs": 34.70000000111759,
+          "inputMs": 0,
+          "rate": 64.99011020055323,
+          "targetRate": 240
+        },
+        "playing": true,
+        "hidden": false,
+        "recording": false,
+        "mobile": false,
+        "preview": false,
+        "manual": true,
+        "visiblePanels": []
+      },
+      "startCounters": {
+        "manualRemoved": 0,
+        "divisions": 0,
+        "immuneDivisions": 0,
+        "kills": 0,
+        "apoptosis": 0,
+        "environment": 0,
+        "apoptosisStarted": 0,
+        "killStarted": 0,
+        "environmentStarted": 0,
+        "recognitions": 1,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 0,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 0,
+        "vascularArrivals": 0,
+        "extravasations": 0,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "endCounters": {
+        "manualRemoved": 0,
+        "divisions": 3,
+        "immuneDivisions": 3,
+        "kills": 15,
+        "apoptosis": 0,
+        "environment": 4,
+        "apoptosisStarted": 0,
+        "killStarted": 16,
+        "environmentStarted": 4,
+        "recognitions": 26,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 4,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 0,
+        "vascularArrivals": 0,
+        "extravasations": 0,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "frames": [
+        {
+          "at": 1017.5,
+          "time": 65
+        },
+        {
+          "at": 2051,
+          "time": 132
+        },
+        {
+          "at": 3068.199999999255,
+          "time": 201
+        },
+        {
+          "at": 4101,
+          "time": 263
+        },
+        {
+          "at": 5134.199999999255,
+          "time": 333
+        },
+        {
+          "at": 5167.39999999851,
+          "time": 401
+        },
+        {
+          "at": 6200.799999998882,
+          "time": 404
+        },
+        {
+          "at": 7251,
+          "time": 474
+        },
+        {
+          "at": 8267.5,
+          "time": 544
+        },
+        {
+          "at": 8301.799999998882,
+          "time": 607
+        },
+        {
+          "at": 8333.5,
+          "time": 608
+        },
+        {
+          "at": 8367.299999998882,
+          "time": 609
+        },
+        {
+          "at": 8400.799999998882,
+          "time": 611
+        },
+        {
+          "at": 9434.39999999851,
+          "time": 614
+        },
+        {
+          "at": 10467.5,
+          "time": 676
+        },
+        {
+          "at": 10501.5,
+          "time": 743
+        },
+        {
+          "at": 10533.5,
+          "time": 744
+        },
+        {
+          "at": 10567,
+          "time": 745
+        },
+        {
+          "at": 11600.89999999851,
+          "time": 747
+        },
+        {
+          "at": 12617.5,
+          "time": 811
+        },
+        {
+          "at": 13667.699999999255,
+          "time": 878
+        },
+        {
+          "at": 14701.099999999627,
+          "time": 945
+        },
+        {
+          "at": 15750.89999999851,
+          "time": 1013
+        },
+        {
+          "at": 16767.699999999255,
+          "time": 1078
+        }
+      ],
+      "initialMedianOnlyGate": true
+    },
+    {
+      "case": "maximum",
+      "pair": 3,
+      "mode": "prototype",
+      "seed": 29,
+      "startMCS": 64,
+      "endMCS": 1025,
+      "startCells": 859,
+      "endCells": 843,
+      "elapsedMs": 15518.5,
+      "mcsPerSecond": 61.92608821728904,
+      "newFrameFPS": 1.0310274833263524,
+      "frameGaps": {
+        "count": 15,
+        "p50Ms": 1033.2000000011176,
+        "p95Ms": 1050.9000000003725,
+        "p99Ms": 1050.9000000003725,
+        "maxMs": 1050.9000000003725,
+        "over50ms": 14,
+        "over100ms": 14
+      },
+      "raf": {
+        "count": 30,
+        "p50Ms": 33.39999999999418,
+        "p95Ms": 1016.7000000000116,
+        "p99Ms": 1016.7000000000116,
+        "maxMs": 1016.7000000000116,
+        "over50ms": 14,
+        "over100ms": 14
+      },
+      "longTasks": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "p99Ms": null,
+        "maxMs": null,
+        "over50ms": 0,
+        "over100ms": 0
+      },
+      "visible": true,
+      "focused": false,
+      "schedulingValid": false,
+      "display": [
+        1920,
+        1440
+      ],
+      "lattice": [
+        1024,
+        768
+      ],
+      "dpr": 2,
+      "renderer": {
+        "gpu": true,
+        "device": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "error": "",
+        "ms": 0.30000000074505806,
+        "fps": 0,
+        "renderMs": 6.099999999627471,
+        "snapshotMs": 4.700000001117587
+      },
+      "presentation": {
+        "fps": 60,
+        "workMs": 8,
+        "idleMs": 0
+      },
+      "adaptive": {
+        "mode": "quality",
+        "resolutionLevel": 0,
+        "publicationLevel": 0,
+        "fps": 60,
+        "uiMs": 125,
+        "workMs": 8,
+        "idleMs": 0,
+        "scale": 1,
+        "bottleneck": "simulation",
+        "changes": 0,
+        "metrics": {
+          "renderMs": 6.200000001117587,
+          "snapshotMs": 5.300000000745058,
+          "stepMs": 15.484125826988272,
+          "gapMs": 34.70000000111759,
+          "inputMs": 0,
+          "rate": 64.99011020055323,
+          "targetRate": 240
+        },
+        "playing": true,
+        "hidden": false,
+        "recording": false,
+        "mobile": false,
+        "preview": false,
+        "manual": true,
+        "visiblePanels": []
+      },
+      "startCounters": {
+        "manualRemoved": 0,
+        "divisions": 0,
+        "immuneDivisions": 0,
+        "kills": 0,
+        "apoptosis": 0,
+        "environment": 0,
+        "apoptosisStarted": 0,
+        "killStarted": 0,
+        "environmentStarted": 0,
+        "recognitions": 1,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 0,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 0,
+        "vascularArrivals": 0,
+        "extravasations": 0,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "endCounters": {
+        "manualRemoved": 0,
+        "divisions": 2,
+        "immuneDivisions": 2,
+        "kills": 15,
+        "apoptosis": 0,
+        "environment": 3,
+        "apoptosisStarted": 0,
+        "killStarted": 16,
+        "environmentStarted": 4,
+        "recognitions": 25,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 4,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 0,
+        "vascularArrivals": 0,
+        "extravasations": 0,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "frames": [
+        {
+          "at": 1035,
+          "time": 65
+        },
+        {
+          "at": 2068.199999999255,
+          "time": 131
+        },
+        {
+          "at": 2101.5,
+          "time": 198
+        },
+        {
+          "at": 3134.89999999851,
+          "time": 200
+        },
+        {
+          "at": 4168.0999999996275,
+          "time": 269
+        },
+        {
+          "at": 5217.39999999851,
+          "time": 340
+        },
+        {
+          "at": 6268.299999998882,
+          "time": 406
+        },
+        {
+          "at": 7284.799999998882,
+          "time": 478
+        },
+        {
+          "at": 8318.099999999627,
+          "time": 547
+        },
+        {
+          "at": 9334.89999999851,
+          "time": 616
+        },
+        {
+          "at": 10351.599999999627,
+          "time": 684
+        },
+        {
+          "at": 11401.5,
+          "time": 752
+        },
+        {
+          "at": 12434.699999999255,
+          "time": 822
+        },
+        {
+          "at": 13451.39999999851,
+          "time": 894
+        },
+        {
+          "at": 14485,
+          "time": 957
+        },
+        {
+          "at": 15518.5,
+          "time": 1025
+        }
+      ],
+      "initialMedianOnlyGate": false
+    },
+    {
+      "case": "fine",
+      "pair": 1,
+      "mode": "baseline",
+      "seed": 29,
+      "startMCS": 64,
+      "endMCS": 1104,
+      "startCells": 206,
+      "endCells": 197,
+      "elapsedMs": 9318.299999998882,
+      "mcsPerSecond": 111.60834057715728,
+      "newFrameFPS": 0.9658414088407842,
+      "frameGaps": {
+        "count": 8,
+        "p50Ms": 1033.2000000011176,
+        "p95Ms": 1050.199999999255,
+        "p99Ms": 1050.199999999255,
+        "maxMs": 1050.199999999255,
+        "over50ms": 8,
+        "over100ms": 8
+      },
+      "raf": {
+        "count": 18,
+        "p50Ms": 33.39999999999418,
+        "p95Ms": 1016.7000000000116,
+        "p99Ms": 1016.7000000000116,
+        "maxMs": 1016.7000000000116,
+        "over50ms": 8,
+        "over100ms": 8
+      },
+      "longTasks": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "p99Ms": null,
+        "maxMs": null,
+        "over50ms": 0,
+        "over100ms": 0
+      },
+      "visible": true,
+      "focused": false,
+      "schedulingValid": false,
+      "display": [
+        1920,
+        1440
+      ],
+      "lattice": [
+        960,
+        720
+      ],
+      "dpr": 2,
+      "renderer": {
+        "gpu": true,
+        "device": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "error": "",
+        "ms": 0.09999999962747097,
+        "fps": 0,
+        "renderMs": 3.900000000372529,
+        "snapshotMs": 3.200000001117587
+      },
+      "presentation": {
+        "fps": 60,
+        "workMs": 8,
+        "idleMs": 0
+      },
+      "adaptive": {
+        "mode": "quality",
+        "resolutionLevel": 0,
+        "publicationLevel": 0,
+        "fps": 60,
+        "uiMs": 125,
+        "workMs": 8,
+        "idleMs": 0,
+        "scale": 1,
+        "bottleneck": "simulation",
+        "changes": 0,
+        "metrics": {
+          "renderMs": 6.200000001117587,
+          "snapshotMs": 5.300000000745058,
+          "stepMs": 15.484125826988272,
+          "gapMs": 34.70000000111759,
+          "inputMs": 0,
+          "rate": 64.99011020055323,
+          "targetRate": 240
+        },
+        "playing": true,
+        "hidden": false,
+        "recording": false,
+        "mobile": false,
+        "preview": false,
+        "manual": true,
+        "visiblePanels": []
+      },
+      "startCounters": {
+        "manualRemoved": 0,
+        "divisions": 0,
+        "immuneDivisions": 0,
+        "kills": 0,
+        "apoptosis": 0,
+        "environment": 0,
+        "apoptosisStarted": 0,
+        "killStarted": 0,
+        "environmentStarted": 0,
+        "recognitions": 2,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 0,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 0,
+        "vascularArrivals": 1,
+        "extravasations": 0,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "endCounters": {
+        "manualRemoved": 0,
+        "divisions": 9,
+        "immuneDivisions": 4,
+        "kills": 20,
+        "apoptosis": 0,
+        "environment": 2,
+        "apoptosisStarted": 0,
+        "killStarted": 20,
+        "environmentStarted": 2,
+        "recognitions": 28,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 2,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 3,
+        "vascularArrivals": 5,
+        "extravasations": 1,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "frames": [
+        {
+          "at": 1068.5999999996275,
+          "time": 66
+        },
+        {
+          "at": 2084.9000000003725,
+          "time": 204
+        },
+        {
+          "at": 3118.5,
+          "time": 342
+        },
+        {
+          "at": 4151.799999998882,
+          "time": 494
+        },
+        {
+          "at": 5185,
+          "time": 612
+        },
+        {
+          "at": 6235.199999999255,
+          "time": 707
+        },
+        {
+          "at": 7268.299999998882,
+          "time": 832
+        },
+        {
+          "at": 8285,
+          "time": 958
+        },
+        {
+          "at": 9318.299999998882,
+          "time": 1104
+        }
+      ],
+      "initialMedianOnlyGate": false
+    },
+    {
+      "case": "fine",
+      "pair": 1,
+      "mode": "prototype",
+      "seed": 29,
+      "startMCS": 64,
+      "endMCS": 1086,
+      "startCells": 206,
+      "endCells": 197,
+      "elapsedMs": 8317.799999998882,
+      "mcsPerSecond": 122.86902786796236,
+      "newFrameFPS": 0.9617927817453022,
+      "frameGaps": {
+        "count": 7,
+        "p50Ms": 1033.300000000745,
+        "p95Ms": 1050,
+        "p99Ms": 1050,
+        "maxMs": 1050,
+        "over50ms": 7,
+        "over100ms": 7
+      },
+      "raf": {
+        "count": 16,
+        "p50Ms": 33.30000000001746,
+        "p95Ms": 1016.7000000000116,
+        "p99Ms": 1016.7000000000116,
+        "maxMs": 1016.7000000000116,
+        "over50ms": 7,
+        "over100ms": 7
+      },
+      "longTasks": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "p99Ms": null,
+        "maxMs": null,
+        "over50ms": 0,
+        "over100ms": 0
+      },
+      "visible": true,
+      "focused": false,
+      "schedulingValid": false,
+      "display": [
+        1920,
+        1440
+      ],
+      "lattice": [
+        960,
+        720
+      ],
+      "dpr": 2,
+      "renderer": {
+        "gpu": true,
+        "device": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "error": "",
+        "ms": 0.2000000011175871,
+        "fps": 0,
+        "renderMs": 3.800000000745058,
+        "snapshotMs": 2.300000000745058
+      },
+      "presentation": {
+        "fps": 60,
+        "workMs": 8,
+        "idleMs": 0
+      },
+      "adaptive": {
+        "mode": "quality",
+        "resolutionLevel": 0,
+        "publicationLevel": 0,
+        "fps": 60,
+        "uiMs": 125,
+        "workMs": 8,
+        "idleMs": 0,
+        "scale": 1,
+        "bottleneck": "simulation",
+        "changes": 0,
+        "metrics": {
+          "renderMs": 6.200000001117587,
+          "snapshotMs": 5.300000000745058,
+          "stepMs": 15.484125826988272,
+          "gapMs": 34.70000000111759,
+          "inputMs": 0,
+          "rate": 64.99011020055323,
+          "targetRate": 240
+        },
+        "playing": true,
+        "hidden": false,
+        "recording": false,
+        "mobile": false,
+        "preview": false,
+        "manual": true,
+        "visiblePanels": []
+      },
+      "startCounters": {
+        "manualRemoved": 0,
+        "divisions": 0,
+        "immuneDivisions": 0,
+        "kills": 0,
+        "apoptosis": 0,
+        "environment": 0,
+        "apoptosisStarted": 0,
+        "killStarted": 0,
+        "environmentStarted": 0,
+        "recognitions": 2,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 0,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 0,
+        "vascularArrivals": 1,
+        "extravasations": 0,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "endCounters": {
+        "manualRemoved": 0,
+        "divisions": 9,
+        "immuneDivisions": 4,
+        "kills": 20,
+        "apoptosis": 0,
+        "environment": 2,
+        "apoptosisStarted": 0,
+        "killStarted": 20,
+        "environmentStarted": 2,
+        "recognitions": 28,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 2,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 3,
+        "vascularArrivals": 5,
+        "extravasations": 1,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "frames": [
+        {
+          "at": 1067.7999999988824,
+          "time": 67
+        },
+        {
+          "at": 2117.7999999988824,
+          "time": 208
+        },
+        {
+          "at": 3151.0999999996275,
+          "time": 354
+        },
+        {
+          "at": 4184.4000000003725,
+          "time": 505
+        },
+        {
+          "at": 5217.799999998882,
+          "time": 648
+        },
+        {
+          "at": 6251.0999999996275,
+          "time": 790
+        },
+        {
+          "at": 7284.5,
+          "time": 938
+        },
+        {
+          "at": 8317.799999998882,
+          "time": 1086
+        }
+      ],
+      "initialMedianOnlyGate": false
+    },
+    {
+      "case": "fine",
+      "pair": 2,
+      "mode": "prototype",
+      "seed": 29,
+      "startMCS": 64,
+      "endMCS": 1084,
+      "startCells": 206,
+      "endCells": 197,
+      "elapsedMs": 8269.300000000745,
+      "mcsPerSecond": 123.34780452999748,
+      "newFrameFPS": 0.967433761019588,
+      "frameGaps": {
+        "count": 7,
+        "p50Ms": 1033.300000000745,
+        "p95Ms": 1033.4000000003725,
+        "p99Ms": 1033.4000000003725,
+        "maxMs": 1033.4000000003725,
+        "over50ms": 7,
+        "over100ms": 7
+      },
+      "raf": {
+        "count": 16,
+        "p50Ms": 16.70000000001164,
+        "p95Ms": 1016.7000000000116,
+        "p99Ms": 1016.7000000000116,
+        "maxMs": 1016.7000000000116,
+        "over50ms": 7,
+        "over100ms": 7
+      },
+      "longTasks": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "p99Ms": null,
+        "maxMs": null,
+        "over50ms": 0,
+        "over100ms": 0
+      },
+      "visible": true,
+      "focused": false,
+      "schedulingValid": false,
+      "display": [
+        1920,
+        1440
+      ],
+      "lattice": [
+        960,
+        720
+      ],
+      "dpr": 2,
+      "renderer": {
+        "gpu": true,
+        "device": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "error": "",
+        "ms": 0.2000000011175871,
+        "fps": 0,
+        "renderMs": 3.600000001490116,
+        "snapshotMs": 2.300000000745058
+      },
+      "presentation": {
+        "fps": 60,
+        "workMs": 8,
+        "idleMs": 0
+      },
+      "adaptive": {
+        "mode": "quality",
+        "resolutionLevel": 0,
+        "publicationLevel": 0,
+        "fps": 60,
+        "uiMs": 125,
+        "workMs": 8,
+        "idleMs": 0,
+        "scale": 1,
+        "bottleneck": "simulation",
+        "changes": 0,
+        "metrics": {
+          "renderMs": 6.200000001117587,
+          "snapshotMs": 5.300000000745058,
+          "stepMs": 15.484125826988272,
+          "gapMs": 34.70000000111759,
+          "inputMs": 0,
+          "rate": 64.99011020055323,
+          "targetRate": 240
+        },
+        "playing": true,
+        "hidden": false,
+        "recording": false,
+        "mobile": false,
+        "preview": false,
+        "manual": true,
+        "visiblePanels": []
+      },
+      "startCounters": {
+        "manualRemoved": 0,
+        "divisions": 0,
+        "immuneDivisions": 0,
+        "kills": 0,
+        "apoptosis": 0,
+        "environment": 0,
+        "apoptosisStarted": 0,
+        "killStarted": 0,
+        "environmentStarted": 0,
+        "recognitions": 2,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 0,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 0,
+        "vascularArrivals": 1,
+        "extravasations": 0,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "endCounters": {
+        "manualRemoved": 0,
+        "divisions": 9,
+        "immuneDivisions": 4,
+        "kills": 20,
+        "apoptosis": 0,
+        "environment": 2,
+        "apoptosisStarted": 0,
+        "killStarted": 20,
+        "environmentStarted": 2,
+        "recognitions": 28,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 2,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 3,
+        "vascularArrivals": 5,
+        "extravasations": 1,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "frames": [
+        {
+          "at": 1052.5999999996275,
+          "time": 67
+        },
+        {
+          "at": 2085.9000000003725,
+          "time": 210
+        },
+        {
+          "at": 3119.0999999996275,
+          "time": 356
+        },
+        {
+          "at": 4152.5,
+          "time": 504
+        },
+        {
+          "at": 5185.800000000745,
+          "time": 654
+        },
+        {
+          "at": 6219.199999999255,
+          "time": 802
+        },
+        {
+          "at": 7236.0999999996275,
+          "time": 948
+        },
+        {
+          "at": 8269.300000000745,
+          "time": 1084
+        }
+      ],
+      "initialMedianOnlyGate": false
+    },
+    {
+      "case": "fine",
+      "pair": 2,
+      "mode": "baseline",
+      "seed": 29,
+      "startMCS": 64,
+      "endMCS": 1116,
+      "startCells": 206,
+      "endCells": 197,
+      "elapsedMs": 9452,
+      "mcsPerSecond": 111.29919593736776,
+      "newFrameFPS": 1.3753702920016928,
+      "frameGaps": {
+        "count": 12,
+        "p50Ms": 1016.9000000003725,
+        "p95Ms": 1050.2000000011176,
+        "p99Ms": 1050.2000000011176,
+        "maxMs": 1050.2000000011176,
+        "over50ms": 9,
+        "over100ms": 9
+      },
+      "raf": {
+        "count": 22,
+        "p50Ms": 33.29999999998836,
+        "p95Ms": 1016.6999999999825,
+        "p99Ms": 1016.6999999999825,
+        "maxMs": 1016.6999999999825,
+        "over50ms": 8,
+        "over100ms": 8
+      },
+      "longTasks": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "p99Ms": null,
+        "maxMs": null,
+        "over50ms": 0,
+        "over100ms": 0
+      },
+      "visible": true,
+      "focused": false,
+      "schedulingValid": false,
+      "display": [
+        1920,
+        1440
+      ],
+      "lattice": [
+        960,
+        720
+      ],
+      "dpr": 2,
+      "renderer": {
+        "gpu": true,
+        "device": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "error": "",
+        "ms": 0.30000000074505806,
+        "fps": 0,
+        "renderMs": 3.5,
+        "snapshotMs": 2.099999999627471
+      },
+      "presentation": {
+        "fps": 60,
+        "workMs": 8,
+        "idleMs": 0
+      },
+      "adaptive": {
+        "mode": "quality",
+        "resolutionLevel": 0,
+        "publicationLevel": 0,
+        "fps": 60,
+        "uiMs": 125,
+        "workMs": 8,
+        "idleMs": 0,
+        "scale": 1,
+        "bottleneck": "simulation",
+        "changes": 0,
+        "metrics": {
+          "renderMs": 3.800000000745058,
+          "snapshotMs": 2.700000001117587,
+          "stepMs": 6.852613517967541,
+          "gapMs": 33.30000000074506,
+          "inputMs": 0,
+          "rate": 139.58125623100983,
+          "targetRate": 240
+        },
+        "playing": true,
+        "hidden": false,
+        "recording": false,
+        "mobile": false,
+        "preview": false,
+        "manual": true,
+        "visiblePanels": []
+      },
+      "startCounters": {
+        "manualRemoved": 0,
+        "divisions": 0,
+        "immuneDivisions": 0,
+        "kills": 0,
+        "apoptosis": 0,
+        "environment": 0,
+        "apoptosisStarted": 0,
+        "killStarted": 0,
+        "environmentStarted": 0,
+        "recognitions": 2,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 0,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 0,
+        "vascularArrivals": 1,
+        "extravasations": 0,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "endCounters": {
+        "manualRemoved": 0,
+        "divisions": 9,
+        "immuneDivisions": 4,
+        "kills": 20,
+        "apoptosis": 0,
+        "environment": 2,
+        "apoptosisStarted": 0,
+        "killStarted": 21,
+        "environmentStarted": 2,
+        "recognitions": 28,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 2,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 3,
+        "vascularArrivals": 5,
+        "extravasations": 1,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "frames": [
+        {
+          "at": 68.89999999850988,
+          "time": 67
+        },
+        {
+          "at": 102,
+          "time": 70
+        },
+        {
+          "at": 1135.2999999988824,
+          "time": 73
+        },
+        {
+          "at": 2185.5,
+          "time": 218
+        },
+        {
+          "at": 2218.199999999255,
+          "time": 362
+        },
+        {
+          "at": 2251.39999999851,
+          "time": 366
+        },
+        {
+          "at": 3285.199999999255,
+          "time": 373
+        },
+        {
+          "at": 4318.699999999255,
+          "time": 516
+        },
+        {
+          "at": 5352,
+          "time": 637
+        },
+        {
+          "at": 6368.5999999996275,
+          "time": 734
+        },
+        {
+          "at": 7385.5,
+          "time": 862
+        },
+        {
+          "at": 8401.89999999851,
+          "time": 984
+        },
+        {
+          "at": 9452,
+          "time": 1116
+        }
+      ],
+      "initialMedianOnlyGate": false
+    },
+    {
+      "case": "fine",
+      "pair": 3,
+      "mode": "baseline",
+      "seed": 29,
+      "startMCS": 64,
+      "endMCS": 1028,
+      "startCells": 206,
+      "endCells": 197,
+      "elapsedMs": 8635.400000000373,
+      "mcsPerSecond": 111.63350858095264,
+      "newFrameFPS": 2.2002455010768673,
+      "frameGaps": {
+        "count": 18,
+        "p50Ms": 33.600000001490116,
+        "p95Ms": 1034.1000000014901,
+        "p99Ms": 1034.1000000014901,
+        "maxMs": 1034.1000000014901,
+        "over50ms": 8,
+        "over100ms": 8
+      },
+      "raf": {
+        "count": 27,
+        "p50Ms": 33.30000000001746,
+        "p95Ms": 1016.7000000000116,
+        "p99Ms": 1016.7999999999884,
+        "maxMs": 1016.7999999999884,
+        "over50ms": 7,
+        "over100ms": 7
+      },
+      "longTasks": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "p99Ms": null,
+        "maxMs": null,
+        "over50ms": 0,
+        "over100ms": 0
+      },
+      "visible": true,
+      "focused": false,
+      "schedulingValid": false,
+      "display": [
+        1920,
+        1440
+      ],
+      "lattice": [
+        960,
+        720
+      ],
+      "dpr": 2,
+      "renderer": {
+        "gpu": true,
+        "device": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "error": "",
+        "ms": 0.2000000011175871,
+        "fps": 0,
+        "renderMs": 3.900000000372529,
+        "snapshotMs": 2.300000000745058
+      },
+      "presentation": {
+        "fps": 60,
+        "workMs": 8,
+        "idleMs": 0
+      },
+      "adaptive": {
+        "mode": "quality",
+        "resolutionLevel": 0,
+        "publicationLevel": 0,
+        "fps": 60,
+        "uiMs": 125,
+        "workMs": 8,
+        "idleMs": 0,
+        "scale": 1,
+        "bottleneck": "simulation",
+        "changes": 0,
+        "metrics": {
+          "renderMs": 3.800000000745058,
+          "snapshotMs": 2.800000000745058,
+          "stepMs": 9.030831115058412,
+          "gapMs": 33.40000000037253,
+          "inputMs": 0,
+          "rate": 90.66440005685664,
+          "targetRate": 240
+        },
+        "playing": true,
+        "hidden": false,
+        "recording": false,
+        "mobile": false,
+        "preview": false,
+        "manual": true,
+        "visiblePanels": []
+      },
+      "startCounters": {
+        "manualRemoved": 0,
+        "divisions": 0,
+        "immuneDivisions": 0,
+        "kills": 0,
+        "apoptosis": 0,
+        "environment": 0,
+        "apoptosisStarted": 0,
+        "killStarted": 0,
+        "environmentStarted": 0,
+        "recognitions": 2,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 0,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 0,
+        "vascularArrivals": 1,
+        "extravasations": 0,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "endCounters": {
+        "manualRemoved": 0,
+        "divisions": 9,
+        "immuneDivisions": 4,
+        "kills": 19,
+        "apoptosis": 0,
+        "environment": 2,
+        "apoptosisStarted": 0,
+        "killStarted": 20,
+        "environmentStarted": 2,
+        "recognitions": 27,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 2,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 3,
+        "vascularArrivals": 4,
+        "extravasations": 1,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "frames": [
+        {
+          "at": 69.30000000074506,
+          "time": 65
+        },
+        {
+          "at": 102,
+          "time": 67
+        },
+        {
+          "at": 135.19999999925494,
+          "time": 70
+        },
+        {
+          "at": 168.80000000074506,
+          "time": 74
+        },
+        {
+          "at": 201.80000000074506,
+          "time": 77
+        },
+        {
+          "at": 234.90000000037253,
+          "time": 80
+        },
+        {
+          "at": 268.19999999925494,
+          "time": 84
+        },
+        {
+          "at": 1302.300000000745,
+          "time": 92
+        },
+        {
+          "at": 2335.5,
+          "time": 234
+        },
+        {
+          "at": 3368.699999999255,
+          "time": 376
+        },
+        {
+          "at": 4385.5999999996275,
+          "time": 520
+        },
+        {
+          "at": 5402,
+          "time": 644
+        },
+        {
+          "at": 5434.9000000003725,
+          "time": 752
+        },
+        {
+          "at": 5468.0999999996275,
+          "time": 756
+        },
+        {
+          "at": 5501.5,
+          "time": 760
+        },
+        {
+          "at": 5535.199999999255,
+          "time": 764
+        },
+        {
+          "at": 6568.800000000745,
+          "time": 772
+        },
+        {
+          "at": 7602,
+          "time": 900
+        },
+        {
+          "at": 8635.400000000373,
+          "time": 1028
+        }
+      ],
+      "initialMedianOnlyGate": false
+    },
+    {
+      "case": "fine",
+      "pair": 3,
+      "mode": "prototype",
+      "seed": 29,
+      "startMCS": 64,
+      "endMCS": 1074,
+      "startCells": 206,
+      "endCells": 197,
+      "elapsedMs": 7352,
+      "mcsPerSecond": 137.37758433079435,
+      "newFrameFPS": 1.7682263329706203,
+      "frameGaps": {
+        "count": 12,
+        "p50Ms": 1016.5999999996275,
+        "p95Ms": 1033.4000000003725,
+        "p99Ms": 1033.4000000003725,
+        "maxMs": 1033.4000000003725,
+        "over50ms": 7,
+        "over100ms": 7
+      },
+      "raf": {
+        "count": 20,
+        "p50Ms": 16.70000000001164,
+        "p95Ms": 1016.7000000000116,
+        "p99Ms": 1016.7000000000116,
+        "maxMs": 1016.7000000000116,
+        "over50ms": 7,
+        "over100ms": 7
+      },
+      "longTasks": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "p99Ms": null,
+        "maxMs": null,
+        "over50ms": 0,
+        "over100ms": 0
+      },
+      "visible": true,
+      "focused": false,
+      "schedulingValid": false,
+      "display": [
+        1920,
+        1440
+      ],
+      "lattice": [
+        960,
+        720
+      ],
+      "dpr": 2,
+      "renderer": {
+        "gpu": true,
+        "device": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "error": "",
+        "ms": 0.19999999925494194,
+        "fps": 0,
+        "renderMs": 4.400000000372529,
+        "snapshotMs": 3.200000001117587
+      },
+      "presentation": {
+        "fps": 60,
+        "workMs": 8,
+        "idleMs": 0
+      },
+      "adaptive": {
+        "mode": "quality",
+        "resolutionLevel": 0,
+        "publicationLevel": 0,
+        "fps": 60,
+        "uiMs": 125,
+        "workMs": 8,
+        "idleMs": 0,
+        "scale": 1,
+        "bottleneck": "simulation",
+        "changes": 0,
+        "metrics": {
+          "renderMs": 3.800000000745058,
+          "snapshotMs": 2.800000000745058,
+          "stepMs": 9.030831115058412,
+          "gapMs": 33.40000000037253,
+          "inputMs": 0,
+          "rate": 90.66440005685664,
+          "targetRate": 240
+        },
+        "playing": true,
+        "hidden": false,
+        "recording": false,
+        "mobile": false,
+        "preview": false,
+        "manual": true,
+        "visiblePanels": []
+      },
+      "startCounters": {
+        "manualRemoved": 0,
+        "divisions": 0,
+        "immuneDivisions": 0,
+        "kills": 0,
+        "apoptosis": 0,
+        "environment": 0,
+        "apoptosisStarted": 0,
+        "killStarted": 0,
+        "environmentStarted": 0,
+        "recognitions": 2,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 0,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 0,
+        "vascularArrivals": 1,
+        "extravasations": 0,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "endCounters": {
+        "manualRemoved": 0,
+        "divisions": 9,
+        "immuneDivisions": 4,
+        "kills": 20,
+        "apoptosis": 0,
+        "environment": 2,
+        "apoptosisStarted": 0,
+        "killStarted": 20,
+        "environmentStarted": 2,
+        "recognitions": 28,
+        "mutations": 0,
+        "abnormalInitiations": 0,
+        "malignantTransitions": 0,
+        "abnormalKills": 0,
+        "normalEnvironmentDeaths": 0,
+        "abnormalEnvironmentDeaths": 0,
+        "lifespan": 0,
+        "lifespanStarted": 0,
+        "normalDivisions": 0,
+        "replicationDeaths": 2,
+        "stemAsymmetric": 0,
+        "stemSelfRenewal": 0,
+        "stemDifferentiation": 0,
+        "stemReversions": 0,
+        "normalTraitMutations": 0,
+        "stressMutations": 0,
+        "antigenExposures": 0,
+        "antigenEscapes": 0,
+        "suppressiveTransitions": 0,
+        "suppressiveRecoveries": 0,
+        "injuryDeactivations": 0,
+        "signalDeactivations": 0,
+        "endothelialDeaths": 0,
+        "endothelialDivisions": 3,
+        "vascularArrivals": 5,
+        "extravasations": 1,
+        "circulationReturns": 0,
+        "intravasations": 0,
+        "bloodstreamExports": 0
+      },
+      "frames": [
+        {
+          "at": 52.09999999962747,
+          "time": 65
+        },
+        {
+          "at": 68.40000000037253,
+          "time": 66
+        },
+        {
+          "at": 84.80000000074506,
+          "time": 67
+        },
+        {
+          "at": 101.5,
+          "time": 68
+        },
+        {
+          "at": 118.30000000074506,
+          "time": 69
+        },
+        {
+          "at": 1151.5999999996275,
+          "time": 72
+        },
+        {
+          "at": 2184.800000000745,
+          "time": 218
+        },
+        {
+          "at": 3218.199999999255,
+          "time": 366
+        },
+        {
+          "at": 4251.5999999996275,
+          "time": 516
+        },
+        {
+          "at": 5268.199999999255,
+          "time": 662
+        },
+        {
+          "at": 6301.5999999996275,
+          "time": 808
+        },
+        {
+          "at": 7318.199999999255,
+          "time": 944
+        },
+        {
+          "at": 7352,
+          "time": 1074
+        }
+      ],
+      "initialMedianOnlyGate": false
+    }
+  ],
+  "focused": false,
+  "visibility": "visible",
+  "valid": false,
+  "reason": "Approximately 1 new frame per second despite visible state; background/occlusion scheduling invalidates end-to-end comparisons. Never use these FPS values as optimization evidence.",
+  "note": "The initial median-only RAF gate did not catch intermittent 1 Hz occlusion. All rows are rejected. The probe now also checks RAF P95 and actual unique-frame cadence and stops on invalid scheduling."
+}

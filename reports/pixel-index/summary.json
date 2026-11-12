@@ -1,0 +1,131 @@
+{
+  "date": "2026-11-13",
+  "timedMCSPerVersion": 8640,
+  "pairedWindows": 54,
+  "warmupCheckpoints": 9,
+  "rows": [
+    {
+      "case": "default",
+      "gainRange": [
+        4.717266151987376,
+        5.975443060030505
+      ],
+      "stateIdentical": true,
+      "slotsMiB": 0.7041549682617188,
+      "baseline": {
+        "mcsPerSecond": 343.7686583460721,
+        "stepP99Ms": 8.588332999999693,
+        "over50ms": 0,
+        "over100ms": 0,
+        "eventMeanMs": {
+          "divide": {
+            "count": 16,
+            "ms": 8.887687249999885
+          },
+          "eraseCell": {
+            "count": 84,
+            "ms": 2.857026773809488
+          }
+        }
+      },
+      "prototype": {
+        "mcsPerSecond": 362.3185709648818,
+        "stepP99Ms": 5.7354999999997744,
+        "over50ms": 0,
+        "over100ms": 0,
+        "eventMeanMs": {
+          "divide": {
+            "count": 16,
+            "ms": 0.8603541875000928
+          },
+          "eraseCell": {
+            "count": 84,
+            "ms": 0.24033378571431013
+          }
+        }
+      }
+    },
+    {
+      "case": "maximum",
+      "gainRange": [
+        1.8928686458428157,
+        6.016434127877313
+      ],
+      "stateIdentical": true,
+      "slotsMiB": 4.0029296875,
+      "baseline": {
+        "mcsPerSecond": 63.03512179826115,
+        "stepP99Ms": 43.79387499999939,
+        "over50ms": 19,
+        "over100ms": 4,
+        "eventMeanMs": {
+          "divide": {
+            "count": 10,
+            "ms": 83.40145849999935
+          },
+          "eraseCell": {
+            "count": 54,
+            "ms": 26.81892433333363
+          }
+        }
+      },
+      "prototype": {
+        "mcsPerSecond": 65.19698082995065,
+        "stepP99Ms": 25.507250000002387,
+        "over50ms": 1,
+        "over100ms": 0,
+        "eventMeanMs": {
+          "divide": {
+            "count": 10,
+            "ms": 2.6758833000003506
+          },
+          "eraseCell": {
+            "count": 54,
+            "ms": 0.46102999999975175
+          }
+        }
+      }
+    },
+    {
+      "case": "fine",
+      "gainRange": [
+        13.814197895083646,
+        15.532793682202396
+      ],
+      "stateIdentical": true,
+      "slotsMiB": 3.75274658203125,
+      "baseline": {
+        "mcsPerSecond": 125.54560230127072,
+        "stepP99Ms": 44.437832999999955,
+        "over50ms": 27,
+        "over100ms": 7,
+        "eventMeanMs": {
+          "divide": {
+            "count": 25,
+            "ms": 78.69180824000003
+          },
+          "eraseCell": {
+            "count": 49,
+            "ms": 24.92442269387781
+          }
+        }
+      },
+      "prototype": {
+        "mcsPerSecond": 143.7989190978372,
+        "stepP99Ms": 13.749166999999943,
+        "over50ms": 0,
+        "over100ms": 0,
+        "eventMeanMs": {
+          "divide": {
+            "count": 25,
+            "ms": 3.3927766400000836
+          },
+          "eraseCell": {
+            "count": 49,
+            "ms": 1.2903537551021182
+          }
+        }
+      }
+    }
+  ]
+}
