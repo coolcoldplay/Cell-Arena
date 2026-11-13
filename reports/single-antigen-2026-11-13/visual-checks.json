@@ -1,0 +1,112 @@
+{
+  "mobile": {
+    "viewport": 390,
+    "scrollWidth": 390,
+    "dialog": {
+      "x": 12,
+      "right": 378,
+      "top": 166.65625,
+      "bottom": 677.3359375
+    },
+    "chartWidth": 320,
+    "chartScroll": 682,
+    "scrollLeft": 322.5,
+    "readout": "360 MCS · A13 · 4 颗 · 100.0% · 父谱系 A10 · C1 GCTTCA · 非自身抗原 · 分支出现 0 MCS",
+    "time": 1800,
+    "errors": []
+  },
+  "english": {
+    "lang": "en",
+    "text": "Tumor lineage evolution · SankeyCollapseWidth = share of living tumors at each sampled time; ribbons show ancestry, not conserved traffic. Growth and death change widths. Scroll horizontally for the full history.A10A13A22A24A25A29Select a ribbon or lineage ID for count, share, antigen and ancestry; dashed edges mark branching."
+  },
+  "migrationPreview": {
+    "text": "File validatedOlder experiments restart under single-antigen rules; seeds and parameters are retained, but trajectories change.Older four-slot recipes retain only P1 and its expression; P2–P4 are omitted. The original file is unchanged.",
+    "time": 36
+  },
+  "imported": {
+    "schema": 3,
+    "slots": 1,
+    "allSingle": true,
+    "segments": [
+      {
+        "id": 1,
+        "kind": 2,
+        "colors": [
+          "#4e25bb"
+        ]
+      },
+      {
+        "id": 2,
+        "kind": 2,
+        "colors": [
+          "#4e25bb"
+        ]
+      },
+      {
+        "id": 3,
+        "kind": 2,
+        "colors": [
+          "#a211b6"
+        ]
+      },
+      {
+        "id": 4,
+        "kind": 2,
+        "colors": [
+          "#1fb292"
+        ]
+      },
+      {
+        "id": 5,
+        "kind": 3,
+        "colors": [
+          "#4e25bb",
+          "#a211b6"
+        ]
+      },
+      {
+        "id": 6,
+        "kind": 3,
+        "colors": [
+          "#1fb292"
+        ]
+      },
+      {
+        "id": 7,
+        "kind": 3,
+        "colors": []
+      }
+    ],
+    "errors": [],
+    "gpu": true
+  },
+  "inspector": {
+    "slots": 1,
+    "text": "Antigen & immunityG2 · Founderimported founder · 0 MCS · Generation 0Each inherited antigen has one color. Expression changes intensity, sequence mutations change color, and genetic loss removes that segment.A-bb2c07c5Each target has one antigen slot. Sequence mutation replaces its antigen. Self or genetically lost antigens have no color segment.P1C1AAAAAANon-self featureExpression100%Presented100%C1 channel100%C2 channel100%Checkpoint brake8%Surface targets · reservedS1CTGAGG60%S2GACCGT80%Outline intensity shows current non-self presentation. Dim profiles retain their genetic identity but may provide insufficient stimulus.Recognition at actual contactsNo current immune–tumor/precancer contact; immune outlines indicate receptor potential, not actual stimulation."
+  },
+  "desktop": {
+    "branch": "1800 MCS · A22 · 2 颗 · 6.7% · 父谱系 A13 · C1 GCTTAA · 非自身抗原 · 分支出现 718 MCS",
+    "previous": "1470 MCS · A22 · 2 颗 · 6.7% · 父谱系 A13 · C1 GCTTAA · 非自身抗原 · 分支出现 718 MCS",
+    "restored": {
+      "parent": "current-history",
+      "time": 1800
+    }
+  },
+  "export": {
+    "schema": 3,
+    "slots": 1,
+    "rows": 61,
+    "allSingle": true,
+    "end": {
+      "time": 1800,
+      "total": 30,
+      "counts": {
+        "13": 24,
+        "22": 2,
+        "24": 2,
+        "25": 1,
+        "29": 1
+      }
+    }
+  }
+}

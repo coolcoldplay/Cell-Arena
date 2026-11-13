@@ -148,7 +148,7 @@ Arena 培养皿|Arena culture dish
 实验场景|Scenarios
 肿瘤发生发展|Tumor development
 免疫冷肿瘤扩散转移|Cold tumor spread
-免疫热肿瘤治愈|Hot tumor clearance
+免疫热肿瘤应答|Hot tumor response
 发生发展|Onset
 冷肿瘤|Cold
 热肿瘤|Hot
@@ -741,6 +741,9 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
 抗原轮廓|Antigen outline
 抗原谱系轮廓|Antigen lineage outlines
 存活正常细胞的持续压力或损伤也可触发；不必先死亡。暴露越强、越久转蓝概率越高；0 关闭|Sustained stress or injury in living normal cells can also trigger this; prior death is not required. Stronger and longer exposure increases switching; 0 disables it.
+旧实验将按单抗原规则重新运行；种子与参数保留，演化轨迹会变化。|Older experiments restart under single-antigen rules; seeds and parameters are retained, but trajectories change.
+旧四槽配方仅保留 P1 及其表达值，P2–P4 不再参与模拟；原文件不修改。|Older four-slot recipes retain only P1 and its expression; P2–P4 are omitted. The original file is unchanged.
+关闭谱系图|Close lineage diagram
 颜色表示遗传抗原谱；同色免疫外轮廓表示受体匹配潜力|Colors show inherited antigen profiles; matching immune outlines show receptor compatibility
 外轮廓：肿瘤抗原／免疫匹配|Outlines: tumor antigens / immune matching
 追踪后：✓ 已识别 · ≈ 接触扫描 · × 不匹配 · ! 受限。|Track: ✓ recognized · ≈ scanning · × mismatch · ! limited.

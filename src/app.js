@@ -22,6 +22,7 @@
   const adaptive=new CellLabPerformance.Controller({preferences:performancePreferences,now:performance.now()});
   const mobileQuery=matchMedia('(max-width:850px)');
   let performancePlan=adaptive.status(),presentationKey='',lastHeartbeat=0,lastAnimation=0,lastRender=0,latestInput=0,forceFrame=false;
+  const lineageChart=new CellLabLineage.Chart();
   const visiblePanels=new Set(),visibilityTargets=['statistics-panel','cell-inspector','history','scenario-guide'];
   const panelObserver=typeof IntersectionObserver==='function'?new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting)visiblePanels.add(entry.target.id);else visiblePanels.delete(entry.target.id);}uiPending=true;dirty=true;},{root:document.getElementById('sidebar-scroll')}):null;
   for(const id of visibilityTargets)panelObserver?.observe($(id));
@@ -365,7 +366,7 @@
     $('network-status').textContent=s.settings.tumorMorphology===2?`当前稳定接触 ${s.cells.reduce((n,m)=>n+(m.networkDegree||0),0)/2} 对；各细胞保持独立胞体。`:'示例会重新播种一片肿瘤细胞，观察突起逐渐形成与连接。';
     $('seed-status').textContent=`当前 ${s.cells.length} 颗 · 按局部空间尝试加入`;
     if(force||panelVisible('statistics-panel')){
-      CellLabImmuneUI.stats(s);
+      CellLabImmuneUI.stats(s);lineageChart.update(s);
       const p=CellLabRounds.population(s);
       for(const kind of ['normal','abnormal','tumor','immune','endothelial'])$(kind+'-count').textContent=p[kind];
       const vas=s.vascular; $('vascular-statistics').hidden=!vas?.vessels?.length; if(vas){$('vessel-functional').textContent=vas.functional+' / '+vas.vessels.length;$('vessel-perfusion').textContent=Math.round(vas.meanPerfusion*100)+'%';$('vessel-immune').textContent=(s.counters.extravasations||0)+' / '+(s.counters.vascularArrivals||0);$('vessel-export').textContent=s.counters.bloodstreamExports||0;$('vessel-repair').textContent='内皮分裂 '+(s.counters.endothelialDivisions||0)+' · 内皮死亡 '+(s.counters.endothelialDeaths||0)+' · 循环返回 '+(s.counters.circulationReturns||0);}
@@ -855,8 +856,9 @@
   $('import-file').addEventListener('change',async()=>{
     const file=$('import-file').files?.[0];if(!file)return;const ticket=++importSerial,filename=document.createElement('b');filename.dataset.noI18n='';filename.textContent=file.name;pendingImport=null;$('confirm-import').disabled=true;$('import-summary').replaceChildren(filename);$('import-status').textContent='正在读取文件…';$('import-dialog').showModal();
     try{if(file.size>32*1024*1024)throw Error('文件超过 32 MB，请使用较小的实验参数文件');const data=JSON.parse(await file.text()),profile=CellLabExperiment.parse(data);if(ticket!==importSerial||!$('import-dialog').open)return;pendingImport=data;
-      $('import-summary').replaceChildren(filename,document.createTextNode('\n'+[`情境：${titles[profile.config.scene]||{oncogenesis:'肿瘤发生发展',cold:'免疫冷肿瘤扩散转移',hot:'免疫热肿瘤治愈'}[profile.config.scene]}`,`种子 ${profile.config.seed} · 区域 ${profile.config.worldWidth} × ${profile.config.worldHeight} · 精细度 ${profile.config.refinement}×`,`参数 ${Object.keys(profile.config.settings).length} 项 · 导出时刻 ${profile.sourceTime} MCS`].join('\n')));
-      $('import-status').textContent=profile.ignored.length?'将忽略旧版或未知参数：'+profile.ignored.join(', '):'文件校验通过';$('confirm-import').disabled=false;
+      $('import-summary').replaceChildren(filename,document.createTextNode('\n'+[`情境：${titles[profile.config.scene]||{oncogenesis:'肿瘤发生发展',cold:'免疫冷肿瘤扩散转移',hot:'免疫热肿瘤应答'}[profile.config.scene]}`,`种子 ${profile.config.seed} · 区域 ${profile.config.worldWidth} × ${profile.config.worldHeight} · 精细度 ${profile.config.refinement}×`,`参数 ${Object.keys(profile.config.settings).length} 项 · 导出时刻 ${profile.sourceTime} MCS`].join('\n')));
+      const messages=[profile.ignored.length?'将忽略旧版或未知参数：'+profile.ignored.join(', '):'文件校验通过',...profile.warnings];
+      $('import-status').replaceChildren(...messages.flatMap((line,i)=>[...(i?[document.createElement('br')]:[]),document.createTextNode(line)]));$('confirm-import').disabled=false;
     }catch(error){if(ticket===importSerial)$('import-status').textContent=error instanceof SyntaxError?'不是有效的 JSON 实验文件':String(error.message||error);}finally{if(ticket===importSerial)$('import-file').value='';}
   });
   $('cancel-import').addEventListener('click',()=>$('import-dialog').close());$('import-dialog').addEventListener('close',()=>{pendingImport=null;importSerial++;$('import-file').value='';});

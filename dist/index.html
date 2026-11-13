@@ -255,6 +255,10 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
 #clone-history{width:100%;height:auto;background:#f7f0e2}.clone-legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;margin:6px 0}#genetics-summary{white-space:pre-line;line-height:1.5}
 
 .antigen-profile-list{display:flex;flex-wrap:wrap;gap:6px 10px;margin:6px 0}.antigen-profile-chip{display:inline-flex;align-items:center;gap:5px;font:11px Consolas,monospace;color:var(--ink);white-space:nowrap}.antigen-profile-chip i{width:11px;height:11px;flex:none;border:3px solid;border-radius:50%;background:var(--paper,#fffaf0)}#antigen-lineage-legend .immune-note{font-size:11px;line-height:1.55;margin:5px 0}
+
+#lineage-sankey-panel{margin-top:12px;min-width:0}#lineage-sankey-panel h3{font-size:13px;margin:0 0 5px}.lineage-sankey-scroll{width:100%;overflow-x:auto;overscroll-behavior-x:contain;border:1px solid var(--line)}#lineage-sankey{display:block;max-width:none;touch-action:pan-x pan-y;margin:0}.lineage-sankey-legend{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.lineage-sankey-legend button{display:inline-flex;align-items:center;gap:4px;padding:4px 6px;font-size:11px;min-height:28px}.lineage-sankey-legend i{width:9px;height:9px;border-radius:50%}.lineage-sankey-legend button[aria-pressed=true]{background:#73563b;color:#fff9eb}#lineage-sankey-readout{min-height:35px;line-height:1.5}.immune-slots{grid-template-columns:minmax(0,1fr)}
+
+.lineage-sankey-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.lineage-sankey-head button{font-size:12px;padding:4px 9px}#lineage-sankey-dialog{box-sizing:border-box;width:min(1050px,calc(100vw - 24px));max-width:none;max-height:calc(100dvh - 24px);padding:20px}#lineage-sankey-dialog #lineage-sankey-panel{margin:8px 0 0}#lineage-sankey-dialog .lineage-sankey-head{padding-right:20px}
 </style></head>
 <body>
 <main class="workspace">
@@ -264,7 +268,7 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
   <aside aria-label="模拟控制面板">
     <div class="panel-head"><a class="brand" href="https://github.com/coolcoldplay/Cell-Arena" target="_blank" rel="noreferrer"><span class="mark" aria-hidden="true">C</span><b>Cell-Arena</b></a><button id="language" type="button" value="zh" aria-label="Switch to English" title="Switch to English" data-no-i18n>Eng</button><button id="mobile-expand" class="mobile-only" aria-expanded="false" aria-controls="sidebar-scroll" aria-label="展开面板" title="展开面板">↑</button><button id="file-actions" class="header-icon" aria-label="导入与导出" title="导入与导出" aria-expanded="false" aria-controls="file-menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h9l5 5v13H5Z"/><path d="M14 3v6h5M8 13h8M8 17h6"/></svg></button><button id="record-video" class="header-icon" aria-label="录制视频" title="录制视频" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle class="record-dot" cx="12" cy="12" r="4"/></svg></button><button id="arena-fullscreen" class="header-icon" aria-label="全屏 Arena" title="全屏 Arena" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9V3h6M15 3h6v6M21 15v6h-6M9 21H3v-6"/></svg></button><button id="about" class="header-icon" aria-label="模型与来源" title="模型与来源"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 1 1 5 2c-1 1-2 1-2 3M12 17v1"/></svg></button><div id="file-menu" class="file-menu" role="group" aria-label="导入与导出" hidden><button id="snapshot">保存画面 ↓</button><button id="export-data">导出实验数据 ↓</button><button id="import-data">导入实验参数 ↑</button><button id="file-export-rounds">导出历局 CSV</button></div></div>
     <div class="dish-head"><div><span id="status-dot" class="status-dot"></span><b id="scene-title">肿瘤发生发展</b><span id="run-state">正在准备</span></div><button id="record-indicator" class="quiet" title="停止录制并下载" hidden>■ 00:00</button><div><span id="clock">0</span> <span class="unit">MCS</span></div></div>
-    <nav class="scenes" aria-label="实验场景"><button data-scene="oncogenesis" class="active" title="肿瘤发生发展">发生发展</button><button data-scene="cold" title="免疫冷肿瘤扩散转移">冷肿瘤</button><button data-scene="hot" title="免疫热肿瘤治愈">热肿瘤</button><button data-scene="maze" title="免疫细胞迷宫">免疫迷宫</button><button data-scene="empty" title="空白自建：暂停摆放细胞，准备好后开始模拟">空白自建</button></nav>
+    <nav class="scenes" aria-label="实验场景"><button data-scene="oncogenesis" class="active" title="肿瘤发生发展">发生发展</button><button data-scene="cold" title="免疫冷肿瘤扩散转移">冷肿瘤</button><button data-scene="hot" title="免疫热肿瘤应答">热肿瘤</button><button data-scene="maze" title="免疫细胞迷宫">免疫迷宫</button><button data-scene="empty" title="空白自建：暂停摆放细胞，准备好后开始模拟">空白自建</button></nav>
     <div class="transport"><button id="play" class="primary">Ⅱ 暂停</button><button id="reset">↺ 重来</button><button id="shuffle" title="在合理模型范围内随机生成参数与细胞布局">随机</button><div class="playback-row"><label class="speed-label">速度 <input id="speed" type="range" min="0.25" max="8" step="0.25" value="1"><output id="speed-out">1×</output></label></div></div>
     <div id="maze-score" class="maze-score" hidden aria-live="polite"></div><div class="quick-tools"><div class="tools paired-tools" role="group" aria-label="鼠标工具"><div class="tool-pair"><button data-tool="move" class="selected">↔ 拖动</button><button data-tool="inspect">⌾ 追踪</button></div><div class="tool-pair"><button data-tool="seed">＋ 新增</button><button data-tool="remove">⌫ 擦除</button></div><div class="tool-pair"><button data-tool="wall">▥ 障碍</button><button data-tool="signal">◉ 信号</button></div></div>
       <p id="tool-hint" class="hint compact-hint">拖动时暂停 · 邻居让位 · 实体墙阻挡</p>
@@ -323,6 +327,7 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
           <div id="history-legend" class="history-legend" role="group" aria-label="历史曲线显示类型"></div>
           <div class="history-options"><span id="history-mode">细胞数量</span><label id="history-percent-option" hidden><input type="checkbox" id="history-percent">百分比</label><span id="history-states" class="history-states" hidden></span></div>
           <canvas id="history" width="960" height="125" tabindex="0" aria-label="细胞数量历史曲线"></canvas><div id="history-readout" class="history-readout"></div>
+          <section id="lineage-sankey-panel" data-no-i18n><div class="lineage-sankey-head"><h3 id="lineage-sankey-title">肿瘤谱系演化 · 桑基图</h3><button type="button" id="lineage-sankey-expand">展开</button></div><p id="lineage-sankey-note" class="hint"></p><div class="lineage-sankey-scroll"><canvas id="lineage-sankey" width="620" height="270" tabindex="0" aria-label="肿瘤抗原谱系演化桑基图"></canvas></div><div id="lineage-sankey-legend" class="lineage-sankey-legend"></div><p id="lineage-sankey-readout" class="hint" aria-live="polite"></p></section>
         </div>
         <section id="round-results" hidden>
           <div class="round-toolbar"><span>历局记录保存在本机</span><div><button id="round-cleanup" aria-pressed="false" disabled>清理</button><button id="export-rounds">导出 CSV</button></div></div>
@@ -363,6 +368,7 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
   <div class="dialog-actions"><button id="round-cleanup-cancel" autofocus>取消</button><button id="round-cleanup-confirm">确认清除</button></div>
 </dialog>
 <dialog id="import-dialog"><h2>导入实验参数</h2><div id="import-summary" class="inspection"></div><p>加载后按文件中的情境、种子和参数重新开局并暂停，不恢复导出时的细胞布置、障碍、浓度场或统计历史。</p><p id="import-status" role="status"></p><div class="dialog-actions"><button id="cancel-import">取消</button><button id="confirm-import" class="primary">加载参数并重新开局</button></div></dialog>
+<dialog id="lineage-sankey-dialog"><button type="button" class="close" id="lineage-sankey-close" aria-label="关闭谱系图">×</button><div id="lineage-sankey-host"></div></dialog>
 <dialog id="about-dialog"><button id="close-about" class="close" aria-label="关闭">×</button><div data-language="zh">
   <h2>模型与来源</h2>
   <p>Cell-Arena 基于 <a href="https://doi.org/10.7554/eLife.61288" target="_blank" rel="noreferrer"><strong>Artistoo</strong>（Wortel 与 Textor，eLife，2021）</a> 构建。Artistoo 是在浏览器中模拟细胞与组织的开源 JavaScript 库；本网页使用其细胞 Potts 模型（CPM）实现胞体形变与相互作用，并沿用 Act 活性着色。可视化参考其 <a href="https://artistoo.net/examples/CancerInvasion.html" target="_blank" rel="noreferrer">Cancer Invasion 示例</a>。Artistoo 使用 MIT 许可，代码来源和完整许可保留在下方。</p>
@@ -370,7 +376,7 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
   <ul>
     <li><strong>微环境与通讯：</strong>局部氧、糖、酸负荷，以及凝聚、损伤和免疫招募信号共同影响细胞运动、生长与存活。</li>
     <li><strong>免疫监视：</strong>分散巡逻、局部趋化、抗原接触识别、累积杀伤、识别后招募、有限克隆扩增与可调杀伤寿命。</li>
-    <li><strong>特异识别：</strong>四个短 ATCG 抗原槽位、可遗传的识别码与交叉识别；分开遗传缺失、可逆表达、呈递能力和免疫刹车。后台有限候选谱经过抗原暴露与延迟启动，经血管增援。</li>
+    <li><strong>特异识别：</strong>单个短 ATCG 抗原槽位、可遗传的识别码与交叉识别；分开遗传缺失、可逆表达、呈递能力和免疫刹车。后台有限候选谱经过抗原暴露与延迟启动，经血管增援。</li>
     <li><strong>肿瘤演化：</strong>正常 → 癌前细胞 → 肿瘤；增殖、侵袭、耐受和抗原表达可遗传、突变，并区分不同死亡过程。</li>
     <li><strong>干性与修复：</strong>肿瘤干细胞的对称／不对称分裂、分化与环境可塑性；有限代正常组织修复，肿瘤性状具有资源代价。</li>
     <li><strong>细胞周期：</strong>分阶段营养需求、有限能量／合成储备与复制损伤检查点。G0 静息与 G1／S／G2／M 推进；营养、压缩和损伤控制周期。CTL 使用独立 IL-2 与抗原刺激记忆扩增，慢性刺激可累积耗竭。</li>
@@ -395,7 +401,7 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
 <ul>
   <li><strong>Environment and communication:</strong> local oxygen, glucose, acid load, cohesion, damage and immune recruitment signals influence movement, growth and survival.</li>
   <li><strong>Immune surveillance:</strong> dispersed patrol, local chemotaxis, contact-based antigen recognition, cumulative killing, recruitment after recognition, limited clonal expansion and a configurable tumor-kill lifespan.</li>
-  <li><strong>Specific recognition:</strong> four short ATCG epitope slots, inherited receptors and cross-recognition; genetic loss, reversible expression, presentation and checkpoint brakes remain separate. A finite background repertoire primes after antigen release and a delay, with new responders arriving through vessels.</li>
+  <li><strong>Specific recognition:</strong> one short ATCG epitope slot, inherited receptors and cross-recognition; genetic loss, reversible expression, presentation and checkpoint brakes remain separate. A finite background repertoire primes after antigen release and a delay, with new responders arriving through vessels.</li>
   <li><strong>Tumor evolution:</strong> normal → precancerous → tumor transitions; inherited and mutable growth, invasion, tolerance and antigen traits, with distinct death processes.</li>
   <li><strong>Stemness and repair:</strong> symmetric and asymmetric stem divisions, differentiation and niche plasticity; finite normal repair lineages and tumor trait costs.</li>
   <li><strong>Cell cycles:</strong> phase-specific nutrient demand, finite energy/precursor reserves and replication-damage checkpoints. G0 quiescence and G1/S/G2/M progression, gated by nutrients, compression and injury. CTLs expand using separate IL-2 support and antigen memory; chronic stimulation can accumulate exhaustion.</li>
@@ -12219,7 +12225,7 @@ var CPM = (function (exports, module$1) {
       // Same seeded MT19937 implementation as CPM, on an explicit substream so
       // adding epitopes does not redraw maze geometry or consume motility RNG.
       this.rng=new s.C.mt.constructor((s.seedValue^0x49b72d15)>>>0);
-      this.clones=new Map();this.unarchived=new Set();this.serial=0;this.immuneSerial=0;this.cache=new Map();this.cacheLimit=8192;this.history=[];this.exposures=[];this.queue=[];this.encounters=new Map();
+      this.branches=new Map();this.clones=new Map();this.unarchived=new Set();this.serial=0;this.immuneSerial=0;this.cache=new Map();this.cacheLimit=8192;this.history=[];this.exposures=[];this.queue=[];this.encounters=new Map();
       this.metrics={geneticChanges:0,substitutions:0,losses:0,primed:0,reinforcements:0,exposureRecords:0,cacheMisses:0};
       this.self=Array.from({length:4},()=>this.sequence());
       // A finite repertoire is generated BEFORE targets. No encountered target
@@ -12242,9 +12248,13 @@ var CPM = (function (exports, module$1) {
       this.cache.set(key,value);this.metrics.cacheMisses++;return value;
     }
     create(genes,parent=0,event='founder',generation=0){
+      if(genes.peptides?.length!==1)throw Error('Exactly one antigen slot is required');
       genes.traits.repair??=1;
       genes.fragments={expression:genes.peptides.map(p=>({base:code(p.base),stress:code(p.stress,-3,3),inflammation:code(p.inflammation,-3,3)})),presentation:genes.presentation.map(v=>code(v)),brake:{base:code(genes.brake.base),response:code(genes.brake.response,0,3)},traits:Object.fromEntries(['tolerance','proliferation','invasion','repair'].map(k=>[k,code(genes.traits[k],.25,3)]))};
-      const id=++this.serial;this.clones.set(id,{id,parent,time:this.s.C.time,generation,event,genes:freeze(genes)});this.unarchived.add(id);return id;
+      const id=++this.serial,p=genes.peptides[0],ancestor=this.clones.get(parent),prior=this.branches.get(ancestor?.antigenBranch);
+      const identity=p.channel+':'+p.sequence+':'+Number(p.present),antigenBranch=prior?.identity===identity?prior.id:id;
+      if(antigenBranch===id)this.branches.set(id,{id,parent:prior?.id||0,time:this.s.C.time,event,identity,sequence:p.sequence,channel:p.channel,present:p.present,self:this.self.includes(p.sequence),key:p.present&&!this.self.includes(p.sequence)?p.channel+':'+p.sequence:null});
+      this.clones.set(id,{id,parent,antigenBranch,time:this.s.C.time,generation,event,genes:freeze(genes)});this.unarchived.add(id);return id;
     }
     genes(m){return this.clones.get(m.geneClone)?.genes;}
     bind(m,id,expression=null){
@@ -12252,7 +12262,7 @@ var CPM = (function (exports, module$1) {
       if(m.kind===2)m.genome=g.traits;
       if(m.kind===1)m.normalTolerance=g.traits.tolerance;
       m.expression=expression?{peptides:[...expression.peptides],presentation:[...expression.presentation],checkpoint:expression.checkpoint}:{peptides:g.peptides.map(p=>p.present?p.base:0),presentation:[...g.presentation],checkpoint:g.brake.base};
-      for(let i=0;i<4;i++)if(!g.peptides[i].present)m.expression.peptides[i]=0;
+      for(let i=0;i<g.peptides.length;i++)if(!g.peptides[i].present)m.expression.peptides[i]=0;
       for(let i=0;i<2;i++)if(!g.presentation[i])m.expression.presentation[i]=0;
       m.primed??=false;m.primingProgress??=0;m.recognition={target:0,score:0,stimulus:0,execution:0,reasons:['no-contact']};
       this.summarize(m);
@@ -12260,7 +12270,8 @@ var CPM = (function (exports, module$1) {
     register(m){
       if(this.s.divisionParent){m.primed=this.s.divisionParent.primed;this.bind(m,this.s.divisionParent.geneClone,this.s.divisionParent.expression);return;}
       const tumor=m.kind===2,immune=m.kind===3,positive=tumor&&m.antigenRoll<this.s.settings.antigen/100;
-      const peptides=Array.from({length:4},(_,i)=>({sequence:tumor&&i<3?(i<2?this.families[(i+Math.floor(m.antigenRoll*4))%Math.max(1,this.families.length)]||this.sequence():this.sequence()):this.self[i],present:true,base:tumor?(positive?.85:.09):.7,stress:(this.random()-.5)*1.6,inflammation:(this.random()-.5)*1.2,channel:tumor&&i<2?(i+Math.floor(m.antigenRoll*4))%2:i%2}));
+      const family=Math.floor(m.antigenRoll*4),candidateAntigen=this.repertoire[family],self=this.self[family];
+      const peptides=[{sequence:tumor?(candidateAntigen?.sequence||this.sequence()):self,present:true,base:tumor?(positive?.85:.09):.7,stress:(this.random()-.5)*1.6,inflammation:(this.random()-.5)*1.2,channel:tumor?(candidateAntigen?.channel??family%2):family%2}];
       let receptor=null,candidate=0;
       if(immune){
         const cover=this.s.scene==='hot'?.85:this.s.scene==='cold'?.15:.5,preferred=this.random()<cover?this.repertoire.slice(0,12):this.repertoire.slice(12),pool=preferred.length?preferred:this.repertoire;
@@ -12274,14 +12285,14 @@ var CPM = (function (exports, module$1) {
     }
     summarize(m){
       const g=this.genes(m);if(!g)return;
-      let level=0;for(let i=0;i<4;i++)if(g.peptides[i].present&&!this.self.includes(g.peptides[i].sequence))level=Math.max(level,m.expression.peptides[i]*m.expression.presentation[g.peptides[i].channel]);
+      let level=0;for(let i=0;i<g.peptides.length;i++)if(g.peptides[i].present&&!this.self.includes(g.peptides[i].sequence))level=Math.max(level,m.expression.peptides[i]*m.expression.presentation[g.peptides[i].channel]);
       const before=m.antigen;m.antigenLevel=level;m.antigen=(m.kind===2||m.state==='abnormal')&&level>=.18;
       if(before&&!m.antigen)this.s.releaseAntigenTarget(m);
     }
     express(m,dt){
       const g=this.genes(m);if(!g||m.kind===3)return;
       const k=-Math.expm1(-dt/180),pressure=clamp(m.mutationPressure||0),inflammation=clamp(m.inflammatoryExposure||0);
-      for(let i=0;i<4;i++){
+      for(let i=0;i<g.peptides.length;i++){
         const p=g.peptides[i],target=p.present?clamp(p.base*(1+p.stress*pressure*this.s.settings.antigenStressGain+p.inflammation*inflammation)):0;
         m.expression.peptides[i]+=k*(target-m.expression.peptides[i]);if(!p.present)m.expression.peptides[i]=0;
       }
@@ -12296,7 +12307,7 @@ var CPM = (function (exports, module$1) {
       const cg=this.genes(ctl),g=this.genes(target),reasons=[];
       if(!g||!cg?.receptor)return {target:target?.id||0,score:0,stimulus:0,execution:0,reasons:['no-receptor']};
       let present=false,expressed=false,presented=false,best=0,drive=0;
-      for(let i=0;i<4;i++){
+      for(let i=0;i<g.peptides.length;i++){
         const p=g.peptides[i];if(!p.present||this.self.includes(p.sequence))continue;present=true;
         const e=target.expression.peptides[i],channel=target.expression.presentation[p.channel],a=cache?this.score(cg.receptor,p):cg.receptor.channel===p.channel?affinity(cg.receptor.sequence,p.sequence):0;
         expressed||=e>=.18;presented||=e*channel>=.18;best=Math.max(best,a);
@@ -12319,7 +12330,7 @@ var CPM = (function (exports, module$1) {
       const id=this.create(g,parent,event,m.generation);this.bind(m,id,m.expression);this.express(m,0);return id;
     }
     abnormal(m){
-      this.alter(m,g=>{if(this.random()<.6){const i=Math.floor(this.random()*4);g.peptides[i].sequence=this.substitute(g.peptides[i].sequence);}},'precancer alteration');
+      this.alter(m,g=>{if(this.random()<.6)g.peptides[0].sequence=this.substitute(g.peptides[0].sequence);},'precancer alteration');
     }
     malignant(m){const traits={...m.genome};this.alter(m,g=>{g.traits={...g.traits,...traits};},'malignant transition');}
     inherit(c,parentId,parentExpression){
@@ -12331,23 +12342,23 @@ var CPM = (function (exports, module$1) {
       if(this.random()>=chance)return;
       const category=this.random(),i=Math.floor(this.random()*4),previous=c.geneClone;let event;
       this.alter(c,g=>{
-        if(category<.5){const p=g.peptides[i],before=p.sequence;p.sequence=this.substitute(before);event='peptide '+(i+1)+' '+before+'>'+p.sequence;}
-        else if(category<.55){g.peptides[i].present=false;event='peptide loss '+(i+1);}
+        if(category<.5){const p=g.peptides[0],before=p.sequence;p.sequence=this.substitute(before);event='peptide 1 '+before+'>'+p.sequence;}
+        else if(category<.55){g.peptides[0].present=false;event='peptide loss 1';}
         else if(category<.60){g.presentation[i%2]=0;event='presentation loss '+(i%2+1);}
-        else if(category<.72){g.peptides[i].base=clamp(g.peptides[i].base+(this.random()-.5)*2*s.mutationSize);event='expression regulation '+(i+1);}
+        else if(category<.72){g.peptides[0].base=clamp(g.peptides[0].base+(this.random()-.5)*2*s.mutationSize);event='expression regulation 1';}
         else if(category<.79){g.brake.base=clamp(g.brake.base+(this.random()-.5)*2*s.mutationSize);event='checkpoint regulation';}
         else if(category<.84){g.surface[i%2].sequence=this.substitute(g.surface[i%2].sequence);event='surface target '+(i%2+1);}
         else{const key=['tolerance','proliferation','invasion','repair'][i];g.traits[key]=clamp(g.traits[key]*Math.exp(this.s.mutationStep(key,c)),.25,3);event='trait '+key;}
       },'division mutation');
       if(c.geneClone===previous)return;
       if(category<.5)this.metrics.substitutions++;else if(category<.6)this.metrics.losses++;
-      this.clones.get(c.geneClone).event=event;this.metrics.geneticChanges++;this.s.counters.mutations++;
+      this.clones.get(c.geneClone).event=event;if(this.clones.get(c.geneClone).antigenBranch===c.geneClone)this.branches.get(c.geneClone).event=event;this.metrics.geneticChanges++;this.s.counters.mutations++;
     }
     expose(m,amount=1){
       if(m.kind!==2&&m.state!=='abnormal')return;
       if(amount<1&&this.s.C.time-(m.lastExposureAt??-Infinity)<120)return;m.lastExposureAt=this.s.C.time;
       const g=this.genes(m),danger=this.s.fieldOnCell(m,'danger'),inhibition=this.s.fieldOnCell(m,'inhibition');
-      for(let i=0;i<4;i++)if(g.peptides[i].present&&m.expression.peptides[i]>.08&&!this.self.includes(g.peptides[i].sequence)){
+      for(let i=0;i<g.peptides.length;i++)if(g.peptides[i].present&&m.expression.peptides[i]>.08&&!this.self.includes(g.peptides[i].sequence)){
         this.exposures.push({clone:m.geneClone,birth:m.birth,slot:i,sequence:g.peptides[i].sequence,channel:g.peptides[i].channel,time:this.s.C.time,strength:amount*m.expression.peptides[i]*(.35+danger/(.2+danger))/(1+inhibition)});this.metrics.exposureRecords++;
       }
       if(this.exposures.length>128)this.exposures.splice(0,this.exposures.length-128);
@@ -12374,12 +12385,12 @@ var CPM = (function (exports, module$1) {
       this.alter(m,g=>{g.receptor={sequence:r.sequence,channel:r.channel};g.candidate=r.id;},'primed vascular reinforcement');m.primed=true;m.antigenMemory=.45;this.metrics.reinforcements++;
     }
     record(){
-      const counts={},states={};for(const m of this.s.live())if(!m.dying&&(m.kind===2||m.state==='abnormal'||m.kind===3)){counts[m.geneClone]=(counts[m.geneClone]||0)+1;states[m.geneClone]=m.kind;}
-      const row={time:this.s.C.time,counts,states};if(this.history.at(-1)?.time===row.time)this.history[this.history.length-1]=row;else this.history.push(row);
-      this.historyView=null;
+      const counts={},states={},tumors={};for(const m of this.s.live())if(!m.dying&&(m.kind===2||m.state==='abnormal'||m.kind===3)){counts[m.geneClone]=(counts[m.geneClone]||0)+1;states[m.geneClone]=m.kind;if(m.kind===2){const branch=this.clones.get(m.geneClone).antigenBranch;tumors[branch]=(tumors[branch]||0)+1;}}
+      const row={time:this.s.C.time,counts,states,tumors};if(this.history.at(-1)?.time===row.time)this.history[this.history.length-1]=row;else this.history.push(row);
+      this.historyView=null;this.evolutionView=null;
       // Time-bin compression retains the entire time span; no simulation state
       // or mutation sampling depends on this bounded observer history.
-      if(this.history.length>512)this.history=this.history.filter((_,i)=>i%2===0||i===this.history.length-1);
+      if(this.history.length>512){this.history=this.history.filter((_,i)=>i%2===0||i===this.history.length-1);this.historyCompressed=true;}
       const alive=new Set(this.s.live().map(m=>m.geneClone));for(const id of this.unarchived)if(!alive.has(id)){const c=this.clones.get(id);c.archivedGenes=JSON.stringify(c.genes);c.genes=null;this.unarchived.delete(id);}
     }
     compactHistory(){
@@ -12389,6 +12400,15 @@ var CPM = (function (exports, module$1) {
       // UI snapshots retain major clones plus an 'other' total per kind. Full
       // analytic export retains all recorded clones; this never changes biology.
       return this.historyView=this.history.map(r=>{const counts={},states={};for(const [id,n]of Object.entries(r.counts)){const kind=r.states[id],key=keep.has(id)?id:-kind;counts[key]=(counts[key]||0)+n;states[key]=kind;}return {time:r.time,counts,states};});
+    }
+    evolutionReport(full=false){
+      if(!full&&this.evolutionView)return this.evolutionView;
+      const peaks=new Map();for(const row of this.history)for(const [id,n]of Object.entries(row.tumors||{}))peaks.set(+id,Math.max(peaks.get(+id)||0,n));
+      const ranked=[...peaks].sort((a,b)=>b[1]-a[1]||a[0]-b[0]),keep=new Set((full?ranked:ranked.slice(0,12)).map(([id])=>id)),ancestors=new Set(keep);
+      for(const id of keep){let parent=this.branches.get(id)?.parent;while(parent&&!ancestors.has(parent)){ancestors.add(parent);parent=this.branches.get(parent)?.parent;}}
+      const rows=this.history.map(row=>{const counts={};let total=0;for(const [id,n]of Object.entries(row.tumors||{})){const key=keep.has(+id)?id:0;counts[key]=(counts[key]||0)+n;total+=n;}return {time:row.time,total,counts};});
+      const report={rows,branches:[...ancestors].sort((a,b)=>a-b).map(id=>({...this.branches.get(id)})),shown:[...keep],omitted:ranked.length-keep.size,samplingMCS:30,compressed:!!this.historyCompressed};
+      if(!full)this.evolutionView=report;return report;
     }
     contactReport(selected){
       if(!selected||selected.dying)return [];
@@ -12427,7 +12447,7 @@ var CPM = (function (exports, module$1) {
       const clones=Object.keys(counts).filter(id=>!visible||visible.has(+id)).map(id=>{const {genes,...c}=this.clones.get(+id);return {...c,live:counts[id],...(full?{genes}:{})};});
       const variants=new Set(),presented=new Set(),receptors=new Set();let primedCells=0;
       for(const m of this.s.live())if(!m.dying){const g=this.genes(m);if(m.kind===3){if(g.receptor)receptors.add(g.receptor.channel+':'+g.receptor.sequence);primedCells+=Number(m.primed);}else if(m.kind===2||m.state==='abnormal')g.peptides.forEach((p,i)=>{if(p.present&&!this.self.includes(p.sequence)){const k=p.channel+':'+p.sequence;variants.add(k);if(m.expression.peptides[i]*m.expression.presentation[p.channel]>=.18)presented.add(k);}});}
-      return {length:this.length,threshold,self:this.self,clones,selectedGene,visuals:this.visualReport(),contacts:this.contactReport(selected),selectedID:selected?.id||0,history:full?this.history:this.compactHistory(),coverage:{variants:variants.size,presented:presented.size,receptors:receptors.size,primedCells},metrics:{...this.metrics,cacheEntries:this.cache.size},repertoire:this.repertoire.map(r=>({...r})),queue:this.queue.length,exposures:this.exposures.slice(-16),encounters:[...this.encounters.values()].slice(-64),...(full?{lineage:[...this.clones.values()].map(({archivedGenes,...c})=>({...c,genes:c.genes||(archivedGenes?JSON.parse(archivedGenes):null)}))}:{})};
+      return {slots:1,evolution:this.evolutionReport(full),length:this.length,threshold,self:this.self,clones,selectedGene,visuals:this.visualReport(),contacts:this.contactReport(selected),selectedID:selected?.id||0,history:full?this.history:this.compactHistory(),coverage:{variants:variants.size,presented:presented.size,receptors:receptors.size,primedCells},metrics:{...this.metrics,cacheEntries:this.cache.size},repertoire:this.repertoire.map(r=>({...r})),queue:this.queue.length,exposures:this.exposures.slice(-16),encounters:[...this.encounters.values()].slice(-64),...(full?{lineage:[...this.clones.values()].map(({archivedGenes,...c})=>({...c,genes:c.genes||(archivedGenes?JSON.parse(archivedGenes):null)}))}:{})};
     }
     definitions(m){const g=this.genes(m);return {kind:m.kind,x:m.x/this.s.scale,y:m.y/this.s.scale,radius:Math.sqrt(this.s.C.getVolume(m.id)/Math.PI)/this.s.scale,genes:structuredClone(g),primed:m.primed,state:m.state};}
     initialize(definitions){
@@ -12455,7 +12475,7 @@ var CPM = (function (exports, module$1) {
   Object.assign(DEFAULTS,{normalSupport:0,immuneKillLimit:10});
   Object.assign(DEFAULTS,{cycleCoupling:1,reserveCapacity:80,replicationStress:1,dnaRepair:1,checkpointIntegrity:1,traitCost:.45,normalRepair:.25,normalDivisions:4});
   Object.assign(DEFAULTS,{stemFraction:20,stemSymmetry:30,stemRenewal:60,stemCycleSlowdown:1.35,stemRepair:1.4,stemPlasticity:.25,tumorProgenyLimit:0});
-  const MODEL_REVISION='2026-11-onset-calibration-antigen-visuals-2';
+  const MODEL_REVISION='2026-11-single-antigen-lineage-3';
   Object.assign(DEFAULTS,{antigenLength:6,initialImmuneReady:65,primingRate:1,checkpointStrength:1});
   // Vascular parameters are phenomenological MCS rates, not clinical estimates.
   Object.assign(DEFAULTS,{vesselCount:0,vesselRadius:11,vesselSupply:1,vesselDependence:45,vesselImmuneRate:1,vesselImmuneHealth:60,vesselPassage:1,vesselRepair:1,vesselDivisions:4,vesselLifespan:18000,vesselInflammation:1,tumorIntravasation:1});
@@ -12528,7 +12548,7 @@ var CPM = (function (exports, module$1) {
     oncogenesis:{label:'肿瘤发生发展',environmentProfile:'mosaic',founderTolerance:2.3,description:'密铺正常组织与 12 颗分散免疫细胞，从零肿瘤开始。三处供给较弱的区域与健康边缘形成差异；癌前、癌变、免疫清除、抑制与恢复相互竞争，逃逸克隆可能再次扩增。没有定时转变或预设结局。',settings:{supply:2.7,metabolism:1.05,inflammation:1.3,stressMutation:4.5,progression:2.5,normalMutationGain:5,tumorMutationGain:6,growth:1.3,tumorCycle:170,apoptosis:3,tumorMotility:1.1,normalMotility:.1,cohesion:1.1,escape:3,immuneMotility:1.3,immuneGrowth:.5,immuneDivisions:3,immuneCycle:200,antigenMemory:1200,kill:1.4,recruitment:1.4,chemotaxis:1.8,mutation:12,mutationSize:.2,antigenStressGain:1.2,contactEscape:.6,signalEscape:.3,damagePolarization:3.5,damageDeactivation:1.2,suppressiveSecretion:1.5,suppressionStrength:1.3,suppressionRecovery:1.5,immuneRegulationMemory:200}},
     random:{label:'随机肿瘤演化',environmentProfile:'mosaic',founderTolerance:2.3,description:'随机化的密铺正常组织、12–16 颗内部免疫细胞与三处弱供给区域。参数在发生发展附近抽样，肿瘤必须由局部癌前产生；相同种子和参数可重现开局，结局由局部相互作用产生。',settings:{}},
     cold:{label:'免疫冷肿瘤扩散转移',description:'正常细胞铺满背景，中央嵌入 19 颗低抗原肿瘤，外围仅 3 颗免疫细胞。梭形肿瘤侵袭扩增，压力提高性状变异，部分克隆可能暴露抗原；免疫招募较弱。包含局部侵袭与概率性入血播散，不模拟远处器官定植。',settings:{supply:2.8,metabolism:.65,stressMutation:0,progression:1,growth:1.4,tumorCycle:180,apoptosis:2,tumorMotility:1.5,tumorMorphology:1,normalMotility:.25,cohesion:.4,sectionYield:.4,immuneMotility:.8,antigen:15,kill:1,chemotaxis:.6,recruitment:.35,immuneGrowth:.15,immuneDivisions:2,alignment:.2,noise:.85,mutation:8,normalMutationGain:1,tumorMutationGain:5,antigenStressGain:.3,contactEscape:.15,signalEscape:.1}},
-    hot:{label:'免疫热肿瘤治愈',description:'正常细胞铺满背景，中央嵌入 37 颗高抗原肿瘤，18 颗免疫细胞分散在病灶周边的组织内。接触识别、招募及 IL-2 扩增支持早期清除；少数存活克隆可能丢失抗原并再次扩增。结局随种子改变，关闭杀伤可作对照。',settings:{supply:2.8,metabolism:.65,stressMutation:0,progression:1,growth:.75,tumorCycle:280,apoptosis:0,tumorMotility:.35,immuneMotility:1.2,antigen:100,kill:2,chemotaxis:2.5,recruitment:2.4,immuneGrowth:.65,immuneDivisions:3,immuneCycle:200,antigenMemory:1200,il2Secretion:1.2,noise:.45,halfLife:180,mutation:2,mutationSize:.05,antigenStressGain:.15,contactEscape:.35,signalEscape:.12}},
+    hot:{label:'免疫热肿瘤应答',description:'正常细胞铺满背景，中央嵌入 37 颗高抗原肿瘤，18 颗免疫细胞分散在病灶周边的组织内。接触识别、招募及 IL-2 扩增支持早期清除；少数存活克隆可能丢失抗原并再次扩增。结局随种子改变，关闭杀伤可作对照。',settings:{supply:2.8,metabolism:.65,stressMutation:0,progression:1,growth:.75,tumorCycle:280,apoptosis:0,tumorMotility:.35,immuneMotility:1.2,antigen:100,kill:2,chemotaxis:2.5,recruitment:2.4,immuneGrowth:.65,immuneDivisions:3,immuneCycle:200,antigenMemory:1200,il2Secretion:1.2,noise:.45,halfLife:180,mutation:2,mutationSize:.05,antigenStressGain:.15,contactEscape:.35,signalEscape:.12}},
     ecosystem:{label:'免疫共培养',settings:{}},
     network:{label:'胶质瘤样分枝成网',settings:{tumorMorphology:2,tumorMotility:.12,branchLength:2.8,branchStrength:5,networkAdhesion:1,growth:.18,apoptosis:0,metabolism:.65,supply:2.6,stressMutation:0,alignment:.15,noise:.35}},
     collective:{label:'群体迁移',settings:{normalMotility:.85,alignment:2,cohesion:1.2,repulsion:.4,noise:.35,growth:0,apoptosis:0}},
@@ -13060,7 +13080,7 @@ var CPM = (function (exports, module$1) {
     }
     changeAntigen(m,level,cause){
       // Explicit experimental expression perturbation, never a DNA mutation.
-      for(let i=0;i<4;i++)m.expression.peptides[i]=this.immunity.genes(m).peptides[i].present?clamp(level):0;
+      for(let i=0;i<this.immunity.genes(m).peptides.length;i++)m.expression.peptides[i]=this.immunity.genes(m).peptides[i].present?clamp(level):0;
       m.lastAntigenChange={time:this.C.time,cause};this.immunity.summarize(m);
     }
     releaseAntigenTarget(m){
@@ -14281,7 +14301,7 @@ var CPM = (function (exports, module$1) {
   function parse(data){
     if(!object(data)||!object(data.settings)||!scenes.includes(data.scene))invalid('settings / scene');
     if(data.format!==undefined&&data.format!=='cell-arena-experiment')invalid('format');
-    if(data.schemaVersion!==undefined&&![1,2].includes(data.schemaVersion))throw Error('实验文件版本暂不支持');
+    if(data.schemaVersion!==undefined&&![1,2,3].includes(data.schemaVersion))throw Error('实验文件版本暂不支持');
     if(data.version!==undefined&&!/^[34]\.\d+/.test(String(data.version)))throw Error('实验文件版本暂不支持');
     const seed=number(data.seed,0,4294967295,'seed');if(!Number.isInteger(seed))invalid('seed');
     const boundary=choice(data.boundary,['solid','wrap'],'boundary'),refinement=choice(data.refinement,[1,1.5,2,3,4],'refinement');
@@ -14293,13 +14313,13 @@ var CPM = (function (exports, module$1) {
     const initialCells=data.initialCells??[];
     if(!Array.isArray(initialCells)||initialCells.length>4096)invalid('initialCells');
     const length=settings.antigenLength||6,seq=x=>{if(typeof x!=='string'||x.length!==length||!/^[ATCG]+$/.test(x))invalid('ATCG sequence');return x;};
-    const definedClones=new Map();
+    const definedClones=new Map();let legacySlots=false;
     const cleanCells=initialCells.map(d=>{
       if(!object(d))invalid('initial cell');choice(d.kind,[1,2,3],'kind');number(d.x,0,worldWidth,'cell.x');number(d.y,0,worldHeight,'cell.y');number(d.radius,2,24,'cell.radius');
       if(d.primed!==undefined&&typeof d.primed!=='boolean')invalid('primed');if(d.state!==undefined)choice(d.state,['normal','abnormal','tumor','immune'],'cell.state');
       if((d.state==='abnormal'||d.state==='normal')&&d.kind!==1)invalid('cell.state / kind');
       let genes;
-      if(d.genes!==undefined){const g=d.genes;if(!object(g)||!Array.isArray(g.peptides)||g.peptides.length!==4||!Array.isArray(g.surface)||g.surface.length!==2||!Array.isArray(g.presentation)||g.presentation.length!==2||!object(g.brake)||!object(g.traits))invalid('genes');
+      if(d.genes!==undefined){const g=d.genes;if(!object(g)||!Array.isArray(g.peptides)||!([1].includes(g.peptides.length)||(data.schemaVersion!==3&&g.peptides.length===4))||!Array.isArray(g.surface)||g.surface.length!==2||!Array.isArray(g.presentation)||g.presentation.length!==2||!object(g.brake)||!object(g.traits))invalid('genes');
         const peptides=g.peptides.map(p=>{if(!object(p)||typeof p.present!=='boolean')invalid('peptide');return {sequence:seq(p.sequence),present:p.present,base:number(p.base,0,1,'base'),stress:number(p.stress,-3,3,'stress response'),inflammation:number(p.inflammation,-3,3,'inflammatory response'),channel:choice(p.channel,[0,1],'channel')};});
         const surface=g.surface.map(p=>{if(!object(p)||typeof p.present!=='boolean')invalid('surface');return {sequence:seq(p.sequence),present:p.present,base:number(p.base,0,1,'surface.base')};});
         const traits={};for(const key of ['tolerance','proliferation','invasion'])traits[key]=number(g.traits[key],.25,3,key);traits.repair=number(g.traits.repair??1,.25,3,'repair');traits.antigen=number(g.traits.antigen??.5,0,1,'legacy antigen baseline');
@@ -14311,7 +14331,8 @@ var CPM = (function (exports, module$1) {
       if(d.parentKey!==undefined){if(!definedClones.has(d.parentKey)||d.parentKey===d.cloneKey)invalid('parentKey');lineage.parentKey=d.parentKey;}
       if(d.cloneKey)definedClones.set(d.cloneKey,JSON.stringify(genes));
       let expression;
-      if(d.expression!==undefined){const e=d.expression;if(!genes||!object(e)||!Array.isArray(e.peptides)||e.peptides.length!==4||!Array.isArray(e.presentation)||e.presentation.length!==2)invalid('expression');expression={peptides:e.peptides.map(v=>number(v,0,1,'expression')),presentation:e.presentation.map(v=>number(v,0,1,'presentation')),checkpoint:number(e.checkpoint,0,1,'checkpoint')};}
+      if(d.expression!==undefined){const e=d.expression;if(!genes||!object(e)||!Array.isArray(e.peptides)||e.peptides.length!==d.genes.peptides.length||!Array.isArray(e.presentation)||e.presentation.length!==2)invalid('expression');expression={peptides:e.peptides.map(v=>number(v,0,1,'expression')),presentation:e.presentation.map(v=>number(v,0,1,'presentation')),checkpoint:number(e.checkpoint,0,1,'checkpoint')};}
+      if(genes?.peptides.length===4){legacySlots=true;genes.peptides=genes.peptides.slice(0,1);if(expression)expression.peptides=expression.peptides.slice(0,1);}
       return {kind:d.kind,x:d.x,y:d.y,radius:d.radius,...lineage,...(genes?{genes}:{}),...(expression?{expression}:{}),...(d.primed!==undefined?{primed:d.primed}:{}),...(d.state?{state:d.state}:{})};
     });
     const sources=data.sources===undefined?undefined:data.sources;if(sources!==undefined){if(!Array.isArray(sources)||sources.length>4096)invalid('sources');for(const v of sources){if(!object(v))invalid('source');choice(v.type,[...signals,'oxygen','glucose','acid','nutrient','hostile'],'source.type');number(v.x,0,worldWidth,'source.x');number(v.y,0,worldHeight,'source.y');number(v.radius,2,40,'source.radius');}}
@@ -14329,8 +14350,8 @@ var CPM = (function (exports, module$1) {
     if(input.opacity!==undefined){if(!object(input.opacity))invalid('opacity');display.opacity={};for(const [k,v]of Object.entries(input.opacity))if(['adversity','oxygen','glucose','acid','density',...signals].includes(k))display.opacity[k]=number(v,0,1,'opacity.'+k);}
     if(input.flags!==undefined){if(!object(input.flags))invalid('flags');display.flags={};for(const [k,v]of Object.entries(input.flags))if(flags.includes(k)){if(typeof v!=='boolean')invalid(k);display.flags[k]=v;}}
     for(const [key,options]of [['zoom',['100','150','200','300']],['fit',['cover','contain']],['renderResolution',['auto','1920','2560','3840']]])if(input[key]!==undefined)display[key]=choice(input[key],options,key);
-    const migration=data.schemaVersion!==2||!!(data.modelRevision&&data.modelRevision!==(globalThis.CellLab?.MODEL_REVISION||'2026-11-onset-calibration-antigen-visuals-2'));
-    return {mode:'parameters',migration,warnings:migration?['旧实验已迁移至特异识别规则；种子与参数保留，演化轨迹会变化。']:[],config:{initialCells:cleanCells,scene:data.scene,mazeSignalThroughWalls:!!data.maze?.signalThroughWalls,seed,boundary,worldWidth,worldHeight,refinement,settings,...(vessels?{vessels:vessels.map(v=>({x:v.x,y:v.y,radius:v.radius}))}:{}),...(sources?{sources:sources.map(s=>({type:s.type,x:s.x,y:s.y,radius:s.radius}))}:{}),warmup:data.warmup===undefined?(data.scene==='empty'?0:35):number(data.warmup,0,200,'warmup')},display,speed:data.speed===undefined?1:number(data.speed,.25,8,'speed'),sourceTime:Number.isFinite(data.time)?data.time:0,ignored};
+    const migration=data.schemaVersion!==3||!!(data.modelRevision&&data.modelRevision!==(globalThis.CellLab?.MODEL_REVISION||'2026-11-single-antigen-lineage-3'));
+    return {mode:'parameters',migration,warnings:[...(migration?['旧实验将按单抗原规则重新运行；种子与参数保留，演化轨迹会变化。']:[]),...(legacySlots?['旧四槽配方仅保留 P1 及其表达值，P2–P4 不再参与模拟；原文件不修改。']:[])],config:{initialCells:cleanCells,scene:data.scene,mazeSignalThroughWalls:!!data.maze?.signalThroughWalls,seed,boundary,worldWidth,worldHeight,refinement,settings,...(vessels?{vessels:vessels.map(v=>({x:v.x,y:v.y,radius:v.radius}))}:{}),...(sources?{sources:sources.map(s=>({type:s.type,x:s.x,y:s.y,radius:s.radius}))}:{}),warmup:data.warmup===undefined?(data.scene==='empty'?0:35):number(data.warmup,0,200,'warmup')},display,speed:data.speed===undefined?1:number(data.speed,.25,8,'speed'),sourceTime:Number.isFinite(data.time)?data.time:0,ignored};
   }
   globalThis.CellLabExperiment={parse,ranges,scenes,flags};
 })();
@@ -14416,7 +14437,7 @@ async function handle(event){
     else if(command==='mazeSignal'){value=sim.setMazeSignalMode(payload.throughWalls);resetClock();}
     else if(command==='divide'){
       const target=payload.id||sim.live().filter(c=>!c.dying).sort((a,b)=>sim.C.getVolume(b.id)-sim.C.getVolume(a.id))[0]?.id;value=sim.divide(target);
-    }else if(command==='export')value={format:'cell-arena-experiment',schemaVersion:2,initialCells:sim.initialCells,immunity:sim.immunity.report(true),version:'4.0.0',modelRevision:CellLab.MODEL_REVISION,warmup:sim.initialWarmup,speed,kernel:sim.kernel,compute:backend.info(),scene:sim.scene,scenario:sim.scenarioReport(),vessels:sim.vascular.vessels.filter(v=>v.active).map(v=>sim.vascular.definition(v)),vascular:sim.vascular.report(),normalSupport:sim.normalSupportReport(),cycles:sim.cycleReport(),patrol:{...sim.patrolReport(),checkedBirths:[...sim.patrol.checked]},maze:sim.maze?structuredClone(sim.maze):null,sources:sim.sources.map(s=>({type:s.type,x:s.x/sim.scale,y:s.y/sim.scale,radius:s.radius/sim.scale})),supplyMap:Array.from(sim.supplyMap),boundary:sim.boundary,seed:sim.seedValue,worldWidth:sim.worldWidth,worldHeight:sim.worldHeight,refinement:sim.scale,settings:sim.settings,time:sim.C.time,history:sim.populationHistory(),events:sim.events,counters:sim.counters,manualDeathRemovals:sim.manualDeathRemovals,deaths:sim.deathSummary(),deathHistory:sim.deathHistory,lineage:sim.lineage,cells:sim.snapshot().cells};
+    }else if(command==='export')value={format:'cell-arena-experiment',schemaVersion:3,initialCells:sim.initialCells,immunity:sim.immunity.report(true),version:'4.0.0',modelRevision:CellLab.MODEL_REVISION,warmup:sim.initialWarmup,speed,kernel:sim.kernel,compute:backend.info(),scene:sim.scene,scenario:sim.scenarioReport(),vessels:sim.vascular.vessels.filter(v=>v.active).map(v=>sim.vascular.definition(v)),vascular:sim.vascular.report(),normalSupport:sim.normalSupportReport(),cycles:sim.cycleReport(),patrol:{...sim.patrolReport(),checkedBirths:[...sim.patrol.checked]},maze:sim.maze?structuredClone(sim.maze):null,sources:sim.sources.map(s=>({type:s.type,x:s.x/sim.scale,y:s.y/sim.scale,radius:s.radius/sim.scale})),supplyMap:Array.from(sim.supplyMap),boundary:sim.boundary,seed:sim.seedValue,worldWidth:sim.worldWidth,worldHeight:sim.worldHeight,refinement:sim.scale,settings:sim.settings,time:sim.C.time,history:sim.populationHistory(),events:sim.events,counters:sim.counters,manualDeathRemovals:sim.manualDeathRemovals,deaths:sim.deathSummary(),deathHistory:sim.deathHistory,lineage:sim.lineage,cells:sim.snapshot().cells};
     else if(command==='snapshot')value={time:sim.C.time,cells:sim.live().length};
     else throw Error('Unknown command: '+command);
     if(['seed','sprinkle','divide'].includes(command))sim.record();
@@ -14893,7 +14914,7 @@ globalThis.CellLabSignalGesture=class {
     constructor(){this.active=null;this.serial=0;}
     begin(s,now,iso=new Date().toISOString(),locks={},display={},replayOf=null){
       this.active={id:iso+'-'+s.seed+'-'+(++this.serial),scene:s.scene,seed:s.seed,startedAt:iso,endedAt:null,lastSeenAt:iso,reason:'running',worldWidth:s.worldWidth,worldHeight:s.worldHeight,refinement:s.refinement,boundary:s.boundary,initialMCS:s.time,simulatedMCS:s.time,runningMs:0,initialSettings:{...s.settings},finalSettings:{...s.settings},initialLocks:{...locks},finalLocks:{...locks},parameterChanges:[],population:population(s),initialPopulation:population(s),cycles:copy(s.cycles||{}),sources:copy(s.sources||[]),counters:{...s.counters}};
-      Object.assign(this.active,{schemaVersion:s.immunity?2:1,modelRevision:s.modelRevision||null,initialCells:copy(s.initialCells||[]),initialWarmup:s.warmup,initialKernel:s.kernel,initialVessels:s.vascular?.initial?copy(s.vascular.initial):undefined,vascular:copy(s.vascular||{}),initialCompute:s.compute?.active,initialSpeed:s.speed||1,initialDisplay:copy(display),initialSources:(s.sources||[]).map(v=>({type:v.type,x:v.x/s.refinement,y:v.y/s.refinement,radius:v.radius/s.refinement})),initialMaze:s.maze?{signalThroughWalls:!!s.maze.signalThroughWalls}:null,replayOf});
+      Object.assign(this.active,{schemaVersion:s.immunity?.slots===1?3:s.immunity?2:1,modelRevision:s.modelRevision||null,initialCells:copy(s.initialCells||[]),initialWarmup:s.warmup,initialKernel:s.kernel,initialVessels:s.vascular?.initial?copy(s.vascular.initial):undefined,vascular:copy(s.vascular||{}),initialCompute:s.compute?.active,initialSpeed:s.speed||1,initialDisplay:copy(display),initialSources:(s.sources||[]).map(v=>({type:v.type,x:v.x/s.refinement,y:v.y/s.refinement,radius:v.radius/s.refinement})),initialMaze:s.maze?{signalThroughWalls:!!s.maze.signalThroughWalls}:null,replayOf});
       this.epoch=s.revision+':'+s.seed;this.lastTick=now;this.running=!!s.playing;return this.current();
     }
     observe(s,now,running=true){
@@ -15124,7 +15145,7 @@ Arena 培养皿|Arena culture dish
 实验场景|Scenarios
 肿瘤发生发展|Tumor development
 免疫冷肿瘤扩散转移|Cold tumor spread
-免疫热肿瘤治愈|Hot tumor clearance
+免疫热肿瘤应答|Hot tumor response
 发生发展|Onset
 冷肿瘤|Cold
 热肿瘤|Hot
@@ -15717,6 +15738,9 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
 抗原轮廓|Antigen outline
 抗原谱系轮廓|Antigen lineage outlines
 存活正常细胞的持续压力或损伤也可触发；不必先死亡。暴露越强、越久转蓝概率越高；0 关闭|Sustained stress or injury in living normal cells can also trigger this; prior death is not required. Stronger and longer exposure increases switching; 0 disables it.
+旧实验将按单抗原规则重新运行；种子与参数保留，演化轨迹会变化。|Older experiments restart under single-antigen rules; seeds and parameters are retained, but trajectories change.
+旧四槽配方仅保留 P1 及其表达值，P2–P4 不再参与模拟；原文件不修改。|Older four-slot recipes retain only P1 and its expression; P2–P4 are omitted. The original file is unchanged.
+关闭谱系图|Close lineage diagram
 颜色表示遗传抗原谱；同色免疫外轮廓表示受体匹配潜力|Colors show inherited antigen profiles; matching immune outlines show receptor compatibility
 外轮廓：肿瘤抗原／免疫匹配|Outlines: tumor antigens / immune matching
 追踪后：✓ 已识别 · ≈ 接触扫描 · × 不匹配 · ! 受限。|Track: ✓ recognized · ≈ scanning · × mismatch · ! limited.
@@ -16171,8 +16195,8 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     if(s.boundary==='wrap'){dx-=Math.round(dx/s.width)*s.width;dy-=Math.round(dy/s.height)*s.height;}
     const angle=Math.atan2(dy,dx)+Math.PI,index=Math.min(style.segments.length-1,Math.floor(angle/(2*Math.PI)*style.segments.length));return style.segments[index];
   }
-  // Variable-length color spans: one immune receptor may match more than the
-  // four peptide slots of a single tumor. Identical spans share atlas storage.
+  // Variable-length color spans: one immune receptor can cross-recognize many
+  // single-antigen tumors. Identical spans share atlas storage.
   function antigenTextureData(outlines,buffers={},maxTextureSize=16384){
     const width=Math.min(1024,maxTextureSize),limit=Math.min(width*maxTextureSize,2**24),spans=new Map(),bytes=[];
     const centers=buffers.centers||new Float32Array(256*256*4);centers.fill(0);
@@ -16401,7 +16425,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
   function parse(data){
     if(!object(data)||!object(data.settings)||!scenes.includes(data.scene))invalid('settings / scene');
     if(data.format!==undefined&&data.format!=='cell-arena-experiment')invalid('format');
-    if(data.schemaVersion!==undefined&&![1,2].includes(data.schemaVersion))throw Error('实验文件版本暂不支持');
+    if(data.schemaVersion!==undefined&&![1,2,3].includes(data.schemaVersion))throw Error('实验文件版本暂不支持');
     if(data.version!==undefined&&!/^[34]\.\d+/.test(String(data.version)))throw Error('实验文件版本暂不支持');
     const seed=number(data.seed,0,4294967295,'seed');if(!Number.isInteger(seed))invalid('seed');
     const boundary=choice(data.boundary,['solid','wrap'],'boundary'),refinement=choice(data.refinement,[1,1.5,2,3,4],'refinement');
@@ -16413,13 +16437,13 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     const initialCells=data.initialCells??[];
     if(!Array.isArray(initialCells)||initialCells.length>4096)invalid('initialCells');
     const length=settings.antigenLength||6,seq=x=>{if(typeof x!=='string'||x.length!==length||!/^[ATCG]+$/.test(x))invalid('ATCG sequence');return x;};
-    const definedClones=new Map();
+    const definedClones=new Map();let legacySlots=false;
     const cleanCells=initialCells.map(d=>{
       if(!object(d))invalid('initial cell');choice(d.kind,[1,2,3],'kind');number(d.x,0,worldWidth,'cell.x');number(d.y,0,worldHeight,'cell.y');number(d.radius,2,24,'cell.radius');
       if(d.primed!==undefined&&typeof d.primed!=='boolean')invalid('primed');if(d.state!==undefined)choice(d.state,['normal','abnormal','tumor','immune'],'cell.state');
       if((d.state==='abnormal'||d.state==='normal')&&d.kind!==1)invalid('cell.state / kind');
       let genes;
-      if(d.genes!==undefined){const g=d.genes;if(!object(g)||!Array.isArray(g.peptides)||g.peptides.length!==4||!Array.isArray(g.surface)||g.surface.length!==2||!Array.isArray(g.presentation)||g.presentation.length!==2||!object(g.brake)||!object(g.traits))invalid('genes');
+      if(d.genes!==undefined){const g=d.genes;if(!object(g)||!Array.isArray(g.peptides)||!([1].includes(g.peptides.length)||(data.schemaVersion!==3&&g.peptides.length===4))||!Array.isArray(g.surface)||g.surface.length!==2||!Array.isArray(g.presentation)||g.presentation.length!==2||!object(g.brake)||!object(g.traits))invalid('genes');
         const peptides=g.peptides.map(p=>{if(!object(p)||typeof p.present!=='boolean')invalid('peptide');return {sequence:seq(p.sequence),present:p.present,base:number(p.base,0,1,'base'),stress:number(p.stress,-3,3,'stress response'),inflammation:number(p.inflammation,-3,3,'inflammatory response'),channel:choice(p.channel,[0,1],'channel')};});
         const surface=g.surface.map(p=>{if(!object(p)||typeof p.present!=='boolean')invalid('surface');return {sequence:seq(p.sequence),present:p.present,base:number(p.base,0,1,'surface.base')};});
         const traits={};for(const key of ['tolerance','proliferation','invasion'])traits[key]=number(g.traits[key],.25,3,key);traits.repair=number(g.traits.repair??1,.25,3,'repair');traits.antigen=number(g.traits.antigen??.5,0,1,'legacy antigen baseline');
@@ -16431,7 +16455,8 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
       if(d.parentKey!==undefined){if(!definedClones.has(d.parentKey)||d.parentKey===d.cloneKey)invalid('parentKey');lineage.parentKey=d.parentKey;}
       if(d.cloneKey)definedClones.set(d.cloneKey,JSON.stringify(genes));
       let expression;
-      if(d.expression!==undefined){const e=d.expression;if(!genes||!object(e)||!Array.isArray(e.peptides)||e.peptides.length!==4||!Array.isArray(e.presentation)||e.presentation.length!==2)invalid('expression');expression={peptides:e.peptides.map(v=>number(v,0,1,'expression')),presentation:e.presentation.map(v=>number(v,0,1,'presentation')),checkpoint:number(e.checkpoint,0,1,'checkpoint')};}
+      if(d.expression!==undefined){const e=d.expression;if(!genes||!object(e)||!Array.isArray(e.peptides)||e.peptides.length!==d.genes.peptides.length||!Array.isArray(e.presentation)||e.presentation.length!==2)invalid('expression');expression={peptides:e.peptides.map(v=>number(v,0,1,'expression')),presentation:e.presentation.map(v=>number(v,0,1,'presentation')),checkpoint:number(e.checkpoint,0,1,'checkpoint')};}
+      if(genes?.peptides.length===4){legacySlots=true;genes.peptides=genes.peptides.slice(0,1);if(expression)expression.peptides=expression.peptides.slice(0,1);}
       return {kind:d.kind,x:d.x,y:d.y,radius:d.radius,...lineage,...(genes?{genes}:{}),...(expression?{expression}:{}),...(d.primed!==undefined?{primed:d.primed}:{}),...(d.state?{state:d.state}:{})};
     });
     const sources=data.sources===undefined?undefined:data.sources;if(sources!==undefined){if(!Array.isArray(sources)||sources.length>4096)invalid('sources');for(const v of sources){if(!object(v))invalid('source');choice(v.type,[...signals,'oxygen','glucose','acid','nutrient','hostile'],'source.type');number(v.x,0,worldWidth,'source.x');number(v.y,0,worldHeight,'source.y');number(v.radius,2,40,'source.radius');}}
@@ -16449,8 +16474,8 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     if(input.opacity!==undefined){if(!object(input.opacity))invalid('opacity');display.opacity={};for(const [k,v]of Object.entries(input.opacity))if(['adversity','oxygen','glucose','acid','density',...signals].includes(k))display.opacity[k]=number(v,0,1,'opacity.'+k);}
     if(input.flags!==undefined){if(!object(input.flags))invalid('flags');display.flags={};for(const [k,v]of Object.entries(input.flags))if(flags.includes(k)){if(typeof v!=='boolean')invalid(k);display.flags[k]=v;}}
     for(const [key,options]of [['zoom',['100','150','200','300']],['fit',['cover','contain']],['renderResolution',['auto','1920','2560','3840']]])if(input[key]!==undefined)display[key]=choice(input[key],options,key);
-    const migration=data.schemaVersion!==2||!!(data.modelRevision&&data.modelRevision!==(globalThis.CellLab?.MODEL_REVISION||'2026-11-onset-calibration-antigen-visuals-2'));
-    return {mode:'parameters',migration,warnings:migration?['旧实验已迁移至特异识别规则；种子与参数保留，演化轨迹会变化。']:[],config:{initialCells:cleanCells,scene:data.scene,mazeSignalThroughWalls:!!data.maze?.signalThroughWalls,seed,boundary,worldWidth,worldHeight,refinement,settings,...(vessels?{vessels:vessels.map(v=>({x:v.x,y:v.y,radius:v.radius}))}:{}),...(sources?{sources:sources.map(s=>({type:s.type,x:s.x,y:s.y,radius:s.radius}))}:{}),warmup:data.warmup===undefined?(data.scene==='empty'?0:35):number(data.warmup,0,200,'warmup')},display,speed:data.speed===undefined?1:number(data.speed,.25,8,'speed'),sourceTime:Number.isFinite(data.time)?data.time:0,ignored};
+    const migration=data.schemaVersion!==3||!!(data.modelRevision&&data.modelRevision!==(globalThis.CellLab?.MODEL_REVISION||'2026-11-single-antigen-lineage-3'));
+    return {mode:'parameters',migration,warnings:[...(migration?['旧实验将按单抗原规则重新运行；种子与参数保留，演化轨迹会变化。']:[]),...(legacySlots?['旧四槽配方仅保留 P1 及其表达值，P2–P4 不再参与模拟；原文件不修改。']:[])],config:{initialCells:cleanCells,scene:data.scene,mazeSignalThroughWalls:!!data.maze?.signalThroughWalls,seed,boundary,worldWidth,worldHeight,refinement,settings,...(vessels?{vessels:vessels.map(v=>({x:v.x,y:v.y,radius:v.radius}))}:{}),...(sources?{sources:sources.map(s=>({type:s.type,x:s.x,y:s.y,radius:s.radius}))}:{}),warmup:data.warmup===undefined?(data.scene==='empty'?0:35):number(data.warmup,0,200,'warmup')},display,speed:data.speed===undefined?1:number(data.speed,.25,8,'speed'),sourceTime:Number.isFinite(data.time)?data.time:0,ignored};
   }
   globalThis.CellLabExperiment={parse,ranges,scenes,flags};
 })();
@@ -16834,7 +16859,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
       root.append(node('p','immune-status',cell.primed?t('✓ 已具备响应资格；仍需匹配并实际接触','✓ Response competent; still requires a matching contact'):t('等待抗原特异性启动','Awaiting antigen-specific priming')));
       const meters=node('div','immune-meter-grid');meters.append(bar(t('启动进度','Priming'),cell.primed?1:cell.primingProgress),bar(t('刺激记忆','Memory'),cell.antigenMemory),bar(t('耗竭','Exhaustion'),cell.exhaustion,'brake'));root.append(meters);
     }else{
-      root.append(node('p','immune-note',t('最多 4 个抗原槽位；一次序列突变替换一个槽位，其他槽位保留。自身或遗传缺失的抗原不着色。','Up to 4 antigen slots. A sequence mutation replaces one slot and preserves the others. Self or genetically lost antigens have no color segment.')));
+      root.append(node('p','immune-note',t('每个靶细胞只有一个抗原槽；序列突变替换原抗原，自身或遗传缺失时不着色。','Each target has one antigen slot. Sequence mutation replaces its antigen. Self or genetically lost antigens have no color segment.')));
       const slots=node('div','immune-slots');
       g.peptides.forEach((p,i)=>{
         const self=a.self.includes(p.sequence),amount=cell.expression.peptides[i],shown=amount*cell.expression.presentation[p.channel],slot=node('div','immune-slot'+(!p.present?' lost':self?' self':''));
@@ -16897,6 +16922,78 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     for(let k=0;k<ids.length;k++){ctx.strokeStyle=colors[k];ctx.lineWidth=1.6;ctx.beginPath();a.history.forEach((r,i)=>{let total=0;for(const [id,n]of Object.entries(r.counts))if(r.states[id]===type)total+=n;const x=left+(right-left)*r.time/Math.max(1,s.time),y=bottom-(bottom-top)*(r.counts[ids[k]]||0)/Math.max(1,total);if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y);});ctx.stroke();}
   }
   globalThis.CellLabImmuneUI={inspect,stats,selection,links,assessment,legend};
+})();
+
+/* Observation only: tapered lineage ribbons connect measured population shares.
+ * Widths are independently normalized at each time, not conserved cell traffic. */
+(() => {
+  'use strict';
+  function columns(rows,ids){
+    if(rows.length<2)return rows.slice();
+    const take=new Set([0,rows.length-1]);
+    for(let i=1;i<5;i++)take.add(Math.round((rows.length-1)*i/5));
+    // Preserve a sampled peak for every displayed branch, including extinct ones.
+    for(const id of ids){let peak=-1,index=0;rows.forEach((r,i)=>{const n=r.counts[id]||0;if(n>peak){peak=n;index=i;}});if(peak>0)take.add(index);}
+    return [...take].sort((a,b)=>a-b).map(i=>rows[i]);
+  }
+  function layout(data){
+    const metadata=new Map(data.branches.map(b=>[b.id,b])),ids=[...data.shown],chosen=new Set(ids),children=new Map(),roots=[];
+    const parentOf=id=>{let p=metadata.get(id)?.parent||0,seen=new Set([id]);while(p&&!chosen.has(p)&&!seen.has(p)){seen.add(p);p=metadata.get(p)?.parent||0;}return p&&!seen.has(p)?p:0;};
+    for(const id of ids){const parent=parentOf(id);if(parent){if(!children.has(parent))children.set(parent,[]);children.get(parent).push(id);}else roots.push(id);}
+    const order=[],visit=id=>{if(order.includes(id))return;order.push(id);for(const child of (children.get(id)||[]).sort((a,b)=>a-b))visit(child);};
+    roots.sort((a,b)=>a-b).forEach(visit);ids.forEach(visit);if(data.omitted)order.push(0);
+    const rows=columns(data.rows,order),nodes=rows.map((row,col)=>{let y=0;return order.map(id=>{const count=row.counts[id]||0,share=row.total?count/row.total:0,node={id,col,time:row.time,count,total:row.total,share,lo:y,hi:y+share};y+=share;return node;});}),links=[];
+    for(let col=1;col<nodes.length;col++)for(const end of nodes[col]){
+      const start=nodes[col-1].find(n=>n.id===end.id);
+      if(!start.count&&!end.count)continue;
+      let source=start,ancestor=0;
+      if(!start.count&&end.count&&end.id){let p=metadata.get(end.id)?.parent,seen=new Set([end.id]);while(p&&!seen.has(p)){seen.add(p);const node=nodes[col-1].find(n=>n.id===p&&n.count);if(node){source={...start,lo:(node.lo+node.hi)/2,hi:(node.lo+node.hi)/2};ancestor=p;break;}p=metadata.get(p)?.parent;}}
+      links.push({id:end.id,col:col-1,start:source,end,ancestor});
+    }
+    return {rows,nodes,links,order,metadata};
+  }
+  const english=()=>document.documentElement.lang.startsWith('en'),t=(a,b)=>english()?b:a;
+  class Chart {
+    constructor(){
+      this.canvas=document.getElementById('lineage-sankey');this.legend=document.getElementById('lineage-sankey-legend');this.readout=document.getElementById('lineage-sankey-readout');this.note=document.getElementById('lineage-sankey-note');this.focus=null;this.column=null;
+      const panel=document.getElementById('lineage-sankey-panel'),dialog=document.getElementById('lineage-sankey-dialog'),expand=document.getElementById('lineage-sankey-expand'),anchor=document.createComment('lineage chart position');panel.before(anchor);
+      expand.addEventListener('click',()=>{if(dialog.open){dialog.close();return;}document.getElementById('lineage-sankey-host').append(panel);dialog.showModal();this.expanded=true;this.stamp=null;if(this.last)this.update(this.last);});
+      document.getElementById('lineage-sankey-close').addEventListener('click',()=>dialog.close());
+      dialog.addEventListener('close',()=>{anchor.after(panel);this.expanded=false;this.stamp=null;if(this.last)this.update(this.last);expand.focus();});
+      this.canvas.addEventListener('pointerdown',e=>this.point(e));this.canvas.addEventListener('pointermove',e=>{if(e.pointerType==='mouse')this.point(e);});
+      this.canvas.addEventListener('keydown',e=>{if(!this.plot||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Escape'].includes(e.key))return;e.preventDefault();if(e.key==='Escape')this.focus=null;else if(e.key==='ArrowLeft'||e.key==='ArrowRight')this.column=Math.max(0,Math.min(this.plot.rows.length-1,(this.column??this.plot.rows.length-1)+(e.key==='ArrowLeft'?-1:1)));else {const i=this.plot.order.indexOf(this.focus);this.focus=this.plot.order[(i+(e.key==='ArrowUp'?-1:1)+this.plot.order.length)%this.plot.order.length];}this.draw();});
+      new ResizeObserver(()=>{if(this.last){this.stamp=null;this.update(this.last);}}).observe(this.canvas.parentElement);
+    }
+    update(s){
+      const data=s.immunity?.evolution;if(!data)return;
+      const epoch=s.revision+':'+s.seed;if(this.epoch!==epoch){this.focus=null;this.column=null;this.epoch=epoch;}
+      this.last=s;const stamp=JSON.stringify([epoch,english(),data.rows.length,data.rows.at(-1),data.shown,data.compressed,Math.round(this.canvas.parentElement.clientWidth)]);if(this.stamp===stamp)return;this.stamp=stamp;
+      this.plot=layout(data);this.width=Math.max(620,(this.plot.rows.length-1)*86+80,this.canvas.parentElement.clientWidth);this.height=270;
+      const ratio=Math.min(2,devicePixelRatio||1);this.canvas.width=Math.round(this.width*ratio);this.canvas.height=Math.round(this.height*ratio);this.canvas.style.width=this.width+'px';this.canvas.style.height=this.height+'px';
+      this.canvas.setAttribute('aria-label',t('肿瘤抗原谱系演化桑基图；左右方向键选择时间，上下选择谱系','Tumor antigen lineage Sankey; left/right select time, up/down select lineage'));
+      document.getElementById('lineage-sankey-expand').textContent=this.expanded?t('收起','Collapse'):t('展开','Expand');
+      document.getElementById('lineage-sankey-close').setAttribute('aria-label',t('关闭谱系图','Close lineage diagram'));
+      document.getElementById('lineage-sankey-title').textContent=t('肿瘤谱系演化 · 桑基图','Tumor lineage evolution · Sankey');
+      this.note.textContent=t('带宽＝该采样时点的存活肿瘤占比；连带表示祖先关系，增殖／死亡可改变带宽，非守恒流量。横向滚动查看全程。','Width = share of living tumors at each sampled time; ribbons show ancestry, not conserved traffic. Growth and death change widths. Scroll horizontally for the full history.')+(data.omitted?t(' 其余 '+data.omitted+' 条分支合并为“其他”。',' '+data.omitted+' additional branches grouped as Other.'):'')+(data.compressed?t(' 长历史已降采样，短暂分支可能遗漏。',' Long history is downsampled; brief branches may be missed.'):'');
+      this.legend.replaceChildren();for(const id of this.plot.order){const button=document.createElement('button'),swatch=document.createElement('i');button.type='button';button.dataset.lineage=id;swatch.style.background=this.color(id);button.append(swatch,document.createTextNode(id?'A'+id:t('其他','Other')));button.addEventListener('click',()=>{this.focus=this.focus===id?null:id;this.column=null;this.draw();});this.legend.append(button);}
+      if(!this.plot.order.includes(this.focus))this.focus=null;this.column=this.column===null?null:Math.min(this.column,this.plot.rows.length-1);this.draw();
+    }
+    color(id){const b=this.plot.metadata.get(id);return b?.key?CellLabDisplay.antigenProfileStyle(b.key).color:id?'#9d8d76':'#c7bca9';}
+    x(col){return 36+col*(this.width-72)/Math.max(1,this.plot.rows.length-1);}
+    point(e){if(!this.plot?.rows.length)return;const r=this.canvas.getBoundingClientRect(),x=(e.clientX-r.left)*this.width/r.width,y=(e.clientY-r.top)*this.height/r.height;this.column=Math.max(0,Math.min(this.plot.rows.length-1,Math.round((x-36)/(this.width-72)*Math.max(1,this.plot.rows.length-1))));const node=this.plot.nodes[this.column].find(n=>n.count&&y>=32+n.lo*190&&y<=32+n.hi*190);if(node)this.focus=node.id;this.draw();}
+    draw(){
+      const ctx=this.canvas.getContext('2d'),p=this.plot;if(!p)return;ctx.setTransform(this.canvas.width/this.width,0,0,this.canvas.height/this.height,0,0);ctx.clearRect(0,0,this.width,this.height);ctx.fillStyle='#f7f0e2';ctx.fillRect(0,0,this.width,this.height);ctx.font='11px system-ui';ctx.textAlign='center';
+      if(!p.order.length){ctx.fillStyle='#71634c';ctx.fillText(t('尚无肿瘤谱系；肿瘤出现后开始记录。','No tumor lineages yet. Recording begins when tumors appear.'),this.width/2,125);this.readout.textContent='';return;}
+      for(const link of p.links){const x=this.x(link.col)+4,xx=this.x(link.col+1)-4,mid=(x+xx)/2,y=32+link.start.lo*190,yy=32+link.end.lo*190,b=32+link.start.hi*190,bb=32+link.end.hi*190;ctx.globalAlpha=(this.focus===null||link.id===this.focus)?0.68:0.12;ctx.fillStyle=this.color(link.id);ctx.beginPath();ctx.moveTo(x,y);ctx.bezierCurveTo(mid,y,mid,yy,xx,yy);ctx.lineTo(xx,bb);ctx.bezierCurveTo(mid,bb,mid,b,x,b);ctx.closePath();ctx.fill();if(link.ancestor){ctx.globalAlpha=.65;ctx.strokeStyle=this.color(link.id);ctx.setLineDash([2,3]);ctx.beginPath();ctx.moveTo(x,y);ctx.bezierCurveTo(mid,y,mid,yy,xx,yy);ctx.stroke();ctx.setLineDash([]);}}
+      ctx.globalAlpha=1;
+      p.nodes.forEach((nodes,col)=>{const x=this.x(col);ctx.globalAlpha=1;ctx.fillStyle='#71634c';ctx.fillText(p.rows[col].time+'',x,246);ctx.fillText('n='+p.rows[col].total,x,17);for(const node of nodes)if(node.count){ctx.globalAlpha=this.focus===null||node.id===this.focus?1:.3;ctx.fillStyle=this.color(node.id);ctx.fillRect(x-4,32+node.lo*190,8,node.share*190);if(node.share>=.085){ctx.fillStyle='#312a20';ctx.textAlign='left';ctx.fillText(node.id?'A'+node.id:t('其他','Other'),x+7,32+(node.lo+node.hi)*95+4);ctx.textAlign='center';}}});
+      ctx.globalAlpha=1;ctx.fillStyle='#71634c';ctx.textAlign='right';ctx.fillText('MCS',this.width-6,265);ctx.textAlign='center';
+      const col=this.column??p.rows.length-1,row=p.rows[col],id=this.focus,b=p.metadata.get(id),count=row?.counts[id]||0;
+      this.readout.textContent=id===null?t('选择色带或谱系编号查看细胞数、占比、抗原和祖先；虚线标出分支来源。','Select a ribbon or lineage ID for count, share, antigen and ancestry; dashed edges mark branching.'):row.time+' MCS · '+(id?'A'+id:t('其他','Other'))+' · '+count+t(' 颗',' cells')+' · '+(row.total?100*count/row.total:0).toFixed(1)+'%'+(b?' · '+t('父谱系 ','Parent ')+(b.parent?'A'+b.parent:t('独立起源','Independent founder'))+' · C'+(b.channel+1)+' '+b.sequence+' · '+(!b.present?t('抗原遗传丢失','Antigen lost'):b.self?t('自身抗原','Self antigen'):t('非自身抗原','Non-self antigen'))+' · '+t('分支出现 ','Branch arose ')+b.time+' MCS':'');
+      for(const button of this.legend.children)button.setAttribute('aria-pressed',String(Number(button.dataset.lineage)===this.focus));
+    }
+  }
+  globalThis.CellLabLineage={layout,columns,Chart};
 })();
 
 /* Display-only mobile framing. Rotation never changes the lattice or model. */
@@ -16965,6 +17062,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
   const adaptive=new CellLabPerformance.Controller({preferences:performancePreferences,now:performance.now()});
   const mobileQuery=matchMedia('(max-width:850px)');
   let performancePlan=adaptive.status(),presentationKey='',lastHeartbeat=0,lastAnimation=0,lastRender=0,latestInput=0,forceFrame=false;
+  const lineageChart=new CellLabLineage.Chart();
   const visiblePanels=new Set(),visibilityTargets=['statistics-panel','cell-inspector','history','scenario-guide'];
   const panelObserver=typeof IntersectionObserver==='function'?new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting)visiblePanels.add(entry.target.id);else visiblePanels.delete(entry.target.id);}uiPending=true;dirty=true;},{root:document.getElementById('sidebar-scroll')}):null;
   for(const id of visibilityTargets)panelObserver?.observe($(id));
@@ -17308,7 +17406,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     $('network-status').textContent=s.settings.tumorMorphology===2?`当前稳定接触 ${s.cells.reduce((n,m)=>n+(m.networkDegree||0),0)/2} 对；各细胞保持独立胞体。`:'示例会重新播种一片肿瘤细胞，观察突起逐渐形成与连接。';
     $('seed-status').textContent=`当前 ${s.cells.length} 颗 · 按局部空间尝试加入`;
     if(force||panelVisible('statistics-panel')){
-      CellLabImmuneUI.stats(s);
+      CellLabImmuneUI.stats(s);lineageChart.update(s);
       const p=CellLabRounds.population(s);
       for(const kind of ['normal','abnormal','tumor','immune','endothelial'])$(kind+'-count').textContent=p[kind];
       const vas=s.vascular; $('vascular-statistics').hidden=!vas?.vessels?.length; if(vas){$('vessel-functional').textContent=vas.functional+' / '+vas.vessels.length;$('vessel-perfusion').textContent=Math.round(vas.meanPerfusion*100)+'%';$('vessel-immune').textContent=(s.counters.extravasations||0)+' / '+(s.counters.vascularArrivals||0);$('vessel-export').textContent=s.counters.bloodstreamExports||0;$('vessel-repair').textContent='内皮分裂 '+(s.counters.endothelialDivisions||0)+' · 内皮死亡 '+(s.counters.endothelialDeaths||0)+' · 循环返回 '+(s.counters.circulationReturns||0);}
@@ -17798,8 +17896,9 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
   $('import-file').addEventListener('change',async()=>{
     const file=$('import-file').files?.[0];if(!file)return;const ticket=++importSerial,filename=document.createElement('b');filename.dataset.noI18n='';filename.textContent=file.name;pendingImport=null;$('confirm-import').disabled=true;$('import-summary').replaceChildren(filename);$('import-status').textContent='正在读取文件…';$('import-dialog').showModal();
     try{if(file.size>32*1024*1024)throw Error('文件超过 32 MB，请使用较小的实验参数文件');const data=JSON.parse(await file.text()),profile=CellLabExperiment.parse(data);if(ticket!==importSerial||!$('import-dialog').open)return;pendingImport=data;
-      $('import-summary').replaceChildren(filename,document.createTextNode('\n'+[`情境：${titles[profile.config.scene]||{oncogenesis:'肿瘤发生发展',cold:'免疫冷肿瘤扩散转移',hot:'免疫热肿瘤治愈'}[profile.config.scene]}`,`种子 ${profile.config.seed} · 区域 ${profile.config.worldWidth} × ${profile.config.worldHeight} · 精细度 ${profile.config.refinement}×`,`参数 ${Object.keys(profile.config.settings).length} 项 · 导出时刻 ${profile.sourceTime} MCS`].join('\n')));
-      $('import-status').textContent=profile.ignored.length?'将忽略旧版或未知参数：'+profile.ignored.join(', '):'文件校验通过';$('confirm-import').disabled=false;
+      $('import-summary').replaceChildren(filename,document.createTextNode('\n'+[`情境：${titles[profile.config.scene]||{oncogenesis:'肿瘤发生发展',cold:'免疫冷肿瘤扩散转移',hot:'免疫热肿瘤应答'}[profile.config.scene]}`,`种子 ${profile.config.seed} · 区域 ${profile.config.worldWidth} × ${profile.config.worldHeight} · 精细度 ${profile.config.refinement}×`,`参数 ${Object.keys(profile.config.settings).length} 项 · 导出时刻 ${profile.sourceTime} MCS`].join('\n')));
+      const messages=[profile.ignored.length?'将忽略旧版或未知参数：'+profile.ignored.join(', '):'文件校验通过',...profile.warnings];
+      $('import-status').replaceChildren(...messages.flatMap((line,i)=>[...(i?[document.createElement('br')]:[]),document.createTextNode(line)]));$('confirm-import').disabled=false;
     }catch(error){if(ticket===importSerial)$('import-status').textContent=error instanceof SyntaxError?'不是有效的 JSON 实验文件':String(error.message||error);}finally{if(ticket===importSerial)$('import-file').value='';}
   });
   $('cancel-import').addEventListener('click',()=>$('import-dialog').close());$('import-dialog').addEventListener('close',()=>{pendingImport=null;importSerial++;$('import-file').value='';});

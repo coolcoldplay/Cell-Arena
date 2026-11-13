@@ -20,7 +20,7 @@
       // Same seeded MT19937 implementation as CPM, on an explicit substream so
       // adding epitopes does not redraw maze geometry or consume motility RNG.
       this.rng=new s.C.mt.constructor((s.seedValue^0x49b72d15)>>>0);
-      this.clones=new Map();this.unarchived=new Set();this.serial=0;this.immuneSerial=0;this.cache=new Map();this.cacheLimit=8192;this.history=[];this.exposures=[];this.queue=[];this.encounters=new Map();
+      this.branches=new Map();this.clones=new Map();this.unarchived=new Set();this.serial=0;this.immuneSerial=0;this.cache=new Map();this.cacheLimit=8192;this.history=[];this.exposures=[];this.queue=[];this.encounters=new Map();
       this.metrics={geneticChanges:0,substitutions:0,losses:0,primed:0,reinforcements:0,exposureRecords:0,cacheMisses:0};
       this.self=Array.from({length:4},()=>this.sequence());
       // A finite repertoire is generated BEFORE targets. No encountered target
@@ -43,9 +43,13 @@
       this.cache.set(key,value);this.metrics.cacheMisses++;return value;
     }
     create(genes,parent=0,event='founder',generation=0){
+      if(genes.peptides?.length!==1)throw Error('Exactly one antigen slot is required');
       genes.traits.repair??=1;
       genes.fragments={expression:genes.peptides.map(p=>({base:code(p.base),stress:code(p.stress,-3,3),inflammation:code(p.inflammation,-3,3)})),presentation:genes.presentation.map(v=>code(v)),brake:{base:code(genes.brake.base),response:code(genes.brake.response,0,3)},traits:Object.fromEntries(['tolerance','proliferation','invasion','repair'].map(k=>[k,code(genes.traits[k],.25,3)]))};
-      const id=++this.serial;this.clones.set(id,{id,parent,time:this.s.C.time,generation,event,genes:freeze(genes)});this.unarchived.add(id);return id;
+      const id=++this.serial,p=genes.peptides[0],ancestor=this.clones.get(parent),prior=this.branches.get(ancestor?.antigenBranch);
+      const identity=p.channel+':'+p.sequence+':'+Number(p.present),antigenBranch=prior?.identity===identity?prior.id:id;
+      if(antigenBranch===id)this.branches.set(id,{id,parent:prior?.id||0,time:this.s.C.time,event,identity,sequence:p.sequence,channel:p.channel,present:p.present,self:this.self.includes(p.sequence),key:p.present&&!this.self.includes(p.sequence)?p.channel+':'+p.sequence:null});
+      this.clones.set(id,{id,parent,antigenBranch,time:this.s.C.time,generation,event,genes:freeze(genes)});this.unarchived.add(id);return id;
     }
     genes(m){return this.clones.get(m.geneClone)?.genes;}
     bind(m,id,expression=null){
@@ -53,7 +57,7 @@
       if(m.kind===2)m.genome=g.traits;
       if(m.kind===1)m.normalTolerance=g.traits.tolerance;
       m.expression=expression?{peptides:[...expression.peptides],presentation:[...expression.presentation],checkpoint:expression.checkpoint}:{peptides:g.peptides.map(p=>p.present?p.base:0),presentation:[...g.presentation],checkpoint:g.brake.base};
-      for(let i=0;i<4;i++)if(!g.peptides[i].present)m.expression.peptides[i]=0;
+      for(let i=0;i<g.peptides.length;i++)if(!g.peptides[i].present)m.expression.peptides[i]=0;
       for(let i=0;i<2;i++)if(!g.presentation[i])m.expression.presentation[i]=0;
       m.primed??=false;m.primingProgress??=0;m.recognition={target:0,score:0,stimulus:0,execution:0,reasons:['no-contact']};
       this.summarize(m);
@@ -61,7 +65,8 @@
     register(m){
       if(this.s.divisionParent){m.primed=this.s.divisionParent.primed;this.bind(m,this.s.divisionParent.geneClone,this.s.divisionParent.expression);return;}
       const tumor=m.kind===2,immune=m.kind===3,positive=tumor&&m.antigenRoll<this.s.settings.antigen/100;
-      const peptides=Array.from({length:4},(_,i)=>({sequence:tumor&&i<3?(i<2?this.families[(i+Math.floor(m.antigenRoll*4))%Math.max(1,this.families.length)]||this.sequence():this.sequence()):this.self[i],present:true,base:tumor?(positive?.85:.09):.7,stress:(this.random()-.5)*1.6,inflammation:(this.random()-.5)*1.2,channel:tumor&&i<2?(i+Math.floor(m.antigenRoll*4))%2:i%2}));
+      const family=Math.floor(m.antigenRoll*4),candidateAntigen=this.repertoire[family],self=this.self[family];
+      const peptides=[{sequence:tumor?(candidateAntigen?.sequence||this.sequence()):self,present:true,base:tumor?(positive?.85:.09):.7,stress:(this.random()-.5)*1.6,inflammation:(this.random()-.5)*1.2,channel:tumor?(candidateAntigen?.channel??family%2):family%2}];
       let receptor=null,candidate=0;
       if(immune){
         const cover=this.s.scene==='hot'?.85:this.s.scene==='cold'?.15:.5,preferred=this.random()<cover?this.repertoire.slice(0,12):this.repertoire.slice(12),pool=preferred.length?preferred:this.repertoire;
@@ -75,14 +80,14 @@
     }
     summarize(m){
       const g=this.genes(m);if(!g)return;
-      let level=0;for(let i=0;i<4;i++)if(g.peptides[i].present&&!this.self.includes(g.peptides[i].sequence))level=Math.max(level,m.expression.peptides[i]*m.expression.presentation[g.peptides[i].channel]);
+      let level=0;for(let i=0;i<g.peptides.length;i++)if(g.peptides[i].present&&!this.self.includes(g.peptides[i].sequence))level=Math.max(level,m.expression.peptides[i]*m.expression.presentation[g.peptides[i].channel]);
       const before=m.antigen;m.antigenLevel=level;m.antigen=(m.kind===2||m.state==='abnormal')&&level>=.18;
       if(before&&!m.antigen)this.s.releaseAntigenTarget(m);
     }
     express(m,dt){
       const g=this.genes(m);if(!g||m.kind===3)return;
       const k=-Math.expm1(-dt/180),pressure=clamp(m.mutationPressure||0),inflammation=clamp(m.inflammatoryExposure||0);
-      for(let i=0;i<4;i++){
+      for(let i=0;i<g.peptides.length;i++){
         const p=g.peptides[i],target=p.present?clamp(p.base*(1+p.stress*pressure*this.s.settings.antigenStressGain+p.inflammation*inflammation)):0;
         m.expression.peptides[i]+=k*(target-m.expression.peptides[i]);if(!p.present)m.expression.peptides[i]=0;
       }
@@ -97,7 +102,7 @@
       const cg=this.genes(ctl),g=this.genes(target),reasons=[];
       if(!g||!cg?.receptor)return {target:target?.id||0,score:0,stimulus:0,execution:0,reasons:['no-receptor']};
       let present=false,expressed=false,presented=false,best=0,drive=0;
-      for(let i=0;i<4;i++){
+      for(let i=0;i<g.peptides.length;i++){
         const p=g.peptides[i];if(!p.present||this.self.includes(p.sequence))continue;present=true;
         const e=target.expression.peptides[i],channel=target.expression.presentation[p.channel],a=cache?this.score(cg.receptor,p):cg.receptor.channel===p.channel?affinity(cg.receptor.sequence,p.sequence):0;
         expressed||=e>=.18;presented||=e*channel>=.18;best=Math.max(best,a);
@@ -120,7 +125,7 @@
       const id=this.create(g,parent,event,m.generation);this.bind(m,id,m.expression);this.express(m,0);return id;
     }
     abnormal(m){
-      this.alter(m,g=>{if(this.random()<.6){const i=Math.floor(this.random()*4);g.peptides[i].sequence=this.substitute(g.peptides[i].sequence);}},'precancer alteration');
+      this.alter(m,g=>{if(this.random()<.6)g.peptides[0].sequence=this.substitute(g.peptides[0].sequence);},'precancer alteration');
     }
     malignant(m){const traits={...m.genome};this.alter(m,g=>{g.traits={...g.traits,...traits};},'malignant transition');}
     inherit(c,parentId,parentExpression){
@@ -132,23 +137,23 @@
       if(this.random()>=chance)return;
       const category=this.random(),i=Math.floor(this.random()*4),previous=c.geneClone;let event;
       this.alter(c,g=>{
-        if(category<.5){const p=g.peptides[i],before=p.sequence;p.sequence=this.substitute(before);event='peptide '+(i+1)+' '+before+'>'+p.sequence;}
-        else if(category<.55){g.peptides[i].present=false;event='peptide loss '+(i+1);}
+        if(category<.5){const p=g.peptides[0],before=p.sequence;p.sequence=this.substitute(before);event='peptide 1 '+before+'>'+p.sequence;}
+        else if(category<.55){g.peptides[0].present=false;event='peptide loss 1';}
         else if(category<.60){g.presentation[i%2]=0;event='presentation loss '+(i%2+1);}
-        else if(category<.72){g.peptides[i].base=clamp(g.peptides[i].base+(this.random()-.5)*2*s.mutationSize);event='expression regulation '+(i+1);}
+        else if(category<.72){g.peptides[0].base=clamp(g.peptides[0].base+(this.random()-.5)*2*s.mutationSize);event='expression regulation 1';}
         else if(category<.79){g.brake.base=clamp(g.brake.base+(this.random()-.5)*2*s.mutationSize);event='checkpoint regulation';}
         else if(category<.84){g.surface[i%2].sequence=this.substitute(g.surface[i%2].sequence);event='surface target '+(i%2+1);}
         else{const key=['tolerance','proliferation','invasion','repair'][i];g.traits[key]=clamp(g.traits[key]*Math.exp(this.s.mutationStep(key,c)),.25,3);event='trait '+key;}
       },'division mutation');
       if(c.geneClone===previous)return;
       if(category<.5)this.metrics.substitutions++;else if(category<.6)this.metrics.losses++;
-      this.clones.get(c.geneClone).event=event;this.metrics.geneticChanges++;this.s.counters.mutations++;
+      this.clones.get(c.geneClone).event=event;if(this.clones.get(c.geneClone).antigenBranch===c.geneClone)this.branches.get(c.geneClone).event=event;this.metrics.geneticChanges++;this.s.counters.mutations++;
     }
     expose(m,amount=1){
       if(m.kind!==2&&m.state!=='abnormal')return;
       if(amount<1&&this.s.C.time-(m.lastExposureAt??-Infinity)<120)return;m.lastExposureAt=this.s.C.time;
       const g=this.genes(m),danger=this.s.fieldOnCell(m,'danger'),inhibition=this.s.fieldOnCell(m,'inhibition');
-      for(let i=0;i<4;i++)if(g.peptides[i].present&&m.expression.peptides[i]>.08&&!this.self.includes(g.peptides[i].sequence)){
+      for(let i=0;i<g.peptides.length;i++)if(g.peptides[i].present&&m.expression.peptides[i]>.08&&!this.self.includes(g.peptides[i].sequence)){
         this.exposures.push({clone:m.geneClone,birth:m.birth,slot:i,sequence:g.peptides[i].sequence,channel:g.peptides[i].channel,time:this.s.C.time,strength:amount*m.expression.peptides[i]*(.35+danger/(.2+danger))/(1+inhibition)});this.metrics.exposureRecords++;
       }
       if(this.exposures.length>128)this.exposures.splice(0,this.exposures.length-128);
@@ -175,12 +180,12 @@
       this.alter(m,g=>{g.receptor={sequence:r.sequence,channel:r.channel};g.candidate=r.id;},'primed vascular reinforcement');m.primed=true;m.antigenMemory=.45;this.metrics.reinforcements++;
     }
     record(){
-      const counts={},states={};for(const m of this.s.live())if(!m.dying&&(m.kind===2||m.state==='abnormal'||m.kind===3)){counts[m.geneClone]=(counts[m.geneClone]||0)+1;states[m.geneClone]=m.kind;}
-      const row={time:this.s.C.time,counts,states};if(this.history.at(-1)?.time===row.time)this.history[this.history.length-1]=row;else this.history.push(row);
-      this.historyView=null;
+      const counts={},states={},tumors={};for(const m of this.s.live())if(!m.dying&&(m.kind===2||m.state==='abnormal'||m.kind===3)){counts[m.geneClone]=(counts[m.geneClone]||0)+1;states[m.geneClone]=m.kind;if(m.kind===2){const branch=this.clones.get(m.geneClone).antigenBranch;tumors[branch]=(tumors[branch]||0)+1;}}
+      const row={time:this.s.C.time,counts,states,tumors};if(this.history.at(-1)?.time===row.time)this.history[this.history.length-1]=row;else this.history.push(row);
+      this.historyView=null;this.evolutionView=null;
       // Time-bin compression retains the entire time span; no simulation state
       // or mutation sampling depends on this bounded observer history.
-      if(this.history.length>512)this.history=this.history.filter((_,i)=>i%2===0||i===this.history.length-1);
+      if(this.history.length>512){this.history=this.history.filter((_,i)=>i%2===0||i===this.history.length-1);this.historyCompressed=true;}
       const alive=new Set(this.s.live().map(m=>m.geneClone));for(const id of this.unarchived)if(!alive.has(id)){const c=this.clones.get(id);c.archivedGenes=JSON.stringify(c.genes);c.genes=null;this.unarchived.delete(id);}
     }
     compactHistory(){
@@ -190,6 +195,15 @@
       // UI snapshots retain major clones plus an 'other' total per kind. Full
       // analytic export retains all recorded clones; this never changes biology.
       return this.historyView=this.history.map(r=>{const counts={},states={};for(const [id,n]of Object.entries(r.counts)){const kind=r.states[id],key=keep.has(id)?id:-kind;counts[key]=(counts[key]||0)+n;states[key]=kind;}return {time:r.time,counts,states};});
+    }
+    evolutionReport(full=false){
+      if(!full&&this.evolutionView)return this.evolutionView;
+      const peaks=new Map();for(const row of this.history)for(const [id,n]of Object.entries(row.tumors||{}))peaks.set(+id,Math.max(peaks.get(+id)||0,n));
+      const ranked=[...peaks].sort((a,b)=>b[1]-a[1]||a[0]-b[0]),keep=new Set((full?ranked:ranked.slice(0,12)).map(([id])=>id)),ancestors=new Set(keep);
+      for(const id of keep){let parent=this.branches.get(id)?.parent;while(parent&&!ancestors.has(parent)){ancestors.add(parent);parent=this.branches.get(parent)?.parent;}}
+      const rows=this.history.map(row=>{const counts={};let total=0;for(const [id,n]of Object.entries(row.tumors||{})){const key=keep.has(+id)?id:0;counts[key]=(counts[key]||0)+n;total+=n;}return {time:row.time,total,counts};});
+      const report={rows,branches:[...ancestors].sort((a,b)=>a-b).map(id=>({...this.branches.get(id)})),shown:[...keep],omitted:ranked.length-keep.size,samplingMCS:30,compressed:!!this.historyCompressed};
+      if(!full)this.evolutionView=report;return report;
     }
     contactReport(selected){
       if(!selected||selected.dying)return [];
@@ -228,7 +242,7 @@
       const clones=Object.keys(counts).filter(id=>!visible||visible.has(+id)).map(id=>{const {genes,...c}=this.clones.get(+id);return {...c,live:counts[id],...(full?{genes}:{})};});
       const variants=new Set(),presented=new Set(),receptors=new Set();let primedCells=0;
       for(const m of this.s.live())if(!m.dying){const g=this.genes(m);if(m.kind===3){if(g.receptor)receptors.add(g.receptor.channel+':'+g.receptor.sequence);primedCells+=Number(m.primed);}else if(m.kind===2||m.state==='abnormal')g.peptides.forEach((p,i)=>{if(p.present&&!this.self.includes(p.sequence)){const k=p.channel+':'+p.sequence;variants.add(k);if(m.expression.peptides[i]*m.expression.presentation[p.channel]>=.18)presented.add(k);}});}
-      return {length:this.length,threshold,self:this.self,clones,selectedGene,visuals:this.visualReport(),contacts:this.contactReport(selected),selectedID:selected?.id||0,history:full?this.history:this.compactHistory(),coverage:{variants:variants.size,presented:presented.size,receptors:receptors.size,primedCells},metrics:{...this.metrics,cacheEntries:this.cache.size},repertoire:this.repertoire.map(r=>({...r})),queue:this.queue.length,exposures:this.exposures.slice(-16),encounters:[...this.encounters.values()].slice(-64),...(full?{lineage:[...this.clones.values()].map(({archivedGenes,...c})=>({...c,genes:c.genes||(archivedGenes?JSON.parse(archivedGenes):null)}))}:{})};
+      return {slots:1,evolution:this.evolutionReport(full),length:this.length,threshold,self:this.self,clones,selectedGene,visuals:this.visualReport(),contacts:this.contactReport(selected),selectedID:selected?.id||0,history:full?this.history:this.compactHistory(),coverage:{variants:variants.size,presented:presented.size,receptors:receptors.size,primedCells},metrics:{...this.metrics,cacheEntries:this.cache.size},repertoire:this.repertoire.map(r=>({...r})),queue:this.queue.length,exposures:this.exposures.slice(-16),encounters:[...this.encounters.values()].slice(-64),...(full?{lineage:[...this.clones.values()].map(({archivedGenes,...c})=>({...c,genes:c.genes||(archivedGenes?JSON.parse(archivedGenes):null)}))}:{})};
     }
     definitions(m){const g=this.genes(m);return {kind:m.kind,x:m.x/this.s.scale,y:m.y/this.s.scale,radius:Math.sqrt(this.s.C.getVolume(m.id)/Math.PI)/this.s.scale,genes:structuredClone(g),primed:m.primed,state:m.state};}
     initialize(definitions){

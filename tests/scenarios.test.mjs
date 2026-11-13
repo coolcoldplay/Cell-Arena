@@ -1,3 +1,4 @@
+import {peptide,receptor} from './cognate-fixture.mjs';
 import {assertConfluentTissue} from './vascular-layout-helper.mjs';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
@@ -58,7 +59,10 @@ test('cold tumor spreads and divides beyond the original lesion using existing m
 });
 
 test('hot tumor clearance requires real killing and an observation interval; living or dying targets prevent success',async()=>{
-  const s=await make('hot');for(let elapsed=0;elapsed<9000&&!s.scenarioReport().achieved;elapsed+=250)s.advance(250);const report=s.scenarioReport();assert.equal(s.counters.kills,37+report.tumorDivisions);assert.equal(s.deathHistory.filter(d=>d.kind===2&&d.cause==='environment').length,0,'tumors clear through immune killing, not environmental death');assert.equal(s.counters.apoptosis,0);assert.equal(report.tumorBodies,0);assert.ok(report.achieved);assert.ok(report.clearanceElapsed>=150);assert.ok(s.counters.recognitions>0);assert.ok(s.counters.immuneDivisions>0);assert.ok(s.live().filter(m=>m.kind===3).every(m=>m.divisionsLeft>=0));
+  // A controlled cognate culture isolates the clearance criterion. The diverse
+  // single-antigen preset can escape; its outcomes are measured across seeds.
+  const s=await make('hot',{mutation:0});for(const m of s.live()){if(m.kind===2)peptide(s,m);if(m.kind===3)receptor(s,m);}
+  for(let elapsed=0;elapsed<9000&&!s.scenarioReport().achieved;elapsed+=250)s.advance(250);const report=s.scenarioReport();assert.equal(s.counters.kills,37+report.tumorDivisions);assert.equal(s.deathHistory.filter(d=>d.kind===2&&d.cause==='environment').length,0,'tumors clear through immune killing, not environmental death');assert.equal(s.counters.apoptosis,0);assert.equal(report.tumorBodies,0);assert.ok(report.achieved);assert.ok(report.clearanceElapsed>=150);assert.ok(s.counters.recognitions>0);assert.ok(s.counters.immuneDivisions>0);assert.ok(s.live().filter(m=>m.kind===3).every(m=>m.divisionsLeft>=0));
   let id=0;for(let y=5*s.scale;y<s.height-5*s.scale&&!id;y+=10*s.scale)for(let x=5*s.scale;x<s.width-5*s.scale&&!id;x+=10*s.scale)id=s.seed(2,x,y,3*s.scale);assert.ok(id);assert.equal(s.scenarioReport().achieved,false);s.updateScenarioState();assert.equal(s.scenarioReport().clearanceAt,null);s.beginDeath(id,'kill');assert.equal(s.scenarioReport().achieved,false);
   const control=await make('hot',{kill:0});control.advance(2000);assert.equal(control.counters.kills,0);assert.ok(control.scenarioReport().tumorBodies>37);assert.equal(control.scenarioReport().achieved,false);
 });
@@ -70,7 +74,8 @@ test('reporting is read-only and preset restoration has no parameter leakage',as
 });
 
 test('acquired antigen loss in a hot tumor can survive early clearance and be inherited by an expanding lineage',async()=>{
-  const s=await make('hot',{}, {seed:77});assert.equal(s.scenarioReport().initial.antigenPositive,37);
+  const s=await make('hot',{mutation:0}, {seed:77});for(const m of s.live()){if(m.kind===2)peptide(s,m);if(m.kind===3)receptor(s,m);}
+  assert.equal(s.scenarioReport().initial.antigenPositive,37);
   // Introduce an explicit experimental genetic-loss branch after real immune
   // clearance starts. Contact no longer directs a favorable DNA mutation.
   // This tests selection/inheritance, not the probability of spontaneous loss.

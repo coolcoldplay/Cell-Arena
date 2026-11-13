@@ -110,8 +110,8 @@
     if(s.boundary==='wrap'){dx-=Math.round(dx/s.width)*s.width;dy-=Math.round(dy/s.height)*s.height;}
     const angle=Math.atan2(dy,dx)+Math.PI,index=Math.min(style.segments.length-1,Math.floor(angle/(2*Math.PI)*style.segments.length));return style.segments[index];
   }
-  // Variable-length color spans: one immune receptor may match more than the
-  // four peptide slots of a single tumor. Identical spans share atlas storage.
+  // Variable-length color spans: one immune receptor can cross-recognize many
+  // single-antigen tumors. Identical spans share atlas storage.
   function antigenTextureData(outlines,buffers={},maxTextureSize=16384){
     const width=Math.min(1024,maxTextureSize),limit=Math.min(width*maxTextureSize,2**24),spans=new Map(),bytes=[];
     const centers=buffers.centers||new Float32Array(256*256*4);centers.fill(0);

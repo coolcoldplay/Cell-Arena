@@ -1,8 +1,8 @@
 {
   "format": "cell-arena-experiment",
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "version": "4.0.0",
-  "modelRevision": "2026-11-specific-immune-genetics-1",
+  "modelRevision": "2026-11-single-antigen-lineage-3",
   "scene": "empty",
   "seed": 8043,
   "boundary": "solid",
@@ -126,30 +126,6 @@
             "base": 0.9,
             "stress": -3,
             "inflammation": 0
-          },
-          {
-            "sequence": "GACCGT",
-            "channel": 1,
-            "present": true,
-            "base": 0.9,
-            "stress": 0,
-            "inflammation": 0
-          },
-          {
-            "sequence": "ACTTCA",
-            "channel": 0,
-            "present": true,
-            "base": 0.9,
-            "stress": 0,
-            "inflammation": 0
-          },
-          {
-            "sequence": "TCGGCA",
-            "channel": 1,
-            "present": true,
-            "base": 0.9,
-            "stress": 0,
-            "inflammation": 0
           }
         ],
         "presentation": [
@@ -185,10 +161,7 @@
       "cloneKey": "reversible",
       "expression": {
         "peptides": [
-          0.01,
-          0.9,
-          0.9,
-          0.9
+          0.01
         ],
         "presentation": [
           1,
@@ -207,30 +180,6 @@
           {
             "sequence": "GTGAGG",
             "channel": 0,
-            "present": true,
-            "base": 0.9,
-            "stress": 0,
-            "inflammation": 0
-          },
-          {
-            "sequence": "GACCGT",
-            "channel": 1,
-            "present": true,
-            "base": 0.9,
-            "stress": 0,
-            "inflammation": 0
-          },
-          {
-            "sequence": "ACTTCA",
-            "channel": 0,
-            "present": true,
-            "base": 0.9,
-            "stress": 0,
-            "inflammation": 0
-          },
-          {
-            "sequence": "TCGGCA",
-            "channel": 1,
             "present": true,
             "base": 0.9,
             "stress": 0,

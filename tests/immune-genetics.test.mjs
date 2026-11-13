@@ -5,7 +5,7 @@ import {readFile} from 'node:fs/promises';
 for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/immune-genetics.js','src/model.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
 const make=(settings={},seed=17)=>new CellLab.Simulation({width:128,height:96,scene:'empty',seed,warmup:0,sectionModel:false,settings:{apoptosis:0,metabolism:0,growth:0,immuneGrowth:0,mutation:0,stressMutation:0,initialImmuneReady:100,checkpointStrength:0,damagePolarization:0,damageDeactivation:0,...settings}});
 function body(s,kind,x,y,w=12,h=12){const id=s.C.makeNewCellID(kind);for(let a=x;a<x+w;a++)for(let b=y;b<y+h;b++)s.C.setpix([a,b],id);s.refreshPositions();s.scanContacts();return s.cells[id];}
-function pair(s){const t=body(s,2,30,30),i=body(s,3,42,30);s.immunity.alter(t,g=>{g.peptides.forEach((p,n)=>{p.sequence='AAAAAA';p.present=n===0;p.base=1;p.channel=0;});g.presentation=[1,1];});t.expression.peptides=[1,0,0,0];t.expression.presentation=[1,1];s.immunity.alter(i,g=>{g.receptor={sequence:'AAAAAA',channel:0};});s.immunity.summarize(t);return {t,i};}
+function pair(s){const t=body(s,2,30,30),i=body(s,3,42,30);s.immunity.alter(t,g=>{g.peptides.forEach((p,n)=>{p.sequence='AAAAAA';p.present=n===0;p.base=1;p.channel=0;});g.presentation=[1,1];});t.expression.peptides=[1];t.expression.presentation=[1,1];s.immunity.alter(i,g=>{g.receptor={sequence:'AAAAAA',channel:0};});s.immunity.summarize(t);return {t,i};}
 test('matching and mismatching immune clones discriminate a physically contacting target',()=>{const s=make(),{t,i}=pair(s);assert.ok(s.contacts.get(i.id).has(t.id));for(let n=0;n<40;n++)s.immuneInteractions(1);assert.ok(t.damage>0);const damage=t.damage;s.immunity.alter(i,g=>{g.receptor.sequence='TTTTTT';});for(let n=0;n<40;n++)s.immuneInteractions(1);assert.ok(t.damage<=damage);assert.ok(i.recognition.reasons.includes('mismatch'));assert.equal(i.targetID,0);});
 test('chemotaxis and distant matching epitopes cannot deliver damage',()=>{const s=make(),{t,i}=pair(s);s.contacts.get(i.id).clear();s.fields.trail.values.fill(30);s.fields.danger.values.fill(30);for(let n=0;n<200;n++)s.immuneInteractions(1);assert.equal(t.damage,0);assert.ok(s.immunity.evaluate(i,t,false).reasons.includes('no-contact'));});
 test('weighted cross-recognition tolerates some substitutions but loses others',()=>{const {affinity,threshold}=CellLabImmunity;assert.ok(affinity('AAAAAA','AAAAAC')>=threshold);assert.ok(affinity('AAAAAA','TAAAAA')<threshold);assert.ok(affinity('AAAAAA','AAAAAA')>affinity('AAAAAA','AAAAAC'));});
@@ -38,9 +38,9 @@ test('background presentation can license a matching resting clone only after th
  for(let n=0;n<90;n++){s.C.time+=16;if(n%10===0)s.immunity.expose(t);s.immunity.tick(16);}
  assert.equal(i.primed,true);assert.ok(i.antigenMemory>0);assert.ok(s.immunity.metrics.primed>0);assert.equal(t.damage,0,'priming is not killing at a distance');
 });
-test('no-op edits do not create a genetic branch; a neutral sequence edit still does',()=>{
- const s=make(),{t}=pair(s),id=t.geneClone;s.immunity.alter(t,g=>{g.peptides[1].present=false;});assert.equal(t.geneClone,id);
- s.immunity.alter(t,g=>{g.peptides[1].sequence=s.immunity.substitute(g.peptides[1].sequence);});assert.notEqual(t.geneClone,id);assert.equal(t.antigen,true);
+test('no-op edits do not create a branch; a cross-recognized sequence edit still does',()=>{
+ const s=make(),{t}=pair(s),id=t.geneClone;s.immunity.alter(t,g=>{g.peptides[0].present=true;});assert.equal(t.geneClone,id);
+ s.immunity.alter(t,g=>{g.peptides[0].sequence='AAAAAC';});assert.notEqual(t.geneClone,id);assert.equal(t.antigen,true);
 });
 test('archived lineages remain exportable without scanning them for live clone snapshots',()=>{
  const s=make(),{t}=pair(s),ancestor=t.geneClone;s.immunity.alter(t,g=>{g.presentation[0]=.7;});s.immunity.record();assert.ok(!s.immunity.unarchived.has(ancestor));assert.equal(s.immunity.clones.get(ancestor).genes,null);assert.ok(s.immunity.report(true).lineage.find(c=>c.id===ancestor).genes);assert.ok(!s.immunity.report().clones.some(c=>c.id===ancestor));

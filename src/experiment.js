@@ -20,7 +20,7 @@
   function parse(data){
     if(!object(data)||!object(data.settings)||!scenes.includes(data.scene))invalid('settings / scene');
     if(data.format!==undefined&&data.format!=='cell-arena-experiment')invalid('format');
-    if(data.schemaVersion!==undefined&&![1,2].includes(data.schemaVersion))throw Error('实验文件版本暂不支持');
+    if(data.schemaVersion!==undefined&&![1,2,3].includes(data.schemaVersion))throw Error('实验文件版本暂不支持');
     if(data.version!==undefined&&!/^[34]\.\d+/.test(String(data.version)))throw Error('实验文件版本暂不支持');
     const seed=number(data.seed,0,4294967295,'seed');if(!Number.isInteger(seed))invalid('seed');
     const boundary=choice(data.boundary,['solid','wrap'],'boundary'),refinement=choice(data.refinement,[1,1.5,2,3,4],'refinement');
@@ -32,13 +32,13 @@
     const initialCells=data.initialCells??[];
     if(!Array.isArray(initialCells)||initialCells.length>4096)invalid('initialCells');
     const length=settings.antigenLength||6,seq=x=>{if(typeof x!=='string'||x.length!==length||!/^[ATCG]+$/.test(x))invalid('ATCG sequence');return x;};
-    const definedClones=new Map();
+    const definedClones=new Map();let legacySlots=false;
     const cleanCells=initialCells.map(d=>{
       if(!object(d))invalid('initial cell');choice(d.kind,[1,2,3],'kind');number(d.x,0,worldWidth,'cell.x');number(d.y,0,worldHeight,'cell.y');number(d.radius,2,24,'cell.radius');
       if(d.primed!==undefined&&typeof d.primed!=='boolean')invalid('primed');if(d.state!==undefined)choice(d.state,['normal','abnormal','tumor','immune'],'cell.state');
       if((d.state==='abnormal'||d.state==='normal')&&d.kind!==1)invalid('cell.state / kind');
       let genes;
-      if(d.genes!==undefined){const g=d.genes;if(!object(g)||!Array.isArray(g.peptides)||g.peptides.length!==4||!Array.isArray(g.surface)||g.surface.length!==2||!Array.isArray(g.presentation)||g.presentation.length!==2||!object(g.brake)||!object(g.traits))invalid('genes');
+      if(d.genes!==undefined){const g=d.genes;if(!object(g)||!Array.isArray(g.peptides)||!([1].includes(g.peptides.length)||(data.schemaVersion!==3&&g.peptides.length===4))||!Array.isArray(g.surface)||g.surface.length!==2||!Array.isArray(g.presentation)||g.presentation.length!==2||!object(g.brake)||!object(g.traits))invalid('genes');
         const peptides=g.peptides.map(p=>{if(!object(p)||typeof p.present!=='boolean')invalid('peptide');return {sequence:seq(p.sequence),present:p.present,base:number(p.base,0,1,'base'),stress:number(p.stress,-3,3,'stress response'),inflammation:number(p.inflammation,-3,3,'inflammatory response'),channel:choice(p.channel,[0,1],'channel')};});
         const surface=g.surface.map(p=>{if(!object(p)||typeof p.present!=='boolean')invalid('surface');return {sequence:seq(p.sequence),present:p.present,base:number(p.base,0,1,'surface.base')};});
         const traits={};for(const key of ['tolerance','proliferation','invasion'])traits[key]=number(g.traits[key],.25,3,key);traits.repair=number(g.traits.repair??1,.25,3,'repair');traits.antigen=number(g.traits.antigen??.5,0,1,'legacy antigen baseline');
@@ -50,7 +50,8 @@
       if(d.parentKey!==undefined){if(!definedClones.has(d.parentKey)||d.parentKey===d.cloneKey)invalid('parentKey');lineage.parentKey=d.parentKey;}
       if(d.cloneKey)definedClones.set(d.cloneKey,JSON.stringify(genes));
       let expression;
-      if(d.expression!==undefined){const e=d.expression;if(!genes||!object(e)||!Array.isArray(e.peptides)||e.peptides.length!==4||!Array.isArray(e.presentation)||e.presentation.length!==2)invalid('expression');expression={peptides:e.peptides.map(v=>number(v,0,1,'expression')),presentation:e.presentation.map(v=>number(v,0,1,'presentation')),checkpoint:number(e.checkpoint,0,1,'checkpoint')};}
+      if(d.expression!==undefined){const e=d.expression;if(!genes||!object(e)||!Array.isArray(e.peptides)||e.peptides.length!==d.genes.peptides.length||!Array.isArray(e.presentation)||e.presentation.length!==2)invalid('expression');expression={peptides:e.peptides.map(v=>number(v,0,1,'expression')),presentation:e.presentation.map(v=>number(v,0,1,'presentation')),checkpoint:number(e.checkpoint,0,1,'checkpoint')};}
+      if(genes?.peptides.length===4){legacySlots=true;genes.peptides=genes.peptides.slice(0,1);if(expression)expression.peptides=expression.peptides.slice(0,1);}
       return {kind:d.kind,x:d.x,y:d.y,radius:d.radius,...lineage,...(genes?{genes}:{}),...(expression?{expression}:{}),...(d.primed!==undefined?{primed:d.primed}:{}),...(d.state?{state:d.state}:{})};
     });
     const sources=data.sources===undefined?undefined:data.sources;if(sources!==undefined){if(!Array.isArray(sources)||sources.length>4096)invalid('sources');for(const v of sources){if(!object(v))invalid('source');choice(v.type,[...signals,'oxygen','glucose','acid','nutrient','hostile'],'source.type');number(v.x,0,worldWidth,'source.x');number(v.y,0,worldHeight,'source.y');number(v.radius,2,40,'source.radius');}}
@@ -68,8 +69,8 @@
     if(input.opacity!==undefined){if(!object(input.opacity))invalid('opacity');display.opacity={};for(const [k,v]of Object.entries(input.opacity))if(['adversity','oxygen','glucose','acid','density',...signals].includes(k))display.opacity[k]=number(v,0,1,'opacity.'+k);}
     if(input.flags!==undefined){if(!object(input.flags))invalid('flags');display.flags={};for(const [k,v]of Object.entries(input.flags))if(flags.includes(k)){if(typeof v!=='boolean')invalid(k);display.flags[k]=v;}}
     for(const [key,options]of [['zoom',['100','150','200','300']],['fit',['cover','contain']],['renderResolution',['auto','1920','2560','3840']]])if(input[key]!==undefined)display[key]=choice(input[key],options,key);
-    const migration=data.schemaVersion!==2||!!(data.modelRevision&&data.modelRevision!==(globalThis.CellLab?.MODEL_REVISION||'2026-11-onset-calibration-antigen-visuals-2'));
-    return {mode:'parameters',migration,warnings:migration?['旧实验已迁移至特异识别规则；种子与参数保留，演化轨迹会变化。']:[],config:{initialCells:cleanCells,scene:data.scene,mazeSignalThroughWalls:!!data.maze?.signalThroughWalls,seed,boundary,worldWidth,worldHeight,refinement,settings,...(vessels?{vessels:vessels.map(v=>({x:v.x,y:v.y,radius:v.radius}))}:{}),...(sources?{sources:sources.map(s=>({type:s.type,x:s.x,y:s.y,radius:s.radius}))}:{}),warmup:data.warmup===undefined?(data.scene==='empty'?0:35):number(data.warmup,0,200,'warmup')},display,speed:data.speed===undefined?1:number(data.speed,.25,8,'speed'),sourceTime:Number.isFinite(data.time)?data.time:0,ignored};
+    const migration=data.schemaVersion!==3||!!(data.modelRevision&&data.modelRevision!==(globalThis.CellLab?.MODEL_REVISION||'2026-11-single-antigen-lineage-3'));
+    return {mode:'parameters',migration,warnings:[...(migration?['旧实验将按单抗原规则重新运行；种子与参数保留，演化轨迹会变化。']:[]),...(legacySlots?['旧四槽配方仅保留 P1 及其表达值，P2–P4 不再参与模拟；原文件不修改。']:[])],config:{initialCells:cleanCells,scene:data.scene,mazeSignalThroughWalls:!!data.maze?.signalThroughWalls,seed,boundary,worldWidth,worldHeight,refinement,settings,...(vessels?{vessels:vessels.map(v=>({x:v.x,y:v.y,radius:v.radius}))}:{}),...(sources?{sources:sources.map(s=>({type:s.type,x:s.x,y:s.y,radius:s.radius}))}:{}),warmup:data.warmup===undefined?(data.scene==='empty'?0:35):number(data.warmup,0,200,'warmup')},display,speed:data.speed===undefined?1:number(data.speed,.25,8,'speed'),sourceTime:Number.isFinite(data.time)?data.time:0,ignored};
   }
   globalThis.CellLabExperiment={parse,ranges,scenes,flags};
 })();

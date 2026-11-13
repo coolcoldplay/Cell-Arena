@@ -49,7 +49,7 @@
       root.append(node('p','immune-status',cell.primed?t('✓ 已具备响应资格；仍需匹配并实际接触','✓ Response competent; still requires a matching contact'):t('等待抗原特异性启动','Awaiting antigen-specific priming')));
       const meters=node('div','immune-meter-grid');meters.append(bar(t('启动进度','Priming'),cell.primed?1:cell.primingProgress),bar(t('刺激记忆','Memory'),cell.antigenMemory),bar(t('耗竭','Exhaustion'),cell.exhaustion,'brake'));root.append(meters);
     }else{
-      root.append(node('p','immune-note',t('最多 4 个抗原槽位；一次序列突变替换一个槽位，其他槽位保留。自身或遗传缺失的抗原不着色。','Up to 4 antigen slots. A sequence mutation replaces one slot and preserves the others. Self or genetically lost antigens have no color segment.')));
+      root.append(node('p','immune-note',t('每个靶细胞只有一个抗原槽；序列突变替换原抗原，自身或遗传缺失时不着色。','Each target has one antigen slot. Sequence mutation replaces its antigen. Self or genetically lost antigens have no color segment.')));
       const slots=node('div','immune-slots');
       g.peptides.forEach((p,i)=>{
         const self=a.self.includes(p.sequence),amount=cell.expression.peptides[i],shown=amount*cell.expression.presentation[p.channel],slot=node('div','immune-slot'+(!p.present?' lost':self?' self':''));

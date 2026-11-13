@@ -1,17 +1,19 @@
 // Read-only observers: no interventions, no RNG consumed by measurements.
 import vm from 'node:vm';
+import {execFileSync} from 'node:child_process';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 const arg=(name,fallback)=>process.argv.find(x=>x.startsWith(`--${name}=`))?.slice(name.length+3)??fallback;
 const label=arg('label','baseline'),seeds=arg('seeds','17,31,77,101').split(',').map(Number),until=Number(arg('until','6000'));
 const files=['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js'];
-const hashes={};for(const f of files){const text=await readFile(f,'utf8');hashes[f]=createHash('sha256').update(text).digest('hex');vm.runInThisContext(text,{filename:f});}
+const sourceRevision=arg('source-revision','');
+const hashes={};for(const f of files){const text=sourceRevision?execFileSync('git',['show',sourceRevision+':'+f],{encoding:'utf8',maxBuffer:8*1024*1024}):await readFile(f,'utf8');hashes[f]=createHash('sha256').update(text).digest('hex');vm.runInThisContext(text,{filename:f});}
 const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm'));
 hashes['build/cpm-kernel.wasm']=createHash('sha256').update(await readFile('build/cpm-kernel.wasm')).digest('hex');
 const dir=arg('out','reports/onset-calibration-2026-11-13');await mkdir(dir,{recursive:true});
 const saved=arg('settings-file','')?JSON.parse(await readFile(arg('settings-file',''),'utf8')):null;
 const config={worldWidth:240,worldHeight:180,refinement:Number(arg('refinement','1.5')),boundary:'wrap',warmup:35,scene:arg('scene','oncogenesis'),settings:saved?(saved.runs?.[0]?.settings||saved.settings||saved):JSON.parse(arg('settings','{}'))};
-const result={revision:CellLab.MODEL_REVISION,hashes,config,until,label,runs:[]};
+const result={sourceRevision,revision:CellLab.MODEL_REVISION,hashes,config,until,label,runs:[]};
 for(const seed of seeds){
   const s=new CellLab.Simulation({...config,seed});await CellLabWasm.install(s,module);
   const run={seed,settings:{...s.settings},first:{},events:{},contactChecks:0,contactReasons:{},stimulatingChecks:0,activeCellMcs:0,suppressiveCellMcs:0,immuneCellMcs:0,peakActive:0,peakSuppressive:0,samples:[]};

@@ -33,22 +33,12 @@ test('low presentation stays dim with stable identity; dying cells have no match
   a.expression.presentation=[0,0];s.immunity.summarize(a);styles=CellLabDisplay.antigenVisuals(s.snapshot());assert.equal(styles.outlines.get(a.id).segments[0].color,bright.color);assert.ok(styles.outlines.get(a.id).segments[0].alpha<bright.alpha);
   s.beginDeath(a.id,'environment');styles=CellLabDisplay.antigenVisuals(s.snapshot());assert.equal(styles.outlines.size,0);
 });
-test('shared antigens keep the same segment color across tumors with different other antigens',()=>{
-  const s=make(),a=body(s,2,15,15),b=body(s,2,45,15),r=s.immunity.repertoire[0];antigen(s,a,r.sequence,r.channel);antigen(s,b,r.sequence,r.channel);
-  const shared=key(s,a);s.immunity.alter(b,g=>Object.assign(g.peptides[1],{present:true,sequence:s.immunity.repertoire[1].sequence,channel:1-r.channel}));
-  const visuals=CellLabDisplay.antigenVisuals(s.snapshot()),one=visuals.outlines.get(a.id),two=visuals.outlines.get(b.id);assert.equal(one.segments.length,1);assert.equal(two.segments.length,2);assert.equal(one.segments[0].color,two.segments.find(p=>p.key===shared).color);
+test('one inherited antigen is replaced without retaining its old color',()=>{
+  const s=make(),a=body(s,2,15,15),b=body(s,2,45,15);antigen(s,a,'AAAAAA');s.immunity.inherit(b,a.geneClone,a.expression);
+  antigen(s,b,'AAAAAC');const visuals=CellLabDisplay.antigenVisuals(s.snapshot()),one=visuals.outlines.get(a.id),two=visuals.outlines.get(b.id);
+  assert.equal(s.immunity.genes(a).peptides.length,1);assert.equal(s.immunity.genes(b).peptides.length,1);
+  assert.deepEqual(one.segments.map(p=>p.key),['0:AAAAAA']);assert.deepEqual(two.segments.map(p=>p.key),['0:AAAAAC']);
   const wrap={width:96,height:72,boundary:'wrap'};assert.equal(CellLabDisplay.antigenSegment(two,two.x+4,two.y+3,wrap).key,CellLabDisplay.antigenSegment(two,two.x+100,two.y+75,wrap).key);
-});
-test('one peptide substitution replaces only its slot and preserves the other antigen colors',()=>{
-  const s=make(),a=body(s,2,15,15),b=body(s,2,45,15);
-  const sequences=['AAAAAA','AAAAAC','AAAAAG','AAAAAT'].filter(p=>!s.immunity.self.includes(p));assert.equal(sequences.length,4);
-  s.immunity.alter(a,g=>g.peptides.forEach((p,i)=>Object.assign(p,{present:true,sequence:sequences[i],channel:0})));
-  s.immunity.inherit(b,a.geneClone,a.expression);
-  s.immunity.alter(b,g=>g.peptides[1].sequence='AAAACA');
-  const profiles=s.immunity.visualReport().cloneProfiles;
-  assert.deepEqual(profiles[a.geneClone],sequences.map(p=>'0:'+p).sort());
-  assert.deepEqual(profiles[b.geneClone],['0:AAAAAA','0:AAAAAG','0:AAAAAT','0:AAAACA']);
-  assert.equal(profiles[b.geneClone].includes('0:AAAAAC'),false);
 });
 test('immune body outlines support more than four matches, periodic seams and snapshot invalidation',()=>{
   const keys=Array.from({length:8},(_,i)=>'0:variant'+i),cell={id:1,kind:3,geneClone:8,x:.1,y:20,hasNucleus:false};
