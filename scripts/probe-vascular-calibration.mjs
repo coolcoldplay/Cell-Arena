@@ -1,0 +1,20 @@
+import vm from 'node:vm';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
+const arg=(key,fallback)=>process.argv.find(x=>x.startsWith('--'+key+'='))?.slice(key.length+3)??fallback;
+const revision=arg('revision',''),out=arg('out','output/vascular-calibration'),mode=arg('mode','onset'),steps=Number(arg('steps','10000')),settings=JSON.parse(arg('settings','{}'));
+const load=async file=>revision?execFileSync('git',['show',revision+':'+file]):readFile(file),hashes={};
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js']){const b=await load(f);hashes[f]=createHash('sha256').update(b).digest('hex');vm.runInThisContext(b.toString(),{filename:f});}
+const bytes=await load('build/cpm-kernel.wasm'),wasm=await CellLabWasm.load(bytes);hashes['build/cpm-kernel.wasm']=createHash('sha256').update(bytes).digest('hex');await mkdir(out,{recursive:true});
+for(const seed of arg('seeds','17,31,77').split(',').map(Number)){
+ const config=mode==='onset'?{worldWidth:240,worldHeight:180,refinement:1.5,scene:'oncogenesis',seed,warmup:35,settings}:{worldWidth:160,worldHeight:128,refinement:1.5,scene:'empty',seed,warmup:0,vessels:mode==='cluster'?[]:[{x:80,y:64,radius:11}],settings:{metabolism:.25,supply:3,vesselImmuneRate:0,vesselLifespan:0,apoptosis:0,...settings}};
+ const s=new CellLab.Simulation(config);await CellLabWasm.install(s,wasm);
+ if(mode==='cluster')s.vascular.initiate(80*s.scale,64*s.scale,{normal:2,tumor:0,total:2,fraction:0});
+ const original=s.vascular.biology.bind(s.vascular),driveStats={calls:0,gap:0,induced:0,committed:0,growth:0,weakInductionGrowth:0,repairOnlyGrowth:0};
+ s.vascular.biology=(m,dt)=>{const mix=s.vascular.angiogenicMix(m),threshold=s.settings.angiogenicThreshold,drive=s.settings.angiogenesis*Math.max(0,mix.total-threshold)/(threshold+mix.total),gap=s.vascular.localGap(m,s.vascular.at(m.vesselID)).some(Boolean),before=m.target;driveStats.calls++;if(gap)driveStats.gap++;if(drive>0)driveStats.induced++;if(m.repairProgress>=.4)driveStats.committed++;original(m,dt);const added=Math.max(0,m.target-before);driveStats.growth+=added;if(drive>0&&drive<.1)driveStats.weakInductionGrowth+=added;if(!drive)driveStats.repairOnlyGrowth+=added;};
+ const samples=[],start=performance.now();
+ const sample=()=>{const live=s.live().filter(m=>!m.dying),endothelium=live.filter(m=>m.vesselID);return {time:s.C.time,population:s.populationRow(),counters:{...s.counters},vascular:s.vascular.report(),driveStats:{...driveStats},valid:live.every(m=>s.components(m.id).length===1&&s.section.fits(m,m.nucleusX,m.nucleusY)),nucleusRatio:endothelium.reduce((n,m)=>n+Math.PI*m.nucleusRadius**2/s.C.getVolume(m.id),0)/Math.max(1,endothelium.length),endothelium:endothelium.map(m=>({id:m.id,vessel:m.vesselID,generation:m.generation,remaining:m.divisionsLeft,area:s.C.getVolume(m.id),base:m.base,target:m.target,nucleusRadius:m.nucleusRadius/s.scale,fitness:m.fitness,energy:m.resources.energy,progress:m.repairProgress,signal:s.vascular.angiogenicMix(m).total,repairExposure:m.repairExposure,angiogenicExposure:m.angiogenicExposure}))};};
+ samples.push(sample());for(let n=0;n<steps;n+=100){if(mode==='cluster'||mode==='induced')s.fields.angiogenicNormal.values.fill(2);s.advance(100);if((n+100)%1000===0)samples.push(sample());}
+ const result={revision:CellLab.MODEL_REVISION,sourceRevision:revision||'working-tree',hashes,config,settings:s.settings,mode,elapsedMs:performance.now()-start,samples};await writeFile(out+'/'+mode+'-'+seed+'.json',JSON.stringify(result,null,2)+'\n');const last=samples.at(-1);console.log(JSON.stringify({mode,seed,valid:samples.every(x=>x.valid),divisions:last.counters.endothelialDivisions,nucleusRatio:last.nucleusRatio,driveStats,vessels:last.vascular.vessels.map(v=>({id:v.id,radius:v.radius/s.scale,initial:v.initialRadius/s.scale,nascent:v.nascent,perfusion:v.perfusion,localOrigin:v.localOrigin}))}));
+}

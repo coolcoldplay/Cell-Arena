@@ -43,3 +43,23 @@ test('source-dependent function is inherited, controls real exchange and uses th
  }
  for(let i=1;i<rows.length;i++){const a=rows[i-1],b=rows[i];assert.ok(b.q<a.q&&b.o<a.o&&b.g<a.g&&b.a>a.a);assert.ok(b.shade>a.shade);assert.ok(b.c.every((v,j)=>v>=a.c[j]));}
 });
+
+test('endothelial nuclei are smaller at all resolutions, including both daughters and local clusters',()=>{
+ for(const refinement of [1,1.5,2]){const s=make({refinement,vessels:[{x:80,y:64,radius:11}]}),v=s.vascular.vessels[0];
+  for(const id of v.cells)assert.equal(s.cells[id].nucleusRadius,1.5*s.scale);
+  const parent=s.cells[v.cells.reduce((a,b)=>s.C.getVolume(a)>s.C.getVolume(b)?a:b)],child=s.divide(parent.id);assert.ok(child);assert.equal(parent.nucleusRadius,1.5*s.scale);assert.equal(s.cells[child].nucleusRadius,1.5*s.scale);intact(s);
+  const q=make({refinement});assert.ok(q.vascular.initiate(80*q.scale,64*q.scale,mix(0)));for(const m of q.live())assert.equal(m.nucleusRadius,1.5*q.scale);intact(q);
+ }
+});
+
+test('a gap without endothelial loss does not amplify repair; weak induction remains weak',()=>{
+ const s=make({vessels:[{x:80,y:64,radius:11}],settings:{metabolism:0}}),v=s.vascular.vessels[0],m=s.cells[v.cells[0]],initial=m.target;
+ // Hold the geometric gap cue high to isolate false repair-driven expansion.
+ // Cells and the wall's basal mass remain present, as in a membrane fluctuation.
+ s.vascular.localGap=()=>[true,true];m.fitness=1;m.glucose=m.oxygen=1;m.acid=0;
+ for(let i=0;i<200;i++)s.vascular.biology(m,1);
+ assert.equal(m.target,initial);assert.equal(m.repairProgress,0);assert.equal(s.counters.endothelialDivisions,0);
+ s.fields.angiogenicNormal.values.fill(s.settings.angiogenicThreshold*1.01);
+ for(let i=0;i<120;i++)s.vascular.biology(m,1);
+ assert.ok(m.target>initial&&m.target<initial+1);assert.ok(m.repairProgress<.01);
+});

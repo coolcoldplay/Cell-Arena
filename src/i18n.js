@@ -5,6 +5,7 @@
   const dictionary=new Map(),missing=new Set(),cache=new Map();
   function add(rows){for(const line of rows.trim().split('\n')){const at=line.indexOf('|');if(at>0)dictionary.set(line.slice(0,at),line.slice(at+1));}}
   add(`
+缺口先靠迁移闭合；内皮量减少且缺口持续时才启动修复增殖，营养与分裂额度仍限制修复|Gaps first recruit migration. Repair proliferation requires endothelial loss and a sustained gap, and remains limited by nutrients and division capacity.
 持续缺氧且诱导因子超阈值时原位挤入内皮细胞团；增殖与成腔仍需营养和空间|Sustained hypoxia and above-threshold induction insert a local endothelial cluster; growth and lumen formation still require nutrients and space.
 内皮深绿表示交换功能较好，浅绿表示较差；肿瘤来源诱导和累积损伤降低功能，也实际降低供氧、供糖及排酸。选中内皮可查看数值。|Dark green endothelium has better exchange function; pale green has poorer function. Tumor-source induction and accumulated injury reduce actual oxygen/glucose delivery and acid removal. Select a cell for values.
 持续缺氧可在当地启动内皮细胞团，随后分裂、成腔并扩张；空间或营养不足会停滞。深绿内皮功能较好，浅绿较差。虚线标示管腔，中心百分比是灌注能力。|Sustained hypoxia can initiate a local endothelial cluster, followed by division, lumen formation and expansion. Limited space or nutrients can arrest growth. Dark green indicates better endothelial function; pale green indicates poorer function. Dashed lines mark lumens; percentages show perfusion.

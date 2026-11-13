@@ -13,8 +13,9 @@
     disk(radius){const key=radius.toFixed(3);if(this.disks.has(key))return this.disks.get(key);const d=[];for(let x=-Math.ceil(radius);x<=radius;x++)for(let y=-Math.ceil(radius);y<=radius;y++)if(x*x+y*y<=radius*radius)d.push([x,y]);this.disks.set(key,d);return d;}
     at(x,y){const s=this.s;if(s.wrap){x=(x+s.width)%s.width;y=(y+s.height)%s.height;}if(x<0||y<0||x>=s.width||y>=s.height)return -1;return s.C.grid.p2i([x,y]);}
     fits(m,x,y){for(const [dx,dy] of this.disk(m.nucleusRadius)){const i=this.at(x+dx,y+dy);if(i<0||this.s.C.grid._pixels[i]!==m.id)return false;}return true;}
-    findNucleus(m,points){
-      const s=this.s,r=[0,2.1,2.3,1.7][m.kind]*s.scale;m.nucleusRadius=r;
+    nuclearRadius(m){return (m.state==='endothelial'?1.5:[0,2.1,2.3,1.7][m.kind])*this.s.scale;}
+    findNucleus(m,points,r=this.nuclearRadius(m)){
+      const s=this.s;m.nucleusRadius=r;
       const candidates=points.filter(i=>s.C.pixti(i)===m.id);if(!candidates.length)return null;
       let best=null,score=Infinity;
       for(const i of candidates){const x=s.xs[i],y=s.ys[i],dx=this.delta(x-m.x,s.width),dy=this.delta(y-m.y,s.height),d=dx*dx+dy*dy;
