@@ -8,11 +8,12 @@
   Object.assign(DEFAULTS,{normalSupport:0,immuneKillLimit:10});
   Object.assign(DEFAULTS,{cycleCoupling:1,reserveCapacity:80,replicationStress:1,dnaRepair:1,checkpointIntegrity:1,traitCost:.45,normalRepair:.25,normalDivisions:4});
   Object.assign(DEFAULTS,{stemFraction:20,stemSymmetry:30,stemRenewal:60,stemCycleSlowdown:1.35,stemRepair:1.4,stemPlasticity:.25,tumorProgenyLimit:0});
-  const MODEL_REVISION='2026-11-vascular-homeostasis-7';
+  const MODEL_REVISION='2026-11-vessel-diameter-limit-8';
   Object.assign(DEFAULTS,{antigenLength:6,initialImmuneReady:65,primingRate:1,checkpointStrength:1});
   Object.assign(DEFAULTS,{immuneLearning:1,immuneLearningTime:100,immuneLearningLimit:3,angiogenesis:1,angiogenicSecretion:1,angiogenicThreshold:.012,angiogenicHalfLife:400,angiogenicHypoxia:.55,tumorVesselPenalty:.75});
   // Vascular parameters are phenomenological MCS rates, not clinical estimates.
   Object.assign(DEFAULTS,{vesselCount:0,vesselRadius:11,vesselSupply:1,vesselDependence:45,vesselImmuneRate:1,vesselImmuneHealth:60,vesselPassage:1,vesselRepair:1,vesselDivisions:4,vesselLifespan:18000,vesselInflammation:1,tumorIntravasation:1});
+  Object.assign(DEFAULTS,{vesselMaxDiameter:48});
   // Dimensionless phase-specific uptake and expenditure, not measured ATP units.
   const PHASE_RESOURCE={G0:[.65,.65,.6,.48,.18],G1:[1.1,1.3,1.2,.85,.8],S:[1.25,1.15,1.0,.9,1.05],G2:[1.2,1.1,1.0,.8,.65],M:[1.3,1.15,1.1,1.15,.3]};
   // Phenomenological MCS parameters; not hours or molecular concentrations.
@@ -44,6 +45,7 @@
   Object.assign(RANDOM_RANGES,{damagePolarization:[.5,1.5,.25],damageDeactivation:[.7,1.3,.1],suppressiveSecretion:[.75,1.25,.25],suppressionStrength:[.8,1.2,.1],immuneRegulationMemory:[400,800,100]});
   Object.assign(RANDOM_RANGES,{immuneLearning:[.7,1.3,.1],immuneLearningTime:[60,100,20],immuneLearningLimit:[3,3,1],angiogenesis:[.7,1.3,.1],angiogenicSecretion:[.8,1.2,.1],angiogenicThreshold:[.006,.012,.002],angiogenicHalfLife:[360,440,40],angiogenicHypoxia:[.5,.6,.05],tumorVesselPenalty:[.6,.8,.05]});
   Object.assign(RANDOM_RANGES,{metabolism:[.86,.9,.02],mutation:[16,24,2],mutationSize:[.18,.28,.02]});
+  Object.assign(RANDOM_RANGES,{vesselMaxDiameter:[48,48,1]});
   function randomSettings(seed){
     let state=seed>>>0;
     const random=()=>{state=(state+0x6d2b79f5)>>>0;let n=Math.imul(state^(state>>>15),1|state);n^=n+Math.imul(n^(n>>>7),61|n);return ((n^(n>>>14))>>>0)/4294967296;};
@@ -218,8 +220,29 @@
     definition(v){const r=this.s.scale;return {x:v.x/r,y:v.y/r,radius:v.initialRadius/r};}
     delta(x,y,v){let dx=x-v.x,dy=y-v.y;const s=this.s;if(s.wrap){if(dx>s.width/2)dx-=s.width;else if(dx< -s.width/2)dx+=s.width;if(dy>s.height/2)dy-=s.height;else if(dy< -s.height/2)dy+=s.height;}return [dx,dy];}
     distance(x,y,v){const [dx,dy]=this.delta(x,y,v);return Math.sqrt(dx*dx+dy*dy);}
+    outerLimit(){return this.s.settings.vesselMaxDiameter*this.s.scale/2;}
+    massRadius(v,mass){return v.localOrigin?(mass/Math.PI-v.wall*v.wall)/(2*v.wall):v.initialRadius+(mass-v.initialMass)/(2*Math.PI*v.wall);}
+    quiesce(m){
+      const s=this.s;
+      // Discard unbuilt growth demand once, without deleting actual cytoplasm
+      // or refunding resources. Do not ratchet target down with CPM fluctuations.
+      if(m.cycle.arrest!=='vessel-size')m.target=Math.min(m.target,s.C.getVolume(m.id)/Math.max(.01,m.sectionFraction??1));
+      m.cycle={...newCycle(),arrest:'vessel-size'};m.repairProgress=0;m.repairExposure=0;m.repairCycleDrive=0;s.updateMechanics(m);
+    }
+    checkGrowthLimit(v,cells){
+      if(!v?.active)return false;
+      const s=this.s,limit=this.outerLimit()-v.wall;
+      cells=cells||s.live().filter(m=>m.vesselID===v.id&&!m.dying);
+      const mass=cells.reduce((n,m)=>n+s.C.getVolume(m.id),0);
+      if(!v.growthStopped&&(v.radius>=limit-1e-7||this.massRadius(v,mass)>=limit-1e-7)){
+        v.growthStopped=true;v.stoppedDiameter=s.settings.vesselMaxDiameter;v.stoppedAt=s.C.time;
+        s.log('vascular-size-limit',0,0,{vessel:v.id,diameter:s.settings.vesselMaxDiameter});
+      }
+      if(v.growthStopped)for(const m of cells)this.quiesce(m);
+      return !!v.growthStopped;
+    }
     plan(x,y,radius){
-      const s=this.s,wall=7*s.scale,outer=radius+wall;
+      const s=this.s,wall=7*s.scale;radius=Math.min(radius,this.outerLimit()-wall);const outer=radius+wall;
       if(this.serial>=64||x<outer+2||y<outer+2||x>s.width-outer-3||y>s.height-outer-3||this.vessels.some(v=>this.distance(x,y,v)<outer+v.initialRadius+v.wall+8*s.scale))return null;
       const v={id:++this.serial,x,y,initialRadius:radius,radius,wall,coverage:1,perfusion:1,patency:1,initialMass:0,mass:0,area:Math.PI*radius*radius,cells:[],active:true,quality:1,tumorFraction:0,angiogenicSignal:0,drive:0,parent:0,nascent:false,bornAt:this.s.C.time,nextSprout:0};
       this.vessels.push(v);this.rebuildRegion();return v;
@@ -249,7 +272,7 @@
     }
     initialize(){for(const v of this.vessels)this.seedRing(v);this.measure(0);}
     add(x,y,radius){
-      const s=this.s,outer=radius+7*s.scale;
+      const s=this.s;radius=Math.min(radius,this.outerLimit()-7*s.scale);const outer=radius+7*s.scale;
       // Explicit user placement is transactional: never silently delete tissue.
       for(let yy=Math.floor(y-outer);yy<=Math.ceil(y+outer);yy++)for(let xx=Math.floor(x-outer);xx<=Math.ceil(x+outer);xx++)if((xx-x)**2+(yy-y)**2<=outer*outer){if(xx<0||yy<0||xx>=s.width||yy>=s.height||s.C.pixt([xx,yy]))return {id:0,reason:'occupied'};}
       const v=this.plan(x,y,radius);if(!v||!this.seedRing(v))return {id:0,reason:'geometry'};
@@ -259,7 +282,7 @@
       if(!this.vessels.length)return true;
       const s=this.s,m=s.cells[a];if(!m||m.dying)return true;
       const own=this.at(m.vesselID),local=this.at(this.region[tgt]);
-      if(own){const d=this.distance(s.xs[tgt],s.ys[tgt],own),inner=Math.max(0,own.radius-s.scale);return d>=Math.min(inner,this.distance(s.xs[src],s.ys[src],own))&&d<=own.radius+own.wall+2*s.scale;}
+      if(own){const d=this.distance(s.xs[tgt],s.ys[tgt],own),from=this.distance(s.xs[src],s.ys[src],own),inner=Math.max(0,own.radius-s.scale),outer=Math.min(own.radius+own.wall+2*s.scale,Math.max(this.outerLimit(),from));return d>=Math.min(inner,from)&&d<=outer;}
       if(m.lumenExitID){const v=this.at(m.lumenExitID);if(v&&(!local||local.id===v.id))return this.distance(s.xs[tgt],s.ys[tgt],v)>=Math.min(v.radius+v.wall,this.distance(s.xs[src],s.ys[src],v));}
       if(m.vascularPhase===1){const v=this.at(m.vascularID);if(v)return this.distance(s.xs[tgt],s.ys[tgt],v)<v.radius;}
       if(!local)return true;
@@ -375,6 +398,7 @@
       const life=s.settings.vesselLifespan*m.lifespanScale;
       if(life>0&&m.age>life&&s.C.random()<1-Math.exp(-dt*(m.age/life-1)/Math.max(100,life*.1))){if(s.beginDeath(m.id,'lifespan'))m.deathRecord.trigger='endothelial-age';return;}
       s.updateResources(m,dt);if(m.dying)return;
+      if(v.growthStopped){this.quiesce(m);this.steer(m);return;}
       const mix=this.angiogenicMix(m),drive=s.settings.angiogenesis*Math.max(0,mix.total-s.settings.angiogenicThreshold)/(s.settings.angiogenicThreshold+mix.total),gap=this.localGap(m,v).some(Boolean);
       m.angiogenicExposure=drive>0?Math.min(1000,(m.angiogenicExposure||0)+dt*drive):Math.max(0,(m.angiogenicExposure||0)-dt);
       // A brief membrane fluctuation is not a sustained repair demand. Weak
@@ -398,6 +422,7 @@
       for(const v of this.vessels)if(v.active){
         const cells=s.live().filter(m=>m.vesselID===v.id&&!m.dying);v.cells=cells.map(m=>m.id);v.mass=cells.reduce((sum,m)=>sum+s.C.getVolume(m.id),0);
         if(!cells.length){v.perfusion=0;v.coverage=0;v.area=0;v.active=false;this.rebuildRegion();continue;}
+        this.checkGrowthLimit(v,cells);
         // Repair replaces lost endothelium. A transient opening in a wall that
         // still has all its cells calls for migration, not net proliferation.
         const basalMass=cells.reduce((n,m)=>n+m.base,0);
@@ -416,8 +441,8 @@
           tissueLimit=Math.min(tissueLimit,Math.max(v.radius,clearance-s.scale));
         }
         // Fixed wall thickness: added endothelial area buys circumference, not
-        // a thicker packed ring. Only actual obstacles/other vessels limit it.
-        const target=clamp(v.localOrigin?(v.mass/Math.PI-v.wall*v.wall)/(2*v.wall):v.initialRadius+(v.mass-v.initialMass)/(2*Math.PI*v.wall),0,Math.max(0,Math.min(boundary,tissueLimit)));
+        // a thicker packed ring. Respect the configured outer diameter too.
+        const target=clamp(this.massRadius(v,v.mass),0,Math.max(0,Math.min(boundary,tissueLimit,this.outerLimit()-v.wall)));
         v.radius+=clamp(target-v.radius,-.018*s.scale*dt,.008*s.scale*dt);
         if(Math.abs(v.radius-(v.regionRadius??-99))>=s.scale)this.rebuildRegion();
         this.openLumen(v,dt);
@@ -481,7 +506,7 @@
         const rate=.001*s.settings.vesselImmuneRate*v.perfusion*health*(.12+2*signal/(.2+signal));if(s.C.random()<1-Math.exp(-rate*dt))this.enter(v);
       }
     }
-    report(){const s=this.s,active=this.vessels.filter(v=>v.active),health=1-s.settings.vesselImmuneHealth/100*(1-this.hostHealth);return {vessels:this.vessels.map(v=>({id:v.id,x:v.x,y:v.y,radius:v.radius,wall:v.wall,initialRadius:v.initialRadius,coverage:v.coverage,perfusion:v.perfusion,patency:v.patency,area:v.area,active:v.active,quality:v.quality,tumorFraction:v.tumorFraction,angiogenicSignal:v.angiogenicSignal,parent:v.parent,nascent:v.nascent,bornAt:v.bornAt,localOrigin:!!v.localOrigin})),initial:this.initial.map(v=>({...v})),sprouts:s.counters.vascularSprouts,matured:s.counters.vascularMaturations,nascent:active.filter(v=>v.nascent).length,meanQuality:active.reduce((n,v)=>n+v.quality,0)/Math.max(1,active.length),endothelial:s.live().filter(m=>m.vesselID).length,functional:active.filter(v=>v.perfusion>.05).length,immuneAvailability:health,canRecruit:s.settings.vesselImmuneRate>0&&health>0&&active.some(v=>v.perfusion>.05&&v.radius>5*s.scale),area:active.reduce((n,v)=>n+v.area,0),meanPerfusion:active.reduce((n,v)=>n+v.perfusion,0)/Math.max(1,active.length)};}
+    report(){const s=this.s,active=this.vessels.filter(v=>v.active),health=1-s.settings.vesselImmuneHealth/100*(1-this.hostHealth);return {vessels:this.vessels.map(v=>({id:v.id,x:v.x,y:v.y,radius:v.radius,wall:v.wall,initialRadius:v.initialRadius,coverage:v.coverage,perfusion:v.perfusion,patency:v.patency,area:v.area,active:v.active,quality:v.quality,tumorFraction:v.tumorFraction,angiogenicSignal:v.angiogenicSignal,parent:v.parent,nascent:v.nascent,bornAt:v.bornAt,localOrigin:!!v.localOrigin,outerDiameter:2*(v.radius+v.wall)/s.scale,maxDiameter:s.settings.vesselMaxDiameter,growthStopped:!!v.growthStopped,stoppedAt:v.stoppedAt})),initial:this.initial.map(v=>({...v})),sprouts:s.counters.vascularSprouts,matured:s.counters.vascularMaturations,nascent:active.filter(v=>v.nascent).length,meanQuality:active.reduce((n,v)=>n+v.quality,0)/Math.max(1,active.length),endothelial:s.live().filter(m=>m.vesselID).length,functional:active.filter(v=>v.perfusion>.05).length,immuneAvailability:health,canRecruit:s.settings.vesselImmuneRate>0&&health>0&&active.some(v=>v.perfusion>.05&&v.radius>5*s.scale),area:active.reduce((n,v)=>n+v.area,0),meanPerfusion:active.reduce((n,v)=>n+v.perfusion,0)/Math.max(1,active.length)};}
   }
   // Opt-in performance prototype. Membership updates are O(1); only an event's
   // target body is sorted, in the exact x-major order of Artistoo's pixels().
@@ -1641,6 +1666,7 @@
     }
     divide(id){
       const m=this.cells[id];if(!m||m.dying||m.state==='abnormal'||(m.kind===TUMOR&&!m.isStem&&m.tumorDivisionsLeft===0)||this.C.getVolume(id)<80*this.scale*this.scale||(m.kind===NORMAL&&m.divisionsLeft<=0)||(m.kind===IMMUNE&&(m.divisionsLeft<=0||(this.settings.immuneKillLimit>0&&m.tumorKills>=this.settings.immuneKillLimit))))return 0;
+      if(m.vesselID&&this.vascular.checkGrowthLimit(this.vascular.at(m.vesselID)))return 0;
       // Relabelling existing cytoplasm is not a new protrusion. Preserve its Act
       // age instead of letting GridManipulator turn the whole daughter red.
       const activity=this.pixelIndex?this.pixelIndex.indices(id).map(i=>[i,this.act.pxact(i)]):[];
@@ -1727,7 +1753,7 @@
       if(['initialImmuneReady'].includes(name))value=clamp(value,0,100);
       if(['primingRate','checkpointStrength'].includes(name))value=clamp(value,0,3);
       if(!(name in DEFAULTS)||!Number.isFinite(value))return;
-      const vascularBounds={vesselCount:[0,6],vesselRadius:[8,20],vesselSupply:[0,3],vesselDependence:[0,100],vesselImmuneRate:[0,3],vesselImmuneHealth:[0,100],vesselPassage:[0,3],vesselRepair:[0,3],vesselDivisions:[0,12],vesselLifespan:[0,50000],vesselInflammation:[0,5],tumorIntravasation:[0,3]};
+      const vascularBounds={vesselCount:[0,6],vesselRadius:[8,20],vesselMaxDiameter:[30,160],vesselSupply:[0,3],vesselDependence:[0,100],vesselImmuneRate:[0,3],vesselImmuneHealth:[0,100],vesselPassage:[0,3],vesselRepair:[0,3],vesselDivisions:[0,12],vesselLifespan:[0,50000],vesselInflammation:[0,5],tumorIntravasation:[0,3]};
       if(vascularBounds[name])value=clamp(value,...vascularBounds[name]);if(name==='vesselCount')value=Math.round(value);
       if(['stemFraction','stemSymmetry','stemRenewal'].includes(name))value=clamp(value,0,100);
       if(['stemCycleSlowdown','stemRepair'].includes(name))value=clamp(value,1,3);
@@ -1760,6 +1786,14 @@
       if(['damagePolarization','damageDeactivation','suppressiveSecretion','suppressionStrength','suppressionRecovery'].includes(name))value=clamp(value,0,5);
       if(name==='immuneRegulationMemory')value=clamp(value,100,2000);
       this.settings[name]=value;if(name==='temperature')this.C.conf.T=value;
+      if(name==='vesselMaxDiameter'){
+        for(const v of this.vascular.vessels)if(v.active){
+          if(v.growthStopped&&value>v.stoppedDiameter){v.growthStopped=false;for(const m of this.live())if(m.vesselID===v.id&&!m.dying&&m.cycle.arrest==='vessel-size')m.cycle=newCycle();}
+          if(v.growthStopped)v.stoppedDiameter=Math.min(v.stoppedDiameter,value);
+          this.vascular.checkGrowthLimit(v);
+        }
+        this.vascular.measure(0);
+      }
       this.section?.updateJunctions(0);
       for(const m of this.live())this.updateMechanics(m);
       // Adhesive cohesion is local contact energy, complementary to the secreted field.

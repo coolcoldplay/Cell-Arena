@@ -59,7 +59,7 @@ __attribute__((export_name("vascular_region"))) u32 region_pointer(){return(u32)
 __attribute__((export_name("vascular_geometry"))) u32 vessel_pointer(){return(u32)vessels;}
 static inline int vascular_allowed(int src,int tgt,int a){
   double *m=cell(a);if(!params[33]||!m[PRESENT]||m[DYING]||m[TRANSIT]<0)return 1;double *v=vessel((int)m[VESSEL]);
-  if(v){double d=vessel_distance(tgt,v),lo=v[3]-v[5],from=vessel_distance(src,v);if(lo<0)lo=0;if(from<lo)lo=from;return d>=lo&&d<=v[3]+v[4]+2*v[5];}
+  if(v){double d=vessel_distance(tgt,v),lo=v[3]-v[5],from=vessel_distance(src,v),hi=v[3]+v[4]+2*v[5],cap=from>v[6]?from:v[6];if(lo<0)lo=0;if(from<lo)lo=from;if(cap<hi)hi=cap;return d>=lo&&d<=hi;}
   if(m[TRANSIT]==5){v=vessel((int)m[ACCESS]);if(v&&(!vascular_region[tgt]||vascular_region[tgt]==(int)m[ACCESS])){double d=vessel_distance(src,v),edge=v[3]+v[4];return vessel_distance(tgt,v)>=(d<edge?d:edge);}}
   if(m[TRANSIT]==1){v=vessel((int)m[ACCESS]);if(v)return vessel_distance(tgt,v)<v[3];}
   int id=vascular_region[tgt];v=vessel(id);if(!v)return 1;

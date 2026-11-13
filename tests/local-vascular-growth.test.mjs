@@ -1,6 +1,8 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
 for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js','src/display-fields.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});
-const make=(extra={})=>new CellLab.Simulation({worldWidth:160,worldHeight:128,refinement:1,scene:'empty',warmup:0,seed:17,...extra,settings:{metabolism:.25,supply:3,apoptosis:0,vesselLifespan:0,vesselImmuneRate:0,vesselDivisions:6,stressMutation:0,progression:0,...extra.settings}});
+// Keep a high explicit diameter in these older mechanism-isolation fixtures.
+// Default-limit enforcement has separate multi-scale and strong-drive tests.
+const make=(extra={})=>new CellLab.Simulation({worldWidth:160,worldHeight:128,refinement:1,scene:'empty',warmup:0,seed:17,...extra,settings:{metabolism:.25,supply:3,apoptosis:0,vesselLifespan:0,vesselImmuneRate:0,vesselDivisions:6,vesselMaxDiameter:160,stressMutation:0,progression:0,...extra.settings}});
 const mix=f=>({normal:2*(1-f),tumor:2*f,total:2,fraction:f});
 const intact=s=>{for(const m of s.live().filter(m=>!m.dying)){assert.equal(s.components(m.id).length,1);assert.ok(s.section.fits(m,m.nucleusX,m.nucleusY));}};
 test('sustained hypoxia and induction initiate a solid three-cell cluster without any prior vessel',()=>{

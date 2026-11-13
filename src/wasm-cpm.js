@@ -60,7 +60,7 @@
       this.params[33]=s.vascular.vessels.length?1:0;
       if(this.vascularGeometry){
         if(this.vascularVersion!==s.vascular.version){this.vascularRegion.set(s.vascular.region.subarray(0,this.length));this.vascularVersion=s.vascular.version;}
-        this.vascularGeometry.fill(0);for(const v of s.vascular.vessels)this.vascularGeometry.set([v.active?1:0,v.x,v.y,v.radius,v.wall,s.scale,0,0],v.id*8);
+        this.vascularGeometry.fill(0);for(const v of s.vascular.vessels)this.vascularGeometry.set([v.active?1:0,v.x,v.y,v.radius,v.wall,s.scale,s.vascular.outerLimit(),0],v.id*8);
       }
     }
     installBorderIndex(){

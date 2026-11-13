@@ -5,6 +5,12 @@
   const dictionary=new Map(),missing=new Set(),cache=new Map();
   function add(rows){for(const line of rows.trim().split('\n')){const at=line.indexOf('|');if(at>0)dictionary.set(line.slice(0,at),line.slice(at+1));}}
   add(`
+血管外直径上限|Maximum vessel outer diameter
+包含管壁；达到尺寸或对应内皮容纳量后统一保持 G0，手动提高上限才恢复增殖许可；调低时已有超限血管逐步回缩|Includes the wall. Reaching the diameter or endothelial capacity holds all vessel cells in G0 until the limit is raised. Existing oversized vessels retract gradually after lowering it.
+血管直径上限：保持 G0|Vessel diameter limit: held in G0
+血管外直径|Vessel outer diameter
+尺寸限制：内皮已退出周期|Size limit: endothelium has exited the cell cycle
+尚未达到尺寸限制|Below the size limit
 缺口先靠迁移闭合；内皮量减少且缺口持续时才启动修复增殖，营养与分裂额度仍限制修复|Gaps first recruit migration. Repair proliferation requires endothelial loss and a sustained gap, and remains limited by nutrients and division capacity.
 持续缺氧且诱导因子超阈值时原位挤入内皮细胞团；增殖与成腔仍需营养和空间|Sustained hypoxia and above-threshold induction insert a local endothelial cluster; growth and lumen formation still require nutrients and space.
 内皮深绿表示交换功能较好，浅绿表示较差；肿瘤来源诱导和累积损伤降低功能，也实际降低供氧、供糖及排酸。选中内皮可查看数值。|Dark green endothelium has better exchange function; pale green has poorer function. Tumor-source induction and accumulated injury reduce actual oxygen/glucose delivery and acid removal. Select a cell for values.

@@ -57,6 +57,7 @@
     ['immuneLearningLimit','学得识别类型上限',0,8,1,'原受体另计；已学能力不自动衰减，子代继承；降低上限不删除已有能力',' 种'],
     ['vesselCount','初始血管数',0,6,1,'重开后生效；空白场景可在新增类型中选择血管，放到空隙中',''],
     ['vesselRadius','新血管管腔半径',8,20,1,'只影响新建血管；内皮是可形变的真实胞体，管腔不含组织细胞',''],
+    ['vesselMaxDiameter','血管外直径上限',30,160,2,'包含管壁；达到尺寸或对应内皮容纳量后统一保持 G0，手动提高上限才恢复增殖许可；调低时已有超限血管逐步回缩',''],
     ['vesselSupply','血管交换能力',0,3,.1,'有限速率补充氧糖与排酸；实际通量随灌注、管腔与正常组织保留率变化','×'],
     ['vesselDependence','供给的血管依赖程度',0,100,5,'越高越减少均匀背景供给；血管全部失效后不会自动恢复背景供给','%'],
     ['vesselImmuneRate','循环免疫补充速率',0,3,.1,'管腔内按模型时间概率到达；局部招募信号增强，实际空隙不足时不能生成','×'],
@@ -141,7 +142,7 @@
   ];
   const modules={
     'branch-sliders':['branchLength','branchStrength','branching','networkAdhesion'],
-    'vascular-sliders':['angiogenesis','angiogenicSecretion','angiogenicThreshold','angiogenicHalfLife','angiogenicHypoxia','tumorVesselPenalty','vesselCount','vesselRadius','vesselSupply','vesselDependence','vesselImmuneRate','vesselImmuneHealth','vesselPassage','vesselRepair','vesselDivisions','vesselLifespan','vesselInflammation','tumorIntravasation'],
+    'vascular-sliders':['angiogenesis','angiogenicSecretion','angiogenicThreshold','angiogenicHalfLife','angiogenicHypoxia','tumorVesselPenalty','vesselCount','vesselRadius','vesselMaxDiameter','vesselSupply','vesselDependence','vesselImmuneRate','vesselImmuneHealth','vesselPassage','vesselRepair','vesselDivisions','vesselLifespan','vesselInflammation','tumorIntravasation'],
     'environment-sliders':['supply','normalSupport','metabolism','halfLife','chemotaxis','escape','inflammation'],
     'evolution-sliders':['mutationBias','evolutionMemory'],
     'normal-sliders':['normalRepair','normalDivisions','normalMotility','cohesion','stressMutation','progression','normalMutationGain'],
@@ -418,18 +419,20 @@
     if(!force&&!panelVisible('cell-inspector'))return;
     const cell=s.cells.find(c=>c.id===selected),phases={search:cell?.kind===3?(cell.patrolTurning?'巡逻转向':cell.immuneCue>.05?'局部趋化':cell.patrolScanning?'巡逻接触扫描':'持续巡逻'):'探索',scan:'接触扫描',kill:'识别后递送损伤',dying:CellLabDisplay.deathPhaseLabel(cell)};
     $('selection-label').textContent=cell?'#'+cell.id+' '+CellLabDisplay.cellName(cell):'未选中';
-    $('divide').disabled=!cell||cell.dying||cell.state==='abnormal';
+    const selectedVessel=cell?.vesselID?s.vascular?.vessels.find(v=>v.id===cell.vesselID):null;
+    $('divide').disabled=!cell||cell.dying||cell.state==='abnormal'||!!selectedVessel?.growthStopped;
     if(cell){
       const lines=[`#${cell.id} ${CellLabDisplay.cellName(cell)} · 面积 ${(cell.area/s.refinement**2).toFixed(0)} · ${phases[cell.phase]}${cell.targetID?' · 接触 #'+cell.targetID:''}`,`氧 ${cell.oxygen.toFixed(2)} / 糖 ${cell.glucose.toFixed(2)} / 酸 ${cell.acid.toFixed(2)}`,`代谢效能 ${(cell.fitness*100).toFixed(0)}% · 累积压力 ${(cell.stress*100).toFixed(0)}% · 邻接拥挤 ${(cell.confinement*100).toFixed(0)}%`];
       lines.push(`子代 P${cell.generation} · 沿谱系分裂 ${cell.generation} 次`);
       const family=s.observation?.rootBirth===observedBirth?s.observation:null,member=family?.cells.find(c=>c.id===cell.id);
       if(member)lines.push(`观察谱系：相对第 ${member.generation} 代 · 标记 ${family.cells.length} 颗`);
       if(cell.state!=='abnormal'){
-        const c=cell.cycle,reasons={'':'周期推进',disabled:'生长参数关闭',nutrients:'氧糖或代谢不足',acid:'酸负荷过高',injury:'累积损伤待恢复',lineage:'谱系分裂上限',exhaustion:'慢性刺激耗竭',suppression:'免疫抑制／再激活等待',antigen:'抗原记忆不足',il2:'IL-2 支持不足',space:'实际空间不足',growth:'等待胞体生长',geometry:'分裂几何受限',reserve:'营养储备不足',dna:'DNA 损伤检查点',contact:'接触抑制：缺少空隙'};
+        const c=cell.cycle,reasons={'':'周期推进',disabled:'生长参数关闭',nutrients:'氧糖或代谢不足',acid:'酸负荷过高',injury:'累积损伤待恢复',lineage:'谱系分裂上限','vessel-size':'血管直径上限：保持 G0',exhaustion:'慢性刺激耗竭',suppression:'免疫抑制／再激活等待',antigen:'抗原记忆不足',il2:'IL-2 支持不足',space:'实际空间不足',growth:'等待胞体生长',geometry:'分裂几何受限',reserve:'营养储备不足',dna:'DNA 损伤检查点',contact:'接触抑制：缺少空隙'};
         lines.push(`细胞周期 ${c.phase} · 阶段进度 ${Math.round(c.progress*100)}%`,c.phase==='G0'&&!c.arrest?'整合增殖信号':reasons[c.arrest]);
       }
       if(cell.resources)lines.push(`能量储备 ${Math.round(cell.resources.energy*100)}% · 合成储备 ${Math.round(cell.resources.precursor*100)}% · DNA 损伤 ${Math.round(cell.resources.dnaDamage*100)}%`);
       if(cell.vesselID)lines.push('血管 #'+cell.vesselID+' · 内皮年龄 '+Math.round(cell.age)+' MCS','剩余修复分裂 '+cell.divisionsLeft+' 次 · 累积内皮损伤 '+Math.round((cell.endothelialInjury||0)*100)+'%','内皮交换功能 '+Math.round((cell.endothelialFunction??1)*100)+'% · 肿瘤来源诱导 '+Math.round((cell.endothelialTumorFraction||0)*100)+'%');
+      if(selectedVessel)lines.push('血管外直径 '+selectedVessel.outerDiameter.toFixed(1)+' / '+selectedVessel.maxDiameter+' · '+(selectedVessel.growthStopped?'尺寸限制：内皮已退出周期':'尚未达到尺寸限制'));
       if(cell.lumenExitID)lines.push('血管扩张：正在向组织侧让位');
       if(cell.vascularID)lines.push('血管 #'+cell.vascularID+' · '+({1:'管腔内循环',2:'跨内皮进入组织',3:'肿瘤跨内皮入血',4:'已进入管腔，等待灌注带离'}[cell.vascularPhase]||''));
       if(cell.kind===1&&cell.state==='normal')lines.push(`剩余修复分裂 ${cell.divisionsLeft} 次 · 空隙接触 ${Math.round(cell.freeFraction*100)}%`);

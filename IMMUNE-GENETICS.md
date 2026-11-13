@@ -1,6 +1,6 @@
 # 抗原、免疫识别与克隆演化
 
-模型修订：`2026-11-vascular-homeostasis-7`。原有 CPM 形变、胞核约束、实际膜接触、局部搜寻、代谢、细胞周期、干性、有限免疫扩增与死亡仍然执行；最新血管变化与验证见[血管稳态校准](reports/vascular-homeostasis-2026-11-13/README.md)，原位成腔设计见[原位血管报告](reports/local-vascular-growth-2026-11-13/README.md)。
+模型修订：`2026-11-vessel-diameter-limit-8`。原有 CPM 形变、胞核约束、实际膜接触、局部搜寻、代谢、细胞周期、干性、有限免疫扩增与死亡仍然执行；最新血管尺寸与内皮 G0 限制见[血管直径上限报告](reports/vessel-diameter-limit-2026-11-13/README.md)，此前参数与修复驱动排查见[血管稳态校准](reports/vascular-homeostasis-2026-11-13/README.md)，原位成腔设计见[原位血管报告](reports/local-vascular-growth-2026-11-13/README.md)。
 
 ## 如何体验
 

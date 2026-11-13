@@ -42,7 +42,7 @@ test('only tumors confirmed inside the lumen leave within 40 MCS, even if perfus
  s.C.time=39;s.vascular.tick(1);assert.ok(s.cells[tumor.id]);s.C.time=40;s.vascular.tick(1);assert.equal(s.cells[tumor.id],undefined);assert.ok(s.cells[immune.id]);assert.equal(s.counters.bloodstreamExports,1);assert.equal(s.deathHistory.length,deaths);assert.equal(s.counters.kills,0);
 });
 test('actual endothelial growth preserves JS/WASM trajectories and connected nuclei',async()=>{
- const config={width:160,height:128,scene:'empty',seed:31,warmup:0,vessels:[{x:80,y:64,radius:11}],settings:{metabolism:.25,supply:3,apoptosis:0,vesselLifespan:0,vesselImmuneRate:0,vesselDivisions:6,immuneLearning:0}},a=new CellLab.Simulation(config),b=new CellLab.Simulation(config);
+ const config={width:160,height:128,scene:'empty',seed:31,warmup:0,vessels:[{x:80,y:64,radius:11}],settings:{metabolism:.25,supply:3,apoptosis:0,vesselLifespan:0,vesselImmuneRate:0,vesselDivisions:6,vesselMaxDiameter:160,immuneLearning:0}},a=new CellLab.Simulation(config),b=new CellLab.Simulation(config);
  await CellLabWasm.install(b,await CellLabWasm.load(await readFile('build/cpm-kernel.wasm')));
  for(let t=0;t<1800;t+=100){for(const s of [a,b]){s.fields.angiogenicNormal.values.fill(2);s.advance(100);}assert.deepEqual(b.C.grid._pixels,a.C.grid._pixels);assert.deepEqual(b.counters,a.counters);assert.deepEqual(b.vascular.report(),a.vascular.report());}
  assert.ok(a.counters.endothelialDivisions>0);assert.ok(a.vascular.vessels[0].radius>a.vascular.vessels[0].initialRadius);
