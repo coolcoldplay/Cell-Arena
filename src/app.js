@@ -13,7 +13,7 @@
   const selectedRounds=new Set();let historyCleanup=false,cleanupBusy=false,pendingCleanup=[];
   function storageError(){if(!storageWarning){storageWarning=true;toast('历史记录暂时无法保存到本机，仍可导出本页 CSV');}}
   const historyReady=roundStore.load().then(records=>{completedRounds.push(...records);lastRoundNumber=roundStore.lastRoundNumber;historyVersion++;renderRoundHistory();}).catch(storageError);
-  const opacity={adversity:.35,oxygen:.35,glucose:.35,acid:.35,density:.35,cohesion:.45,danger:.45,trail:.45,il2:.45,normalDamage:.45,inhibition:.45};
+  const opacity={angiogenicNormal:.5,angiogenicTumor:.5,adversity:.35,oxygen:.35,glucose:.35,acid:.35,density:.35,cohesion:.45,danger:.45,trail:.45,il2:.45,normalDamage:.45,inhibition:.45};
   let hover=null,hoverMovedAt=0,probeDirty=false,panGesture=null,recordingScale=0,eraseSource=false;
   const trajectories=new CellLabTrajectories();
   const historyChart=CellLabHistory.mount();
@@ -46,6 +46,15 @@
   const labels=['培养液','正常细胞','肿瘤细胞','免疫细胞','实体障碍'];
   const titles={random:'随机生成',empty:'空白自建',ecosystem:'免疫共培养',collective:'群体迁移',invasion:'肿瘤扩张',maze:'免疫细胞迷宫',stress:'密度与逃逸',surveillance:'癌前监视',network:'胶质瘤样分枝成网'};
   const controls=[
+    ['angiogenesis','血管生成速度',0,3,.1,'持续超过诱导阈值后促进实际内皮分裂和出芽；需要已有内皮、营养与空间','×'],
+    ['angiogenicSecretion','缺氧诱导因子分泌',0,3,.1,'正常与肿瘤来源分别扩散和衰减；死亡细胞与内皮不分泌','×'],
+    ['angiogenicThreshold','血管诱导阈值',.005,3,.005,'两种来源的局部浓度之和；超过阈值仍需持续刺激与真实分裂',''],
+    ['angiogenicHalfLife','血管诱导因子半衰期',40,800,20,'仅作用于诱导因子，不改变免疫记忆',' MCS'],
+    ['angiogenicHypoxia','诱导分泌的氧阈值',.2,.8,.05,'氧低于此值开始分泌；缺氧越重分泌越多',''],
+    ['tumorVesselPenalty','肿瘤来源的血管功能折损',0,.95,.05,'按局部肿瘤来源占比降低氧糖交换与排酸；可调模型假设',''],
+    ['immuneLearning','接触抗原传递与学习',0,3,.1,'抽象学习规则：实际接触、抗原取样与传递后增加识别能力；0 停止新学习','×'],
+    ['immuneLearningTime','学习所需有效接触',20,400,20,'接触中断则重新累积；营养与接触长度影响速度',' MCS'],
+    ['immuneLearningLimit','学得识别类型上限',0,8,1,'原受体另计；已学能力不自动衰减，子代继承；降低上限不删除已有能力',' 种'],
     ['vesselCount','初始血管数',0,6,1,'重开后生效；空白场景可在新增类型中选择血管，放到空隙中',''],
     ['vesselRadius','新血管管腔半径',8,20,1,'只影响新建血管；内皮是可形变的真实胞体，管腔不含组织细胞',''],
     ['vesselSupply','血管交换能力',0,3,.1,'有限速率补充氧糖与排酸；实际通量随灌注、管腔与正常组织保留率变化','×'],
@@ -132,7 +141,7 @@
   ];
   const modules={
     'branch-sliders':['branchLength','branchStrength','branching','networkAdhesion'],
-    'vascular-sliders':['vesselCount','vesselRadius','vesselSupply','vesselDependence','vesselImmuneRate','vesselImmuneHealth','vesselPassage','vesselRepair','vesselDivisions','vesselLifespan','vesselInflammation','tumorIntravasation'],
+    'vascular-sliders':['angiogenesis','angiogenicSecretion','angiogenicThreshold','angiogenicHalfLife','angiogenicHypoxia','tumorVesselPenalty','vesselCount','vesselRadius','vesselSupply','vesselDependence','vesselImmuneRate','vesselImmuneHealth','vesselPassage','vesselRepair','vesselDivisions','vesselLifespan','vesselInflammation','tumorIntravasation'],
     'environment-sliders':['supply','normalSupport','metabolism','halfLife','chemotaxis','escape','inflammation'],
     'evolution-sliders':['mutationBias','evolutionMemory'],
     'normal-sliders':['normalRepair','normalDivisions','normalMotility','cohesion','stressMutation','progression','normalMutationGain'],
@@ -143,7 +152,7 @@
     'resource-sliders':['cycleCoupling','reserveCapacity','replicationStress','dnaRepair'],
     'immune-sliders':['immuneMotility','immuneSeparation','kill','immuneKillLimit','recruitment'],
     'immune-regulation-sliders':['damagePolarization','suppressionRecovery','damageDeactivation','suppressiveSecretion','suppressionStrength','immuneRegulationMemory'],
-    'immune-cycle-sliders':['initialImmuneReady','primingRate','checkpointStrength','immuneGrowth','immuneDivisions','immuneCycle','antigenMemory','il2Secretion','il2HalfLife','exhaustionRate'],
+    'immune-cycle-sliders':['immuneLearning','immuneLearningTime','immuneLearningLimit','initialImmuneReady','primingRate','checkpointStrength','immuneGrowth','immuneDivisions','immuneCycle','antigenMemory','il2Secretion','il2HalfLife','exhaustionRate'],
     'other-sliders':['sectionYield','temperature','alignment','repulsion','noise']
   },moduleFor=Object.fromEntries(Object.entries(modules).flatMap(([id,names])=>names.map(name=>[name,id])));
   for(let i=0;i<controls.length;i++){
@@ -369,7 +378,7 @@
       CellLabImmuneUI.stats(s);lineageChart.update(s);
       const p=CellLabRounds.population(s);
       for(const kind of ['normal','abnormal','tumor','immune','endothelial'])$(kind+'-count').textContent=p[kind];
-      const vas=s.vascular; $('vascular-statistics').hidden=!vas?.vessels?.length; if(vas){$('vessel-functional').textContent=vas.functional+' / '+vas.vessels.length;$('vessel-perfusion').textContent=Math.round(vas.meanPerfusion*100)+'%';$('vessel-immune').textContent=(s.counters.extravasations||0)+' / '+(s.counters.vascularArrivals||0);$('vessel-export').textContent=s.counters.bloodstreamExports||0;$('vessel-repair').textContent='内皮分裂 '+(s.counters.endothelialDivisions||0)+' · 内皮死亡 '+(s.counters.endothelialDeaths||0)+' · 循环返回 '+(s.counters.circulationReturns||0);}
+      const vas=s.vascular; $('vascular-statistics').hidden=!vas?.vessels?.length; if(vas){$('vessel-functional').textContent=vas.functional+' / '+vas.vessels.length;$('vessel-perfusion').textContent=Math.round(vas.meanPerfusion*100)+'%';$('vessel-immune').textContent=(s.counters.extravasations||0)+' / '+(s.counters.vascularArrivals||0);$('vessel-export').textContent=s.counters.bloodstreamExports||0;$('vessel-growth').textContent='血管出芽 '+vas.sprouts+' · 成熟 '+vas.matured+' · 生长中 '+vas.nascent+' · 平均交换质量 '+Math.round(vas.meanQuality*100)+'%';$('vessel-repair').textContent='内皮分裂 '+(s.counters.endothelialDivisions||0)+' · 内皮死亡 '+(s.counters.endothelialDeaths||0)+' · 循环返回 '+(s.counters.circulationReturns||0);}
       $('alive-count').textContent=p.total;$('resting-immune-count').textContent=p.immuneResting;$('activated-immune-count').textContent=p.immuneActive;$('suppressive-immune-count').textContent=p.immuneSuppressive;
       $('division-count').textContent=s.counters.divisions;$('malignant-count').textContent=s.counters.malignantTransitions;$('escape-count').textContent=s.immunity?.metrics.losses||0;
       $('immune-division-count').textContent='免疫分裂 '+s.counters.immuneDivisions;$('recognition-count').textContent=s.counters.recognitions;

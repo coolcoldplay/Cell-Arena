@@ -1,0 +1,184 @@
+{
+  "learning": {
+    "before": [
+      {
+        "id": 2,
+        "learned": 0,
+        "segments": 1
+      },
+      {
+        "id": 3,
+        "learned": 0,
+        "segments": 1
+      }
+    ],
+    "after": {
+      "time": 1000,
+      "metrics": {
+        "geneticChanges": 0,
+        "substitutions": 0,
+        "losses": 0,
+        "primed": 0,
+        "reinforcements": 0,
+        "exposureRecords": 0,
+        "cacheMisses": 2,
+        "antigenUptakes": 1,
+        "antigenTransfers": 1,
+        "learnedRecognitions": 2,
+        "cacheEntries": 2
+      },
+      "immune": [
+        {
+          "id": 2,
+          "learned": 1,
+          "segments": 2
+        },
+        {
+          "id": 3,
+          "learned": 1,
+          "segments": 2
+        }
+      ],
+      "errors": []
+    }
+  },
+  "english": "Antigen & immunityG4 · Founderimported founder · 0 MCS · Generation 0Segments of the cell body outline show current antigens compatible with inherited or learned receptors, not carried antigens or activation.A-1608eae5A-6a2c646eStable receptorGCTTCAC1Learned recognition · no automatic expiryGTGAGGC1 · 330 MCSLearned 1 / 3 types; an abstract rule, inherited by daughters.Transient antigen cargo: C1 GTGAGG✓ Response competent; still requires a matching contactPriming100%Memory30%Exhaustion0%Recognition at actual contactsNo current immune–tumor/precancer contact; immune outlines indicate receptor potential, not actual stimulation.",
+  "mobile": {
+    "width": 390,
+    "scroll": 390,
+    "text": "Learned recognition · no automatic expiryGTGAGGC1 · 330 MCSLearned 1 / 3 types; an abstract rule, inherited by daughters.Transient antigen cargo: C1 GTGAGG",
+    "time": 1000
+  },
+  "vascular": {
+    "time": 6035,
+    "report": {
+      "vessels": [
+        {
+          "id": 1,
+          "x": 82.80000000000001,
+          "y": 72.9,
+          "radius": 23.055255074798694,
+          "wall": 10.5,
+          "initialRadius": 16.5,
+          "coverage": 1,
+          "perfusion": 0.5921894626648619,
+          "patency": 0.8532934131736527,
+          "area": 1425,
+          "active": true,
+          "quality": 0.6940044930879434,
+          "tumorFraction": 0.4079940092160754,
+          "angiogenicSignal": 0.0034602946081749375,
+          "parent": 0,
+          "nascent": false,
+          "bornAt": 0
+        },
+        {
+          "id": 2,
+          "x": 277.20000000000005,
+          "y": 197.10000000000002,
+          "radius": 21.84270693283793,
+          "wall": 10.5,
+          "initialRadius": 16.5,
+          "coverage": 1,
+          "perfusion": 0.45327763331691323,
+          "patency": 0.8637274549098196,
+          "area": 1293,
+          "active": true,
+          "quality": 0.5247924339330388,
+          "tumorFraction": 0.6336100880892817,
+          "angiogenicSignal": 0.0036547899510814045,
+          "parent": 0,
+          "nascent": false,
+          "bornAt": 0
+        },
+        {
+          "id": 3,
+          "x": 236.85381212481593,
+          "y": 181.92849960065394,
+          "radius": 12,
+          "wall": 10.5,
+          "initialRadius": 12,
+          "coverage": 0.078125,
+          "perfusion": 0,
+          "patency": 0.22666666666666666,
+          "area": 102,
+          "active": true,
+          "quality": 0.4411283050401599,
+          "tumorFraction": 0.7451622599464535,
+          "angiogenicSignal": 0.004282870021817307,
+          "parent": 2,
+          "nascent": true,
+          "bornAt": 2988
+        },
+        {
+          "id": 4,
+          "x": 131.2428276081998,
+          "y": 71.50261074207116,
+          "radius": 12,
+          "wall": 10.5,
+          "initialRadius": 12,
+          "coverage": 0.234375,
+          "perfusion": 0,
+          "patency": 0,
+          "area": 0,
+          "active": true,
+          "quality": 0.5601488247135291,
+          "tumorFraction": 0.5864682337152946,
+          "angiogenicSignal": 0.005188953529138592,
+          "parent": 1,
+          "nascent": true,
+          "bornAt": 3300
+        },
+        {
+          "id": 5,
+          "x": 259.57373040838763,
+          "y": 241.0082965719629,
+          "radius": 12,
+          "wall": 10.5,
+          "initialRadius": 12,
+          "coverage": 0.234375,
+          "perfusion": 0,
+          "patency": 0.0684326710816777,
+          "area": 31,
+          "active": true,
+          "quality": 0.4182565538680585,
+          "tumorFraction": 0.7756579281759219,
+          "angiogenicSignal": 0.0036760921865089924,
+          "parent": 2,
+          "nascent": true,
+          "bornAt": 4716
+        }
+      ],
+      "initial": [
+        {
+          "x": 55.20000000000001,
+          "y": 48.6,
+          "radius": 11
+        },
+        {
+          "x": 184.80000000000004,
+          "y": 131.4,
+          "radius": 11
+        }
+      ],
+      "sprouts": 3,
+      "matured": 0,
+      "nascent": 3,
+      "meanQuality": 0.527666122128546,
+      "endothelial": 45,
+      "functional": 2,
+      "immuneAvailability": 0.9212517876501565,
+      "canRecruit": true,
+      "area": 2851,
+      "meanPerfusion": 0.20909341919635502
+    },
+    "stats": "血管与播散有效血管 2 / 5平均灌注 21%穿出 / 到达免疫 0 / 2入血离场 0内皮分裂 29 · 内皮死亡 0 · 循环返回 0血管出芽 3 · 成熟 0 · 生长中 3 · 平均交换质量 53%",
+    "errors": []
+  },
+  "vascularReimport": {
+    "beforeVessels": 5,
+    "recipeVessels": 2,
+    "afterVessels": 2,
+    "errors": []
+  }
+}

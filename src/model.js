@@ -8,8 +8,9 @@
   Object.assign(DEFAULTS,{normalSupport:0,immuneKillLimit:10});
   Object.assign(DEFAULTS,{cycleCoupling:1,reserveCapacity:80,replicationStress:1,dnaRepair:1,checkpointIntegrity:1,traitCost:.45,normalRepair:.25,normalDivisions:4});
   Object.assign(DEFAULTS,{stemFraction:20,stemSymmetry:30,stemRenewal:60,stemCycleSlowdown:1.35,stemRepair:1.4,stemPlasticity:.25,tumorProgenyLimit:0});
-  const MODEL_REVISION='2026-11-single-antigen-lineage-3';
+  const MODEL_REVISION='2026-11-contact-learning-angiogenesis-4';
   Object.assign(DEFAULTS,{antigenLength:6,initialImmuneReady:65,primingRate:1,checkpointStrength:1});
+  Object.assign(DEFAULTS,{immuneLearning:1,immuneLearningTime:100,immuneLearningLimit:3,angiogenesis:1,angiogenicSecretion:1,angiogenicThreshold:.012,angiogenicHalfLife:400,angiogenicHypoxia:.55,tumorVesselPenalty:.75});
   // Vascular parameters are phenomenological MCS rates, not clinical estimates.
   Object.assign(DEFAULTS,{vesselCount:0,vesselRadius:11,vesselSupply:1,vesselDependence:45,vesselImmuneRate:1,vesselImmuneHealth:60,vesselPassage:1,vesselRepair:1,vesselDivisions:4,vesselLifespan:18000,vesselInflammation:1,tumorIntravasation:1});
   // Dimensionless phase-specific uptake and expenditure, not measured ATP units.
@@ -41,6 +42,7 @@
   // Onset calibration: avoid making the abstract injury-to-suppression route
   // dominate before antigen-specific surveillance. This is not a Treg census.
   Object.assign(RANDOM_RANGES,{damagePolarization:[.5,1.5,.25],damageDeactivation:[.7,1.3,.1],suppressiveSecretion:[.75,1.25,.25],suppressionStrength:[.8,1.2,.1],immuneRegulationMemory:[400,800,100]});
+  Object.assign(RANDOM_RANGES,{immuneLearning:[.7,1.3,.1],immuneLearningTime:[60,100,20],immuneLearningLimit:[3,3,1],angiogenesis:[.7,1.3,.1],angiogenicSecretion:[.8,1.2,.1],angiogenicThreshold:[.006,.012,.002],angiogenicHalfLife:[360,440,40],angiogenicHypoxia:[.5,.6,.05],tumorVesselPenalty:[.6,.8,.05]});
   function randomSettings(seed){
     let state=seed>>>0;
     const random=()=>{state=(state+0x6d2b79f5)>>>0;let n=Math.imul(state^(state>>>15),1|state);n^=n+Math.imul(n^(n>>>7),61|n);return ((n^(n>>>14))>>>0)/4294967296;};
@@ -116,6 +118,10 @@
     connected[mask]=reached===mask?1:0;
     reached=0;front=mask&-mask;while(front){reached|=front;let next=0;for(let a=0;a<8;a++)if(front&(1<<a))for(let b=0;b<8;b++)if(mask&(1<<b))if(Math.abs(ringOffsets[a][0]-ringOffsets[b][0])+Math.abs(ringOffsets[a][1]-ringOffsets[b][1])===1)next|=1<<b;front=next&~reached;}connected4[mask]=reached===mask?1:0;
   }
+  Object.assign(PRESETS.oncogenesis.settings,{immuneLearningTime:60,immuneSeparation:.5,angiogenicThreshold:.008,angiogenicHalfLife:400});
+  Object.assign(PRESETS.hot.settings,{immuneLearningTime:100,angiogenicThreshold:.012});
+  Object.assign(PRESETS.cold.settings,{immuneLearning:.7,immuneLearningTime:140,angiogenicThreshold:.012});
+  Object.assign(RANDOM_RANGES,{immuneSeparation:[.4,.8,.1]});
   class SignalField {
     constructor(width,height,wrap=false){this.width=width;this.height=height;this.wrap=wrap;this.values=new Float32Array(width*height);this.next=new Float32Array(width*height);this.blocked=new Uint8Array(width*height);}
     index(x,y){if(this.wrap){x=(x+this.width)%this.width;y=(y+this.height)%this.height;}else if(x<0||y<0||x>=this.width||y>=this.height)return -1;return y*this.width+x;}
@@ -197,7 +203,7 @@
     constructor(sim,definitions){
       this.s=sim;this.vessels=[];this.serial=0;this.version=0;this.region=new Uint16Array(sim.C.grid._pixels.length);this.initial=[];
       this.exchange=new Float32Array(sim.fields.oxygen.values.length);this.hostHealth=1;
-      Object.assign(sim.counters,{endothelialDeaths:0,endothelialDivisions:0,vascularArrivals:0,extravasations:0,circulationReturns:0,intravasations:0,bloodstreamExports:0});
+      Object.assign(sim.counters,{endothelialDeaths:0,endothelialDivisions:0,vascularArrivals:0,extravasations:0,circulationReturns:0,intravasations:0,bloodstreamExports:0,vascularSprouts:0,vascularMaturations:0});
       const locations=[[.23,.27],[.77,.73],[.78,.25],[.22,.76],[.5,.18],[.5,.82]];
       const specs=definitions??locations.slice(0,Math.round(sim.settings.vesselCount)).map(([x,y])=>({x:x*sim.worldWidth,y:y*sim.worldHeight,radius:sim.settings.vesselRadius}));
       for(const spec of specs)this.plan(spec.x*sim.scale,spec.y*sim.scale,spec.radius*sim.scale);
@@ -210,12 +216,12 @@
     plan(x,y,radius){
       const s=this.s,wall=7*s.scale,outer=radius+wall;
       if(this.serial>=64||x<outer+2||y<outer+2||x>s.width-outer-3||y>s.height-outer-3||this.vessels.some(v=>this.distance(x,y,v)<outer+v.initialRadius+v.wall+8*s.scale))return null;
-      const v={id:++this.serial,x,y,initialRadius:radius,radius,wall,coverage:1,perfusion:1,patency:1,initialMass:0,mass:0,area:Math.PI*radius*radius,cells:[],active:true};
+      const v={id:++this.serial,x,y,initialRadius:radius,radius,wall,coverage:1,perfusion:1,patency:1,initialMass:0,mass:0,area:Math.PI*radius*radius,cells:[],active:true,quality:1,tumorFraction:0,angiogenicSignal:0,drive:0,parent:0,nascent:false,bornAt:this.s.C.time,nextSprout:0};
       this.vessels.push(v);this.rebuildRegion();return v;
     }
     rebuildRegion(){
       const s=this.s;this.region.fill(0);
-      for(const v of this.vessels)if(v.active){const reach=v.initialRadius+v.wall+4*s.scale;
+      for(const v of this.vessels)if(v.active&&!v.nascent){const reach=Math.max(v.initialRadius*1.8,v.radius)+v.wall+4*s.scale;
         for(let y=Math.max(0,Math.floor(v.y-reach));y<=Math.min(s.height-1,Math.ceil(v.y+reach));y++)for(let x=Math.max(0,Math.floor(v.x-reach));x<=Math.min(s.width-1,Math.ceil(v.x+reach));x++)if(this.distance(x,y,v)<=reach)this.region[s.C.grid.p2i([x,y])]=v.id;
       }this.version++;
     }
@@ -242,7 +248,7 @@
       // Explicit user placement is transactional: never silently delete tissue.
       for(let yy=Math.floor(y-outer);yy<=Math.ceil(y+outer);yy++)for(let xx=Math.floor(x-outer);xx<=Math.ceil(x+outer);xx++)if((xx-x)**2+(yy-y)**2<=outer*outer){if(xx<0||yy<0||xx>=s.width||yy>=s.height||s.C.pixt([xx,yy]))return {id:0,reason:'occupied'};}
       const v=this.plan(x,y,radius);if(!v||!this.seedRing(v))return {id:0,reason:'geometry'};
-      this.measure(0);s.record();s.version++;return {id:v.id,reason:'',vessel:true};
+      this.initial.push(this.definition(v));this.measure(0);s.record();s.version++;return {id:v.id,reason:'',vessel:true};
     }
     allowed(src,tgt,a,b){
       if(!this.vessels.length)return true;
@@ -262,6 +268,24 @@
     }
     energy(src,tgt,a,b){return this.pointEnergy(tgt,this.s.cells[a])-this.pointEnergy(tgt,this.s.cells[b]);}
     sample(m,key){let value=0,n=0;const f=this.s.fields[key];for(const [i,k]of m.fieldBins){value+=f.values[i]*k;n+=k;}return value/Math.max(1,n);}
+    angiogenicMix(m){
+      const normal=this.sample(m,'angiogenicNormal'),tumor=this.sample(m,'angiogenicTumor'),total=normal+tumor;
+      return {normal,tumor,total,fraction:total>1e-9?tumor/total:0};
+    }
+    sprout(m,parent){
+      const s=this.s;
+      if(parent.nascent||s.C.time<parent.nextSprout||this.serial>=32||s.settings.angiogenesis<=0)return false;
+      const mix=this.angiogenicMix(m);if(mix.total<s.settings.angiogenicThreshold)return false;
+      const [dx,dy]=this.delta(m.nucleusX??m.x,m.nucleusY??m.y,parent),length=Math.hypot(dx,dy)||1;
+      const radius=8*s.scale,wall=7*s.scale,x=(m.nucleusX??m.x)+dx/length*(radius+wall/2),y=(m.nucleusY??m.y)+dy/length*(radius+wall/2),outer=radius+wall;
+      if(x<outer+3||y<outer+3||x>s.width-outer-3||y>s.height-outer-3||this.vessels.some(v=>v.active&&v.id!==parent.id&&this.distance(x,y,v)<outer+v.radius+v.wall+3*s.scale))return false;
+      // Reassign an actual daughter after a successful endothelial division.
+      // No disk is carved and no tissue is erased or teleported. A nascent loop
+      // does not reserve a lumen or supply nutrients until coverage matures.
+      const v={id:++this.serial,x,y,radius,initialRadius:radius,wall,coverage:0,perfusion:0,patency:0,initialMass:Math.PI*((radius+wall)**2-radius**2),mass:s.C.getVolume(m.id),area:0,cells:[m.id],active:true,quality:1-s.settings.tumorVesselPenalty*mix.fraction,tumorFraction:mix.fraction,angiogenicSignal:mix.total,drive:0,parent:parent.id,nascent:true,bornAt:s.C.time,nextSprout:s.C.time+1200};
+      this.vessels.push(v);m.vesselID=v.id;parent.nextSprout=s.C.time+1200;this.version++;
+      s.counters.vascularSprouts++;s.log('vascular-sprout',m.id,0,{vessel:v.id,parent:parent.id,tumorFraction:mix.fraction});return true;
+    }
     localGap(m,v){
       const s=this.s,[dx,dy]=this.delta(m.x,m.y,v),a=Math.atan2(dy,dx),r=v.radius+v.wall/2;
       // Follow only the cell's immediate basement-facing edge. A fixed offset
@@ -307,12 +331,14 @@
       const life=s.settings.vesselLifespan*m.lifespanScale;
       if(life>0&&m.age>life&&s.C.random()<1-Math.exp(-dt*(m.age/life-1)/Math.max(100,life*.1))){if(s.beginDeath(m.id,'lifespan'))m.deathRecord.trigger='endothelial-age';return;}
       s.updateResources(m,dt);if(m.dying)return;
-      const gap=this.localGap(m,v).some(Boolean),canRepair=(gap||m.repairProgress>=.4)&&m.divisionsLeft>0&&m.fitness>.45&&m.resources.energy>.25&&m.resources.precursor>.25&&s.settings.vesselRepair>0;
+      const mix=this.angiogenicMix(m),drive=s.settings.angiogenesis*Math.max(0,mix.total-s.settings.angiogenicThreshold)/(s.settings.angiogenicThreshold+mix.total),gap=this.localGap(m,v).some(Boolean);
+      m.angiogenicExposure=drive>0?Math.min(1000,(m.angiogenicExposure||0)+dt*drive):Math.max(0,(m.angiogenicExposure||0)-dt);
+      const growth=s.settings.vesselRepair+drive,canRepair=(gap||drive>0||m.repairProgress>=.4)&&m.divisionsLeft>0&&m.fitness>.45&&m.resources.energy>.25&&m.resources.precursor>.25&&growth>0;
       if(canRepair){
         const c=m.cycle;c.phase=m.repairProgress<.4?'G1':m.repairProgress<.75?'S':m.repairProgress<.93?'G2':'M';c.progress=m.repairProgress;c.arrest='';
-        s.growTarget(m,m.base*1.9,dt*.4*s.scale*s.scale*s.settings.vesselRepair*m.fitness);
-        m.repairProgress=Math.min(1,m.repairProgress+dt*s.settings.vesselRepair*m.fitness/400);
-        if(m.repairProgress>=1&&s.C.getVolume(m.id)>m.base*1.5&&s.C.time%12===0){const child=s.divide(m.id);if(child){m.repairProgress=0;s.cells[child].repairProgress=0;}else c.arrest='geometry';}
+        s.growTarget(m,m.base*1.9,dt*.4*s.scale*s.scale*growth*m.fitness);
+        m.repairProgress=Math.min(1,m.repairProgress+dt*growth*m.fitness/400);
+        if(m.repairProgress>=1&&s.C.getVolume(m.id)>m.base*1.5&&s.C.time%12===0){const child=s.divide(m.id);if(child){m.repairProgress=0;s.cells[child].repairProgress=0;if(m.angiogenicExposure>=160)this.sprout(s.cells[child],v);}else c.arrest='geometry';}
       }else{m.cycle.phase='G0';m.cycle.progress=0;m.cycle.arrest=m.divisionsLeft<=0?'lineage':gap?'reserve':'';m.repairProgress=Math.max(0,(m.repairProgress||0)-dt/200);}
       if(m.target<m.base)s.growTarget(m,m.base,dt*.5*s.scale*s.scale*m.fitness);this.steer(m);s.updateMechanics(m);
     }
@@ -321,12 +347,18 @@
       for(const v of this.vessels)if(v.active){
         const cells=s.live().filter(m=>m.vesselID===v.id&&!m.dying);v.cells=cells.map(m=>m.id);v.mass=cells.reduce((sum,m)=>sum+s.C.getVolume(m.id),0);
         if(!cells.length){v.perfusion=0;v.coverage=0;v.area=0;v.active=false;this.rebuildRegion();continue;}
-        const target=v.initialRadius*clamp(Math.sqrt(v.mass/Math.max(1,v.initialMass)),.25,1);
+        let normal=0,tumor=0;for(const m of cells){const mix=this.angiogenicMix(m);normal+=mix.normal;tumor+=mix.tumor;}
+        v.angiogenicSignal=(normal+tumor)/cells.length;v.drive=s.settings.angiogenesis*Math.max(0,v.angiogenicSignal-s.settings.angiogenicThreshold)/(s.settings.angiogenicThreshold+v.angiogenicSignal);
+        if(v.drive>0)v.tumorFraction+=((tumor/(normal+tumor||1))-v.tumorFraction)*(1-Math.exp(-dt*v.drive/600));v.quality=1-s.settings.tumorVesselPenalty*v.tumorFraction;
+        const boundary=Math.min(v.x,v.y,s.width-1-v.x,s.height-1-v.y)-v.wall-3*s.scale;
+        const growthLimit=Math.max(1,Math.min(1.8,boundary/v.initialRadius));
+        const target=v.nascent?v.initialRadius:v.initialRadius*clamp(Math.sqrt(v.mass/Math.max(1,v.initialMass)),.25,v.drive>0?growthLimit:Math.max(1,v.radius/v.initialRadius));
         v.radius+=clamp(target-v.radius,-.018*s.scale*dt,.008*s.scale*dt);
         let covered=0;for(let j=0;j<64;j++){const a=j*Math.PI/32;let found=false;for(const dr of [-2,0,2]){const r=v.radius+v.wall/2+dr*s.scale,x=Math.round(v.x+r*Math.cos(a)),y=Math.round(v.y+r*Math.sin(a)),m=s.cells[s.C.pixt([x,y])];if(m?.vesselID===v.id&&!m.dying)found=true;}if(found)covered++;}
         let open=0,total=0;for(let y=Math.floor(v.y-v.radius);y<=Math.ceil(v.y+v.radius);y++)for(let x=Math.floor(v.x-v.radius);x<=Math.ceil(v.x+v.radius);x++)if((x-v.x)**2+(y-v.y)**2<v.radius*v.radius){total++;const id=s.C.pixt([x,y]);if(!id||s.cells[id]?.kind===IMMUNE)open++;}
         v.coverage=covered/64;v.patency=open/Math.max(1,total);v.area=open;
-        v.perfusion=clamp((v.coverage-.25)/.65)*v.patency*clamp((v.radius/(3*s.scale)-1)/2)*clamp(v.radius*v.radius/(v.initialRadius*v.initialRadius));
+        if(v.nascent&&v.coverage>=.65&&v.patency>=.5){v.nascent=false;s.counters.vascularMaturations++;this.rebuildRegion();s.log('vascular-mature',0,0,{vessel:v.id,parent:v.parent});}
+        v.perfusion=(v.nascent?0:1)*v.quality*clamp((v.coverage-.25)/.65)*v.patency*clamp((v.radius/(3*s.scale)-1)/2)*clamp(v.radius*v.radius/(v.initialRadius*v.initialRadius));
       }
       this.prepareExchange();
     }
@@ -357,6 +389,7 @@
       if(s.C.time%4===0)this.measure(4);
       for(const m of s.live()){
         if(m.dying||m.vesselID||![TUMOR,IMMUNE].includes(m.kind))continue;
+        if(m.kind===TUMOR&&m.vascularPhase===4&&s.C.time-(m.bloodstreamEnteredAt??s.C.time)>=40){s.counters.bloodstreamExports++;s.log('bloodstream-export',m.id,0,{vessel:m.vascularID,clone:m.clone,residence:s.C.time-m.bloodstreamEnteredAt});s.eraseCell(m.id);continue;}
         let v=this.at(m.vascularID);
         if(!v&&m.vascularID){m.vascularPhase=0;m.vascularID=0;}
         if(!m.vascularPhase||m.vascularPhase===1){
@@ -371,8 +404,7 @@
         if(m.vascularPhase===1){m.circulationAge=(m.circulationAge||0)+dt;if(m.circulationAge>1200&&s.C.random()<1-Math.exp(-dt*.002*v.perfusion)){s.counters.circulationReturns++;s.log('circulation-return',m.id,0,{vessel:v.id});s.eraseCell(m.id);}}
         else if(m.vascularPhase>=2&&s.C.time%8===0){const e=this.extent(m,v);
           if(m.vascularPhase===2&&e.outside>.95&&e.nucleusOutside){m.vascularPhase=0;m.vascularID=0;s.counters.extravasations++;s.log('extravasation',m.id,0,{vessel:v.id});}
-          else if(m.vascularPhase===3&&e.inside>.9&&e.nucleusInside){m.vascularPhase=4;s.counters.intravasations++;s.log('intravasation',m.id,0,{vessel:v.id});}
-          else if(m.vascularPhase===4&&e.inside>.9&&e.nucleusInside&&v.perfusion>.05&&s.C.random()<1-Math.exp(-.02*v.perfusion*8)){s.counters.bloodstreamExports++;s.log('bloodstream-export',m.id,0,{vessel:v.id,clone:m.clone});s.eraseCell(m.id);}
+          else if(m.vascularPhase===3&&e.inside>.9&&e.nucleusInside){m.vascularPhase=4;m.bloodstreamEnteredAt=s.C.time;s.counters.intravasations++;s.log('intravasation',m.id,0,{vessel:v.id});}
         }
       }
       const health=1-s.settings.vesselImmuneHealth/100*(1-this.hostHealth);
@@ -380,7 +412,7 @@
         const rate=.001*s.settings.vesselImmuneRate*v.perfusion*health*(.12+2*signal/(.2+signal));if(s.C.random()<1-Math.exp(-rate*dt))this.enter(v);
       }
     }
-    report(){const s=this.s,active=this.vessels.filter(v=>v.active),health=1-s.settings.vesselImmuneHealth/100*(1-this.hostHealth);return {vessels:this.vessels.map(v=>({id:v.id,x:v.x,y:v.y,radius:v.radius,wall:v.wall,initialRadius:v.initialRadius,coverage:v.coverage,perfusion:v.perfusion,patency:v.patency,area:v.area,active:v.active})),initial:this.initial.map(v=>({...v})),endothelial:s.live().filter(m=>m.vesselID).length,functional:active.filter(v=>v.perfusion>.05).length,immuneAvailability:health,canRecruit:s.settings.vesselImmuneRate>0&&health>0&&active.some(v=>v.perfusion>.05&&v.radius>5*s.scale),area:active.reduce((n,v)=>n+v.area,0),meanPerfusion:active.reduce((n,v)=>n+v.perfusion,0)/Math.max(1,active.length)};}
+    report(){const s=this.s,active=this.vessels.filter(v=>v.active),health=1-s.settings.vesselImmuneHealth/100*(1-this.hostHealth);return {vessels:this.vessels.map(v=>({id:v.id,x:v.x,y:v.y,radius:v.radius,wall:v.wall,initialRadius:v.initialRadius,coverage:v.coverage,perfusion:v.perfusion,patency:v.patency,area:v.area,active:v.active,quality:v.quality,tumorFraction:v.tumorFraction,angiogenicSignal:v.angiogenicSignal,parent:v.parent,nascent:v.nascent,bornAt:v.bornAt})),initial:this.initial.map(v=>({...v})),sprouts:s.counters.vascularSprouts,matured:s.counters.vascularMaturations,nascent:active.filter(v=>v.nascent).length,meanQuality:active.reduce((n,v)=>n+v.quality,0)/Math.max(1,active.length),endothelial:s.live().filter(m=>m.vesselID).length,functional:active.filter(v=>v.perfusion>.05).length,immuneAvailability:health,canRecruit:s.settings.vesselImmuneRate>0&&health>0&&active.some(v=>v.perfusion>.05&&v.radius>5*s.scale),area:active.reduce((n,v)=>n+v.area,0),meanPerfusion:active.reduce((n,v)=>n+v.perfusion,0)/Math.max(1,active.length)};}
   }
   // Opt-in performance prototype. Membership updates are O(1); only an event's
   // target body is sorted, in the exact x-major order of Artistoo's pixels().
@@ -475,7 +507,7 @@
       this.act.setActivity=(i,a)=>{if(a)this.act.cellpixelsact[i]=a;else delete this.act.cellpixelsact[i];};
       if(kernel!=='reference'&&globalThis.CellLabFast)globalThis.CellLabFast.install(this);
       this.gm=new CPM.GridManipulator(C);
-      this.fields={};for(const key of [...SIGNALS,'oxygen','glucose','acid','density'])this.fields[key]=new SignalField(Math.ceil(width/this.fieldScale),Math.ceil(height/this.fieldScale),this.wrap);
+      this.fields={};for(const key of [...SIGNALS,'angiogenicNormal','angiogenicTumor','oxygen','glucose','acid','density'])this.fields[key]=new SignalField(Math.ceil(width/this.fieldScale),Math.ceil(height/this.fieldScale),this.wrap);
       this.fields.oxygen.values.fill(1);this.fields.glucose.values.fill(1);
       const bins=this.fields.oxygen.values.length;
       // Fixed reservoir geometry, independent of time, cell identity and goals.
@@ -1013,6 +1045,7 @@
           if(injury>0){deposit('normalDamage',.08*dt*injury);deposit('danger',.08*dt*injury);}
         }
         if(m.dying)continue;
+        if((m.kind===NORMAL&&!m.vesselID)||m.kind===TUMOR){const hypoxia=clamp((this.settings.angiogenicHypoxia-m.oxygen)/this.settings.angiogenicHypoxia);if(hypoxia>0)deposit(m.kind===TUMOR?'angiogenicTumor':'angiogenicNormal',.06*dt*this.settings.angiogenicSecretion*hypoxia);}
         if(m.kind===NORMAL&&!m.vesselID)deposit('cohesion',.045*dt);
         // This constitutive lesion cue is an explicit recognizable-phenotype
         // proxy; antigen-negative bodies do not carry a moving chemo-beacon.
@@ -1020,13 +1053,14 @@
         if(m.kind===TUMOR&&m.antigen)deposit('danger',.10*dt);
         const effector=m.immunePhenotype!=='suppressive'&&m.immuneRefractory<=0;
         if(m.kind===IMMUNE&&m.immunePhenotype==='suppressive')deposit('inhibition',.30*dt*this.settings.suppressiveSecretion*m.fitness);
-        if(m.kind===IMMUNE&&effector&&m.recruitment>0)deposit('trail',.38*dt*this.settings.recruitment*m.fitness);
+        if(m.kind===IMMUNE&&effector){if(m.recruitment>0)deposit('trail',.38*dt*this.settings.recruitment*m.fitness);else if(this.settings.immuneLearning>0&&m.antigenCargo?.some(c=>c.expiresAt>this.C.time))deposit('trail',.12*dt*this.settings.recruitment*m.fitness);}
         if(m.kind===IMMUNE&&effector&&m.il2Production>0)deposit('il2',.24*dt*this.settings.il2Secretion*m.fitness*(1-.8*m.exhaustion));
         if(m.kind===IMMUNE){
           const f=this.fields.il2,area=this.C.getVolume(m.id),receptor=.15+.85*m.antigenMemory;
           for(const [i,pixels]of m.fieldBins)if(!f.blocked[i])f.values[i]*=Math.exp(-.025*dt*receptor*pixels/Math.max(1,area));
         }
       }
+      for(let remaining=dt;remaining>0;remaining-=2){const sub=Math.min(2,remaining);for(const key of ['angiogenicNormal','angiogenicTumor'])this.fields[key].step(.09*sub,Math.LN2/this.settings.angiogenicHalfLife*sub);}
       const decay=Math.LN2/this.settings.halfLife;
       // Fixed substeps keep the explicit solver positive for any requested dt.
       for(let remaining=dt;remaining>0;remaining-=2){const sub=Math.min(2,remaining);for(const key of SIGNALS){this.fields[key].step((key==='il2'?.065:.09)*sub,this.maze&&key==='trail'?0:(key==='il2'?Math.LN2/this.settings.il2HalfLife:decay)*sub);this.applySources(key);}}
@@ -1569,8 +1603,10 @@
       const inherited={primed:m.primed,primingBoosted:m.primingBoosted,antigenMemory:m.antigenMemory*.72,exhaustion:m.exhaustion,chronicStimulation:m.chronicStimulation,il2Production:m.il2Production,il2:m.il2,il2Response:m.il2Response,normalTolerance:m.normalTolerance,mutationPressure:m.mutationPressure,immuneEncounters:0,immuneContactMemory:m.immuneContactMemory*.5,recruitmentExposure:m.recruitmentExposure*.5,lastAntigenChange:m.lastAntigenChange};
       Object.assign(inherited,{immunePhenotype:m.immunePhenotype,normalDamageExposure:m.normalDamageExposure*.5,inhibition:m.inhibition,immuneRefractory:m.immuneRefractory});
       if(m.vesselID)Object.assign(inherited,{vesselID:m.vesselID,endothelialInjury:m.endothelialInjury*.8,lifespanScale:m.lifespanScale,repairProgress:0});
-      if(m.vascularID)Object.assign(inherited,{vascularID:m.vascularID,vascularPhase:m.vascularPhase,vascularContact:0,circulationAge:m.circulationAge});
+      if(m.vascularID)Object.assign(inherited,{vascularID:m.vascularID,vascularPhase:m.vascularPhase,vascularContact:0,circulationAge:m.circulationAge,bloodstreamEnteredAt:m.bloodstreamEnteredAt});
+      const learned=structuredClone(m.learnedReceptors||[]),cargo=structuredClone(m.antigenCargo||[]);
       for(const c of [m,daughter]){
+        if(c.kind===IMMUNE){c.learnedReceptors=structuredClone(learned);c.antigenCargo=structuredClone(cargo);c.antigenContacts={};}
         c.cycle=newCycle();Object.assign(c,inherited);c.tumorKills=0;
         c.target=this.section?parentTarget*this.C.getVolume(c.id)/parentArea:this.C.getVolume(c.id);c.sectionFraction=parentFraction;c.age=0;c.damage=damage;c.targetID=0;c.phase='search';c.generation=generation;c.clone=m.clone;c.parentBirth=parentBirth;c.birth=++this.birthSerial;c.divisionsLeft=left;
         if(c.kind===NORMAL)c.base=parentBase;
@@ -1716,7 +1752,7 @@
     biologicalStep(){
       if(this.C.time%4===0)this.updateMetabolism(4);
       if(this.C.time%16===0)this.immunity.tick(16);
-      this.immuneInteractions(1);this.biology(1);
+      this.immunity.contactLearning(1);this.immuneInteractions(1);this.biology(1);
       if(this.C.time%4===0){this.updateSignals(4);this.updatePolarity(4);}
       this.updateScenarioState();
       if(this.C.time%30===0)this.record();
@@ -1799,9 +1835,9 @@
     snapshot(){
       this.refreshPositions();const {grid,activity,walls,orphans,visitedPixels,freePixels}=this.snapshotRaster();
       const cells=this.live().map(m=>({id:m.id,kind:m.kind,x:m.x,y:m.y,px:m.px,py:m.py,area:this.C.getVolume(m.id),target:m.target,antigen:m.antigen,antigenLevel:m.antigenLevel,damage:m.damage,dying:m.dying,deathCause:m.deathCause,phase:m.phase,targetID:m.targetID,age:m.age,genome:m.genome?{...m.genome}:null,clone:m.clone,generation:m.generation,divisionsLeft:m.divisionsLeft,activation:m.activation,recruitment:m.recruitment,oxygen:m.oxygen,glucose:m.glucose,acid:m.acid,stress:m.stress,fitness:m.fitness,confinement:m.confinement}));
-      for(const c of cells){const m=this.cells[c.id];for(const key of ['sectionFraction','sectionPressure','planarTarget','offPlaneTarget','hasNucleus','nucleusX','nucleusY','nucleusRadius','birth','nucleusStrainX','nucleusStrainY','state','origin','abnormalSince','abnormalAge','transformedAt','adversity','immuneCue','inflammatorySignal','inflammatoryExposure','morphologyMode','branchCount','networkDegree','deathStartedAt','deathPhase','deathProgress','deathIntact','vesselID','vascularID','vascularPhase','endothelialInjury','lifespanScale'])c[key]=m[key];if(c.kind===IMMUNE){c.patrolChecked=m.patrolCheckedBirth===m.birth?m.patrolChecked||0:0;c.patrolScanning=!!m.patrolScanning;c.patrolTurning=!!m.patrolMotion?.turnTime;}}
+      for(const c of cells){const m=this.cells[c.id];for(const key of ['sectionFraction','sectionPressure','planarTarget','offPlaneTarget','hasNucleus','nucleusX','nucleusY','nucleusRadius','birth','nucleusStrainX','nucleusStrainY','state','origin','abnormalSince','abnormalAge','transformedAt','adversity','immuneCue','inflammatorySignal','inflammatoryExposure','morphologyMode','branchCount','networkDegree','deathStartedAt','deathPhase','deathProgress','deathIntact','vesselID','vascularID','vascularPhase','bloodstreamEnteredAt','endothelialInjury','lifespanScale'])c[key]=m[key];if(c.kind===IMMUNE){c.patrolChecked=m.patrolCheckedBirth===m.birth?m.patrolChecked||0:0;c.patrolScanning=!!m.patrolScanning;c.patrolTurning=!!m.patrolMotion?.turnTime;}}
       for(const c of cells){const m=this.cells[c.id];c.cycle={...m.cycle};c.resources={...m.resources};c.traitEconomy=this.traitEconomy(m);c.freeFraction=m.freeFraction;for(const key of ['isStem','stemNiche','tumorDivisionsLeft','antigenMemory','il2','il2Response','il2Production','chronicStimulation','exhaustion','normalTolerance','mutationPressure','immuneEncounters','immuneContactMemory','recruitmentExposure','lastAntigenChange','immunePhenotype','normalDamageExposure','inhibition','immuneRefractory','tumorKills'])c[key]=m[key];}
-      for(const c of cells){const m=this.cells[c.id];Object.assign(c,{geneClone:m.geneClone,expression:structuredClone(m.expression),primed:m.primed,primingProgress:m.primingProgress,recognition:{...m.recognition}});}
+      for(const c of cells){const m=this.cells[c.id];Object.assign(c,{geneClone:m.geneClone,expression:structuredClone(m.expression),primed:m.primed,primingProgress:m.primingProgress,recognition:{...m.recognition},...(m.kind===IMMUNE?{learnedReceptors:structuredClone(m.learnedReceptors||[]),antigenCargo:structuredClone(m.antigenCargo||[])}:{})});}
       const fields={};for(const [key,f] of Object.entries(this.fields))fields[key]={width:f.width,height:f.height,values:f.values.slice()};
       const history=this.populationHistory(true),historySamples=this.history.length+(history.at(-1)===this.history.at(-1)?0:1);
       const maze=this.maze?{...this.maze,racers:this.maze.racers.map(r=>({...r,alive:this.cells[r.id]?.birth===r.birth&&!this.cells[r.id].dying})),arrivals:this.maze.arrivals.map(a=>({...a}))}:null;

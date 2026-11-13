@@ -863,6 +863,37 @@ G1／S／G2／M 的基础总时长；实际由增殖性状、生长参数和环�
 损伤退激活|Injury deactivations
 信号退激活|Signal deactivations
 `);
+  add(`
+血管生成速度|Angiogenesis rate
+持续超过诱导阈值后促进实际内皮分裂和出芽；需要已有内皮、营养与空间|Sustained induction promotes real endothelial division and budding; existing endothelium, nutrients and space are required.
+缺氧诱导因子分泌|Hypoxia-induced factor secretion
+正常与肿瘤来源分别扩散和衰减；死亡细胞与内皮不分泌|Normal and tumor sources diffuse and decay separately; dying cells and endothelium do not secrete these factors.
+血管诱导阈值|Angiogenic induction threshold
+两种来源的局部浓度之和；超过阈值仍需持续刺激与真实分裂|Sum of local concentrations from both sources; exceeding it still requires sustained stimulation and actual division.
+血管诱导因子半衰期|Angiogenic factor half-life
+仅作用于诱导因子，不改变免疫记忆|Affects induction factors only, not immune recognition memory.
+诱导分泌的氧阈值|Oxygen threshold for secretion
+氧低于此值开始分泌；缺氧越重分泌越多|Secretion begins below this oxygen level and increases with hypoxia.
+肿瘤来源的血管功能折损|Tumor-source vessel impairment
+按局部肿瘤来源占比降低氧糖交换与排酸；可调模型假设|Reduces oxygen/glucose exchange and acid removal with the local tumor-source share; an adjustable model assumption.
+接触抗原传递与学习|Contact antigen transfer and learning
+抽象学习规则：实际接触、抗原取样与传递后增加识别能力；0 停止新学习|Abstract learning rule: actual contact, antigen uptake and transfer add recognition ability; 0 stops new learning.
+学习所需有效接触|Effective contact needed for learning
+接触中断则重新累积；营养与接触长度影响速度|Interrupted contact resets accumulation; nutrients and contact length affect the rate.
+学得识别类型上限|Maximum learned recognition types
+原受体另计；已学能力不自动衰减，子代继承；降低上限不删除已有能力|The inherited receptor is separate. Learned abilities do not expire and pass to daughters; lowering the limit does not delete existing abilities.
+正常来源血管诱导因子|Normal-source angiogenic factor
+肿瘤来源血管诱导因子|Tumor-source angiogenic factor
+正常／癌前组织缺氧来源的代理浓度；≥1 显示饱和|Proxy concentration from hypoxic normal/precancer tissue; display saturates at 1.
+肿瘤缺氧来源的代理浓度；≥1 显示饱和|Proxy concentration from hypoxic tumors; display saturates at 1.
+缺氧因子促进内皮增殖、扩张和出芽；新芽需成熟才供血。肿瘤来源占比越高，交换质量越低（模型假设）。虚线标示管腔，中心百分比是灌注能力。入血播散不等于远处转移灶形成。|Hypoxic factors promote endothelial proliferation, expansion and budding; buds must mature before perfusion. A higher tumor-source share lowers exchange quality (model assumption). Dashed lines mark lumens; percentages show perfusion. Bloodstream export is not distant colonization.
+旧实验将按当前模型规则重新运行；种子与参数保留，演化轨迹会变化。|Older experiments restart under current model rules; seeds and parameters remain, but trajectories change.
+血管出芽|Vascular buds
+成熟|Matured
+生长中|Growing
+平均交换质量|Mean exchange quality
+ 种| types
+`);
   let terms;
   function translate(value,language='en'){
     const source=String(value);if(language!=='en'||!/[\p{Script=Han}]/u.test(source))return source;

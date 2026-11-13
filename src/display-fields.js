@@ -101,7 +101,7 @@
         const levels=s.immunity?.visuals?.presentation?.[m.id]||{};
         outlines.set(m.id,{x:m.x,y:m.y,segments:entries.map(p=>({...p,alpha:.35+.65*clamp(levels[p.key]??m.antigenLevel??0)}))});
       }else if(!data&&antigenMarked(m))outlines.set(m.id,{x:m.x,y:m.y,segments:[{key:'legacy',color:'#d12f39',rgb:[209,47,57],alpha:.25+.75*antigenStrength(m)}]});
-      if(m.kind===3){const matches=(data?.immuneMatches[m.geneClone]||[]).map(key=>profiles.get(key)).filter(Boolean);if(matches.length)outlines.set(m.id,{x:m.x,y:m.y,segments:matches.map(p=>({...p,alpha:1}))});}
+      if(m.kind===3){const matches=(data?.cellMatches?.[m.id]||data?.immuneMatches[m.geneClone]||[]).map(key=>profiles.get(key)).filter(Boolean);if(matches.length)outlines.set(m.id,{x:m.x,y:m.y,segments:matches.map(p=>({...p,alpha:1}))});}
     }
     return {profiles,outlines};
   }
@@ -158,6 +158,8 @@
   const SIGNALS={cohesion:{label:'细胞凝聚因子',color:[36,171,132]},danger:{label:'损伤趋化因子',color:[239,140,42]},trail:{label:'免疫招募因子',color:[157,100,219]},il2:{label:'IL-2 扩增信号',color:[31,146,205]}};
   Object.assign(SIGNALS,{normalDamage:{label:'正常细胞损伤信号',color:[201,110,66]},inhibition:{label:'免疫抑制信号',color:[57,91,201]}});
   const FIELD_INFO={
+    angiogenicNormal:{label:"正常来源血管诱导因子",low:[239,235,215],high:[40,151,133],description:"正常／癌前组织缺氧来源的代理浓度；≥1 显示饱和"},
+    angiogenicTumor:{label:"肿瘤来源血管诱导因子",low:[239,235,215],high:[173,54,115],description:"肿瘤缺氧来源的代理浓度；≥1 显示饱和"},
     adversity:{label:'环境恶劣度',low:[213,237,222],middle:[238,185,73],high:[147,40,71],description:'0 友好 → 1 恶劣；综合低氧、低糖与高酸，不是细胞累计损伤'},
     oxygen:{label:'氧可用量',low:[142,67,96],high:[95,186,184],description:'0 低氧 → 1 补给浓度'},
     glucose:{label:'葡萄糖可用量',low:[128,76,126],high:[204,181,77],description:'0 耗尽 → 1 补给浓度'},

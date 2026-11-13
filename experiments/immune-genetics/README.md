@@ -1,15 +1,17 @@
-# 可直接导入的免疫遗传实验
+# 可导入的免疫与血管机制实验
 
-先打开 [Cell-Arena](https://coolcoldplay.github.io/Cell-Arena/) 或本地版，再用顶部 **文件图标 → 导入实验参数** 选择 JSON。每个文件都保留种子与初始基因配方；默认暂停，点继续开始。为便于观察，本组关闭自动换局。MCS 是模型时间，不是秒。
+打开 [Cell-Arena](https://coolcoldplay.github.io/Cell-Arena/)，用顶部文件图标导入 JSON。导入按参数重新开局，不是恢复导出时刻。演示关闭自动换局；MCS 不是真实秒。
 
-| 文件 | 如何观察 | 本机固定种子的实际结果 |
-|---|---|---|
-| [01-specific-recognition.json](01-specific-recognition.json) | 两个靶细胞、两个相同受体的免疫细胞。追踪左右肿瘤比较卡片与接触符号。 | 600 MCS 前匹配靶被清除，不匹配靶到 4,000 MCS 仍存活。红线可以相同，受体匹配不同。 |
-| [02-reversible-hiding.json](02-reversible-hiding.json) | 酸场中的初始低表达靶。在约 **200 MCS** 暂停，将「肿瘤 → 环境表达响应」调到 **0**，再继续；观察同一 G 克隆的 P1 表达恢复。也可擦除局部酸源做不同干预。 | 自动探针使用的是 200 MCS 调响应为 0；表达约从 0 升至 600 MCS 的 80%，随后发生实际杀伤，4,000 MCS 前清除。持续高酸本身仍可能致伤。 |
-| [03-heritable-escape.json](03-heritable-escape.json) | 同一祖先与一个预先存在的 P1 遗传缺失子分支竞争；追踪缺失分支，统计切换至肿瘤克隆。 | 600 MCS 敏感祖先被清除；缺失分支留下 2 颗，随后扩张。它是明确设置的遗传选择实验，不冒充现场自发产生逃逸。 |
-| [03-control-kill-off.json](03-control-kill-off.json) | 上一个文件相同初态／种子，只将杀伤设为 0。 | 600 MCS 有 8 颗肿瘤，敏感祖先仍存活。后期分裂机会不同，不能要求两个实验的累计突变数一致。 |
-| [04-clonal-replacement.json](04-clonal-replacement.json) | 敏感与不同抗原分支、有限后台谱、血管和招募场。追踪不同变体并观察启动／血管增援。 | 4,000 MCS 有 106 颗肿瘤，累计 22 次免疫清除、14 个候选完成启动、2 次应答血管增援。展示替代与后续部分应答，未完全清除。 |
+| 文件 | 观察目标 |
+|---|---|
+| [01-specific-recognition.json](01-specific-recognition.json) | 相同受体对不同抗原的特异性；追踪两靶比较实际接触。 |
+| [02-reversible-hiding.json](02-reversible-hiding.json) | 初始低表达；约 200 MCS 将环境表达响应设为 0，观察同一基因的可逆表达恢复。 |
+| [03-heritable-escape.json](03-heritable-escape.json) | 预先放置祖先及遗传缺失分支，观察选择；不声称该预存分支是现场突变。 |
+| [03-control-kill-off.json](03-control-kill-off.json) | 与上述相同初态，关闭杀伤。后续分裂机会可以不同。 |
+| [04-clonal-replacement.json](04-clonal-replacement.json) | 两个预存抗原变体、有限后台应答与血管，观察克隆曲线及桑基图。 |
+| [05-contact-learning.json](05-contact-learning.json) | 固定接触的两个免疫细胞取样／传递后新增识别，1000 MCS 实测各新增 1 种，胞体轮廓从 1 色变为 2 色。已学识别不自动衰减，原始遗传码不变。 |
+| [06-hypoxic-angiogenesis.json](06-hypoxic-angiogenesis.json) | 本阶段发生发展种子 77，分别看正常与肿瘤来源热图及血管统计。约 6000 MCS 可见出芽，密铺组织中不保证成熟。 |
 
-四张 P 卡为肽抗原槽位，C 为抽象呈递通道；S1/S2 是独立预留表面靶标。当前表达与遗传存在是两回事。识别关系只来自实际膜接触，免疫细胞不会通过观察 UI 获得全局目标位置。
+01–04 明确关闭新接触学习与血管新生，保留各自机制对照。当前只有 **一个肽抗原槽**；C1/C2 是通道，S1/S2 是独立表面靶标，不是额外抗原槽。免疫轮廓显示原始＋已学模板可识别的场内抗原，不表示正在杀伤或携带这些抗原。
 
-结果来自本轮固定参数和版本的验证，修改参数、格点或手动操作后轨迹会变化。热肿瘤预设可另外观察快速早期回落；发生发展和随机预设适合观察更长的克隆演化。原始记录见 [demo-results.json](../../reports/immune-genetics/demo-results.json)，完整机制与参数映射见 [IMMUNE-GENETICS.md](../../IMMUNE-GENETICS.md)。
+旧版 01–04 的四槽数值记录保存在 [历史结果](../../reports/immune-genetics/demo-results.json)，不能用作当前单槽结果。新学习／血管的实际记录见[阶段报告](../../reports/contact-angiogenesis-2026-11-13/README.md)。06 固定本阶段参数，后续默认预设调整不会悄悄改写这份对照配方。
