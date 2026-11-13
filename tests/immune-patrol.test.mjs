@@ -21,6 +21,19 @@ test('immune peer separation turns cells away from one another, independently of
   assert.ok(s.cells[a].px<0);assert.ok(s.cells[b].px>0);assert.equal(s.cells[a].immuneCue,0);
   for(const peer of [1,2]){const x=make({immuneSeparation:0}),y=make({immuneSeparation:3});touchingPair(x,peer);touchingPair(y,peer);x.updateLocal(4);y.updateLocal(4);assert.deepEqual(x.snapshot().cells.map(c=>[c.px,c.py,c.damage,c.targetID]),y.snapshot().cells.map(c=>[c.px,c.py,c.damage,c.targetID]));}
 });
+test('peer compression restores searching patrol under strong recruitment without desensitizing isolated cells or real synapses',()=>{
+  const run=(pressure,kind=3,phase='search',motility=1)=>{
+    const s=make({chemotaxis:3,immuneMotility:motility}),[a,b]=touchingPair(s,kind),m=s.cells[a];
+    const f=s.fields.trail;for(let y=0;y<f.height;y++)for(let x=0;x<f.width;x++)f.values[y*f.width+x]=x;
+    m.sectionPressure=pressure;m.phase=phase;m.targetID=phase==='search'?0:b;
+    s.updatePolarity(4);return {s,m};
+  };
+  const free=run(0),crowded=run(1),tissue=run(1,1);
+  assert.ok(crowded.m.immuneCue<free.m.immuneCue);assert.ok(crowded.m.patrolMotion.hy>free.m.patrolMotion.hy);
+  assert.equal(tissue.m.immuneCrowding,0);assert.equal(tissue.m.immuneCue,free.m.immuneCue);
+  for(const phase of ['scan','kill']){const a=run(0,3,phase),b=run(1,3,phase);assert.equal(b.m.immuneCrowding,0);assert.equal(b.m.immuneCue,a.m.immuneCue);assert.equal(b.m.px,a.m.px);assert.equal(b.m.py,a.m.py);}
+  assert.equal(run(1,3,'search',0).m.drive,0,'crowding does not create motility when disabled');
+});
 test('either local damage or recruitment gradients attract an unrecognized patrol, but never make it a recruiter',()=>{
   for(const channel of ['danger','trail']){const s=make({alignment:3,chemotaxis:2}),id=s.seed(3,25,25,4),m=s.cells[id];m.px=0;m.py=1;
     const f=s.fields[channel];for(let y=0;y<f.height;y++)for(let x=0;x<f.width;x++)f.values[y*f.width+x]=x*.05;

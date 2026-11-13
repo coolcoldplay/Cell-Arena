@@ -34,7 +34,8 @@ async function handle(event){
     let value=true;
     if(command==='start'){
       if(dragSession){playing=dragSession.resume;dragSession=null;}
-      sim=new CellLab.Simulation(payload);const module=await wasmModule;if(module&&payload.kernel!=='reference'&&payload.kernel!=='fast')try{await CellLabWasm.install(sim,module);}catch(e){kernelNote=String(e);}
+      const settings=payload.randomize?{...CellLab.randomSettings(payload.seed,payload.scene),...payload.settings}:payload.settings;
+      sim=new CellLab.Simulation({...payload,settings});const module=await wasmModule;if(module&&payload.kernel!=='reference'&&payload.kernel!=='fast')try{await CellLabWasm.install(sim,module);}catch(e){kernelNote=String(e);}
       await backend.configure(sim,backend.mode);revision++;resetClock();
     }else if(command==='import'){
       const profile=CellLabExperiment.parse(payload.data),next=new CellLab.Simulation({...profile.config,...(['reference','fast'].includes(payload.kernel)?{kernel:payload.kernel}:{})}),compute=new CellLabGPU.ComputeBackend();
@@ -43,6 +44,15 @@ async function handle(event){
       // leaves the running experiment, clock and backend untouched.
       await compute.configure(next,['cpu','gpu','auto'].includes(payload.computeMode)?payload.computeMode:backend.mode);backend.gpu?.destroy();backend=compute;sim=next;dragSession=null;playing=false;speed=profile.speed;clock.rate=30*speed;revision++;resetClock();value={mode:profile.mode,sourceTime:profile.sourceTime,ignored:profile.ignored,warnings:profile.warnings};
     }else if(!sim)throw Error('The model has not started');
+    else if(command==='coarsen'){
+      if(dragSession)throw Error('请先结束当前拖动');
+      let next;try{next=CellLabGridTransfer.coarsen(sim,Number(payload.refinement));}catch(error){value={ok:false,message:String(error.message)};sendSnapshot(true);respond(id,value);return;}
+      const compute=new CellLabGPU.ComputeBackend(),module=await wasmModule;
+      if(sim.kernel==='wasm'&&module)await CellLabWasm.install(next,module);
+      await compute.configure(next,backend.mode);backend.gpu?.destroy();backend=compute;sim=next;resetClock();
+      // This is the same experiment and time, so retain the journal revision.
+      value={ok:true,time:sim.C.time,refinement:sim.scale,cells:sim.live().length};
+    }
     else if(command==='playing'){if(dragSession){dragSession.resume=!!payload.value;playing=false;}else playing=!!payload.value;resetClock();}
     else if(command==='beginDrag'){
       const m=sim.cells[payload.id];value=!!m&&!m.dying;
@@ -79,7 +89,7 @@ async function handle(event){
     else if(command==='mazeSignal'){value=sim.setMazeSignalMode(payload.throughWalls);resetClock();}
     else if(command==='divide'){
       const target=payload.id||sim.live().filter(c=>!c.dying).sort((a,b)=>sim.C.getVolume(b.id)-sim.C.getVolume(a.id))[0]?.id;value=sim.divide(target);
-    }else if(command==='export')value={format:'cell-arena-experiment',schemaVersion:3,initialCells:sim.initialCells,immunity:sim.immunity.report(true),version:'4.0.0',modelRevision:CellLab.MODEL_REVISION,warmup:sim.initialWarmup,speed,kernel:sim.kernel,compute:backend.info(),scene:sim.scene,scenario:sim.scenarioReport(),vessels:sim.vascular.initial.map(v=>({...v})),vascular:sim.vascular.report(),normalSupport:sim.normalSupportReport(),cycles:sim.cycleReport(),patrol:{...sim.patrolReport(),checkedBirths:[...sim.patrol.checked]},maze:sim.maze?structuredClone(sim.maze):null,sources:sim.sources.map(s=>({type:s.type,x:s.x/sim.scale,y:s.y/sim.scale,radius:s.radius/sim.scale})),supplyMap:Array.from(sim.supplyMap),boundary:sim.boundary,seed:sim.seedValue,worldWidth:sim.worldWidth,worldHeight:sim.worldHeight,refinement:sim.scale,settings:sim.settings,time:sim.C.time,history:sim.populationHistory(),events:sim.events,counters:sim.counters,manualDeathRemovals:sim.manualDeathRemovals,deaths:sim.deathSummary(),deathHistory:sim.deathHistory,lineage:sim.lineage,cells:sim.snapshot().cells};
+    }else if(command==='export')value={initialRefinement:sim.initialRefinement??sim.scale,refinementTransitions:sim.refinementTransitions||[],format:'cell-arena-experiment',schemaVersion:3,initialCells:sim.initialCells,immunity:sim.immunity.report(true),version:'4.0.0',modelRevision:CellLab.MODEL_REVISION,warmup:sim.initialWarmup,speed,kernel:sim.kernel,compute:backend.info(),scene:sim.scene,scenario:sim.scenarioReport(),vessels:sim.vascular.initial.map(v=>({...v})),vascular:sim.vascular.report(),normalSupport:sim.normalSupportReport(),cycles:sim.cycleReport(),patrol:{...sim.patrolReport(),checkedBirths:[...sim.patrol.checked]},maze:sim.maze?structuredClone(sim.maze):null,sources:sim.sources.map(s=>({type:s.type,x:s.x/sim.scale,y:s.y/sim.scale,radius:s.radius/sim.scale})),supplyMap:Array.from(sim.supplyMap),boundary:sim.boundary,seed:sim.seedValue,worldWidth:sim.worldWidth,worldHeight:sim.worldHeight,refinement:sim.scale,settings:sim.settings,time:sim.C.time,history:sim.populationHistory(),events:sim.events,counters:sim.counters,manualDeathRemovals:sim.manualDeathRemovals,deaths:sim.deathSummary(),deathHistory:sim.deathHistory,lineage:sim.lineage,cells:sim.snapshot().cells};
     else if(command==='snapshot')value={time:sim.C.time,cells:sim.live().length};
     else throw Error('Unknown command: '+command);
     if(['seed','sprinkle','divide'].includes(command))sim.record();

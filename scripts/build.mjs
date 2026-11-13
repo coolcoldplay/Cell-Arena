@@ -10,6 +10,7 @@ const binary=await readFile(path.join(root,'build/cpm-kernel.wasm'));
 const immuneUI=await read('src/immune-genetics-ui.js'),fullscreen=await read('src/fullscreen-view.js');
 const immuneGenetics=await read('src/immune-genetics.js'),lineageSankey=await read('src/lineage-sankey.js');
 const display=await read('src/display-fields.js'),insertion=await read('src/insertion.js');
+const gridTransfer=await read('src/grid-transfer.js');
 const experiment=await read('src/experiment.js'),recorder=await read('src/recorder.js'),i18n=await read('src/i18n.js'),aboutEnglish=await read('src/about.en.html'),mobile=await read('src/mobile-ui.js'),trajectories=await read('src/trajectories.js');
 const mtLicense=await read('vendor/MT19937-LICENSE.txt');
 const sidebarCapture=await read('src/sidebar-capture.js'),statistics=await read('src/statistics-panel.js'),adaptive=await read('src/adaptive-performance.js');
@@ -22,7 +23,7 @@ if(appearanceMeta.sourceSHA256!==createHash('sha256').update((await read('src/ap
 // Git stores LF while an editor may write CRLF; both are the same C source.
 const wasmSource=(await read('src/cpm-kernel.c')).replace(/\r\n/g,'\n');
 if(wasmMeta.sourceSHA256!==createHash('sha256').update(wasmSource).digest('hex')||wasmMeta.wasmSHA256!==createHash('sha256').update(binary).digest('hex'))throw Error('WASM source/binary mismatch. Run npm run build:wasm.');
-for (const [slot, text] of Object.entries({ STYLE: css, WORKER: `globalThis.CELL_LAB_WASM='${binary.toString('base64')}';\n`+[engine,fast,section,wasm,gpu,insertion,immuneGenetics,model,experiment,worker].join('\n'), ABOUT_EN:aboutEnglish, APP: [i18n,display,renderer,experiment,sidebarCapture,recorder,mobile,statistics,immuneUI,lineageSankey,fullscreen,app].join('\n'), LICENSE: license, MT_LICENSE: mtLicense })) {
+for (const [slot, text] of Object.entries({ STYLE: css, WORKER: `globalThis.CELL_LAB_WASM='${binary.toString('base64')}';\n`+[engine,fast,section,wasm,gpu,insertion,immuneGenetics,model,gridTransfer,experiment,worker].join('\n'), ABOUT_EN:aboutEnglish, APP: [i18n,display,renderer,experiment,sidebarCapture,recorder,mobile,statistics,immuneUI,lineageSankey,fullscreen,app].join('\n'), LICENSE: license, MT_LICENSE: mtLicense })) {
   const source=slot==='APP'?`globalThis.CELL_LAB_APPEARANCE_WASM='${appearanceBinary.toString('base64')}';\n`+adaptive+'\n'+trajectories+'\n'+historyChart+'\n'+signalGesture+'\n'+startSeed+'\n'+appearance+'\n'+autoRandom+'\n'+rounds+'\n'+text:text;
   const safe = slot.endsWith('LICENSE') ? source.replaceAll('&','&amp;').replaceAll('<','&lt;') : source.replace(/<\/script/gi, '<\\/script');
   html = html.replace(`/* INLINE_${slot} */`, () => safe);

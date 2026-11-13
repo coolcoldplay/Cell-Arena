@@ -259,3 +259,4 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
 .lineage-sankey-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.lineage-sankey-head button{font-size:12px;padding:4px 9px}#lineage-sankey-dialog{box-sizing:border-box;width:min(1050px,calc(100vw - 24px));max-width:none;max-height:calc(100dvh - 24px);padding:20px}#lineage-sankey-dialog #lineage-sankey-panel{margin:8px 0 0}#lineage-sankey-dialog .lineage-sankey-head{padding-right:20px}
 
 .ecology-table{width:100%;border-collapse:collapse;font-size:11px;font-variant-numeric:tabular-nums}.ecology-table th,.ecology-table td{padding:5px 3px;border-bottom:1px solid #d7c6a6;text-align:right}.ecology-table th:first-child{text-align:left}.ecology-table th{font-weight:500}
+.refinement-scale{display:flex;justify-content:space-between;gap:12px;font-size:11px;color:var(--muted);margin-top:2px}#refinement-control{margin-bottom:9px}#refinement-out{display:block}

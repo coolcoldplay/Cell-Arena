@@ -23,9 +23,9 @@ try{
  await click('#about');check('English model notes are shown',await b.evaluate('!document.querySelector("[data-language=en]").hidden&&document.querySelector("[data-language=zh]").hidden'));await click('#close-about');
  await set('language','zh');check('Chinese switch restores original labels',await b.evaluate('document.querySelector("#shuffle").textContent==="随机生成"'));
  await set('language','en');
- await click('#shuffle');await waitFor('artistooLab.snapshot.scene==="random"&&artistooLab.snapshot.speed===3&&artistooLab.snapshot.playing');await b.evaluate('artistooLab.rpc("playing",{value:false})');
+ await click('#shuffle');await waitFor('artistooLab.snapshot.scene==="oncogenesis"&&artistooLab.snapshot.speed===3&&artistooLab.snapshot.playing');await b.evaluate('artistooLab.rpc("playing",{value:false})');
  const random=await b.evaluate('artistooLab.exportData()');
- check('randomize changes configuration and starts with healthy tissue',random.scene==='random'&&random.seed!==baseline.seed&&random.settings.growth!==undefined&&!random.cells.some(m=>m.kind===2)&&random.cells.some(m=>m.kind===3));
+ check('randomize changes configuration and starts with healthy tissue',random.scene===baseline.scene&&random.seed!==baseline.seed&&random.settings.growth!==undefined&&!random.cells.some(m=>m.kind===2)&&random.cells.some(m=>m.kind===3));
  const randomGrid=await b.evaluate('Array.from(artistooLab.snapshot.grid)');
  const beforeReset=await b.evaluate('artistooLab.snapshot.revision');await click('#reset');await waitFor('artistooLab.snapshot.time===35&&artistooLab.snapshot.revision>'+beforeReset);
  if(random.time>35)await b.evaluate(`artistooLab.rpc('advance',{steps:${random.time-35}})`);

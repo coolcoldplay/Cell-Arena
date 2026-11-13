@@ -1,0 +1,7 @@
+import vm from 'node:vm';import {readFile,writeFile} from 'node:fs/promises';
+for(const f of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js','src/grid-transfer.js'])vm.runInThisContext(await readFile(f,'utf8'),{filename:f});const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm')),results=[];
+for(const [scene,seed,steps]of [['hot',17,4000],['cold',31,2000],['oncogenesis',77,2000]]){
+ const s=new CellLab.Simulation({scene,seed,worldWidth:320,worldHeight:240,refinement:1.5,boundary:'wrap',warmup:35});await CellLabWasm.install(s,module);s.advance(steps);
+ for(const r of (process.argv.find(a=>a.startsWith('--scales='))?.slice(9).split(',').map(Number)||[1,.75,.5,.375])){const start=performance.now();try{const n=CellLabGridTransfer.coarsen(s,r),transferMs=performance.now()-start,ids=n.live().map(m=>[m.id,m.birth]),time=n.C.time;await CellLabWasm.install(n,module);n.advance(500);const row={scene,seed,from:s.scale,to:r,time,transferMs,cellsBefore:s.live().length,cellsTransferred:ids.length,cellsAfter:n.live().length,finalTime:n.C.time,valid:n.live().filter(m=>!m.dying||m.deathIntact).every(m=>n.components(m.id).length===1&&n.section.fits(m,m.nucleusX,m.nucleusY))};results.push(row);console.log(row);}catch(e){const row={scene,seed,to:r,time:s.C.time,error:String(e)};results.push(row);console.log(row);}}
+ await writeFile(process.argv.find(a=>a.startsWith('--output='))?.slice(9)||'output/grid-transfer-probe-final.json',JSON.stringify(results,null,2));
+}

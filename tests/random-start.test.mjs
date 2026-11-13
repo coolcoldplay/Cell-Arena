@@ -23,3 +23,21 @@ test('random founder layouts differ by seed but restart and imported parameters 
   assert.equal(a.scenarioReport().initial.tumor,0);assert.equal(a.scenarioReport().customized,false);assert.ok(a.settings.damagePolarization>0&&a.settings.suppressionRecovery>0);
   assert.ok(a.live().every(m=>a.section.fits(m,m.nucleusX,m.nucleusY)));assert.equal(a.C.time,0);
 });
+test('scenario randomization keeps distinct hot/cold identities and samples legal reproducible parameter ranges',()=>{
+  for(const scene of ['oncogenesis','hot','cold','maze','empty'])for(let seed=0;seed<100;seed++){
+    const values=CellLab.randomSettings(seed,scene),ranges=CellLab.SCENE_RANDOM_RANGES[scene]||{};
+    assert.deepEqual(values,CellLab.randomSettings(seed,scene));
+    for(const [key,value]of Object.entries(values)){
+      if(ranges[key]){const [min,max,step]=ranges[key];assert.ok(value>=min&&value<=max,scene+':'+key);assert.ok(Math.abs((value-min)/step-Math.round((value-min)/step))<1e-8,key);}
+      else assert.equal(value,CellLab.PRESETS[scene]?.settings[key]??CellLab.DEFAULTS[key]);
+    }
+    CellLabExperiment.parse({scene,seed,settings:values,worldWidth:320,worldHeight:240,refinement:.75,boundary:'wrap'});
+  }
+  for(const [scene,tumors,immune]of [['hot',37,18],['cold',19,3],['oncogenesis',0,12]]){
+    const settings={...CellLab.randomSettings(31,scene),kill:0},config={scene,seed:31,settings,worldWidth:192,worldHeight:144,refinement:.75,warmup:0};
+    const s=new CellLab.Simulation(config),replay=new CellLab.Simulation(CellLabExperiment.parse({...s.snapshot(),schemaVersion:3,vessels:s.vascular.initial}).config);
+    assert.equal(s.scenarioReport().initial.tumor,tumors);assert.equal(s.scenarioReport().initial.immune,immune);assert.equal(s.settings.kill,0);
+    assert.deepEqual(s.C.grid._pixels,replay.C.grid._pixels);assert.deepEqual(s.settings,replay.settings);
+    assert.notDeepEqual(CellLab.randomSettings(31,scene),CellLab.randomSettings(77,scene));
+  }
+});

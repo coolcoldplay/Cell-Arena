@@ -226,7 +226,7 @@
     const allowed=!document.hidden&&!autoRandomBusy&&!setupBusy&&!stroke&&!pending.size&&!document.querySelector('dialog[open]')&&document.activeElement!==$('auto-random-minutes');
     const reason=autoRandom.tick(snapshot,now,allowed);renderAutoNotice();if(!reason)return;
     autoRandomBusy=true;
-    start('random',{shuffle:true,reason:'auto-'+reason}).then(()=>toast('已按未锁定参数随机开启新一轮')).catch(error=>{$('auto-random-enabled').checked=false;configureAutoRandom();fail(error);}).finally(()=>{autoRandomBusy=false;renderAutoNotice();});
+    start(undefined,{shuffle:true,reason:'auto-'+reason}).then(()=>toast('已按当前情景与未锁定参数随机开启新一轮')).catch(error=>{$('auto-random-enabled').checked=false;configureAutoRandom();fail(error);}).finally(()=>{autoRandomBusy=false;renderAutoNotice();});
   }
   function renderAutoNotice(){const status=autoRandom.status();$('auto-round-notice').hidden=!status.pendingReason||status.fired||!status.minutes;$('auto-round-reason').textContent=status.pendingReason?CellLabRounds.reasonLabel(status.pendingReason):'';$('auto-round-seconds').textContent=Math.ceil(status.countdownMs/1000);$('auto-round-paused').hidden=!!snapshot?.playing&&!document.hidden;}
   $('auto-round-cancel').addEventListener('click',()=>{$('auto-random-enabled').checked=false;configureAutoRandom();});
@@ -327,7 +327,7 @@
       autoRandom.observe(snapshot,performance.now());
       if(!setupBusy){if(journal.active&&journal.epoch!==snapshot.revision+':'+snapshot.seed)archiveRound('external-reset');if(!journal.active)journal.begin(snapshot,performance.now(),undefined,parameterLocks.toJSON(),displaySettings());journal.observe(snapshot,performance.now(),!document.hidden&&!stroke);}
       performanceContext();
-      if(raster.width!==snapshot.width||raster.height!==snapshot.height){raster.width=snapshot.width;raster.height=snapshot.height;image=rctx.createImageData(snapshot.width,snapshot.height);}
+      if(raster.width!==snapshot.width||raster.height!==snapshot.height){raster.width=snapshot.width;raster.height=snapshot.height;image=rctx.createImageData(snapshot.width,snapshot.height);adaptive.reset(performance.now());}
       pendingFrame=m.frame||0;trajectories.sample(snapshot);dirty=true;uiPending=true;
       if(m.interactive)forceFrame=true;
       if(m.interactive||performance.now()-lastUISync>=performancePlan.uiMs){sync(!!m.interactive);lastUISync=performance.now();uiPending=false;}
@@ -345,6 +345,7 @@
   function updateOverlayButtons(){for(const button of document.querySelectorAll('[data-layer]')){const key=button.dataset.layer,on=key==='adversity'?$('field-view').value==='adversity':signalLayers.has(key);button.setAttribute('aria-pressed',on);button.classList.toggle('selected',on);}}
   function sync(force=false){
     const s=snapshot;if(!s)return;
+    if(force&&!setupBusy)gridPreview();
     $('play').textContent=s.playing?'Ⅱ 暂停':s.time===0?'▶ 开始':'▶ 继续';$('run-state').textContent=s.playing?'运行中':'已暂停';$('status-dot').style.background=s.playing?'var(--accent)':'#7b8d84';
     $('clock').textContent=s.time.toLocaleString();$('scene-title').textContent=s.scenario?.label||titles[s.scene]||s.scene;
     $('maze-score').hidden=!s.maze;
@@ -715,13 +716,17 @@
   canvas.addEventListener('contextmenu',e=>{if(tool==='signal')e.preventDefault();});
   $('eraser-radius').addEventListener('input',()=>{$('eraser-radius-out').textContent=$('eraser-radius').value;probeDirty=true;});
   document.querySelectorAll('[data-tool]').forEach(b=>b.addEventListener('click',()=>setTool(b.dataset.tool)));
-  function gridPreview(){
+  function gridPreview(forScene){
     const width=Number($('world-size').value),height=Number($('world-size').selectedOptions[0]?.dataset.height)||width*.75,refine=$('refinement');
-    for(const option of refine.options)option.disabled=width*Number(option.value)>1024||height*Number(option.value)>768;
-    if(refine.selectedOptions[0].disabled)refine.value=[...refine.options].filter(o=>!o.disabled).at(-1).value;
-    const r=Number(refine.value);$('grid-preview').textContent=`应用后：${Math.round(width*r)} × ${Math.round(height*r)} 真实格点（${width} × ${height} 区域，${r}× 精细度）`;
+    const maze=(typeof forScene==='string'?forScene:snapshot?.scene)==='maze',wanted=Number(refine.value),bounds=CellLabRounds.refinementBounds(width,height,maze);
+    refine.min=bounds.min;refine.max=bounds.max;refine.step=bounds.step;refine.value=CellLabRounds.snapRefinement(width,height,wanted,maze);
+    const r=gridRefinement(maze),label=Number(r.toFixed(3));$('refinement-out').textContent=label+'×';refine.setAttribute('aria-valuetext',label+'×');
+    $('grid-preview').textContent=`应用后：${Math.round(width*r)} × ${Math.round(height*r)} 真实格点（${width} × ${height} 区域，${label}× 精细度）`;
+    if(!setupBusy)$('apply-grid').textContent=canCoarsen()?'降低精细度 · 保留进度':'应用区域与精细度 · 重新开始';
   }
-  for(const id of ['world-size','refinement'])$(id).addEventListener('change',gridPreview);gridPreview();
+  function gridRefinement(maze=snapshot?.scene==='maze'){const width=Number($('world-size').value),height=Number($('world-size').selectedOptions[0]?.dataset.height)||width*.75;return CellLabRounds.snapRefinement(width,height,Number($('refinement').value),maze);}
+  function canCoarsen(){return snapshot&&Math.abs(Number($('world-size').value)-snapshot.worldWidth)<1e-8&&Math.abs((Number($('world-size').selectedOptions[0]?.dataset.height)||Number($('world-size').value)*.75)-snapshot.worldHeight)<1e-8&&gridRefinement()<snapshot.refinement-1e-10;}
+  for(const id of ['world-size','refinement'])$(id).addEventListener('change',gridPreview);$('refinement').addEventListener('input',gridPreview);gridPreview();
   async function start(scene=snapshot?.scene||'oncogenesis',{preserve=false,shuffle=false,preset=false,reason}={}){
     if(setupBusy)return;
     setupBusy++;autoRandom.suspend(performance.now());try{
@@ -729,22 +734,23 @@
     if(snapshot){await rpc('playing',{value:false});journal.observe(snapshot,performance.now(),false);}
     const priorScene=snapshot?.scene,lockedSettings=shuffle?parameterLocks.pick(snapshot?.settings||{}):{};
     if(preset&&scene==='maze'&&Number($('world-size').value)<384){$('world-size').value='384';if(Number($('refinement').value)>2)$('refinement').value='2';gridPreview();}
+    if(scene==='maze'&&Number($('refinement').value)<.5)$('refinement').value='.5';
     selected=0;observedBirth=0;const resetDisplay=preset||shuffle||scene!==snapshot?.scene;
     const tumorPreset=['oncogenesis','cold','hot','random'].includes(scene);
     if(preset||shuffle){if(tumorPreset&&!(shuffle&&parameterLocks.values.boundary))$('boundary').value='wrap';else if(scene==='maze')$('boundary').value='solid';}
     // Each page visit gets one new development experiment. Restart/import keep
     // their explicit seed; revisiting/restoring this preset replays this visit.
     const seed=preset?(scene==='oncogenesis'?openingSeed:17):shuffle?nextStartSeed():snapshot?.seed??openingSeed;
-    let worldWidth=Number($('world-size').value),worldHeight=Number($('world-size').selectedOptions[0]?.dataset.height)||worldWidth*.75,refinement=Number($('refinement').value),boundary=$('boundary').value;
-    if(shuffle){({worldWidth,worldHeight,refinement,boundary}=CellLabRounds.randomGeometry(seed,{worldWidth,worldHeight,refinement,boundary},parameterLocks.values));$('world-size').value=worldWidth;$('refinement').value=refinement;$('boundary').value=boundary;gridPreview();}
+    let worldWidth=Number($('world-size').value),worldHeight=Number($('world-size').selectedOptions[0]?.dataset.height)||worldWidth*.75,refinement=gridRefinement(scene==='maze'),boundary=$('boundary').value;
+    if(shuffle){({worldWidth,worldHeight,refinement,boundary}=CellLabRounds.randomGeometry(seed,{worldWidth,worldHeight,refinement,boundary},parameterLocks.values));if(scene==='maze'){refinement=Math.max(.5,refinement);if(!parameterLocks.values.boundary)boundary='solid';}$('world-size').value=worldWidth;$('refinement').value=refinement;$('boundary').value=boundary;gridPreview();}
     if(((preset||shuffle)&&snapshot)||scene==='empty')await rpc('playing',{value:false});
-    await rpc('start',{scene,seed,worldWidth,worldHeight,refinement,boundary,settings:shuffle?lockedSettings:preserve?snapshot?.settings||{}:{},...(scene==='empty'?{warmup:0}:{})});
+    await rpc('start',{scene,seed,worldWidth,worldHeight,refinement,boundary,randomize:shuffle,settings:shuffle?lockedSettings:preserve?snapshot?.settings||{}:{},...(scene==='empty'?{warmup:0}:{})});
     archiveRound(reason||(shuffle?'manual-random':priorScene!==scene?'scene-change':preset?'preset-reset':'manual-restart'));
     if(resetDisplay){$('antigen-marks').checked=true;$('edge-activity').checked=!tumorPreset;$('normal-activity').checked=false;$('tumor-activity').checked=false;$('immune-activity').checked=scene==='maze';if(tumorPreset){$('nuclei').checked=true;$('cycle-marks').checked=true;$('show-tracks').checked=false;syncTracks();}dirty=true;}
     if(preset||shuffle||scene==='empty'){signalLayers.clear();$('field-view').value=tumorPreset?'adversity':'none';if(tumorPreset||scene==='maze')signalLayers.add('trail');if(scene==='maze'){$('edge-activity').checked=true;$('immune-activity').checked=true;$('show-tracks').checked=true;$('track-duration').value='1200';syncTracks();view.x=0;view.y=0;$('zoom').value='100';$('view-fit').value='contain';}updateOverlayButtons();dirty=true;await rpc('speed',{value:tumorPreset||scene==='network'?3:1});await rpc('playing',{value:scene!=='empty'});}
     else if(scene==='stress'||scene==='surveillance'){$('field-view').value='adversity';dirty=true;}
     if(scene==='empty'){view.x=0;view.y=0;$('zoom').value='100';$('seed-kind').value='1';setTool('seed');if(mobileUI.isMobile)mobileUI.focus('mobile-tools');dirty=true;}
-    }finally{setupBusy--;autoRandom.reset(performance.now());autoRandom.observe(snapshot,performance.now());renderAutoNotice();if(snapshot&&!journal.active)journal.begin(snapshot,performance.now(),undefined,parameterLocks.toJSON(),displaySettings());}
+    }finally{setupBusy--;gridPreview();autoRandom.reset(performance.now());autoRandom.observe(snapshot,performance.now());renderAutoNotice();if(snapshot&&!journal.active)journal.begin(snapshot,performance.now(),undefined,parameterLocks.toJSON(),displaySettings());}
   }
   function syncTracks(){trajectories.configure($('show-tracks').checked,Number($('track-duration').value));$('track-duration-out').textContent=$('track-duration').value+' MCS';if(snapshot)trajectories.sample(snapshot);dirty=true;}
   $('show-tracks').addEventListener('change',syncTracks);$('track-duration').addEventListener('input',syncTracks);
@@ -754,7 +760,13 @@
   document.querySelectorAll('[data-scene]').forEach(b=>b.addEventListener('click',()=>start(b.dataset.scene,{preset:true}).catch(fail)));
   $('restore-scenario').addEventListener('click',()=>start(undefined,{preset:true}).then(()=>toast('已恢复当前情境的参数、种子与初始细胞')).catch(fail));
   $('boundary').addEventListener('change',()=>start(undefined,{preserve:true}).then(()=>toast('已按新的边界条件重新开始')).catch(fail));
-  $('apply-grid').addEventListener('click',async()=>{const b=$('apply-grid');b.disabled=true;b.textContent='正在创建格点与细胞…';try{await start(undefined,{preserve:true});toast('计算区域与真实格点精细度已更新');}catch(e){fail(e);}finally{b.disabled=false;b.textContent='应用区域与精细度 · 重新开始';}});
+  $('apply-grid').addEventListener('click',async()=>{
+    const b=$('apply-grid'),coarsen=canCoarsen();b.disabled=true;b.textContent=coarsen?'正在转换格点，保留当前进度…':'正在创建格点与细胞…';
+    try{
+      if(coarsen){setupBusy++;autoRandom.suspend(performance.now());try{await endStroke();const result=await rpc('coarsen',{refinement:gridRefinement()});if(!result.ok){toast(result.message);return;}journal.observe(snapshot,performance.now(),!document.hidden);checkpointRound(performance.now(),true);probeDirty=true;toast('已降低精细度，保留当前细胞与演化进度');}finally{setupBusy--;}}
+      else {await start(undefined,{preserve:true});toast('计算区域与真实格点精细度已更新');}
+    }catch(e){fail(e);}finally{b.disabled=false;gridPreview();}
+  });
   $('zoom').addEventListener('change',()=>{view.x=0;view.y=0;dirty=true;});
   $('view-fit').addEventListener('change',()=>{view.x=0;view.y=0;dirty=true;});
   $('render-resolution').addEventListener('change',()=>{performanceContext();dirty=true;forceFrame=true;});
@@ -780,7 +792,7 @@
   viewport.addEventListener('touchstart',e=>{if(arenaFullscreen&&e.touches.length===2){e.preventDefault();void endStroke();void exitArenaFullscreen();}},{passive:false});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&arenaFullscreen){e.preventDefault();exitArenaFullscreen();}});
   document.addEventListener('fullscreenchange',()=>{if(document.fullscreenElement)fullscreenHadNative=true;else if(fullscreenHadNative){fullscreenLayout(false);fullscreenHadNative=false;fullscreenFocus?.focus({preventScroll:true});}});
-  $('reset').addEventListener('click',()=>start(undefined,{preserve:true}).catch(fail));$('shuffle').addEventListener('click',()=>start('random',{shuffle:true}).catch(fail));
+  $('reset').addEventListener('click',()=>start(undefined,{preserve:true}).catch(fail));$('shuffle').addEventListener('click',()=>start(undefined,{shuffle:true}).catch(fail));
   $('play').addEventListener('click',()=>rpc('playing',{value:!snapshot?.playing}).catch(fail));
   $('speed').addEventListener('input',e=>{$('speed-out').textContent=e.target.value+'×';rpc('speed',{value:Number(e.target.value)}).catch(fail);});
   $('sprinkle').addEventListener('click',async()=>{
@@ -854,7 +866,7 @@
     setupBusy++;autoRandom.suspend(performance.now());try{
     await endStroke();
     const profile=CellLabExperiment.parse(data);if(snapshot){await rpc('playing',{value:false});journal.observe(snapshot,performance.now(),false);}await rpc('import',{data,kernel:options.kernel,computeMode:options.computeMode});archiveRound(options.reason||'import');
-    const config=profile.config,select=$('world-size');let option=[...select.options].find(o=>o.value===String(config.worldWidth));if(!option){option=new Option('',String(config.worldWidth));select.append(option);}option.textContent=`${config.worldWidth} × ${config.worldHeight}`;option.dataset.height=config.worldHeight;select.value=String(config.worldWidth);$('refinement').value=String(config.refinement);gridPreview();
+    const config=profile.config,select=$('world-size');let option=[...select.options].find(o=>o.value===String(config.worldWidth));if(!option){option=new Option('',String(config.worldWidth));select.append(option);}option.textContent=`${config.worldWidth} × ${config.worldHeight}`;option.dataset.height=config.worldHeight;select.value=String(config.worldWidth);$('refinement').min=.375;$('refinement').max=4;$('refinement').step='any';$('refinement').value=String(config.refinement);gridPreview(config.scene);
     const d=profile.display;if(d.parameterLocks){parameterLocks.restore(d.parameterLocks);persistLocks();}if(d.cellColors)applyColors(d.cellColors);if(d.edgeFade!==undefined){$('body-feather').value=d.edgeFade;syncAppearance();}if(d.fieldView!==undefined)$('field-view').value=d.fieldView;if(d.signalLayers){signalLayers.clear();for(const key of d.signalLayers)signalLayers.add(key);}Object.assign(opacity,d.opacity||{});
     if(d.autoRandomMinutes!==undefined)setAutoRandomMinutes(d.autoRandomMinutes);
     // Migrate the short-lived exclusive selector; current independent flags win.
@@ -864,7 +876,7 @@
     if(d.trackDuration!==undefined)$('track-duration').value=d.trackDuration;syncTracks();
     if(d.zoom)$('zoom').value=d.zoom;if(d.fit)$('view-fit').value=d.fit;if(d.renderResolution)$('render-resolution').value=d.renderResolution;
     view.x=0;view.y=0;selected=0;observedBirth=0;hover=null;probeDirty=true;syncOpacity();updateOverlayButtons();setTool(config.scene==='empty'?'seed':'move');dirty=true;if(profile.warnings.length)toast(profile.warnings.join(' '));return profile;
-    }finally{setupBusy--;autoRandom.reset(performance.now());autoRandom.observe(snapshot,performance.now());renderAutoNotice();if(snapshot&&!journal.active)journal.begin(snapshot,performance.now(),undefined,parameterLocks.toJSON(),displaySettings(),options.replayOf||null);}
+    }finally{setupBusy--;gridPreview();autoRandom.reset(performance.now());autoRandom.observe(snapshot,performance.now());renderAutoNotice();if(snapshot&&!journal.active)journal.begin(snapshot,performance.now(),undefined,parameterLocks.toJSON(),displaySettings(),options.replayOf||null);}
   }
   $('import-data').addEventListener('click',()=>$('import-file').click());
   $('import-file').addEventListener('change',async()=>{

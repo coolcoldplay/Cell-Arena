@@ -10,13 +10,25 @@
     pick(settings){return Object.fromEntries(this.keys.filter(k=>this.values[k]&&settings[k]!==undefined).map(k=>[k,settings[k]]));}
     toJSON(){return {...this.values};}
   }
+  function refinementBounds(width,height,maze=false){
+    // Snap to whole physical lattice dimensions, rather than changing the
+    // culture size by rounding one side. Euclid also supports imported ratios.
+    let a=width,b=height;for(let n=0;n<40&&b>1e-7;n++){const r=a%b;a=b;b=Math.min(r,b-r)<1e-7?0:r;}
+    const low=Math.max(maze?.5:.375,32/width,24/height),high=Math.min(4,1024/width,768/height);
+    // Arbitrary imported dimensions may have no exact lattice in this range.
+    // Keep setup usable; live transfer still rejects any change of world size.
+    const divisor=Math.ceil(low*a-1e-8)<=Math.floor(high*a+1e-8)?a:1000;
+    const minTick=Math.ceil(low*divisor-1e-8),maxTick=Math.floor(high*divisor+1e-8);
+    return {min:minTick/divisor,max:maxTick/divisor,step:1/divisor,divisor,minTick,maxTick};
+  }
+  function snapRefinement(width,height,value,maze=false){const b=refinementBounds(width,height,maze);return Math.max(b.minTick,Math.min(b.maxTick,Math.round(value*b.divisor)))/b.divisor;}
   function randomGeometry(seed,current,locks){
     // Setup-only sampling never consumes the simulation's biological RNG.
     let n=seed>>>0;const pick=values=>{n=(Math.imul(n,1664525)+1013904223)>>>0;return values[Math.floor(n/4294967296*values.length)];};
-    const widths=[192,240,256,320,384].filter(w=>!locks.refinement||(w*current.refinement<=1024&&w*.75*current.refinement<=768));
-    const worldWidth=locks['world-size']?current.worldWidth:pick(widths),worldHeight=locks['world-size']?current.worldHeight:worldWidth*.75;
-    const refinements=[1,1.5,2].filter(r=>worldWidth*r<=1024&&worldHeight*r<=768);
-    return {worldWidth,worldHeight,refinement:locks.refinement?current.refinement:pick(refinements),boundary:locks.boundary?current.boundary:pick(['wrap','solid'])};
+    const widths=[192,240,256,320,384].filter(w=>!locks.refinement||(w*current.refinement<=1024&&w*.75*current.refinement<=768&&Math.abs(w*current.refinement-Math.round(w*current.refinement))<1e-8&&Math.abs(w*.75*current.refinement-Math.round(w*.75*current.refinement))<1e-8));
+    const keepSize=locks['world-size']||!widths.length,worldWidth=keepSize?current.worldWidth:pick(widths),worldHeight=keepSize?current.worldHeight:worldWidth*.75;
+    const refinements=[.375,.5,.75,1,1.5,2].filter(r=>worldWidth*r<=1024&&worldHeight*r<=768);
+    return {worldWidth,worldHeight,refinement:locks.refinement?current.refinement:snapRefinement(worldWidth,worldHeight,pick(refinements)),boundary:locks.boundary?current.boundary:pick(['wrap','solid'])};
   }
   function population(s){
     const p={total:0,normal:0,abnormal:0,tumor:0,immune:0,endothelial:0,tumorStem:0,tumorDifferentiated:0,tumorAntigenPositive:0,tumorAntigenNegative:0,immuneResting:0,immuneActive:0,immuneSuppressive:0,clearing:0,spontaneousClearing:0,environmentClearing:0,killClearing:0,lifespanClearing:0};
@@ -38,7 +50,7 @@
       const a=this.active;if(!a||s.revision+':'+s.seed!==this.epoch)return;
       if(this.running&&running&&s.playing)a.runningMs+=Math.max(0,now-this.lastTick);this.lastTick=now;this.running=running&&!!s.playing;
       for(const [key,value]of Object.entries(s.settings))if(a.finalSettings[key]!==value)a.parameterChanges.push({mcs:s.time,key,value});
-      a.finalSettings={...s.settings};a.simulatedMCS=s.time;a.population=population(s);a.counters={...s.counters};a.cycles=copy(s.cycles||{});a.vascular=copy(s.vascular||{});a.sources=copy(s.sources||[]);a.lastSeenAt=new Date().toISOString();if(s.immunity)a.immuneGenetics={length:s.immunity.length,metrics:copy(s.immunity.metrics),coverage:copy(s.immunity.coverage),clones:s.immunity.clones.filter(c=>c.live).sort((a,b)=>b.live-a.live).slice(0,16).map(({genes,archivedGenes,...c})=>c)};
+      a.finalRefinement=s.refinement;a.refinementTransitions=copy(s.refinementTransitions||[]);a.finalSettings={...s.settings};a.simulatedMCS=s.time;a.population=population(s);a.counters={...s.counters};a.cycles=copy(s.cycles||{});a.vascular=copy(s.vascular||{});a.sources=copy(s.sources||[]);a.lastSeenAt=new Date().toISOString();if(s.immunity)a.immuneGenetics={length:s.immunity.length,metrics:copy(s.immunity.metrics),coverage:copy(s.immunity.coverage),clones:s.immunity.clones.filter(c=>c.live).sort((a,b)=>b.live-a.live).slice(0,16).map(({genes,archivedGenes,...c})=>c)};
     }
     finish(reason,now,iso=new Date().toISOString(),locks={},display={}){
       if(!this.active)return null;const a=this.active;a.reason=reason;a.endedAt=iso;a.finalLocks={...locks};a.display=copy(display);this.active=null;this.running=false;return copy(a);
@@ -62,15 +74,15 @@
     return records.filter(r=>chosen.has(r.id)!==keepSelected).map(r=>r.id);
   }
   function replayExperiment(r){
-    return copy({format:'cell-arena-experiment',schemaVersion:r.schemaVersion??(r.modelRevision==='2026-11-specific-immune-genetics-1'?2:1),modelRevision:r.modelRevision,initialCells:r.initialCells||[],version:'4.0.0',scene:r.scene,seed:r.seed,boundary:r.boundary,worldWidth:r.worldWidth,worldHeight:r.worldHeight,refinement:r.refinement,settings:r.initialSettings,warmup:r.initialWarmup,sources:r.initialSources,vessels:r.initialVessels,maze:r.initialMaze,speed:r.initialSpeed||1,display:{...(r.initialDisplay||{}),autoRandomMinutes:0}});
+    return copy({format:'cell-arena-experiment',schemaVersion:r.schemaVersion??(r.modelRevision==='2026-11-specific-immune-genetics-1'?2:1),modelRevision:r.modelRevision,initialCells:r.initialCells||[],version:'4.0.0',scene:r.scene,seed:r.seed,boundary:r.boundary,worldWidth:r.worldWidth,worldHeight:r.worldHeight,refinement:r.refinement,refinementTransitions:r.refinementTransitions||[],settings:r.initialSettings,warmup:r.initialWarmup,sources:r.initialSources,vessels:r.initialVessels,maze:r.initialMaze,speed:r.initialSpeed||1,display:{...(r.initialDisplay||{}),autoRandomMinutes:0}});
   }
   function csv(records){
     records=numbered(records);
     const params=[...new Set(records.flatMap(r=>[...Object.keys(r.initialSettings),...Object.keys(r.finalSettings)]))].sort();
     const events=[...new Set(records.flatMap(r=>Object.keys(r.counters)))].sort(),states=Object.keys(population({cells:[]}));
-    const columns=['round_number','model_revision','replay_of','initial_sources','initial_vessels','final_vascular_state','run_id','started_at','ended_at','reason','reason_label','scene','seed','simulated_MCS','running_seconds','world_width','world_height','refinement','boundary',...states.map(k=>'end.'+k),...params.map(k=>'initial.'+k),...params.map(k=>'final.'+k),...events.map(k=>'event.'+k),'initial_locks','final_locks','parameter_changes','display','cycle_states','field_sources','immune_genetics'];
+    const columns=['round_number','model_revision','replay_of','initial_sources','initial_vessels','final_vascular_state','run_id','started_at','ended_at','reason','reason_label','scene','seed','simulated_MCS','running_seconds','world_width','world_height','refinement','final_refinement','refinement_transitions','boundary',...states.map(k=>'end.'+k),...params.map(k=>'initial.'+k),...params.map(k=>'final.'+k),...events.map(k=>'event.'+k),'initial_locks','final_locks','parameter_changes','display','cycle_states','field_sources','immune_genetics'];
     const quote=value=>'"'+String(value??'').replaceAll('"','""')+'"';
-    return '\uFEFF'+[columns,...records.map(r=>[r.roundNumber,r.modelRevision,r.replayOf,JSON.stringify(r.initialSources??null),JSON.stringify(r.initialVessels??null),JSON.stringify(r.vascular??null),r.id,r.startedAt,r.endedAt,r.reason,reasonLabel(r.reason),r.scene,r.seed,r.simulatedMCS,(r.runningMs/1000).toFixed(3),r.worldWidth,r.worldHeight,r.refinement,r.boundary,...states.map(k=>r.population[k]||0),...params.map(k=>r.initialSettings[k]),...params.map(k=>r.finalSettings[k]),...events.map(k=>r.counters[k]||0),JSON.stringify(r.initialLocks),JSON.stringify(r.finalLocks),JSON.stringify(r.parameterChanges),JSON.stringify(r.display||{}),JSON.stringify(r.cycles||{}),JSON.stringify(r.sources||[]),JSON.stringify(r.immuneGenetics||{})])].map(row=>row.map(quote).join(',')).join('\r\n')+'\r\n';
+    return '\uFEFF'+[columns,...records.map(r=>[r.roundNumber,r.modelRevision,r.replayOf,JSON.stringify(r.initialSources??null),JSON.stringify(r.initialVessels??null),JSON.stringify(r.vascular??null),r.id,r.startedAt,r.endedAt,r.reason,reasonLabel(r.reason),r.scene,r.seed,r.simulatedMCS,(r.runningMs/1000).toFixed(3),r.worldWidth,r.worldHeight,r.refinement,r.finalRefinement??r.refinement,JSON.stringify(r.refinementTransitions||[]),r.boundary,...states.map(k=>r.population[k]||0),...params.map(k=>r.initialSettings[k]),...params.map(k=>r.finalSettings[k]),...events.map(k=>r.counters[k]||0),JSON.stringify(r.initialLocks),JSON.stringify(r.finalLocks),JSON.stringify(r.parameterChanges),JSON.stringify(r.display||{}),JSON.stringify(r.cycles||{}),JSON.stringify(r.sources||[]),JSON.stringify(r.immuneGenetics||{})])].map(row=>row.map(quote).join(',')).join('\r\n')+'\r\n';
   }
   // Store compact records, not grids or movies. Completed rounds are never
   // truncated to a display buffer; pagination only limits rendered rows.
@@ -109,5 +121,5 @@
       remove:ids=>transaction(tx=>{for(const id of new Set(ids))tx.objectStore('rounds').delete(id);})
     };
   }
-  globalThis.CellLabRounds={Locks,Journal,randomGeometry,population,csv,reasonLabel,openStore,numbered,replayExperiment,startTime,cleanupIds};
+  globalThis.CellLabRounds={Locks,Journal,randomGeometry,refinementBounds,snapRefinement,population,csv,reasonLabel,openStore,numbered,replayExperiment,startTime,cleanupIds};
 })();

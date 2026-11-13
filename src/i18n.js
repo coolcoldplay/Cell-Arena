@@ -5,6 +5,23 @@
   const dictionary=new Map(),missing=new Set(),cache=new Map();
   function add(rows){for(const line of rows.trim().split('\n')){const at=line.indexOf('|');if(at>0)dictionary.set(line.slice(0,at),line.slice(at+1));}}
   add(`
+迷宫通道需要至少 0.5× 精细度|Maze corridors require at least 0.5× grid detail
+粗 · 省计算|Coarse · Less computation
+细 · 细胞形态|Fine · Cell shapes
+最低 0.375×，按区域大小对齐整数格点；迷宫最低 0.5×。低于 0.5× 为极粗预览，可能出现局部停滞；粗档会改变接触、通行和演化结果。默认 1.5×；定量比较需固定精细度并与更细格点对照。最高 1024 × 768 格点。|Minimum 0.375×, aligned to whole grid dimensions for the chosen area; maze minimum 0.5×. Below 0.5× is an extreme coarse preview with possible local stalling; coarse grids change contacts, passage and evolution. Default 1.5×; keep detail fixed for quantitative comparisons and check finer grids. Up to 1024 × 768 lattice sites.
+请选择比当前更低的精细度|Choose a lower grid detail than the current setting
+当前区域不能无损保持尺寸，请选择其他精细度|This detail cannot preserve the current area dimensions; choose another detail
+粗网格无法完整容纳细胞 #|The coarse grid cannot retain complete cell #
+，已保留原进度；请先选择较接近当前的精细度|. Original progress retained; try a detail closer to the current setting
+格点转换未通过细胞完整性检查，原进度保留|Grid conversion failed the cell integrity check; original progress retained
+请先结束当前拖动|Finish the current drag first
+降低精细度 · 保留进度|Lower grid detail · Keep progress
+正在转换格点，保留当前进度…|Converting the grid while keeping progress…
+已降低精细度，保留当前细胞与演化进度|Lowered grid detail; current cells and evolution progress retained
+区域不变时降低精细度可保留当前进度；升高精细度或改变区域仍需重新开始。粗网格无法容纳完整细胞时保留原模拟。|Lower grid detail at the same culture size to keep progress. Raising detail or changing size still restarts. If complete cells cannot fit the coarse grid, the original simulation is retained.
+此实验包含运行中精细度切换；导入仅按所列精细度重新开局，不续跑或重放中途切换。|This experiment includes grid detail changes during a run. Import starts over at the listed detail; it does not resume or replay those changes.
+保留当前情景，随机生成新种子与情景范围内的未锁定参数|Keep the current scenario and randomize the seed and unlocked settings within its ranges
+已按当前情景与未锁定参数随机开启新一轮|Started a new round of the current scenario with unlocked parameters randomized
 血管外直径上限|Maximum vessel outer diameter
 包含管壁；达到尺寸或对应内皮容纳量后统一保持 G0，手动提高上限才恢复增殖许可；调低时已有超限血管逐步回缩|Includes the wall. Reaching the diameter or endothelial capacity holds all vessel cells in G0 until the limit is raised. Existing oversized vessels retract gradually after lowering it.
 血管直径上限：保持 G0|Vessel diameter limit: held in G0
@@ -273,6 +290,8 @@ Arena 培养皿|Arena culture dish
 切换边界会按当前参数重新开始。|Changing the boundary restarts with current parameters.
 培养区域|Culture size
 格点精细度|Grid detail
+0.5× · 粗略分布|0.5× · Coarse overview
+0.75× · 轻量|0.75× · Lightweight
 1× · 快速|1× · Fast
 1.5× · 精细|1.5× · Fine
 2× · 更精细|2× · Finer
@@ -502,7 +521,7 @@ CPM 温度，影响随机复制尝试的接受率|CPM temperature; controls acce
 只稳定持续接触的肿瘤对；0 关闭成网黏附，不产生隔空连接|Stabilizes sustained tumor contacts only. 0 disables network adhesion; no distant connections.
 单击加入一颗，可挤入已有细胞区域；邻居变形、核区逐格让位，切面缩小不超过设定上限，总目标量保留。只检查局部空间，不按总数量拒绝新增；挤入失败不改动原有细胞。|Click to add one cell, even in occupied tissue. Neighbor bodies and nuclei yield locally within the section limit, preserving total target biomass. Insertion depends on local space, not population count; a failed attempt leaves existing cells unchanged.
 0% 隐藏，50% 以下保留胞体本色；超过 50% 逐步增强，100% 完整显示图层，可覆盖胞体色。细胞核和边界仍保留；各通道独立调节，环境分量分别记忆。|0% hides the layer; below 50% cell colors are protected. Above 50% the layer grows stronger, reaching full opacity at 100%. Nuclei and outlines remain visible. Each channel remembers its own opacity.
-区域扩大空间；精细度增加真实形态格点，最高 1024 × 768。细胞物理尺寸近似保持；更大、更细会增加计算量。|Culture size adds space; detail increases physical grid resolution, up to 1024 × 768. Cell size stays approximately constant. Larger, finer grids require more computation.
+0.5× / 0.75× 适合大区域空间分布预览；细胞尺寸近似保持，但粗格点会改变接触、通行和演化结果。形态或定量比较建议使用固定精细度，并与更细格点对照。最高 1024 × 768 格点。|Use 0.5× / 0.75× for large-area spatial previews. Cell size stays approximately constant, but coarse grids change contacts, passage and evolution. Keep detail fixed for shape or quantitative comparisons and compare against finer grids. Up to 1024 × 768 lattice sites.
 显示分辨率即时生效，保存 PNG 使用同样尺寸；它不改变物理格点，也不重开模拟。|Render resolution applies immediately and also sets PNG dimensions. It does not change the physical grid or restart the model.
 默认配色：免疫未激活淡红，实际识别后激活深红；肿瘤遗传增殖性状越高越黑，范围 0.25–3。核区默认用深蓝、深红或浅金。可在「细胞配色」分别修改；各类 Act 独立开启，开启后覆盖局部胞体色。|Default colors: resting immune cells are pale red; recognized targets trigger deep red activation. Tumors darken with inherited proliferation (0.25–3). Nuclei use blue, red or pale gold. Customize each under Cell colors. Act can independently override local body colors.
 点击方案立即应用，也可继续自定义，颜色保存在当前浏览器；不会重启模拟。高增殖使用所选肿瘤色，低增殖逐渐变浅；关闭上方选项可使用统一纯色。Act 与高强度热图仍可覆盖胞体色，关闭图层可查看本色。|Apply a palette or customize colors, saved in this browser without restarting. Higher proliferation uses the selected tumor color; lower values lighten it. Disable shading for uniform colors. Act and strong overlays can still override body colors.

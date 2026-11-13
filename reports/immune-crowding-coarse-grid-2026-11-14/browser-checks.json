@@ -1,0 +1,101 @@
+{
+  "browser": "Ego Lite",
+  "localUrl": "http://127.0.0.1:4178/",
+  "mobile": "390x844 Chromium viewport emulation, not a physical phone",
+  "scenarioChecks": [
+    {
+      "check": "hot random preserves scenario and locks",
+      "passed": true,
+      "seed": 148287016,
+      "antigen": 100,
+      "initial": 37
+    },
+    {
+      "check": "hot random preserves scenario and locks",
+      "passed": true,
+      "seed": 2614856809,
+      "antigen": 100,
+      "initial": 37
+    },
+    {
+      "check": "cold random",
+      "passed": true,
+      "seed": 1953017838
+    },
+    {
+      "check": "oncogenesis random",
+      "passed": true,
+      "seed": 3965756008
+    },
+    {
+      "check": "maze random",
+      "passed": true,
+      "seed": 1157493496
+    },
+    {
+      "check": "empty random",
+      "passed": true,
+      "seed": 3143423226
+    },
+    {
+      "check": "automatic random retains current hot scenario",
+      "passed": true,
+      "seed": 1456183960,
+      "reason": "auto-empty"
+    }
+  ],
+  "sliderChecks": [
+    {
+      "name": "default minimum live slider",
+      "pass": true,
+      "time": 36,
+      "refinement": 0.38333333333333336,
+      "cells": 198
+    },
+    {
+      "name": "320 hot live slider minimum",
+      "pass": true,
+      "time": 335,
+      "cells": 340,
+      "refinement": 0.375
+    },
+    {
+      "name": "raising detail restarts",
+      "pass": true
+    },
+    {
+      "name": "slider hot random keeps scenario and lock",
+      "pass": true,
+      "seed": 1067829832,
+      "r": 0.5,
+      "antigen": 95
+    },
+    {
+      "name": "maze retains traversable minimum",
+      "pass": true
+    },
+    {
+      "name": "import slider bounds 512",
+      "pass": true,
+      "r": 0.5,
+      "min": "0.375",
+      "max": "2"
+    },
+    {
+      "name": "import slider bounds 240",
+      "pass": true,
+      "r": 4,
+      "min": "0.38333333333333336",
+      "max": "4"
+    },
+    {
+      "name": "large area caps slider",
+      "pass": true
+    },
+    {
+      "name": "mobile English slider",
+      "pass": true,
+      "errors": []
+    }
+  ]
+}

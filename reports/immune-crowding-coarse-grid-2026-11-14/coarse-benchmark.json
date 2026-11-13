@@ -1,0 +1,242 @@
+{
+  "revision": "2026-11-immune-crowding-coarse-grid-9",
+  "hashes": {
+    "vendor/artistoo.js": "cf324da4b8a475853f02bcc842662ade65140132fe11d6db4e034ea17a5ca7e5",
+    "src/fast-cpm.js": "bfd3d49749c3c93cccb05db721978f99d5690908637943e83fdd1313be0ad452",
+    "src/section-mechanics.js": "4ef4e53a8c8f8e07602c6e335e3f3d61742389dc1f5fb49289b4b1c98c448584",
+    "src/wasm-cpm.js": "19dacc927b986fe3b4d66ad1ea3a0ed07eda571f7cb48269430230729c3913b5",
+    "src/immune-genetics.js": "802c8f2240e4d46f958748ff986de44f2ee275ceb47b82408147002722a8db27",
+    "src/model.js": "1335e009e0095e6630adc4ddb087e2829219ee1f038982241645c5efc7c88827",
+    "build/cpm-kernel.wasm": "a780c7464408f849d8152fbf48305b7109b49ae1bc4274a2f3e7e512e5cb721d"
+  },
+  "hardware": {
+    "cpu": "Apple M5",
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "v24.22.1"
+  },
+  "config": {
+    "scene": "hot",
+    "worldWidth": 512,
+    "worldHeight": 384,
+    "boundary": "wrap",
+    "seed": 17,
+    "warmup": 35
+  },
+  "warmupMCS": 200,
+  "measuredMCS": 300,
+  "runs": [
+    {
+      "repeat": 0,
+      "refinement": 0.375,
+      "width": 192,
+      "height": 144,
+      "cellsBefore": 856,
+      "cellsAfter": 850,
+      "msPerMCS": 9.052186666666666,
+      "tumor": 27,
+      "kills": 9,
+      "valid": true
+    },
+    {
+      "repeat": 0,
+      "refinement": 0.5,
+      "width": 256,
+      "height": 192,
+      "cellsBefore": 856,
+      "cellsAfter": 850,
+      "msPerMCS": 10.973183610000003,
+      "tumor": 25,
+      "kills": 10,
+      "valid": true
+    },
+    {
+      "repeat": 0,
+      "refinement": 0.75,
+      "width": 384,
+      "height": 288,
+      "cellsBefore": 856,
+      "cellsAfter": 854,
+      "msPerMCS": 14.09696833333334,
+      "tumor": 24,
+      "kills": 6,
+      "valid": true
+    },
+    {
+      "repeat": 0,
+      "refinement": 1,
+      "width": 512,
+      "height": 384,
+      "cellsBefore": 857,
+      "cellsAfter": 847,
+      "msPerMCS": 16.347361249999995,
+      "tumor": 22,
+      "kills": 12,
+      "valid": true
+    },
+    {
+      "repeat": 0,
+      "refinement": 1.5,
+      "width": 768,
+      "height": 576,
+      "cellsBefore": 856,
+      "cellsAfter": 849,
+      "msPerMCS": 24.89684000000001,
+      "tumor": 24,
+      "kills": 10,
+      "valid": true
+    },
+    {
+      "repeat": 1,
+      "refinement": 1.5,
+      "width": 768,
+      "height": 576,
+      "cellsBefore": 856,
+      "cellsAfter": 849,
+      "msPerMCS": 23.655303609999972,
+      "tumor": 24,
+      "kills": 10,
+      "valid": true
+    },
+    {
+      "repeat": 1,
+      "refinement": 1,
+      "width": 512,
+      "height": 384,
+      "cellsBefore": 857,
+      "cellsAfter": 847,
+      "msPerMCS": 16.762255140000004,
+      "tumor": 22,
+      "kills": 12,
+      "valid": true
+    },
+    {
+      "repeat": 1,
+      "refinement": 0.75,
+      "width": 384,
+      "height": 288,
+      "cellsBefore": 856,
+      "cellsAfter": 854,
+      "msPerMCS": 14.206042916666677,
+      "tumor": 24,
+      "kills": 6,
+      "valid": true
+    },
+    {
+      "repeat": 1,
+      "refinement": 0.5,
+      "width": 256,
+      "height": 192,
+      "cellsBefore": 856,
+      "cellsAfter": 850,
+      "msPerMCS": 11.213676666666675,
+      "tumor": 25,
+      "kills": 10,
+      "valid": true
+    },
+    {
+      "repeat": 1,
+      "refinement": 0.375,
+      "width": 192,
+      "height": 144,
+      "cellsBefore": 856,
+      "cellsAfter": 850,
+      "msPerMCS": 9.349151389999994,
+      "tumor": 27,
+      "kills": 9,
+      "valid": true
+    },
+    {
+      "repeat": 2,
+      "refinement": 0.375,
+      "width": 192,
+      "height": 144,
+      "cellsBefore": 856,
+      "cellsAfter": 850,
+      "msPerMCS": 9.28316180666666,
+      "tumor": 27,
+      "kills": 9,
+      "valid": true
+    },
+    {
+      "repeat": 2,
+      "refinement": 0.5,
+      "width": 256,
+      "height": 192,
+      "cellsBefore": 856,
+      "cellsAfter": 850,
+      "msPerMCS": 11.078554863333315,
+      "tumor": 25,
+      "kills": 10,
+      "valid": true
+    },
+    {
+      "repeat": 2,
+      "refinement": 0.75,
+      "width": 384,
+      "height": 288,
+      "cellsBefore": 856,
+      "cellsAfter": 854,
+      "msPerMCS": 13.365287359999979,
+      "tumor": 24,
+      "kills": 6,
+      "valid": true
+    },
+    {
+      "repeat": 2,
+      "refinement": 1,
+      "width": 512,
+      "height": 384,
+      "cellsBefore": 857,
+      "cellsAfter": 847,
+      "msPerMCS": 17.625936249999988,
+      "tumor": 22,
+      "kills": 12,
+      "valid": true
+    },
+    {
+      "repeat": 2,
+      "refinement": 1.5,
+      "width": 768,
+      "height": 576,
+      "cellsBefore": 856,
+      "cellsAfter": 849,
+      "msPerMCS": 24.90851541666663,
+      "tumor": 24,
+      "kills": 10,
+      "valid": true
+    }
+  ],
+  "summary": [
+    {
+      "refinement": 0.375,
+      "msPerMCS": 9.28316180666666,
+      "speedup": 2.681935370567435,
+      "timeReduction": 0.6271349373387685
+    },
+    {
+      "refinement": 0.5,
+      "msPerMCS": 11.078554863333315,
+      "speedup": 2.2473003299736383,
+      "timeReduction": 0.5550216467899818
+    },
+    {
+      "refinement": 0.75,
+      "msPerMCS": 14.09696833333334,
+      "speedup": 1.766113068519106,
+      "timeReduction": 0.43378483641565224
+    },
+    {
+      "refinement": 1,
+      "msPerMCS": 16.762255140000004,
+      "speedup": 1.4852917935002872,
+      "timeReduction": 0.32673161975576026
+    },
+    {
+      "refinement": 1.5,
+      "msPerMCS": 24.89684000000001,
+      "speedup": 1,
+      "timeReduction": 0
+    }
+  ]
+}

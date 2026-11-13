@@ -13,6 +13,18 @@ test('unlocked setup dimensions and boundaries vary within supported bounds, whi
  const seen=new Set();for(let seed=1;seed<50;seed++){const g=CellLabRounds.randomGeometry(seed,current,{});assert.ok(g.worldWidth*g.refinement<=1024&&g.worldHeight*g.refinement<=768);seen.add(JSON.stringify(g));}
  assert.ok(seen.size>5);for(let seed=1;seed<50;seed++){const g=CellLabRounds.randomGeometry(seed,current,{refinement:true});assert.equal(g.refinement,4);assert.ok(g.worldWidth<=256);}
 });
+test('refinement slider bounds preserve integer grids, current detail and fractional locks',()=>{
+  for(const width of [96,160,192,240,256,320,384,512,768,1024]){
+    const height=width*.75,b=CellLabRounds.refinementBounds(width,height);
+    assert.ok(b.min>=.375&&b.max<=4&&b.min<=b.max);
+    for(let r=.1;r<=4.1;r+=.037){const v=CellLabRounds.snapRefinement(width,height,r);assert.ok(v>=b.min&&v<=b.max);assert.ok(Math.abs(width*v-Math.round(width*v))<1e-8);assert.ok(Math.abs(height*v-Math.round(height*v))<1e-8);}
+    if(width<=512)assert.equal(CellLabRounds.snapRefinement(width,height,1.5),1.5);
+  }
+  assert.equal(CellLabRounds.refinementBounds(240,180).min,23/60);assert.equal(CellLabRounds.refinementBounds(320,240).min,.375);assert.equal(CellLabRounds.refinementBounds(512,384).max,2);assert.equal(CellLabRounds.refinementBounds(320,240,true).min,.5);
+  assert.ok(Math.abs(CellLabRounds.snapRefinement(240.00000000000003,180,1.5)-1.5)<1e-10);
+  const imported=CellLabRounds.refinementBounds(100.1,75.1);assert.ok(imported.min<=imported.max);
+  for(let seed=1;seed<=30;seed++){const g=CellLabRounds.randomGeometry(seed,{worldWidth:240,worldHeight:180,refinement:23/60,boundary:'wrap'},{refinement:true});assert.equal(g.refinement,23/60);assert.ok(Math.abs(g.worldWidth*g.refinement-Math.round(g.worldWidth*g.refinement))<1e-8);assert.ok(Math.abs(g.worldHeight*g.refinement-Math.round(g.worldHeight*g.refinement))<1e-8);}
+});
 test('round records keep initial and final parameters, active duration, states and the actual termination reason',()=>{
   assert.ok(CellLabRounds.Journal,'round history is available');const log=new CellLabRounds.Journal(),s=snapshot();log.begin(s,0,'2026-11-11T00:00:00.000Z',{growth:true});
   log.observe(s,1000,true);s.time=120;s.settings.growth=1.5;s.cells[2].activation=0;log.observe(s,2000,true);

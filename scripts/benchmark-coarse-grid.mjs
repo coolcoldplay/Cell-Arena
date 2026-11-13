@@ -1,0 +1,11 @@
+// Run without another simulation/test process for meaningful wall-clock timing.
+import vm from 'node:vm';import {readFile,writeFile,mkdir} from 'node:fs/promises';import {createHash} from 'node:crypto';import os from 'node:os';
+const hashes={};for(const file of ['vendor/artistoo.js','src/fast-cpm.js','src/section-mechanics.js','src/wasm-cpm.js','src/immune-genetics.js','src/model.js']){const b=await readFile(file);hashes[file]=createHash('sha256').update(b).digest('hex');vm.runInThisContext(b.toString(),{filename:file});}
+const bytes=await readFile('build/cpm-kernel.wasm'),module=await CellLabWasm.load(bytes);hashes['build/cpm-kernel.wasm']=createHash('sha256').update(bytes).digest('hex');
+const config={scene:'hot',worldWidth:512,worldHeight:384,boundary:'wrap',seed:17,warmup:35},runs=[];
+for(let repeat=0;repeat<3;repeat++)for(const refinement of repeat%2?[1.5,1,.75,.5,.375]:[.375,.5,.75,1,1.5]){
+  const s=new CellLab.Simulation({...config,refinement});await CellLabWasm.install(s,module);s.advance(200);const before=s.live().length,began=performance.now();s.advance(300);const elapsedMs=performance.now()-began;
+  const row={repeat,refinement,width:s.width,height:s.height,cellsBefore:before,cellsAfter:s.live().length,msPerMCS:elapsedMs/300,tumor:s.live().filter(m=>m.kind===2&&!m.dying).length,kills:s.counters.kills,valid:s.live().filter(m=>!m.dying).every(m=>s.components(m.id).length===1&&s.section.fits(m,m.nucleusX,m.nucleusY))};runs.push(row);console.log(JSON.stringify(row));
+}
+const median=a=>a.sort((a,b)=>a-b)[Math.floor(a.length/2)],baseline=median(runs.filter(r=>r.refinement===1.5).map(r=>r.msPerMCS)),summary=[.375,.5,.75,1,1.5].map(refinement=>{const msPerMCS=median(runs.filter(r=>r.refinement===refinement).map(r=>r.msPerMCS));return {refinement,msPerMCS,speedup:baseline/msPerMCS,timeReduction:1-msPerMCS/baseline};});
+await mkdir('output/immune-clusters',{recursive:true});await writeFile('output/immune-clusters/coarse-benchmark.json',JSON.stringify({revision:CellLab.MODEL_REVISION,hashes,hardware:{cpu:os.cpus()[0].model,platform:os.platform(),arch:os.arch(),node:process.version},config,warmupMCS:200,measuredMCS:300,runs,summary},null,2)+'\n');console.log(JSON.stringify(summary));

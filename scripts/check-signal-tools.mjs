@@ -17,13 +17,13 @@ try{
  for(const scene of ['oncogenesis','cold','hot','random']){
   // Dirty prior display preferences must not leak into a fresh preset.
   await b.evaluate(`for(const id of ['nuclei','antigen-marks','cycle-marks'])document.getElementById(id).checked=false;for(const id of ['edge-activity','normal-activity','tumor-activity','immune-activity','show-tracks'])document.getElementById(id).checked=true`);
-  await click(scene==='random'?'#shuffle':`[data-scene=${scene}]`);await wait(`artistooLab.snapshot.scene==='${scene}'&&artistooLab.snapshot.speed===3&&artistooLab.snapshot.playing`);await b.evaluate('artistooLab.rpc("playing",{value:false})');
+  await click(scene==='random'?'#shuffle':`[data-scene=${scene}]`);await wait(`artistooLab.snapshot.scene==='${scene==='random'?'hot':scene}'&&artistooLab.snapshot.speed===3&&artistooLab.snapshot.playing`);await b.evaluate('artistooLab.rpc("playing",{value:false})');
   const data=await b.evaluate('artistooLab.exportData()');
   check(scene+' uses wrap, 3×, nuclei/antigen/cycle, recruitment/adversity, and no Act/tracks',data.boundary==='wrap'&&data.speed===3&&['nuclei','antigen-marks','cycle-marks'].every(k=>data.display.flags[k])&&['edge-activity','normal-activity','tumor-activity','immune-activity','show-tracks'].every(k=>!data.display.flags[k])&&data.display.fieldView==='adversity'&&data.display.signalLayers.length===1&&data.display.signalLayers[0]==='trail');
  }
  check('Complementary tools share columns, with one signal tool and no pan button',await paired());await shot('desktop-defaults');
  await set('boundary','solid');await wait('artistooLab.snapshot.boundary==="solid"');await b.evaluate('artistooLab.rpc("playing",{value:false})');
- await b.evaluate(`document.getElementById('nuclei').checked=false;document.getElementById('field-view').value='acid';artistooLab.rpc('speed',{value:2})`);await click('#reset');await wait('artistooLab.snapshot.scene==="random"');
+ await b.evaluate(`document.getElementById('nuclei').checked=false;document.getElementById('field-view').value='acid';artistooLab.rpc('speed',{value:2})`);await click('#reset');await wait('artistooLab.snapshot.scene==="hot"');
  check('Restart preserves explicit boundary, markers, layers and speed',await b.evaluate('artistooLab.snapshot.boundary==="solid"&&artistooLab.snapshot.speed===2&&!document.getElementById("nuclei").checked&&document.getElementById("field-view").value==="acid"'));
  await click('[data-scene=maze]');await wait('artistooLab.snapshot.scene==="maze"&&artistooLab.snapshot.speed===1');await b.evaluate('artistooLab.rpc("playing",{value:false})');
  check('Maze retains solid walls and its own immune Act/tracks defaults',await b.evaluate('artistooLab.snapshot.boundary==="solid"&&document.getElementById("edge-activity").checked&&document.getElementById("immune-activity").checked&&document.getElementById("show-tracks").checked'));

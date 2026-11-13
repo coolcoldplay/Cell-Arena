@@ -8,7 +8,8 @@
   Object.assign(DEFAULTS,{normalSupport:0,immuneKillLimit:10});
   Object.assign(DEFAULTS,{cycleCoupling:1,reserveCapacity:80,replicationStress:1,dnaRepair:1,checkpointIntegrity:1,traitCost:.45,normalRepair:.25,normalDivisions:4});
   Object.assign(DEFAULTS,{stemFraction:20,stemSymmetry:30,stemRenewal:60,stemCycleSlowdown:1.35,stemRepair:1.4,stemPlasticity:.25,tumorProgenyLimit:0});
-  const MODEL_REVISION='2026-11-vessel-diameter-limit-8';
+  const MODEL_REVISION='2026-11-immune-crowding-coarse-grid-9';
+  const isRefinement=r=>Number.isFinite(r)&&r>=.375&&r<=4;
   Object.assign(DEFAULTS,{antigenLength:6,initialImmuneReady:65,primingRate:1,checkpointStrength:1});
   Object.assign(DEFAULTS,{immuneLearning:1,immuneLearningTime:100,immuneLearningLimit:3,angiogenesis:1,angiogenicSecretion:1,angiogenicThreshold:.012,angiogenicHalfLife:400,angiogenicHypoxia:.55,tumorVesselPenalty:.75});
   // Vascular parameters are phenomenological MCS rates, not clinical estimates.
@@ -46,10 +47,11 @@
   Object.assign(RANDOM_RANGES,{immuneLearning:[.7,1.3,.1],immuneLearningTime:[60,100,20],immuneLearningLimit:[3,3,1],angiogenesis:[.7,1.3,.1],angiogenicSecretion:[.8,1.2,.1],angiogenicThreshold:[.006,.012,.002],angiogenicHalfLife:[360,440,40],angiogenicHypoxia:[.5,.6,.05],tumorVesselPenalty:[.6,.8,.05]});
   Object.assign(RANDOM_RANGES,{metabolism:[.86,.9,.02],mutation:[16,24,2],mutationSize:[.18,.28,.02]});
   Object.assign(RANDOM_RANGES,{vesselMaxDiameter:[48,48,1]});
-  function randomSettings(seed){
+  function randomSettings(seed,scene='random'){
     let state=seed>>>0;
     const random=()=>{state=(state+0x6d2b79f5)>>>0;let n=Math.imul(state^(state>>>15),1|state);n^=n+Math.imul(n^(n>>>7),61|n);return ((n^(n>>>14))>>>0)/4294967296;};
-    return Object.fromEntries(Object.entries(RANDOM_RANGES).map(([key,[lo,hi,step]])=>[key,Number((lo+Math.floor(random()*(Math.round((hi-lo)/step)+1))*step).toFixed(2))]));
+    const ranges=scene==='random'?RANDOM_RANGES:SCENE_RANDOM_RANGES[scene]||{};
+    return {...(scene==='random'?{}:{...DEFAULTS,...PRESETS[scene]?.settings}),...Object.fromEntries(Object.entries(ranges).map(([key,[lo,hi,step]])=>[key,Number((lo+Math.floor(random()*(Math.round((hi-lo)/step)+1))*step).toFixed(2))]))};
   }
   function ecologyLayout(seed,randomized){
     let state=(seed^0x58a1c9e7)>>>0;
@@ -128,6 +130,15 @@
   Object.assign(PRESETS.hot.settings,{immuneLearningTime:100,angiogenicThreshold:.012});
   Object.assign(PRESETS.cold.settings,{immuneLearning:.7,immuneLearningTime:140,angiogenicThreshold:.012});
   Object.assign(RANDOM_RANGES,{immuneSeparation:[.4,.8,.1]});
+  // Setup-only variation around each scenario's identity. Unlisted settings
+  // retain that preset; explicit parameter locks override the sampled values.
+  // The legacy random-development recipe remains importable and reproducible.
+  const SCENE_RANDOM_RANGES={
+    oncogenesis:RANDOM_RANGES,
+    hot:{supply:[2.7,2.9,.05],metabolism:[.6,.7,.01],growth:[.65,.85,.05],tumorCycle:[250,310,10],tumorMotility:[.25,.45,.05],antigen:[90,100,5],initialImmuneReady:[85,100,5],primingRate:[1.2,1.6,.1],immuneMotility:[1.1,1.3,.05],kill:[1.8,2,.1],chemotaxis:[2.2,2.8,.1],recruitment:[2.1,2.7,.1],immuneGrowth:[.55,.75,.05],immuneCycle:[180,220,10],noise:[.35,.55,.05],vesselImmuneRate:[1.1,1.5,.1],vesselPassage:[1.2,1.6,.1]},
+    cold:{supply:[2.7,2.9,.05],metabolism:[.6,.7,.01],growth:[1.25,1.55,.05],tumorCycle:[160,200,10],tumorMotility:[1.3,1.5,.05],antigen:[10,20,5],initialImmuneReady:[15,35,5],primingRate:[.3,.5,.05],immuneMotility:[.7,.9,.05],kill:[.8,1.2,.1],chemotaxis:[.5,.7,.05],recruitment:[.25,.45,.05],immuneGrowth:[.1,.2,.05],noise:[.75,.95,.05],vesselImmuneRate:[.25,.45,.05],vesselPassage:[.55,.75,.05]},
+    maze:{immuneMotility:[1.2,1.5,.1],chemotaxis:[2.5,3,.1],noise:[.4,.6,.05],immuneSeparation:[.6,1,.1]}
+  };
   class SignalField {
     constructor(width,height,wrap=false){this.width=width;this.height=height;this.wrap=wrap;this.values=new Float32Array(width*height);this.next=new Float32Array(width*height);this.blocked=new Uint8Array(width*height);}
     index(x,y){if(this.wrap){x=(x+this.width)%this.width;y=(y+this.height)%this.height;}else if(x<0||y<0||x>=this.width||y>=this.height)return -1;return y*this.width+x;}
@@ -527,7 +538,8 @@
   class Simulation {
     constructor({width,height,worldWidth=240,worldHeight=180,refinement,scene='ecosystem',seed=17,boundary='solid',settings={},sources,vessels,initialCells=[],mazeSignalThroughWalls=false,warmup=35,kernel='fast',sectionModel=true,pixelIndex=false}={}){
       this.scale=refinement??(width===undefined?1.5:1);
-      if(![1,1.5,2,3,4].includes(this.scale))throw Error('Unsupported lattice refinement');
+      if(!isRefinement(this.scale))throw Error('Unsupported lattice refinement');
+      if(scene==='maze'&&this.scale<.5)throw Error('迷宫通道需要至少 0.5× 精细度');
       width=width??Math.round(worldWidth*this.scale);height=height??Math.round(worldHeight*this.scale);
       if(!Number.isInteger(width)||!Number.isInteger(height)||width<32||height<24||width>1024||height>768)throw Error('计算格点需在 32×24 至 1024×768 内，请降低区域或精细度');
       this.worldWidth=width/this.scale;this.worldHeight=height/this.scale;this.fieldScale=scene==='maze'?Math.max(1,Math.round(this.scale*1.25)):FIELD_SCALE*this.scale;
@@ -1183,7 +1195,7 @@
     updatePolarity(dt){
       const s=this.settings,next=[];
       for(const m of this.live()){
-        if(m.dying)continue;let gx=0,gy=0,ax=0,ay=0,rx=0,ry=0,ix=0,iy=0,total=0;
+        if(m.dying)continue;let gx=0,gy=0,ax=0,ay=0,rx=0,ry=0,ix=0,iy=0,total=0,peerContact=0;
         if(this.vascular.steer(m)){this.updateMechanics(m);continue;}
         const gradient=key=>{const f=this.fields[key];let x=0,y=0,n=0;for(const [i,amount] of m.fieldBins){const g=f.gradient(i%f.width,Math.floor(i/f.width));x+=g[0]*amount;y+=g[1]*amount;n+=amount;}return [x/(n||1),y/(n||1)];};
         if(m.kind===IMMUNE){
@@ -1198,11 +1210,20 @@
         if(m.kind===IMMUNE)m.immuneCue=clamp(s.chemotaxis/1.6)*Math.min(1,magnitude/.035);
         for(const edge of this.contacts.get(m.id)?.values()||[]){
           const other=this.cells[edge.id];if(!other||other.dying)continue;
-          if(m.kind===IMMUNE&&other.kind===IMMUNE){ix-=edge.nx;iy-=edge.ny;continue;}
+          if(m.kind===IMMUNE&&other.kind===IMMUNE){ix-=edge.nx;iy-=edge.ny;peerContact+=edge.length;continue;}
           if(other.kind===m.kind){ax+=other.px*edge.length;ay+=other.py*edge.length;total+=edge.length;}
           if(m.targetID!==other.id){rx-=edge.nx;ry-=edge.ny;}
         }
         if(total){ax/=total;ay/=total;}
+        if(m.kind===IMMUNE){
+          // Searching cells squeezed by peers must retain room for patrol and
+          // separation. Otherwise carrier-derived recruitment keeps every front
+          // pointing inward, pinning healthy nuclei against the hard area floor.
+          // This local steering response neither moves pixels nor weakens a
+          // real antigen scan/synapse, nuclear exclusion or volume constraints.
+          m.immuneCrowding=m.phase==='search'&&!m.targetID?clamp(peerContact/Math.max(1,4*Math.sqrt(this.C.getVolume(m.id))))*(m.sectionPressure||0):0;
+          const response=1/(1+4*m.immuneCrowding);gx*=response;gy*=response;m.immuneCue*=response;
+        }
         const r=Math.hypot(rx,ry);if(r>0){rx/=r;ry/=r;}
         const chemo=m.kind===NORMAL?s.cohesion:s.chemotaxis;
         const repel=s.repulsion*(m.kind===TUMOR?.18:m.kind===IMMUNE?.16:1);
@@ -1949,8 +1970,8 @@
       const history=this.populationHistory(true),historySamples=this.history.length+(history.at(-1)===this.history.at(-1)?0:1);
       const maze=this.maze?{...this.maze,racers:this.maze.racers.map(r=>({...r,alive:this.cells[r.id]?.birth===r.birth&&!this.cells[r.id].dying})),arrivals:this.maze.arrivals.map(a=>({...a}))}:null;
       const observation=this.observationReport(),normalSupport=this.normalSupportReport();
-      return {immunity:this.immunity.report(),initialCells:this.initialCells,modelRevision:MODEL_REVISION,warmup:this.initialWarmup,kernel:this.kernel,width:this.width,height:this.height,worldWidth:this.worldWidth,worldHeight:this.worldHeight,refinement:this.scale,fieldScale:this.fieldScale,fieldMask:this.fields.oxygen.blocked.slice(),scene:this.scene,scenario:this.scenarioReport(),vascular:this.vascular.report(),observation,normalSupport,cycles:this.cycleReport(),patrol:this.patrolReport({visitedPixels,freePixels}),maze,sources:this.sources.map(s=>({...s})),boundary:this.boundary,time:this.C.time,seed:this.seedValue,settings:{...this.settings},counters:{...this.counters},manualDeathRemovals:{...this.manualDeathRemovals},deaths:this.deathSummary(),recentDeaths:this.deathHistory.slice(-8).map(d=>({...d})),recentClearances:this.recentClearances.map(d=>({...d})),deathEffects:this.deathEffects.map(e=>({...e})),grid,activity,walls,orphans,cells,fields,history,historySamples,events:this.events.slice(-12)};
+      return {initialRefinement:this.initialRefinement??this.scale,refinementTransitions:this.refinementTransitions||[],immunity:this.immunity.report(),initialCells:this.initialCells,modelRevision:MODEL_REVISION,warmup:this.initialWarmup,kernel:this.kernel,width:this.width,height:this.height,worldWidth:this.worldWidth,worldHeight:this.worldHeight,refinement:this.scale,fieldScale:this.fieldScale,fieldMask:this.fields.oxygen.blocked.slice(),scene:this.scene,scenario:this.scenarioReport(),vascular:this.vascular.report(),observation,normalSupport,cycles:this.cycleReport(),patrol:this.patrolReport({visitedPixels,freePixels}),maze,sources:this.sources.map(s=>({...s})),boundary:this.boundary,time:this.C.time,seed:this.seedValue,settings:{...this.settings},counters:{...this.counters},manualDeathRemovals:{...this.manualDeathRemovals},deaths:this.deathSummary(),recentDeaths:this.deathHistory.slice(-8).map(d=>({...d})),recentClearances:this.recentClearances.map(d=>({...d})),deathEffects:this.deathEffects.map(e=>({...e})),grid,activity,walls,orphans,cells,fields,history,historySamples,events:this.events.slice(-12)};
     }
   }
-  globalThis.CellLab={MODEL_REVISION,Simulation,SignalField,StepClock,DEFAULTS,PRESETS,BODY_COLORS,TYPE_NAMES,NORMAL,TUMOR,IMMUNE,WALL,sampleHistory,randomSettings,RANDOM_RANGES};
+  globalThis.CellLab={MODEL_REVISION,isRefinement,Simulation,SignalField,StepClock,DEFAULTS,PRESETS,BODY_COLORS,TYPE_NAMES,NORMAL,TUMOR,IMMUNE,WALL,sampleHistory,randomSettings,RANDOM_RANGES,SCENE_RANDOM_RANGES};
 })();

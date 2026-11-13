@@ -5,6 +5,8 @@
     configure(enabled,duration){if(!enabled)this.paths.clear();this.enabled=!!enabled;this.duration=Math.max(20,Math.min(2000,Number(duration)||400));}
     sample(s){
       if(this.revision!==s.revision){this.paths.clear();this.revision=s.revision;}
+      if(this.refinement&&s.refinement&&this.refinement!==s.refinement){const q=s.refinement/this.refinement;for(const path of this.paths.values())for(const p of path.points){p.x*=q;p.y*=q;}}
+      this.refinement=s.refinement;
       if(!this.enabled)return;
       const cutoff=s.time-this.duration;
       for(const c of s.cells){if(c.dying)continue;const key=c.birth??c.id;let path=this.paths.get(key);if(!path){path={id:c.id,kind:c.kind,points:[]};this.paths.set(key,path);}path.kind=c.kind;

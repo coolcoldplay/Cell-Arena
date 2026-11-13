@@ -1,0 +1,172 @@
+{
+  "modelRevision": "2026-11-immune-crowding-coarse-grid-9",
+  "worldWidth": 320,
+  "worldHeight": 240,
+  "seedByScene": {
+    "hot": 17,
+    "cold": 31,
+    "oncogenesis": 77
+  },
+  "warmup": 35,
+  "advanceAfterConversion": 500,
+  "hashes": {
+    "src/grid-transfer.js": "7574711852b7000086d8704ddd95e60880ed79f9274f9c5e20126fd03a6307bf",
+    "src/model.js": "1335e009e0095e6630adc4ddb087e2829219ee1f038982241645c5efc7c88827",
+    "src/section-mechanics.js": "4ef4e53a8c8f8e07602c6e335e3f3d61742389dc1f5fb49289b4b1c98c448584",
+    "build/cpm-kernel.wasm": "a780c7464408f849d8152fbf48305b7109b49ae1bc4274a2f3e7e512e5cb721d"
+  },
+  "timingNote": "Conversions were measured with concurrent validation workloads; not an isolated speed benchmark.",
+  "results": [
+    {
+      "scene": "hot",
+      "seed": 17,
+      "from": 1.5,
+      "to": 1,
+      "time": 4035,
+      "transferMs": 5208.6700000000055,
+      "cellsBefore": 384,
+      "cellsTransferred": 384,
+      "cellsAfter": 386,
+      "finalTime": 4535,
+      "valid": true
+    },
+    {
+      "scene": "hot",
+      "seed": 17,
+      "from": 1.5,
+      "to": 0.75,
+      "time": 4035,
+      "transferMs": 2872.776582999999,
+      "cellsBefore": 384,
+      "cellsTransferred": 384,
+      "cellsAfter": 387,
+      "finalTime": 4535,
+      "valid": true
+    },
+    {
+      "scene": "hot",
+      "seed": 17,
+      "from": 1.5,
+      "to": 0.5,
+      "time": 4035,
+      "transferMs": 834.8812500000058,
+      "cellsBefore": 384,
+      "cellsTransferred": 384,
+      "cellsAfter": 391,
+      "finalTime": 4535,
+      "valid": true
+    },
+    {
+      "scene": "cold",
+      "seed": 31,
+      "to": 1,
+      "time": 2035,
+      "error": "Error: \u7c97\u7f51\u683c\u65e0\u6cd5\u5b8c\u6574\u5bb9\u7eb3\u7ec6\u80de #173\uff0c\u5df2\u4fdd\u7559\u539f\u8fdb\u5ea6\uff1b\u8bf7\u5148\u9009\u62e9\u8f83\u63a5\u8fd1\u5f53\u524d\u7684\u7cbe\u7ec6\u5ea6"
+    },
+    {
+      "scene": "cold",
+      "seed": 31,
+      "from": 1.5,
+      "to": 0.75,
+      "time": 2035,
+      "transferMs": 1052.681500000006,
+      "cellsBefore": 366,
+      "cellsTransferred": 366,
+      "cellsAfter": 372,
+      "finalTime": 2535,
+      "valid": true
+    },
+    {
+      "scene": "cold",
+      "seed": 31,
+      "from": 1.5,
+      "to": 0.5,
+      "time": 2035,
+      "transferMs": 500.9609590000182,
+      "cellsBefore": 366,
+      "cellsTransferred": 366,
+      "cellsAfter": 371,
+      "finalTime": 2535,
+      "valid": true
+    },
+    {
+      "scene": "oncogenesis",
+      "seed": 77,
+      "from": 1.5,
+      "to": 1,
+      "time": 2035,
+      "transferMs": 1724.227917000011,
+      "cellsBefore": 339,
+      "cellsTransferred": 339,
+      "cellsAfter": 339,
+      "finalTime": 2535,
+      "valid": true
+    },
+    {
+      "scene": "oncogenesis",
+      "seed": 77,
+      "from": 1.5,
+      "to": 0.75,
+      "time": 2035,
+      "transferMs": 996.1173329999729,
+      "cellsBefore": 339,
+      "cellsTransferred": 339,
+      "cellsAfter": 339,
+      "finalTime": 2535,
+      "valid": true
+    },
+    {
+      "scene": "oncogenesis",
+      "seed": 77,
+      "from": 1.5,
+      "to": 0.5,
+      "time": 2035,
+      "transferMs": 511.6866250000021,
+      "cellsBefore": 339,
+      "cellsTransferred": 339,
+      "cellsAfter": 339,
+      "finalTime": 2535,
+      "valid": true
+    },
+    {
+      "scene": "hot",
+      "seed": 17,
+      "from": 1.5,
+      "to": 0.375,
+      "time": 4035,
+      "transferMs": 230.19087500000023,
+      "cellsBefore": 384,
+      "cellsTransferred": 384,
+      "cellsAfter": 388,
+      "finalTime": 4535,
+      "valid": true
+    },
+    {
+      "scene": "cold",
+      "seed": 31,
+      "from": 1.5,
+      "to": 0.375,
+      "time": 2035,
+      "transferMs": 410.0684579999943,
+      "cellsBefore": 366,
+      "cellsTransferred": 366,
+      "cellsAfter": 371,
+      "finalTime": 2535,
+      "valid": true
+    },
+    {
+      "scene": "oncogenesis",
+      "seed": 77,
+      "from": 1.5,
+      "to": 0.375,
+      "time": 2035,
+      "transferMs": 341.6804580000171,
+      "cellsBefore": 339,
+      "cellsTransferred": 339,
+      "cellsAfter": 339,
+      "finalTime": 2535,
+      "valid": true
+    }
+  ],
+  "hashScope": "Final implementation. The first nine transfers preceded admitting 0.375 as a valid refinement; their transfer and biological rules were identical. The final three ran with the listed model hash. Final code also normalizes floating-point world-size roundoff (covered by a consecutive-transfer regression)."
+}
