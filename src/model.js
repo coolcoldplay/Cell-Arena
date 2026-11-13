@@ -8,7 +8,7 @@
   Object.assign(DEFAULTS,{normalSupport:0,immuneKillLimit:10});
   Object.assign(DEFAULTS,{cycleCoupling:1,reserveCapacity:80,replicationStress:1,dnaRepair:1,checkpointIntegrity:1,traitCost:.45,normalRepair:.25,normalDivisions:4});
   Object.assign(DEFAULTS,{stemFraction:20,stemSymmetry:30,stemRenewal:60,stemCycleSlowdown:1.35,stemRepair:1.4,stemPlasticity:.25,tumorProgenyLimit:0});
-  const MODEL_REVISION='2026-11-contact-learning-angiogenesis-4';
+  const MODEL_REVISION='2026-11-spatial-evolution-5';
   Object.assign(DEFAULTS,{antigenLength:6,initialImmuneReady:65,primingRate:1,checkpointStrength:1});
   Object.assign(DEFAULTS,{immuneLearning:1,immuneLearningTime:100,immuneLearningLimit:3,angiogenesis:1,angiogenicSecretion:1,angiogenicThreshold:.012,angiogenicHalfLife:400,angiogenicHypoxia:.55,tumorVesselPenalty:.75});
   // Vascular parameters are phenomenological MCS rates, not clinical estimates.
@@ -43,6 +43,7 @@
   // dominate before antigen-specific surveillance. This is not a Treg census.
   Object.assign(RANDOM_RANGES,{damagePolarization:[.5,1.5,.25],damageDeactivation:[.7,1.3,.1],suppressiveSecretion:[.75,1.25,.25],suppressionStrength:[.8,1.2,.1],immuneRegulationMemory:[400,800,100]});
   Object.assign(RANDOM_RANGES,{immuneLearning:[.7,1.3,.1],immuneLearningTime:[60,100,20],immuneLearningLimit:[3,3,1],angiogenesis:[.7,1.3,.1],angiogenicSecretion:[.8,1.2,.1],angiogenicThreshold:[.006,.012,.002],angiogenicHalfLife:[360,440,40],angiogenicHypoxia:[.5,.6,.05],tumorVesselPenalty:[.6,.8,.05]});
+  Object.assign(RANDOM_RANGES,{metabolism:[.86,.9,.02],mutation:[16,24,2],mutationSize:[.18,.28,.02]});
   function randomSettings(seed){
     let state=seed>>>0;
     const random=()=>{state=(state+0x6d2b79f5)>>>0;let n=Math.imul(state^(state>>>15),1|state);n^=n+Math.imul(n^(n>>>7),61|n);return ((n^(n>>>14))>>>0)/4294967296;};
@@ -80,8 +81,8 @@
   }
   const SIGNALS=['cohesion','danger','trail','il2','normalDamage','inhibition'];
   const PRESETS={
-    oncogenesis:{label:'肿瘤发生发展',environmentProfile:'mosaic',founderTolerance:2.3,description:'密铺正常组织与 12 颗分散免疫细胞，从零肿瘤开始。三处供给较弱的区域与健康边缘形成差异；癌前、癌变、免疫清除、抑制与恢复相互竞争，逃逸克隆可能再次扩增。没有定时转变或预设结局。',settings:{supply:2.7,metabolism:1.05,inflammation:1.3,stressMutation:4.5,progression:2.5,normalMutationGain:5,tumorMutationGain:6,growth:1.3,tumorCycle:170,apoptosis:3,tumorMotility:1.1,normalMotility:.1,cohesion:1.1,escape:3,immuneMotility:1.3,immuneGrowth:.5,immuneDivisions:3,immuneCycle:200,antigenMemory:1200,kill:1.4,recruitment:1.4,chemotaxis:1.8,mutation:12,mutationSize:.2,antigenStressGain:1.2,contactEscape:.6,signalEscape:.3,damagePolarization:3.5,damageDeactivation:1.2,suppressiveSecretion:1.5,suppressionStrength:1.3,suppressionRecovery:1.5,immuneRegulationMemory:200}},
-    random:{label:'随机肿瘤演化',environmentProfile:'mosaic',founderTolerance:2.3,description:'随机化的密铺正常组织、12–16 颗内部免疫细胞与三处弱供给区域。参数在发生发展附近抽样，肿瘤必须由局部癌前产生；相同种子和参数可重现开局，结局由局部相互作用产生。',settings:{}},
+    oncogenesis:{label:'肿瘤发生发展',environmentProfile:'mosaic',founderTolerance:2,founderTraitSpread:.4,description:'密铺正常组织与 12 颗分散免疫细胞，从零肿瘤开始。三处供给较弱的区域与健康边缘形成差异；癌前、癌变、免疫清除、抑制与恢复相互竞争，逃逸克隆可能再次扩增。没有定时转变或预设结局。',settings:{supply:2.7,metabolism:1.05,inflammation:1.3,stressMutation:4.5,progression:2.5,normalMutationGain:5,tumorMutationGain:6,growth:1.3,tumorCycle:170,apoptosis:3,tumorMotility:1.1,normalMotility:.1,cohesion:1.1,escape:3,immuneMotility:1.3,immuneGrowth:.5,immuneDivisions:3,immuneCycle:200,antigenMemory:1200,kill:1.4,recruitment:1.4,chemotaxis:1.8,mutation:12,mutationSize:.2,antigenStressGain:1.2,contactEscape:.6,signalEscape:.3,damagePolarization:3.5,damageDeactivation:1.2,suppressiveSecretion:1.5,suppressionStrength:1.3,suppressionRecovery:1.5,immuneRegulationMemory:200}},
+    random:{label:'随机肿瘤演化',environmentProfile:'mosaic',founderTolerance:2,founderTraitSpread:.4,description:'随机化的密铺正常组织、12–16 颗内部免疫细胞与三处弱供给区域。参数在发生发展附近抽样，肿瘤必须由局部癌前产生；相同种子和参数可重现开局，结局由局部相互作用产生。',settings:{}},
     cold:{label:'免疫冷肿瘤扩散转移',description:'正常细胞铺满背景，中央嵌入 19 颗低抗原肿瘤，外围仅 3 颗免疫细胞。梭形肿瘤侵袭扩增，压力提高性状变异，部分克隆可能暴露抗原；免疫招募较弱。包含局部侵袭与概率性入血播散，不模拟远处器官定植。',settings:{supply:2.8,metabolism:.65,stressMutation:0,progression:1,growth:1.4,tumorCycle:180,apoptosis:2,tumorMotility:1.5,tumorMorphology:1,normalMotility:.25,cohesion:.4,sectionYield:.4,immuneMotility:.8,antigen:15,kill:1,chemotaxis:.6,recruitment:.35,immuneGrowth:.15,immuneDivisions:2,alignment:.2,noise:.85,mutation:8,normalMutationGain:1,tumorMutationGain:5,antigenStressGain:.3,contactEscape:.15,signalEscape:.1}},
     hot:{label:'免疫热肿瘤应答',description:'正常细胞铺满背景，中央嵌入 37 颗高抗原肿瘤，18 颗免疫细胞分散在病灶周边的组织内。接触识别、招募及 IL-2 扩增支持早期清除；少数存活克隆可能丢失抗原并再次扩增。结局随种子改变，关闭杀伤可作对照。',settings:{supply:2.8,metabolism:.65,stressMutation:0,progression:1,growth:.75,tumorCycle:280,apoptosis:0,tumorMotility:.35,immuneMotility:1.2,antigen:100,kill:2,chemotaxis:2.5,recruitment:2.4,immuneGrowth:.65,immuneDivisions:3,immuneCycle:200,antigenMemory:1200,il2Secretion:1.2,noise:.45,halfLife:180,mutation:2,mutationSize:.05,antigenStressGain:.15,contactEscape:.35,signalEscape:.12}},
     ecosystem:{label:'免疫共培养',settings:{}},
@@ -96,6 +97,8 @@
   const BODY_COLORS=[[239,242,237],[174,184,181],[48,56,65],[190,65,78],[93,108,111]];
   // Preserve a viable background when local vascular exchange is added. The
   // reserve/cycle window lets initiated clones compete before cumulative injury.
+  // Keep viable growth opportunities while retaining heterogeneous hostile niches.
+  // Independent founder traits are drawn before selection, never from position.
   Object.assign(PRESETS.oncogenesis.settings,{normalSupport:20,reserveCapacity:140,traitCost:.3,normalRepair:.15});
   Object.assign(PRESETS.oncogenesis.settings,{metabolism:.95,progression:4,normalMotility:.25,cohesion:.4,sectionYield:.4,tumorMotility:1.5,tumorMorphology:1,escape:4,chemotaxis:2.5});
   Object.assign(PRESETS.cold.settings,{normalSupport:20,initialImmuneReady:25,primingRate:.4});
@@ -103,6 +106,7 @@
   Object.assign(PRESETS.maze.settings,{initialImmuneReady:100});
   Object.assign(PRESETS.oncogenesis.settings,{vesselCount:2,vesselDependence:20});
   Object.assign(PRESETS.oncogenesis.settings,{damagePolarization:1,damageDeactivation:1,suppressiveSecretion:1,suppressionStrength:1,immuneRegulationMemory:600});
+  Object.assign(PRESETS.oncogenesis.settings,{metabolism:.88,mutation:20,mutationSize:.25});
   Object.assign(PRESETS.cold.settings,{vesselCount:2,vesselImmuneRate:.35,vesselPassage:.65,vesselDependence:25,tumorIntravasation:1.3});
   Object.assign(PRESETS.hot.settings,{vesselCount:2,vesselImmuneRate:1.3,vesselPassage:1.4,vesselDependence:25,tumorIntravasation:.6});
   const ringOffsets=[[-1,-1],[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0]];
@@ -573,7 +577,8 @@
     register(id,kind){
       const theta=this.C.random()*2*Math.PI,roll=this.C.random();
       const base=[0,240,330,72][kind]*this.scale*this.scale;
-      const genome=kind===TUMOR?{tolerance:(.85+.3*this.C.random())*(PRESETS[this.scene]?.founderTolerance||1),proliferation:.85+.3*this.C.random(),invasion:.85+.3*this.C.random(),antigen:roll<this.settings.antigen/100?.45+.55*this.C.random():.04+.07*this.C.random()}:null;
+      const spread=PRESETS[this.scene]?.founderTraitSpread??.15,draw=()=>1-spread+2*spread*this.C.random();
+      const genome=kind===TUMOR?{tolerance:draw()*(PRESETS[this.scene]?.founderTolerance||1),proliferation:draw(),invasion:draw(),antigen:roll<this.settings.antigen/100?.45+.55*this.C.random():.04+.07*this.C.random()}:null;
       const m={id,kind,name:TYPE_NAMES[kind],base,target:kind===TUMOR?base*.55:base,lambdaV:0,lambdaP:0,perimeter:0,activity:0,drive:0,px:Math.cos(theta),py:Math.sin(theta),x:0,y:0,sx:0,sy:0,sinX:0,cosX:0,sinY:0,cosY:0,age:0,antigenRoll:roll,antigen:false,antigenLevel:0,damage:0,dying:false,deathCause:'',targetID:0,phase:'search',genome,clone:id,generation:0,birth:++this.birthSerial,parentBirth:0,divisionsLeft:kind===IMMUNE?this.settings.immuneDivisions:null,activation:0,recruitment:0,stress:0,adversity:0,fitness:1,oxygen:1,glucose:1,acid:0,confinement:0};
       m.state=kind===NORMAL?'normal':kind===TUMOR?'tumor':'immune';m.origin=m.state;m.abnormalAge=0;m.abnormalSince=null;m.transformedAt=null;m.immuneCue=0;m.inflammatorySignal=0;m.inflammatoryExposure=0;
       m.nucleusStrainX=0;m.nucleusStrainY=0;m.fieldBins=new Map();m.sectionFraction=1;m.sectionPressure=0;m.hasNucleus=false;if(genome)this.applyGenome(m);
@@ -603,7 +608,8 @@
       for(const [bin,pixels] of m.fieldBins){this.occupancy[NORMAL][bin]-=pixels;this.occupancy[TUMOR][bin]+=pixels;}
       this.C.setCellKind(id,TUMOR);m.kind=TUMOR;m.state='tumor';m.name=TYPE_NAMES[TUMOR];m.base=330*this.scale*this.scale;m.age=0;m.transformedAt=this.C.time;
       m.divisionsLeft=null;
-      m.genome={tolerance:clamp((.85+.3*this.C.random())*(PRESETS[this.scene]?.founderTolerance||1)*m.normalTolerance,.25,3),proliferation:.85+.3*this.C.random(),invasion:.85+.3*this.C.random(),antigen:m.antigenLevel};
+      const spread=PRESETS[this.scene]?.founderTraitSpread??.15,draw=()=>1-spread+2*spread*this.C.random();
+      m.genome={tolerance:clamp(draw()*(PRESETS[this.scene]?.founderTolerance||1)*m.normalTolerance,.25,3),proliferation:draw(),invasion:draw(),antigen:m.antigenLevel};
       m.cycle=newCycle();this.initializeStemness(m);this.immunity.malignant(m);this.updateMechanics(m);this.C.stat_values={};
       this.counters.malignantTransitions++;this.log('malignant',id,0,{clone:m.clone,genome:{...m.genome}});return true;
     }
@@ -1791,7 +1797,7 @@
       }
       if(c.bloodstreamExports>0&&!tumors.length){phase='局部肿瘤已清除，曾发生入血播散';achieved=false;}
       const preset=PRESETS[this.scene],baseline={...DEFAULTS,...(this.scene==='random'?randomSettings(this.seedValue):preset.settings)};
-      return {label:preset.label,description:preset.description,profile:{environment:preset.environmentProfile||'uniform',founderTolerance:preset.founderTolerance||1,...(this.ecology?{niches:this.ecology.niches.map(n=>({...n}))}:{})},phase,achieved,initial:{...state.initial,clones:[...state.initial.clones]},tumor:active.length,tumorBodies:tumors.length,abnormal,farTumor:far,distalRadius:55,tumorDivisions:state.tumorDivisions,distalDivisions:state.distalDivisions,peakTumor:state.peakTumor,clearanceAt:state.clearanceAt,clearanceElapsed:elapsed,maxAdversity,customized:Object.keys(DEFAULTS).some(k=>this.settings[k]!==baseline[k])};
+      return {label:preset.label,description:preset.description,profile:{environment:preset.environmentProfile||'uniform',founderTolerance:preset.founderTolerance||1,founderTraitSpread:preset.founderTraitSpread??.15,...(this.ecology?{niches:this.ecology.niches.map(n=>({...n}))}:{})},phase,achieved,initial:{...state.initial,clones:[...state.initial.clones]},tumor:active.length,tumorBodies:tumors.length,abnormal,farTumor:far,distalRadius:55,tumorDivisions:state.tumorDivisions,distalDivisions:state.distalDivisions,peakTumor:state.peakTumor,clearanceAt:state.clearanceAt,clearanceElapsed:elapsed,maxAdversity,customized:Object.keys(DEFAULTS).some(k=>this.settings[k]!==baseline[k])};
     }
     populationRow(){const counts=[0,0,0,0],states=Object.fromEntries(POPULATION_STATES.map(k=>[k,0]));let px=0,py=0,n=0,abnormal=0,endothelial=0;
       for(const m of this.live()){counts[m.kind]++;if(m.vesselID)endothelial++;if(m.state==='abnormal')abnormal++;if(!m.dying){px+=m.px;py+=m.py;n++;}

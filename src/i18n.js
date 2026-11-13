@@ -301,6 +301,20 @@ Act · 标记 · 环境分量|Act / markers / fields
 胞体|Body
 胞核|Nucleus
 肿瘤保留增殖深浅变化|Shade tumors by proliferation trait
+肿瘤按所选性状显示深浅|Shade tumors by the selected trait
+肿瘤性状与局部环境|Tumor traits and local environment
+肿瘤胞体着色|Tumor body shading
+遗传增殖能力|Inherited proliferation
+遗传环境耐受|Inherited stress tolerance
+遗传侵袭能力|Inherited invasion
+当前非自身抗原呈递|Current non-self antigen presentation
+肿瘤：浅 → 深，遗传耐受低 → 高|Tumor: light → dark, low → high inherited tolerance
+肿瘤：浅 → 深，遗传侵袭低 → 高|Tumor: light → dark, low → high inherited invasion
+肿瘤：浅 → 深，当前呈递低 → 高|Tumor: light → dark, low → high current presentation
+胞体显示当前非自身抗原呈递（0–1 固定色标），可能随环境恢复。|Bodies show current non-self presentation on a fixed 0–1 scale; it may recover with the environment.
+胞体显示所选遗传性状（0.25–3 固定色标），不是当前周期或移动速度。|Bodies show the selected inherited trait on a fixed 0.25–3 scale, not the current cycle phase or speed.
+所选性状越高，胞体越深；遗传性状使用 0.25–3，当前呈递使用 0–1 固定色标。关闭上方选项使用统一纯色。外轮廓仍表示抗原身份。|Higher values use darker bodies. Inherited traits use a fixed 0.25–3 scale and current presentation a fixed 0–1 scale. Uncheck for a uniform body color. Outlines still identify antigens.
+
 恢复原始配色|Restore original palette
 形态与穿行|Shape & passage
 分枝 · 成网 · 让位|Branches / networks / yielding

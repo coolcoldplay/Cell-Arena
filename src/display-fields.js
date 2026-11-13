@@ -19,7 +19,7 @@
   const colorKey=m=>m?.state==='endothelial'?'endothelial':m?.state==='abnormal'?'abnormal':m?.kind===3?(immuneSuppressive(m)?'suppressive':immuneActive(m)?'activated':'immune'):m?.kind===2?'tumor':'normal';
   const hexRGB=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
   function normalizeColors(value){
-    const result={proliferationShading:value?.proliferationShading!==false};
+    const result={proliferationShading:value?.proliferationShading!==false,tumorTrait:['proliferation','tolerance','invasion','antigenLevel'].includes(value?.tumorTrait)?value.tumorTrait:'proliferation'};
     for(const key of ['normal','abnormal','tumor','immune','activated','suppressive','endothelial']){result[key]={};for(const part of ['body','nucleus']){const c=value?.[key]?.[part];result[key][part]=typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c)?c.toLowerCase():COLOR_DEFAULTS[key][part];}}
     return result;
   }
@@ -32,13 +32,23 @@
   // Fixed scale across scenes and generations, using the heritable trait,
   // not transient nutrient suppression or a population-relative ranking.
   const gray=Array.from({length:89},(_,v)=>[v,v,v]);
-  const tumorShade=m=>Math.round(88*(1-clamp(((m?.genome?.proliferation??1)-.25)/2.75)));
+  const tumorShade=(m,trait='proliferation')=>Math.round((trait==='proliferation'?88:198)*(1-(trait==='antigenLevel'?clamp(m?.antigenLevel??0):clamp(((m?.genome?.[trait]??1)-.25)/2.75))));
   const bodyColor=(m,palette)=>{
     if(!palette)return m?.kind===2?gray[tumorShade(m)]:BODY_COLORS[displayKind(m)];
     if(!m||m.kind===0||m.kind===4)return BODY_COLORS[m?.kind||0];
-    const base=hexRGB(palette[colorKey(m)].body),t=m.kind===2&&palette.proliferationShading?tumorShade(m)/255:0;
+    const base=hexRGB(palette[colorKey(m)].body),t=m.kind===2&&palette.proliferationShading?tumorShade(m,palette.tumorTrait)/255:0;
     return base.map(v=>Math.round(v+(255-v)*t));
   };
+  // Descriptive environment groups, never spatial instructions to the model.
+  function tumorEcology(s){
+    const cells=s.cells.filter(m=>m.kind===2&&!m.dying),ordered=cells.slice().sort((a,b)=>(a.adversity||0)-(b.adversity||0)||a.birth-b.birth);
+    const n=Math.floor(cells.length/4),groups=cells.length>=8&&(ordered.at(-1).adversity-ordered[0].adversity)>.02;
+    const summarize=list=>Object.fromEntries(['tolerance','proliferation','invasion','antigenLevel','adversity'].map(key=>{
+      const values=list.map(m=>key==='antigenLevel'||key==='adversity'?m[key]:m.genome?.[key]).filter(Number.isFinite);
+      return [key,values.length?{mean:values.reduce((a,b)=>a+b,0)/values.length,min:Math.min(...values),max:Math.max(...values)}:null];
+    }));
+    return {count:cells.length,clones:new Set(cells.map(m=>m.geneClone)).size,groupSize:groups?n:0,all:summarize(cells),low:groups?summarize(ordered.slice(0,n)):null,high:groups?summarize(ordered.slice(-n)):null};
+  }
   const cellName=m=>m?.state==='endothelial'?'血管内皮细胞':m?.state==='abnormal'?'癌前细胞':m?.kind===3?(immuneSuppressive(m)?'免疫抑制样细胞':immuneActive(m)?'已激活免疫细胞':'未激活免疫细胞'):['培养液','正常细胞','肿瘤细胞','免疫细胞','实体障碍'][m?.kind||0];
   const deathCode=m=>m?.dying?({spontaneous:1,kill:2,environment:3}[m.deathCause]||1):0;
   function deathColor(rgb,m){
@@ -228,5 +238,5 @@
     const wall=!!s.walls[q],blocked=wall||!!s.fieldMask?.[bin];
     return {x,y,bin,time:s.time,cell:s.cells.find(m=>m.id===s.grid[q])||null,wall,blocked,values:blocked?null:Object.fromEntries(['oxygen','glucose','acid',...Object.keys(SIGNALS)].map(key=>[key,s.fields[key]?.values[bin]??0]))};
   }
-  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,immuneSuppressive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,cycleColor,antigenMarked,antigenStrength,antigenProfileStyle,antigenVisuals,antigenSegment,antigenTextureData,selectionBounds,selectionBoxes,bodyOpacity,adversity,signals,sample,Cache};
+  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,immuneSuppressive,displayKind,tumorShade,bodyColor,tumorEcology,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,cycleColor,antigenMarked,antigenStrength,antigenProfileStyle,antigenVisuals,antigenSegment,antigenTextureData,selectionBounds,selectionBoxes,bodyOpacity,adversity,signals,sample,Cache};
 })();

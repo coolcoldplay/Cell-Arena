@@ -1,13 +1,15 @@
 # Cell-Arena · 细胞生态竞技场
 
-2026-11-13：新增[接触学习、缺氧诱导血管与肿瘤入血快速离场](reports/contact-angiogenesis-2026-11-13/README.md)。已统一为[单抗原槽与谱系演化桑基图](reports/single-antigen-2026-11-13/README.md)，四槽运行模式已移除。此前新增[抗原谱系与免疫胞体匹配轮廓](reports/immune-body-outlines-2026-11-13/README.md)，并根据多种子对照收窄发生发展的损伤抑制范围。仍存在有限受体匹配与低氧区免疫低响应的模型限制。[性能路线讨论已归档并暂缓](reports/parallel-cpm/decisions-2026-11-13.md)。
+2026-11-13：已增加[发生发展的亚群空间演化校准与性状着色](reports/spatial-evolution-2026-11-13/README.md)。新增[接触学习、缺氧诱导血管与肿瘤入血快速离场](reports/contact-angiogenesis-2026-11-13/README.md)。已统一为[单抗原槽与谱系演化桑基图](reports/single-antigen-2026-11-13/README.md)，四槽运行模式已移除。此前新增[抗原谱系与免疫胞体匹配轮廓](reports/immune-body-outlines-2026-11-13/README.md)，并根据多种子对照收窄发生发展的损伤抑制范围。仍存在有限受体匹配与低氧区免疫低响应的模型限制。[性能路线讨论已归档并暂缓](reports/parallel-cpm/decisions-2026-11-13.md)。
 
 
 本轮更新：**特异抗原、独立呈递、有限免疫启动、遗传克隆演化**，以及等比旋转的手机全屏与侧边统计。见 [机制、参数迁移、实测与文献](IMMUNE-GENETICS.md) 和 [可导入机制演示](experiments/immune-genetics/README.md)。
 
 [在线体验](https://coolcoldplay.github.io/Cell-Arena/) · [GitHub 源码](https://github.com/coolcoldplay/Cell-Arena)
 
-在浏览器里探索细胞形变、肿瘤进化、免疫接触杀伤与微环境。选择情境，拖动或新增细胞、释放趋化信号、绘制障碍，观察局部规则产生的群体行为。无需登录或安装，计算在访问者的浏览器内完成。
+在浏览器里探索细胞形变、肿瘤进化、免疫接触杀伤与微环境。
+
+观察亚群时，可在“显示 → 细胞配色”切换遗传耐受／增殖／侵袭／当前抗原呈递，抗原外轮廓保持不变；在“统计 → 肿瘤性状与局部环境”比较环境压力分组。这里展示自然产生的差异，不规定哪类必须位于核心或边缘。[三个固定种子配方与对照](experiments/spatial-evolution/README.md)。选择情境，拖动或新增细胞、释放趋化信号、绘制障碍，观察局部规则产生的群体行为。无需登录或安装，计算在访问者的浏览器内完成。
 
 右上角点击 **Chi / Eng** 文字切换中英文，语言选择保存在当前浏览器，不重置模拟。Click Chi / Eng in the top bar to switch languages. All simulation work stays in your browser.
 

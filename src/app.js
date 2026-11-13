@@ -48,7 +48,7 @@
   const controls=[
     ['angiogenesis','血管生成速度',0,3,.1,'持续超过诱导阈值后促进实际内皮分裂和出芽；需要已有内皮、营养与空间','×'],
     ['angiogenicSecretion','缺氧诱导因子分泌',0,3,.1,'正常与肿瘤来源分别扩散和衰减；死亡细胞与内皮不分泌','×'],
-    ['angiogenicThreshold','血管诱导阈值',.005,3,.005,'两种来源的局部浓度之和；超过阈值仍需持续刺激与真实分裂',''],
+    ['angiogenicThreshold','血管诱导阈值',.005,3,.001,'两种来源的局部浓度之和；超过阈值仍需持续刺激与真实分裂',''],
     ['angiogenicHalfLife','血管诱导因子半衰期',40,800,20,'仅作用于诱导因子，不改变免疫记忆',' MCS'],
     ['angiogenicHypoxia','诱导分泌的氧阈值',.2,.8,.05,'氧低于此值开始分泌；缺氧越重分泌越多',''],
     ['tumorVesselPenalty','肿瘤来源的血管功能折损',0,.95,.05,'按局部肿瘤来源占比降低氧糖交换与排酸；可调模型假设',''],
@@ -99,7 +99,7 @@
     ['temperature','膜形变波动',2,30,1,'CPM 温度，影响随机复制尝试的接受率',''],
     ['supply','氧糖补给与酸清除',0,3,.05,'培养液储库补给；调低后密集区域更容易恶化',''],
     ['normalSupport','正常细胞供给联动',0,100,1,'按本局健康正常细胞存活数的历史峰值计算保留比例；0% 无联动，100% 等比例影响全局氧糖补给和酸清除','%'],
-    ['metabolism','消耗与产酸强度',0,2,.05,'按实际细胞占据面积与邻域密度持续计算',''],
+    ['metabolism','消耗与产酸强度',0,2,.01,'按实际细胞占据面积与邻域密度持续计算',''],
     ['escape','恶劣环境逃逸',0,5,.1,'沿局部氧糖上升、酸负荷下降的方向重新极化',''],
     ['recruitment','识别后招募信号',0,3,.1,'实际接触识别癌前或肿瘤后分泌；仅被吸引者不自动接力',''],
     ['immuneGrowth','免疫扩增速度',0,1.5,.05,'抗原刺激记忆与 IL-2 共同支持；受营养、耗竭和实际空间限制',''],
@@ -199,14 +199,15 @@
     $('palette-status').textContent='当前：'+(CellLabDisplay.COLOR_PRESETS[preset]?.name||(preset==='original'?'原始配色':'自定义配色'));
     for(const button of $('color-presets').children){const active=button.dataset.palette===preset;button.classList.toggle('selected',active);button.setAttribute('aria-pressed',active);}
     for(const [key] of colorTypes)for(const part of ['body','nucleus'])$('color-'+key+'-'+part).value=cellColors[key][part];
-    $('proliferation-shading').checked=cellColors.proliferationShading;
+    $('proliferation-shading').checked=cellColors.proliferationShading;$('tumor-trait-view').value=cellColors.tumorTrait;
     for(const [key,css] of [['normal','normal'],['abnormal','abnormal'],['tumor','tumor'],['immune','immune'],['activated','immune-active'],['suppressive','immune-suppressive'],['endothelial','endothelial']]){for(const node of document.querySelectorAll('.legend .'+css))node.style.background=cellColors[key].body;document.querySelector('.population-'+key)?.style.setProperty('--population-color',cellColors[key].body);}
-    const ramp=document.querySelector('.proliferation-key'),low=CellLabDisplay.bodyColor({kind:2,genome:{proliferation:.25}},cellColors),high=cellColors.tumor.body;
+    const ramp=document.querySelector('.proliferation-key'),low=CellLabDisplay.bodyColor({kind:2,genome:{proliferation:.25,tolerance:.25,invasion:.25},antigenLevel:0},cellColors),high=cellColors.tumor.body;
     ramp.querySelector('i').style.background=`linear-gradient(90deg,rgb(${low.join(',')}),${high})`;
-    ramp.lastChild.textContent=cellColors.proliferationShading?'肿瘤：浅 → 深，增殖能力低 → 高':'肿瘤：统一胞体色';
+    ramp.lastChild.textContent=cellColors.proliferationShading?({proliferation:'肿瘤：浅 → 深，增殖能力低 → 高',tolerance:'肿瘤：浅 → 深，遗传耐受低 → 高',invasion:'肿瘤：浅 → 深，遗传侵袭低 → 高',antigenLevel:'肿瘤：浅 → 深，当前呈递低 → 高'}[cellColors.tumorTrait]):'肿瘤：统一胞体色';
   }
   function applyColors(value){cellColors=CellLabDisplay.normalizeColors(value);try{localStorage.setItem('cell-arena-colors-v1',JSON.stringify(cellColors));}catch{/* Private/storage-disabled contexts still support this session. */}syncColors();dirty=true;}
   $('reset-colors').addEventListener('click',()=>applyColors(null));
+  $('tumor-trait-view').addEventListener('change',e=>applyColors({...cellColors,tumorTrait:e.target.value,proliferationShading:true}));
   $('proliferation-shading').addEventListener('change',e=>applyColors({...cellColors,proliferationShading:e.target.checked}));syncColors();
   try{const saved=localStorage.getItem('cell-arena-edge-fade-v1');if(saved!==null&&Number.isFinite(Number(saved)))$('body-feather').value=Math.max(0,Math.min(100,Number(saved)));}catch{}
   function syncAppearance(){ $('body-feather-out').textContent=$('body-feather').value+'%';dirty=true;forceFrame=true; }
@@ -532,12 +533,12 @@
     const view=$('field-view').value,wrap=s.boundary==='wrap',seams=$('cell-seams').checked,showNuclei=$('nuclei').checked,showAntigen=$('antigen-marks').checked,showCycle=$('cycle-marks').checked;
     const protect=$('protect-bodies').checked,{field,info,signal,bodySignal}=displayCache.get(s,view,signalLayers,opacity,protect),environmentOpacity=opacity[view]??0,bodyEnvironmentOpacity=CellLabDisplay.bodyOpacity(environmentOpacity,protect);
     const actFlags=[0,...['normal-activity','tumor-activity','immune-activity'].map(id=>$('edge-activity').checked&&$(id).checked?1:0)];
-    const nextLegend=JSON.stringify([view,[...signalLayers],opacity,protect,actFlags,showAntigen,showCycle,!!s.maze,cellColors.proliferationShading]);
+    const nextLegend=JSON.stringify([view,[...signalLayers],opacity,protect,actFlags,showAntigen,showCycle,!!s.maze,cellColors.proliferationShading,cellColors.tumorTrait]);
     if(legendKey!==nextLegend){legendKey=nextLegend;
     const legend=[];if(info)legend.push(info.label+' · '+info.description);
     if(s.maze&&signalLayers.has('trail'))legend.push('迷宫招募场：0—30 固定色标，圆心持续供给，入口清除。');
     if(signal&&!s.maze)legend.push([...signalLayers].map(k=>CellLabDisplay.SIGNALS[k].label).join('、')+'：增强低浓度显示，非线性固定色标；重叠混色，原始浓度见悬停。');
-    if(!legend.length)legend.push(actFlags.some(Boolean)?'Act：红＝新生突起 → 黄 → 绿＝活性衰减；零活性恢复胞体色。':'胞体与胞核颜色可在「细胞配色」调整；免疫激活由真实接触识别触发。'+(cellColors.proliferationShading?'肿瘤增殖性状越高，胞体越接近所选深色（0.25–3 固定色标）。':''));
+    if(!legend.length)legend.push(actFlags.some(Boolean)?'Act：红＝新生突起 → 黄 → 绿＝活性衰减；零活性恢复胞体色。':'胞体与胞核颜色可在「细胞配色」调整；免疫激活由真实接触识别触发。'+(cellColors.proliferationShading?(cellColors.tumorTrait==='antigenLevel'?'胞体显示当前非自身抗原呈递（0–1 固定色标），可能随环境恢复。':'胞体显示所选遗传性状（0.25–3 固定色标），不是当前周期或移动速度。'):''));
     $('field-legend').textContent=legend.join(' ｜ ');$('heat-key').hidden=!info;
     if(info){$('heat-ramp').style.background='linear-gradient(90deg,'+[info.low,info.middle,info.high].filter(Boolean).map(c=>'rgb('+c.join(',')+')').join(',')+')';$('heat-scale').textContent=view==='adversity'?'友好 0 → 1 恶劣':'0 → 1';}
     updateOverlayButtons();syncOpacity();

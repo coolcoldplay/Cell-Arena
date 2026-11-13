@@ -105,7 +105,22 @@
     }
     return out;
   }
+  function ecology(s){
+    const root=document.getElementById('tumor-ecology-content');if(!root||!root.parentElement.open)return;
+    const data=CellLabDisplay.tumorEcology(s),stamp=JSON.stringify([english(),data,s.scenario?.tumorDivisions]);if(root.dataset.stamp===stamp)return;root.dataset.stamp=stamp;root.replaceChildren();
+    root.append(node('p','immune-note',t('存活肿瘤 ','Living tumors ')+data.count+' · '+t('遗传克隆 ','Genetic clones ')+data.clones+' · '+t('本局肿瘤分裂 ','Tumor divisions ')+(s.scenario?.tumorDivisions||0)));
+    if(!data.count){root.append(node('p','immune-note',t('肿瘤出现后显示性状分布。','Trait distributions appear after tumors emerge.')));return;}
+    const table=node('table','ecology-table'),head=node('tr');
+    for(const label of [t('性状','Trait'),t('全体范围','Full range'),t('低压力组','Low stress'),t('高压力组','High stress')])head.append(node('th','',label));table.append(head);
+    for(const [key,zh,en]of [['tolerance','遗传耐受','Tolerance'],['proliferation','遗传增殖','Proliferation'],['invasion','遗传侵袭','Invasion'],['antigenLevel','当前呈递','Presented']]){
+      const row=node('tr'),a=data.all[key];row.append(node('th','',t(zh,en)),node('td','',a?a.min.toFixed(2)+'–'+a.max.toFixed(2):'—'));
+      for(const group of [data.low,data.high])row.append(node('td','',group?.[key]?.mean.toFixed(2)||'—'));table.append(row);
+    }root.append(table);
+    root.append(node('p','immune-note',data.groupSize?t('按每颗细胞实际氧糖／酸压力，取最低和最高各 25%（各 ','Actual local oxygen/glucose/acid stress: lowest and highest quarters (')+data.groupSize+t(' 颗），显示组均值；不是核心／边缘标签。',' cells each), showing group means; these are not core/rim labels.'):t('至少 8 颗且局部压力有差异时才比较环境分组。','Environment groups require at least 8 cells and a local stress difference.')));
+    root.append(node('p','immune-note',t('在显示 → 细胞配色切换胞体性状；外轮廓继续标记抗原。分布差异是观察值，不能单独证明选择因果。','Switch body traits under Display → Cell colors; outlines still mark antigens. Distribution differences alone do not establish selection causality.')));
+  }
   function stats(s){
+    ecology(s);
     const el=document.getElementById('genetics-summary'),canvas=document.getElementById('clone-history');if(!el||!s.immunity)return;
     const a=s.immunity,type=Number(document.getElementById('clone-history-type').value),living=s.cells.filter(c=>!c.dying&&c.kind===type),counts=new Map();for(const c of living)counts.set(c.geneClone,(counts.get(c.geneClone)||0)+1);
     const scores=new Map();for(const r of a.history)for(const [id,n]of Object.entries(r.counts))if(+id>0&&r.states[id]===type)scores.set(+id,Math.max(scores.get(+id)||0,n));

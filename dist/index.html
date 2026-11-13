@@ -259,6 +259,8 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
 #lineage-sankey-panel{margin-top:12px;min-width:0}#lineage-sankey-panel h3{font-size:13px;margin:0 0 5px}.lineage-sankey-scroll{width:100%;overflow-x:auto;overscroll-behavior-x:contain;border:1px solid var(--line)}#lineage-sankey{display:block;max-width:none;touch-action:pan-x pan-y;margin:0}.lineage-sankey-legend{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.lineage-sankey-legend button{display:inline-flex;align-items:center;gap:4px;padding:4px 6px;font-size:11px;min-height:28px}.lineage-sankey-legend i{width:9px;height:9px;border-radius:50%}.lineage-sankey-legend button[aria-pressed=true]{background:#73563b;color:#fff9eb}#lineage-sankey-readout{min-height:35px;line-height:1.5}.immune-slots{grid-template-columns:minmax(0,1fr)}
 
 .lineage-sankey-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.lineage-sankey-head button{font-size:12px;padding:4px 9px}#lineage-sankey-dialog{box-sizing:border-box;width:min(1050px,calc(100vw - 24px));max-width:none;max-height:calc(100dvh - 24px);padding:20px}#lineage-sankey-dialog #lineage-sankey-panel{margin:8px 0 0}#lineage-sankey-dialog .lineage-sankey-head{padding-right:20px}
+
+.ecology-table{width:100%;border-collapse:collapse;font-size:11px;font-variant-numeric:tabular-nums}.ecology-table th,.ecology-table td{padding:5px 3px;border-bottom:1px solid #d7c6a6;text-align:right}.ecology-table th:first-child{text-align:left}.ecology-table th{font-weight:500}
 </style></head>
 <body>
 <main class="workspace">
@@ -305,7 +307,7 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
         <p class="hint">默认配色：免疫未激活淡红，实际识别后激活深红；肿瘤遗传增殖性状越高越黑，范围 0.25–3。核区默认用深蓝、深红或浅金。可在「细胞配色」分别修改；各类 Act 独立开启，开启后覆盖局部胞体色。</p>
       </div></details><details class="subsection" id="module-colors"><summary>细胞配色 <span>预设 · 胞体 · 胞核</span></summary><div class="section-body">
         <label class="slider"><span>边缘淡化<output id="body-feather-out">80%</output></span><input id="body-feather" type="range" min="0" max="100" step="5" value="80"></label><p class="hint">沿当前胞体轮廓由内向外渐透明；0% 为纯色。Act 和标记独立显示。</p>
-        <div class="color-presets" id="color-presets" role="group" aria-label="细胞配色方案"></div><p class="hint" id="palette-status">当前：原始配色</p><p class="hint palette-key">预览从左到右：正常 · 癌前 · 肿瘤 · 免疫 · 激活</p><div class="color-grid" id="color-controls"><span>类型 / 状态</span><span>胞体</span><span>胞核</span></div><div class="checks"><label><input id="proliferation-shading" type="checkbox" checked>肿瘤保留增殖深浅变化</label></div><p class="hint">点击方案立即应用，也可继续自定义，颜色保存在当前浏览器；不会重启模拟。高增殖使用所选肿瘤色，低增殖逐渐变浅；关闭上方选项可使用统一纯色。Act 与高强度热图仍可覆盖胞体色，关闭图层可查看本色。</p><button id="reset-colors" class="quiet">恢复原始配色</button></div></details></div></details>
+        <div class="color-presets" id="color-presets" role="group" aria-label="细胞配色方案"></div><p class="hint" id="palette-status">当前：原始配色</p><p class="hint palette-key">预览从左到右：正常 · 癌前 · 肿瘤 · 免疫 · 激活</p><div class="color-grid" id="color-controls"><span>类型 / 状态</span><span>胞体</span><span>胞核</span></div><label class="control-label" for="tumor-trait-view">肿瘤胞体着色</label><select id="tumor-trait-view"><option value="proliferation">遗传增殖能力</option><option value="tolerance">遗传环境耐受</option><option value="invasion">遗传侵袭能力</option><option value="antigenLevel">当前非自身抗原呈递</option></select><div class="checks"><label><input id="proliferation-shading" type="checkbox" checked>肿瘤按所选性状显示深浅</label></div><p class="hint">点击方案立即应用，也可继续自定义，颜色保存在当前浏览器；不会重启模拟。所选性状越高，胞体越深；遗传性状使用 0.25–3，当前呈递使用 0–1 固定色标。关闭上方选项使用统一纯色。外轮廓仍表示抗原身份。Act 与高强度热图仍可覆盖胞体色，关闭图层可查看本色。</p><button id="reset-colors" class="quiet">恢复原始配色</button></div></details></div></details>
       <details id="record-options" class="subsection"><summary>录像设置 <span id="record-options-summary">MP4 · 1440p</span></summary><label class="select-row">录制范围<select id="record-scope"><option value="arena" selected>仅 Arena</option><option value="workspace">Arena ＋ 右侧栏</option></select></label><p class="hint record-scope-hint">组合录制包含侧栏当前可见的内容；统计可先占满侧栏。Arena 30 FPS，侧栏最多每秒刷新 5 次。</p><label class="select-row">视频格式<select id="record-format"><option value="mp4" selected>MP4 · 推荐</option><option value="webm">WebM · 兼容</option></select></label><label class="select-row">录像画质<select id="record-quality"><option value="standard">1080p · 标准</option><option value="high" selected>1440p · 高清</option><option value="ultra">4K · 超清</option></select></label><p id="record-options-info" class="hint"></p><p class="hint">保留画布比例，高清录制时提升绘制精度；4K 文件较大。</p><p id="record-status" class="hint" role="status"></p></details>
 </section>
       <section id="parameter-groups" aria-label="五组演化参数"><div class="parameter-heading"><b>演化参数</b><button id="lock-all-parameters" class="quiet" aria-pressed="false" title="锁定参数在自动换局与随机生成时保持不变">全部锁定</button></div><nav id="parameter-module-nav" aria-label="参数分组快捷入口"><button data-module="module-environment" aria-pressed="true">微环境</button><button data-module="module-normal" aria-pressed="false">体细胞</button><button data-module="module-tumor" aria-pressed="false">肿瘤</button><button data-module="module-immune" aria-pressed="false">免疫</button><button data-module="module-other" aria-pressed="false">其他</button></nav><details class="section" open id="module-environment"><summary><b>微环境</b><span>资源 / 信号 / 炎性促癌</span></summary><div class="section-body"><div id="environment-sliders"></div><details class="subsection" id="vascular-controls"><summary>血管、灌注与浸润</summary><div id="vascular-sliders"></div><p class="hint">缺氧因子促进内皮增殖、扩张和出芽；新芽需成熟才供血。肿瘤来源占比越高，交换质量越低（模型假设）。虚线标示管腔，中心百分比是灌注能力。入血播散不等于远处转移灶形成。</p></details><details class="subsection" id="evolution-controls"><summary>演化实验</summary><div id="evolution-sliders"></div></details></div></details>
@@ -342,6 +344,7 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
         <section class="death-overview" aria-label="死亡清除原因"><div class="death-heading"><span>死亡清除</span><b id="total-death-count">0</b><small id="total-death-progress">清除中 0</small></div>
           <div class="death-causes"><div><span>免疫杀伤</span><b id="kill-count">0</b></div><div><span>环境死亡</span><b id="environment-death-count">0</b></div><div><span>自发凋亡</span><b id="death-count">0</b></div><div><span>寿命凋亡</span><b id="lifespan-death-count">0</b></div></div>
         </section>
+        <details class="stats-detail" id="tumor-ecology-statistics"><summary>肿瘤性状与局部环境</summary><div id="tumor-ecology-content" data-no-i18n></div></details>
         <section id="vascular-statistics" class="vascular-stats" hidden><b>血管与播散</b><div class="vascular-metrics"><span>有效血管 <strong id="vessel-functional">0</strong></span><span>平均灌注 <strong id="vessel-perfusion">0%</strong></span><span>穿出 / 到达免疫 <strong id="vessel-immune">0</strong></span><span>入血离场 <strong id="vessel-export">0</strong></span></div><small id="vessel-repair"></small><small id="vessel-growth"></small></section>
         <details class="stats-detail" id="immune-statistics"><summary>周期、干性与巡逻</summary><div class="patrol-summary"><span>巡逻覆盖率 <b id="patrol-coverage">0.0%</b></span><span>已检查 <b id="patrol-checked">0</b></span><span>接触识别 <b id="recognition-count">0</b></span></div><p id="patrol-current"></p><div class="cycle-summary"><p id="cycle-normal"></p><p id="stem-summary"></p><p id="repair-summary"></p><p id="stem-events"></p><p id="cycle-tumor"></p><p id="cycle-immune"></p></div>
           <details class="patrol-definition"><summary>巡逻统计口径</summary><p>覆盖率＝免疫胞体实际经过的面积／当前非障碍面积，封闭区域仍计入分母。拖动路径不计入自主巡逻。</p><p>检查需连续膜接触累积达到 6 个有效 MCS，按接触长度和代谢效能加权。正常、癌前、肿瘤均可计入；按出生身份去重，分裂子代重新统计。已检查不等于已识别抗原。</p></details>
@@ -376,14 +379,14 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
   <ul>
     <li><strong>微环境与通讯：</strong>局部氧、糖、酸负荷，以及凝聚、损伤和免疫招募信号共同影响细胞运动、生长与存活。</li>
     <li><strong>免疫监视：</strong>分散巡逻、局部趋化、抗原接触识别、累积杀伤、识别后招募、有限克隆扩增与可调杀伤寿命。</li>
-    <li><strong>特异识别：</strong>单个短 ATCG 抗原槽位、可遗传的识别码与交叉识别；分开遗传缺失、可逆表达、呈递能力和免疫刹车。后台有限候选谱经过抗原暴露与延迟启动，经血管增援。</li>
-    <li><strong>肿瘤演化：</strong>正常 → 癌前细胞 → 肿瘤；增殖、侵袭、耐受和抗原表达可遗传、突变，并区分不同死亡过程。</li>
+    <li><strong>特异识别：</strong>单个短 ATCG 抗原槽位、遗传识别码、交叉识别与抽象的接触学习；分开遗传缺失、可逆表达、呈递能力和免疫刹车。后台有限候选谱经过抗原暴露与延迟启动，经血管增援。</li>
+    <li><strong>肿瘤演化：</strong>正常 → 癌前细胞 → 肿瘤；增殖、侵袭、耐受和抗原表达可遗传、突变，并受资源成本和异质环境筛选。创始性状独立抽样，不预设核心或边缘类型；区分不同死亡过程。</li>
     <li><strong>干性与修复：</strong>肿瘤干细胞的对称／不对称分裂、分化与环境可塑性；有限代正常组织修复，肿瘤性状具有资源代价。</li>
     <li><strong>细胞周期：</strong>分阶段营养需求、有限能量／合成储备与复制损伤检查点。G0 静息与 G1／S／G2／M 推进；营养、压缩和损伤控制周期。CTL 使用独立 IL-2 与抗原刺激记忆扩增，慢性刺激可累积耗竭。</li>
-    <li><strong>血管与灌注：</strong>空心内皮环、局部氧糖与排酸、循环免疫补充和真实跨内皮；有限内皮修复及肿瘤入血离场。<a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/VASCULAR.md" target="_blank" rel="noreferrer">机制与原始研究</a>（不模拟远处定植）。</li>
+    <li><strong>血管与灌注：</strong>空心内皮环、局部氧糖与排酸、循环免疫补充和真实跨内皮；有限内皮修复与缺氧诱导生长，正常及肿瘤来源比例控制交换质量代理。确认入血的肿瘤在 40 MCS 内离场，不计死亡。<a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/VASCULAR.md" target="_blank" rel="noreferrer">机制与原始研究</a>（不模拟远处定植）。</li>
     <li><strong>形态与穿行：</strong>有限切面让位、核区约束、可变形胞核，以及可选的间质样分枝与接触成网。</li>
   </ul>
-  <details><summary>免疫遗传：机制与抽象</summary><p>ATCG 是抽象特征编码，不是真实 DNA／肽序列或 HLA 预测器。可见免疫单元综合代表部分免疫过程；粉／红／蓝状态不表示真实 CTL 可以任意转变成调节性 T 细胞。交叉呈递和启动在后台抽象，不代表 CTL 自行完成树突状细胞的全部功能。两类独立表面靶标仅预留给未来 CAR 等疗法，本轮未实现疗法按钮。</p><p>免疫选择依据 <a href="https://doi.org/10.1038/nature10755" target="_blank" rel="noreferrer">Matsushita 等，Nature 2012</a>；交叉识别参考 <a href="https://doi.org/10.1074/jbc.M111.289488" target="_blank" rel="noreferrer">Wooldridge 等，JBC 2012</a>；后台呈递参考 <a href="https://doi.org/10.1126/science.1164206" target="_blank" rel="noreferrer">Hildner 等，Science 2008</a>。序列长度、亲和力矩阵、启动时长及参数范围均为可玩性设置，未从这些论文拟合。</p></details>
+  <details><summary>免疫遗传：机制与抽象</summary><p>接触学习允许新增且永久保留识别模板，并由子代继承。这是复合免疫单位的抽象规则，不是真实成熟 CTL 重排受体。临时抗原材料另有期限。</p><p>ATCG 是抽象特征编码，不是真实 DNA／肽序列或 HLA 预测器。可见免疫单元综合代表部分免疫过程；粉／红／蓝状态不表示真实 CTL 可以任意转变成调节性 T 细胞。交叉呈递和启动在后台抽象，不代表 CTL 自行完成树突状细胞的全部功能。两类独立表面靶标仅预留给未来 CAR 等疗法，本轮未实现疗法按钮。</p><p>免疫选择依据 <a href="https://doi.org/10.1038/nature10755" target="_blank" rel="noreferrer">Matsushita 等，Nature 2012</a>；交叉识别参考 <a href="https://doi.org/10.1074/jbc.M111.289488" target="_blank" rel="noreferrer">Wooldridge 等，JBC 2012</a>；后台呈递参考 <a href="https://doi.org/10.1126/science.1164206" target="_blank" rel="noreferrer">Hildner 等，Science 2008</a>。序列长度、亲和力矩阵、启动时长及参数范围均为可玩性设置，未从这些论文拟合。</p></details>
   <p><a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/BIOLOGY_REFERENCES.md" target="_blank" rel="noreferrer">新增机制与参数的文献对照表</a>：Nature 的肿瘤谱系追踪、胶质瘤干性及 DNA 修复研究，Cell 的干性可塑性研究。具体概率、倍率和 MCS 时长是未标定的演示设置。</p>
   <h3>怎么使用</h3>
   <ol>
@@ -401,14 +404,14 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
 <ul>
   <li><strong>Environment and communication:</strong> local oxygen, glucose, acid load, cohesion, damage and immune recruitment signals influence movement, growth and survival.</li>
   <li><strong>Immune surveillance:</strong> dispersed patrol, local chemotaxis, contact-based antigen recognition, cumulative killing, recruitment after recognition, limited clonal expansion and a configurable tumor-kill lifespan.</li>
-  <li><strong>Specific recognition:</strong> one short ATCG epitope slot, inherited receptors and cross-recognition; genetic loss, reversible expression, presentation and checkpoint brakes remain separate. A finite background repertoire primes after antigen release and a delay, with new responders arriving through vessels.</li>
-  <li><strong>Tumor evolution:</strong> normal → precancerous → tumor transitions; inherited and mutable growth, invasion, tolerance and antigen traits, with distinct death processes.</li>
+  <li><strong>Specific recognition:</strong> one short ATCG epitope slot, inherited receptors, cross-recognition and an explicit abstract contact-learning rule; genetic loss, reversible expression, presentation and checkpoint brakes remain separate. A finite background repertoire primes after antigen release and a delay, with new responders arriving through vessels.</li>
+  <li><strong>Tumor evolution:</strong> normal → precancerous → tumor transitions; inherited and mutable growth, invasion, tolerance and antigen traits, with resource costs, heterogeneous niches and distinct death processes. Founder traits are sampled independently of position; no core/rim phenotype is assigned.</li>
   <li><strong>Stemness and repair:</strong> symmetric and asymmetric stem divisions, differentiation and niche plasticity; finite normal repair lineages and tumor trait costs.</li>
   <li><strong>Cell cycles:</strong> phase-specific nutrient demand, finite energy/precursor reserves and replication-damage checkpoints. G0 quiescence and G1/S/G2/M progression, gated by nutrients, compression and injury. CTLs expand using separate IL-2 support and antigen memory; chronic stimulation can accumulate exhaustion.</li>
   <li><strong>Shape and passage:</strong> limited section-area yielding, nuclear constraints, deformable nuclei, and optional mesenchymal branching and contact networks.</li>
-  <li><strong>Vessels and perfusion:</strong> deformable endothelial rings, finite local nutrient delivery and acid clearance, circulating immune arrivals, continuous transendothelial passage and finite repair. Tumor bloodstream departures are separate from deaths and do not establish distant metastases. <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/VASCULAR.md" target="_blank" rel="noreferrer">Model and primary research</a>.</li>
+  <li><strong>Vessels and perfusion:</strong> deformable endothelial rings, finite local nutrient delivery and acid clearance, circulating immune arrivals, continuous transendothelial passage, finite repair and hypoxia-induced endothelial growth. Separate normal/tumor-source induction fields control a phenomenological exchange-quality penalty. Confirmed intravascular tumors leave within 40 MCS; these departures are separate from deaths and do not establish distant metastases. <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/VASCULAR.md" target="_blank" rel="noreferrer">Model and primary research</a>.</li>
 </ul>
-<details><summary>Immune genetics: mechanisms and abstraction</summary><p>ATCG is an abstract feature code, not real DNA, peptides or an HLA predictor. One visible immune unit combines selected immune functions; its pink/red/blue states do not imply that real CTLs freely become regulatory T cells. Background cross-presentation does not mean CTLs replace dendritic cells. Two independent surface targets reserve a foundation for future CAR-like treatments; those therapies are not implemented.</p><p>Mechanism references: immune selection, <a href="https://doi.org/10.1038/nature10755" target="_blank" rel="noreferrer">Matsushita et al., Nature 2012</a>; cross-recognition, <a href="https://doi.org/10.1074/jbc.M111.289488" target="_blank" rel="noreferrer">Wooldridge et al., JBC 2012</a>; cross-presentation, <a href="https://doi.org/10.1126/science.1164206" target="_blank" rel="noreferrer">Hildner et al., Science 2008</a>. Sequence length, affinity matrix, timing and parameter ranges are uncalibrated game settings, not values fitted from those papers.</p></details>
+<details><summary>Immune genetics: mechanisms and abstraction</summary><p>ATCG is an abstract feature code, not real DNA, peptides or an HLA predictor. One visible immune unit combines selected immune functions; its pink/red/blue states do not imply that real CTLs freely become regulatory T cells. Contact learning adds persistent recognition templates to a composite immune agent and passes them to daughters; this is not real mature-CTL receptor rearrangement. Temporary antigen cargo has a separate lifetime. Background cross-presentation does not mean CTLs replace dendritic cells. Two independent surface targets reserve a foundation for future CAR-like treatments; those therapies are not implemented.</p><p>Mechanism references: immune selection, <a href="https://doi.org/10.1038/nature10755" target="_blank" rel="noreferrer">Matsushita et al., Nature 2012</a>; cross-recognition, <a href="https://doi.org/10.1074/jbc.M111.289488" target="_blank" rel="noreferrer">Wooldridge et al., JBC 2012</a>; cross-presentation, <a href="https://doi.org/10.1126/science.1164206" target="_blank" rel="noreferrer">Hildner et al., Science 2008</a>. Sequence length, affinity matrix, timing and parameter ranges are uncalibrated game settings, not values fitted from those papers.</p></details>
 <p><a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/BIOLOGY_REFERENCES.md" target="_blank" rel="noreferrer">Mechanism and parameter evidence</a>: primary lineage-tracing, glioma stemness, DNA repair and plasticity studies. Rates, multipliers and MCS durations are uncalibrated demo settings.</p>
 <h3>Getting started</h3>
 <ol>
@@ -12533,7 +12536,7 @@ var CPM = (function (exports, module$1) {
   Object.assign(DEFAULTS,{normalSupport:0,immuneKillLimit:10});
   Object.assign(DEFAULTS,{cycleCoupling:1,reserveCapacity:80,replicationStress:1,dnaRepair:1,checkpointIntegrity:1,traitCost:.45,normalRepair:.25,normalDivisions:4});
   Object.assign(DEFAULTS,{stemFraction:20,stemSymmetry:30,stemRenewal:60,stemCycleSlowdown:1.35,stemRepair:1.4,stemPlasticity:.25,tumorProgenyLimit:0});
-  const MODEL_REVISION='2026-11-contact-learning-angiogenesis-4';
+  const MODEL_REVISION='2026-11-spatial-evolution-5';
   Object.assign(DEFAULTS,{antigenLength:6,initialImmuneReady:65,primingRate:1,checkpointStrength:1});
   Object.assign(DEFAULTS,{immuneLearning:1,immuneLearningTime:100,immuneLearningLimit:3,angiogenesis:1,angiogenicSecretion:1,angiogenicThreshold:.012,angiogenicHalfLife:400,angiogenicHypoxia:.55,tumorVesselPenalty:.75});
   // Vascular parameters are phenomenological MCS rates, not clinical estimates.
@@ -12568,6 +12571,7 @@ var CPM = (function (exports, module$1) {
   // dominate before antigen-specific surveillance. This is not a Treg census.
   Object.assign(RANDOM_RANGES,{damagePolarization:[.5,1.5,.25],damageDeactivation:[.7,1.3,.1],suppressiveSecretion:[.75,1.25,.25],suppressionStrength:[.8,1.2,.1],immuneRegulationMemory:[400,800,100]});
   Object.assign(RANDOM_RANGES,{immuneLearning:[.7,1.3,.1],immuneLearningTime:[60,100,20],immuneLearningLimit:[3,3,1],angiogenesis:[.7,1.3,.1],angiogenicSecretion:[.8,1.2,.1],angiogenicThreshold:[.006,.012,.002],angiogenicHalfLife:[360,440,40],angiogenicHypoxia:[.5,.6,.05],tumorVesselPenalty:[.6,.8,.05]});
+  Object.assign(RANDOM_RANGES,{metabolism:[.86,.9,.02],mutation:[16,24,2],mutationSize:[.18,.28,.02]});
   function randomSettings(seed){
     let state=seed>>>0;
     const random=()=>{state=(state+0x6d2b79f5)>>>0;let n=Math.imul(state^(state>>>15),1|state);n^=n+Math.imul(n^(n>>>7),61|n);return ((n^(n>>>14))>>>0)/4294967296;};
@@ -12605,8 +12609,8 @@ var CPM = (function (exports, module$1) {
   }
   const SIGNALS=['cohesion','danger','trail','il2','normalDamage','inhibition'];
   const PRESETS={
-    oncogenesis:{label:'肿瘤发生发展',environmentProfile:'mosaic',founderTolerance:2.3,description:'密铺正常组织与 12 颗分散免疫细胞，从零肿瘤开始。三处供给较弱的区域与健康边缘形成差异；癌前、癌变、免疫清除、抑制与恢复相互竞争，逃逸克隆可能再次扩增。没有定时转变或预设结局。',settings:{supply:2.7,metabolism:1.05,inflammation:1.3,stressMutation:4.5,progression:2.5,normalMutationGain:5,tumorMutationGain:6,growth:1.3,tumorCycle:170,apoptosis:3,tumorMotility:1.1,normalMotility:.1,cohesion:1.1,escape:3,immuneMotility:1.3,immuneGrowth:.5,immuneDivisions:3,immuneCycle:200,antigenMemory:1200,kill:1.4,recruitment:1.4,chemotaxis:1.8,mutation:12,mutationSize:.2,antigenStressGain:1.2,contactEscape:.6,signalEscape:.3,damagePolarization:3.5,damageDeactivation:1.2,suppressiveSecretion:1.5,suppressionStrength:1.3,suppressionRecovery:1.5,immuneRegulationMemory:200}},
-    random:{label:'随机肿瘤演化',environmentProfile:'mosaic',founderTolerance:2.3,description:'随机化的密铺正常组织、12–16 颗内部免疫细胞与三处弱供给区域。参数在发生发展附近抽样，肿瘤必须由局部癌前产生；相同种子和参数可重现开局，结局由局部相互作用产生。',settings:{}},
+    oncogenesis:{label:'肿瘤发生发展',environmentProfile:'mosaic',founderTolerance:2,founderTraitSpread:.4,description:'密铺正常组织与 12 颗分散免疫细胞，从零肿瘤开始。三处供给较弱的区域与健康边缘形成差异；癌前、癌变、免疫清除、抑制与恢复相互竞争，逃逸克隆可能再次扩增。没有定时转变或预设结局。',settings:{supply:2.7,metabolism:1.05,inflammation:1.3,stressMutation:4.5,progression:2.5,normalMutationGain:5,tumorMutationGain:6,growth:1.3,tumorCycle:170,apoptosis:3,tumorMotility:1.1,normalMotility:.1,cohesion:1.1,escape:3,immuneMotility:1.3,immuneGrowth:.5,immuneDivisions:3,immuneCycle:200,antigenMemory:1200,kill:1.4,recruitment:1.4,chemotaxis:1.8,mutation:12,mutationSize:.2,antigenStressGain:1.2,contactEscape:.6,signalEscape:.3,damagePolarization:3.5,damageDeactivation:1.2,suppressiveSecretion:1.5,suppressionStrength:1.3,suppressionRecovery:1.5,immuneRegulationMemory:200}},
+    random:{label:'随机肿瘤演化',environmentProfile:'mosaic',founderTolerance:2,founderTraitSpread:.4,description:'随机化的密铺正常组织、12–16 颗内部免疫细胞与三处弱供给区域。参数在发生发展附近抽样，肿瘤必须由局部癌前产生；相同种子和参数可重现开局，结局由局部相互作用产生。',settings:{}},
     cold:{label:'免疫冷肿瘤扩散转移',description:'正常细胞铺满背景，中央嵌入 19 颗低抗原肿瘤，外围仅 3 颗免疫细胞。梭形肿瘤侵袭扩增，压力提高性状变异，部分克隆可能暴露抗原；免疫招募较弱。包含局部侵袭与概率性入血播散，不模拟远处器官定植。',settings:{supply:2.8,metabolism:.65,stressMutation:0,progression:1,growth:1.4,tumorCycle:180,apoptosis:2,tumorMotility:1.5,tumorMorphology:1,normalMotility:.25,cohesion:.4,sectionYield:.4,immuneMotility:.8,antigen:15,kill:1,chemotaxis:.6,recruitment:.35,immuneGrowth:.15,immuneDivisions:2,alignment:.2,noise:.85,mutation:8,normalMutationGain:1,tumorMutationGain:5,antigenStressGain:.3,contactEscape:.15,signalEscape:.1}},
     hot:{label:'免疫热肿瘤应答',description:'正常细胞铺满背景，中央嵌入 37 颗高抗原肿瘤，18 颗免疫细胞分散在病灶周边的组织内。接触识别、招募及 IL-2 扩增支持早期清除；少数存活克隆可能丢失抗原并再次扩增。结局随种子改变，关闭杀伤可作对照。',settings:{supply:2.8,metabolism:.65,stressMutation:0,progression:1,growth:.75,tumorCycle:280,apoptosis:0,tumorMotility:.35,immuneMotility:1.2,antigen:100,kill:2,chemotaxis:2.5,recruitment:2.4,immuneGrowth:.65,immuneDivisions:3,immuneCycle:200,antigenMemory:1200,il2Secretion:1.2,noise:.45,halfLife:180,mutation:2,mutationSize:.05,antigenStressGain:.15,contactEscape:.35,signalEscape:.12}},
     ecosystem:{label:'免疫共培养',settings:{}},
@@ -12621,6 +12625,8 @@ var CPM = (function (exports, module$1) {
   const BODY_COLORS=[[239,242,237],[174,184,181],[48,56,65],[190,65,78],[93,108,111]];
   // Preserve a viable background when local vascular exchange is added. The
   // reserve/cycle window lets initiated clones compete before cumulative injury.
+  // Keep viable growth opportunities while retaining heterogeneous hostile niches.
+  // Independent founder traits are drawn before selection, never from position.
   Object.assign(PRESETS.oncogenesis.settings,{normalSupport:20,reserveCapacity:140,traitCost:.3,normalRepair:.15});
   Object.assign(PRESETS.oncogenesis.settings,{metabolism:.95,progression:4,normalMotility:.25,cohesion:.4,sectionYield:.4,tumorMotility:1.5,tumorMorphology:1,escape:4,chemotaxis:2.5});
   Object.assign(PRESETS.cold.settings,{normalSupport:20,initialImmuneReady:25,primingRate:.4});
@@ -12628,6 +12634,7 @@ var CPM = (function (exports, module$1) {
   Object.assign(PRESETS.maze.settings,{initialImmuneReady:100});
   Object.assign(PRESETS.oncogenesis.settings,{vesselCount:2,vesselDependence:20});
   Object.assign(PRESETS.oncogenesis.settings,{damagePolarization:1,damageDeactivation:1,suppressiveSecretion:1,suppressionStrength:1,immuneRegulationMemory:600});
+  Object.assign(PRESETS.oncogenesis.settings,{metabolism:.88,mutation:20,mutationSize:.25});
   Object.assign(PRESETS.cold.settings,{vesselCount:2,vesselImmuneRate:.35,vesselPassage:.65,vesselDependence:25,tumorIntravasation:1.3});
   Object.assign(PRESETS.hot.settings,{vesselCount:2,vesselImmuneRate:1.3,vesselPassage:1.4,vesselDependence:25,tumorIntravasation:.6});
   const ringOffsets=[[-1,-1],[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0]];
@@ -13098,7 +13105,8 @@ var CPM = (function (exports, module$1) {
     register(id,kind){
       const theta=this.C.random()*2*Math.PI,roll=this.C.random();
       const base=[0,240,330,72][kind]*this.scale*this.scale;
-      const genome=kind===TUMOR?{tolerance:(.85+.3*this.C.random())*(PRESETS[this.scene]?.founderTolerance||1),proliferation:.85+.3*this.C.random(),invasion:.85+.3*this.C.random(),antigen:roll<this.settings.antigen/100?.45+.55*this.C.random():.04+.07*this.C.random()}:null;
+      const spread=PRESETS[this.scene]?.founderTraitSpread??.15,draw=()=>1-spread+2*spread*this.C.random();
+      const genome=kind===TUMOR?{tolerance:draw()*(PRESETS[this.scene]?.founderTolerance||1),proliferation:draw(),invasion:draw(),antigen:roll<this.settings.antigen/100?.45+.55*this.C.random():.04+.07*this.C.random()}:null;
       const m={id,kind,name:TYPE_NAMES[kind],base,target:kind===TUMOR?base*.55:base,lambdaV:0,lambdaP:0,perimeter:0,activity:0,drive:0,px:Math.cos(theta),py:Math.sin(theta),x:0,y:0,sx:0,sy:0,sinX:0,cosX:0,sinY:0,cosY:0,age:0,antigenRoll:roll,antigen:false,antigenLevel:0,damage:0,dying:false,deathCause:'',targetID:0,phase:'search',genome,clone:id,generation:0,birth:++this.birthSerial,parentBirth:0,divisionsLeft:kind===IMMUNE?this.settings.immuneDivisions:null,activation:0,recruitment:0,stress:0,adversity:0,fitness:1,oxygen:1,glucose:1,acid:0,confinement:0};
       m.state=kind===NORMAL?'normal':kind===TUMOR?'tumor':'immune';m.origin=m.state;m.abnormalAge=0;m.abnormalSince=null;m.transformedAt=null;m.immuneCue=0;m.inflammatorySignal=0;m.inflammatoryExposure=0;
       m.nucleusStrainX=0;m.nucleusStrainY=0;m.fieldBins=new Map();m.sectionFraction=1;m.sectionPressure=0;m.hasNucleus=false;if(genome)this.applyGenome(m);
@@ -13128,7 +13136,8 @@ var CPM = (function (exports, module$1) {
       for(const [bin,pixels] of m.fieldBins){this.occupancy[NORMAL][bin]-=pixels;this.occupancy[TUMOR][bin]+=pixels;}
       this.C.setCellKind(id,TUMOR);m.kind=TUMOR;m.state='tumor';m.name=TYPE_NAMES[TUMOR];m.base=330*this.scale*this.scale;m.age=0;m.transformedAt=this.C.time;
       m.divisionsLeft=null;
-      m.genome={tolerance:clamp((.85+.3*this.C.random())*(PRESETS[this.scene]?.founderTolerance||1)*m.normalTolerance,.25,3),proliferation:.85+.3*this.C.random(),invasion:.85+.3*this.C.random(),antigen:m.antigenLevel};
+      const spread=PRESETS[this.scene]?.founderTraitSpread??.15,draw=()=>1-spread+2*spread*this.C.random();
+      m.genome={tolerance:clamp(draw()*(PRESETS[this.scene]?.founderTolerance||1)*m.normalTolerance,.25,3),proliferation:draw(),invasion:draw(),antigen:m.antigenLevel};
       m.cycle=newCycle();this.initializeStemness(m);this.immunity.malignant(m);this.updateMechanics(m);this.C.stat_values={};
       this.counters.malignantTransitions++;this.log('malignant',id,0,{clone:m.clone,genome:{...m.genome}});return true;
     }
@@ -14316,7 +14325,7 @@ var CPM = (function (exports, module$1) {
       }
       if(c.bloodstreamExports>0&&!tumors.length){phase='局部肿瘤已清除，曾发生入血播散';achieved=false;}
       const preset=PRESETS[this.scene],baseline={...DEFAULTS,...(this.scene==='random'?randomSettings(this.seedValue):preset.settings)};
-      return {label:preset.label,description:preset.description,profile:{environment:preset.environmentProfile||'uniform',founderTolerance:preset.founderTolerance||1,...(this.ecology?{niches:this.ecology.niches.map(n=>({...n}))}:{})},phase,achieved,initial:{...state.initial,clones:[...state.initial.clones]},tumor:active.length,tumorBodies:tumors.length,abnormal,farTumor:far,distalRadius:55,tumorDivisions:state.tumorDivisions,distalDivisions:state.distalDivisions,peakTumor:state.peakTumor,clearanceAt:state.clearanceAt,clearanceElapsed:elapsed,maxAdversity,customized:Object.keys(DEFAULTS).some(k=>this.settings[k]!==baseline[k])};
+      return {label:preset.label,description:preset.description,profile:{environment:preset.environmentProfile||'uniform',founderTolerance:preset.founderTolerance||1,founderTraitSpread:preset.founderTraitSpread??.15,...(this.ecology?{niches:this.ecology.niches.map(n=>({...n}))}:{})},phase,achieved,initial:{...state.initial,clones:[...state.initial.clones]},tumor:active.length,tumorBodies:tumors.length,abnormal,farTumor:far,distalRadius:55,tumorDivisions:state.tumorDivisions,distalDivisions:state.distalDivisions,peakTumor:state.peakTumor,clearanceAt:state.clearanceAt,clearanceElapsed:elapsed,maxAdversity,customized:Object.keys(DEFAULTS).some(k=>this.settings[k]!==baseline[k])};
     }
     populationRow(){const counts=[0,0,0,0],states=Object.fromEntries(POPULATION_STATES.map(k=>[k,0]));let px=0,py=0,n=0,abnormal=0,endothelial=0;
       for(const m of this.live()){counts[m.kind]++;if(m.vesselID)endothelial++;if(m.state==='abnormal')abnormal++;if(!m.dying){px+=m.px;py+=m.py;n++;}
@@ -14434,7 +14443,7 @@ var CPM = (function (exports, module$1) {
     const vessels=data.vessels;if(vessels!==undefined){if(!Array.isArray(vessels)||vessels.length>64)invalid('vessels');for(const v of vessels){if(!object(v))invalid('vessel');number(v.x,0,worldWidth,'vessel.x');number(v.y,0,worldHeight,'vessel.y');number(v.radius,8,20,'vessel.radius');}}
     if(data.maze?.signalThroughWalls!==undefined&&typeof data.maze.signalThroughWalls!=='boolean')invalid('maze.signalThroughWalls');
     const display={},input=data.display??{};if(!object(input))invalid('display');
-    if(input.cellColors!==undefined){if(!object(input.cellColors))invalid('cellColors');const colors={};for(const kind of ['normal','abnormal','tumor','immune','activated','suppressive','endothelial'])if(input.cellColors[kind]!==undefined){if(!object(input.cellColors[kind]))invalid(kind);colors[kind]={};for(const part of ['body','nucleus'])if(input.cellColors[kind][part]!==undefined){const c=input.cellColors[kind][part];if(typeof c!=='string'||!/^#[0-9a-f]{6}$/i.test(c))invalid(kind+'.'+part);colors[kind][part]=c.toLowerCase();}}if(input.cellColors.proliferationShading!==undefined){if(typeof input.cellColors.proliferationShading!=='boolean')invalid('proliferationShading');colors.proliferationShading=input.cellColors.proliferationShading;}display.cellColors=colors;}
+    if(input.cellColors!==undefined){if(!object(input.cellColors))invalid('cellColors');const colors={};for(const kind of ['normal','abnormal','tumor','immune','activated','suppressive','endothelial'])if(input.cellColors[kind]!==undefined){if(!object(input.cellColors[kind]))invalid(kind);colors[kind]={};for(const part of ['body','nucleus'])if(input.cellColors[kind][part]!==undefined){const c=input.cellColors[kind][part];if(typeof c!=='string'||!/^#[0-9a-f]{6}$/i.test(c))invalid(kind+'.'+part);colors[kind][part]=c.toLowerCase();}}if(input.cellColors.proliferationShading!==undefined){if(typeof input.cellColors.proliferationShading!=='boolean')invalid('proliferationShading');colors.proliferationShading=input.cellColors.proliferationShading;}if(input.cellColors.tumorTrait!==undefined)colors.tumorTrait=choice(input.cellColors.tumorTrait,['proliferation','tolerance','invasion','antigenLevel'],'tumorTrait');display.cellColors=colors;}
     if(input.edgeFade!==undefined)display.edgeFade=number(input.edgeFade,0,100,'edgeFade');
     if(input.autoRandomMinutes!==undefined)display.autoRandomMinutes=number(input.autoRandomMinutes,0,1440,'autoRandomMinutes');
     if(input.parameterLocks!==undefined){if(!object(input.parameterLocks))invalid('parameterLocks');display.parameterLocks={};for(const [key,value]of Object.entries(input.parameterLocks)){if(!(key in ranges)&&!['boundary','world-size','refinement'].includes(key))continue;if(typeof value!=='boolean')invalid('parameterLocks.'+key);display.parameterLocks[key]=value;}}
@@ -14445,7 +14454,7 @@ var CPM = (function (exports, module$1) {
     if(input.opacity!==undefined){if(!object(input.opacity))invalid('opacity');display.opacity={};for(const [k,v]of Object.entries(input.opacity))if(['adversity','oxygen','glucose','acid','density','angiogenicNormal','angiogenicTumor',...signals].includes(k))display.opacity[k]=number(v,0,1,'opacity.'+k);}
     if(input.flags!==undefined){if(!object(input.flags))invalid('flags');display.flags={};for(const [k,v]of Object.entries(input.flags))if(flags.includes(k)){if(typeof v!=='boolean')invalid(k);display.flags[k]=v;}}
     for(const [key,options]of [['zoom',['100','150','200','300']],['fit',['cover','contain']],['renderResolution',['auto','1920','2560','3840']]])if(input[key]!==undefined)display[key]=choice(input[key],options,key);
-    const migration=data.schemaVersion!==3||!!(data.modelRevision&&data.modelRevision!==(globalThis.CellLab?.MODEL_REVISION||'2026-11-contact-learning-angiogenesis-4'));
+    const migration=data.schemaVersion!==3||!!(data.modelRevision&&data.modelRevision!==(globalThis.CellLab?.MODEL_REVISION||'2026-11-spatial-evolution-5'));
     return {mode:'parameters',migration,warnings:[...(migration?['旧实验将按当前模型规则重新运行；种子与参数保留，演化轨迹会变化。']:[]),...(legacySlots?['旧四槽配方仅保留 P1 及其表达值，P2–P4 不再参与模拟；原文件不修改。']:[])],config:{initialCells:cleanCells,scene:data.scene,mazeSignalThroughWalls:!!data.maze?.signalThroughWalls,seed,boundary,worldWidth,worldHeight,refinement,settings,...(vessels?{vessels:vessels.map(v=>({x:v.x,y:v.y,radius:v.radius}))}:{}),...(sources?{sources:sources.map(s=>({type:s.type,x:s.x,y:s.y,radius:s.radius}))}:{}),warmup:data.warmup===undefined?(data.scene==='empty'?0:35):number(data.warmup,0,200,'warmup')},display,speed:data.speed===undefined?1:number(data.speed,.25,8,'speed'),sourceTime:Number.isFinite(data.time)?data.time:0,ignored};
   }
   globalThis.CellLabExperiment={parse,ranges,scenes,flags};
@@ -15393,6 +15402,20 @@ Act · 标记 · 环境分量|Act / markers / fields
 胞体|Body
 胞核|Nucleus
 肿瘤保留增殖深浅变化|Shade tumors by proliferation trait
+肿瘤按所选性状显示深浅|Shade tumors by the selected trait
+肿瘤性状与局部环境|Tumor traits and local environment
+肿瘤胞体着色|Tumor body shading
+遗传增殖能力|Inherited proliferation
+遗传环境耐受|Inherited stress tolerance
+遗传侵袭能力|Inherited invasion
+当前非自身抗原呈递|Current non-self antigen presentation
+肿瘤：浅 → 深，遗传耐受低 → 高|Tumor: light → dark, low → high inherited tolerance
+肿瘤：浅 → 深，遗传侵袭低 → 高|Tumor: light → dark, low → high inherited invasion
+肿瘤：浅 → 深，当前呈递低 → 高|Tumor: light → dark, low → high current presentation
+胞体显示当前非自身抗原呈递（0–1 固定色标），可能随环境恢复。|Bodies show current non-self presentation on a fixed 0–1 scale; it may recover with the environment.
+胞体显示所选遗传性状（0.25–3 固定色标），不是当前周期或移动速度。|Bodies show the selected inherited trait on a fixed 0.25–3 scale, not the current cycle phase or speed.
+所选性状越高，胞体越深；遗传性状使用 0.25–3，当前呈递使用 0–1 固定色标。关闭上方选项使用统一纯色。外轮廓仍表示抗原身份。|Higher values use darker bodies. Inherited traits use a fixed 0.25–3 scale and current presentation a fixed 0–1 scale. Uncheck for a uniform body color. Outlines still identify antigens.
+
 恢复原始配色|Restore original palette
 形态与穿行|Shape & passage
 分枝 · 成网 · 让位|Branches / networks / yielding
@@ -16230,7 +16253,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
   const colorKey=m=>m?.state==='endothelial'?'endothelial':m?.state==='abnormal'?'abnormal':m?.kind===3?(immuneSuppressive(m)?'suppressive':immuneActive(m)?'activated':'immune'):m?.kind===2?'tumor':'normal';
   const hexRGB=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
   function normalizeColors(value){
-    const result={proliferationShading:value?.proliferationShading!==false};
+    const result={proliferationShading:value?.proliferationShading!==false,tumorTrait:['proliferation','tolerance','invasion','antigenLevel'].includes(value?.tumorTrait)?value.tumorTrait:'proliferation'};
     for(const key of ['normal','abnormal','tumor','immune','activated','suppressive','endothelial']){result[key]={};for(const part of ['body','nucleus']){const c=value?.[key]?.[part];result[key][part]=typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c)?c.toLowerCase():COLOR_DEFAULTS[key][part];}}
     return result;
   }
@@ -16243,13 +16266,23 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
   // Fixed scale across scenes and generations, using the heritable trait,
   // not transient nutrient suppression or a population-relative ranking.
   const gray=Array.from({length:89},(_,v)=>[v,v,v]);
-  const tumorShade=m=>Math.round(88*(1-clamp(((m?.genome?.proliferation??1)-.25)/2.75)));
+  const tumorShade=(m,trait='proliferation')=>Math.round((trait==='proliferation'?88:198)*(1-(trait==='antigenLevel'?clamp(m?.antigenLevel??0):clamp(((m?.genome?.[trait]??1)-.25)/2.75))));
   const bodyColor=(m,palette)=>{
     if(!palette)return m?.kind===2?gray[tumorShade(m)]:BODY_COLORS[displayKind(m)];
     if(!m||m.kind===0||m.kind===4)return BODY_COLORS[m?.kind||0];
-    const base=hexRGB(palette[colorKey(m)].body),t=m.kind===2&&palette.proliferationShading?tumorShade(m)/255:0;
+    const base=hexRGB(palette[colorKey(m)].body),t=m.kind===2&&palette.proliferationShading?tumorShade(m,palette.tumorTrait)/255:0;
     return base.map(v=>Math.round(v+(255-v)*t));
   };
+  // Descriptive environment groups, never spatial instructions to the model.
+  function tumorEcology(s){
+    const cells=s.cells.filter(m=>m.kind===2&&!m.dying),ordered=cells.slice().sort((a,b)=>(a.adversity||0)-(b.adversity||0)||a.birth-b.birth);
+    const n=Math.floor(cells.length/4),groups=cells.length>=8&&(ordered.at(-1).adversity-ordered[0].adversity)>.02;
+    const summarize=list=>Object.fromEntries(['tolerance','proliferation','invasion','antigenLevel','adversity'].map(key=>{
+      const values=list.map(m=>key==='antigenLevel'||key==='adversity'?m[key]:m.genome?.[key]).filter(Number.isFinite);
+      return [key,values.length?{mean:values.reduce((a,b)=>a+b,0)/values.length,min:Math.min(...values),max:Math.max(...values)}:null];
+    }));
+    return {count:cells.length,clones:new Set(cells.map(m=>m.geneClone)).size,groupSize:groups?n:0,all:summarize(cells),low:groups?summarize(ordered.slice(0,n)):null,high:groups?summarize(ordered.slice(-n)):null};
+  }
   const cellName=m=>m?.state==='endothelial'?'血管内皮细胞':m?.state==='abnormal'?'癌前细胞':m?.kind===3?(immuneSuppressive(m)?'免疫抑制样细胞':immuneActive(m)?'已激活免疫细胞':'未激活免疫细胞'):['培养液','正常细胞','肿瘤细胞','免疫细胞','实体障碍'][m?.kind||0];
   const deathCode=m=>m?.dying?({spontaneous:1,kill:2,environment:3}[m.deathCause]||1):0;
   function deathColor(rgb,m){
@@ -16439,7 +16472,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     const wall=!!s.walls[q],blocked=wall||!!s.fieldMask?.[bin];
     return {x,y,bin,time:s.time,cell:s.cells.find(m=>m.id===s.grid[q])||null,wall,blocked,values:blocked?null:Object.fromEntries(['oxygen','glucose','acid',...Object.keys(SIGNALS)].map(key=>[key,s.fields[key]?.values[bin]??0]))};
   }
-  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,immuneSuppressive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,cycleColor,antigenMarked,antigenStrength,antigenProfileStyle,antigenVisuals,antigenSegment,antigenTextureData,selectionBounds,selectionBoxes,bodyOpacity,adversity,signals,sample,Cache};
+  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,immuneSuppressive,displayKind,tumorShade,bodyColor,tumorEcology,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,cycleColor,antigenMarked,antigenStrength,antigenProfileStyle,antigenVisuals,antigenSegment,antigenTextureData,selectionBounds,selectionBoxes,bodyOpacity,adversity,signals,sample,Cache};
 })();
 
 /* Display-only WebGL2 rasterizer. All cell copies and contacts stay in the
@@ -16511,8 +16544,8 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
       // Palette changes redraw even when model time and snapshot are unchanged.
       if(this.cellColors!==cellColors){g.uniform3fv(u['bodyColors[0]'],Float32Array.from((cellColors?CellLabDisplay.paletteBodies(cellColors):CellLabDisplay.BODY_COLORS).flat(),v=>v/255));this.cellColors=cellColors;}
       g.uniform1i(u.proliferationShading,cellColors?.proliferationShading===false?0:1);
-      if(this.snapshot!==s){this.upload(0,s.width,s.height,g.R16UI,g.RED_INTEGER,g.UNSIGNED_SHORT,s.grid);this.upload(1,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.activity);this.upload(2,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.walls);
-        this.meta.fill(0);for(const m of s.cells){this.meta[m.id*4]=CellLabDisplay.displayKind(m);this.meta[m.id*4+1]=CellLabDisplay.deathCode(m)|(CellLabDisplay.antigenMarked(m)?8:0);this.meta[m.id*4+2]=m.kind===2?CellLabDisplay.tumorShade(m):0;this.meta[m.id*4+3]=Math.round((m.dying?Math.max(0,Math.min(1,m.deathProgress||0)):CellLabDisplay.antigenStrength(m))*255);}this.upload(3,256,256,g.RGBA8UI,g.RGBA_INTEGER,g.UNSIGNED_BYTE,this.meta);
+      if(this.snapshot!==s||this.tumorTrait!==cellColors?.tumorTrait){this.tumorTrait=cellColors?.tumorTrait;this.upload(0,s.width,s.height,g.R16UI,g.RED_INTEGER,g.UNSIGNED_SHORT,s.grid);this.upload(1,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.activity);this.upload(2,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.walls);
+        this.meta.fill(0);for(const m of s.cells){this.meta[m.id*4]=CellLabDisplay.displayKind(m);this.meta[m.id*4+1]=CellLabDisplay.deathCode(m)|(CellLabDisplay.antigenMarked(m)?8:0);this.meta[m.id*4+2]=m.kind===2?CellLabDisplay.tumorShade(m,cellColors?.tumorTrait):0;this.meta[m.id*4+3]=Math.round((m.dying?Math.max(0,Math.min(1,m.deathProgress||0)):CellLabDisplay.antigenStrength(m))*255);}this.upload(3,256,256,g.RGBA8UI,g.RGBA_INTEGER,g.UNSIGNED_BYTE,this.meta);
         const a=this.antigenData=CellLabDisplay.antigenTextureData((antigenStyles||CellLabDisplay.antigenVisuals(s)).outlines,this.antigenData,this.maxTextureSize);
         this.upload(9,a.width,a.height,g.RGBA8,g.RGBA,g.UNSIGNED_BYTE,a.colors);this.upload(10,256,256,g.RGBA32F,g.RGBA,g.FLOAT,a.centers);this.snapshot=s;this.field=null;}
       if(this.field!==field){if(field)this.upload(4,field.width,field.height,g.R32F,g.RED,g.FLOAT,field.values);else this.upload(4,1,1,g.R32F,g.RED,g.FLOAT,new Float32Array(1));this.field=field;}
@@ -16592,7 +16625,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     const vessels=data.vessels;if(vessels!==undefined){if(!Array.isArray(vessels)||vessels.length>64)invalid('vessels');for(const v of vessels){if(!object(v))invalid('vessel');number(v.x,0,worldWidth,'vessel.x');number(v.y,0,worldHeight,'vessel.y');number(v.radius,8,20,'vessel.radius');}}
     if(data.maze?.signalThroughWalls!==undefined&&typeof data.maze.signalThroughWalls!=='boolean')invalid('maze.signalThroughWalls');
     const display={},input=data.display??{};if(!object(input))invalid('display');
-    if(input.cellColors!==undefined){if(!object(input.cellColors))invalid('cellColors');const colors={};for(const kind of ['normal','abnormal','tumor','immune','activated','suppressive','endothelial'])if(input.cellColors[kind]!==undefined){if(!object(input.cellColors[kind]))invalid(kind);colors[kind]={};for(const part of ['body','nucleus'])if(input.cellColors[kind][part]!==undefined){const c=input.cellColors[kind][part];if(typeof c!=='string'||!/^#[0-9a-f]{6}$/i.test(c))invalid(kind+'.'+part);colors[kind][part]=c.toLowerCase();}}if(input.cellColors.proliferationShading!==undefined){if(typeof input.cellColors.proliferationShading!=='boolean')invalid('proliferationShading');colors.proliferationShading=input.cellColors.proliferationShading;}display.cellColors=colors;}
+    if(input.cellColors!==undefined){if(!object(input.cellColors))invalid('cellColors');const colors={};for(const kind of ['normal','abnormal','tumor','immune','activated','suppressive','endothelial'])if(input.cellColors[kind]!==undefined){if(!object(input.cellColors[kind]))invalid(kind);colors[kind]={};for(const part of ['body','nucleus'])if(input.cellColors[kind][part]!==undefined){const c=input.cellColors[kind][part];if(typeof c!=='string'||!/^#[0-9a-f]{6}$/i.test(c))invalid(kind+'.'+part);colors[kind][part]=c.toLowerCase();}}if(input.cellColors.proliferationShading!==undefined){if(typeof input.cellColors.proliferationShading!=='boolean')invalid('proliferationShading');colors.proliferationShading=input.cellColors.proliferationShading;}if(input.cellColors.tumorTrait!==undefined)colors.tumorTrait=choice(input.cellColors.tumorTrait,['proliferation','tolerance','invasion','antigenLevel'],'tumorTrait');display.cellColors=colors;}
     if(input.edgeFade!==undefined)display.edgeFade=number(input.edgeFade,0,100,'edgeFade');
     if(input.autoRandomMinutes!==undefined)display.autoRandomMinutes=number(input.autoRandomMinutes,0,1440,'autoRandomMinutes');
     if(input.parameterLocks!==undefined){if(!object(input.parameterLocks))invalid('parameterLocks');display.parameterLocks={};for(const [key,value]of Object.entries(input.parameterLocks)){if(!(key in ranges)&&!['boundary','world-size','refinement'].includes(key))continue;if(typeof value!=='boolean')invalid('parameterLocks.'+key);display.parameterLocks[key]=value;}}
@@ -16603,7 +16636,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     if(input.opacity!==undefined){if(!object(input.opacity))invalid('opacity');display.opacity={};for(const [k,v]of Object.entries(input.opacity))if(['adversity','oxygen','glucose','acid','density','angiogenicNormal','angiogenicTumor',...signals].includes(k))display.opacity[k]=number(v,0,1,'opacity.'+k);}
     if(input.flags!==undefined){if(!object(input.flags))invalid('flags');display.flags={};for(const [k,v]of Object.entries(input.flags))if(flags.includes(k)){if(typeof v!=='boolean')invalid(k);display.flags[k]=v;}}
     for(const [key,options]of [['zoom',['100','150','200','300']],['fit',['cover','contain']],['renderResolution',['auto','1920','2560','3840']]])if(input[key]!==undefined)display[key]=choice(input[key],options,key);
-    const migration=data.schemaVersion!==3||!!(data.modelRevision&&data.modelRevision!==(globalThis.CellLab?.MODEL_REVISION||'2026-11-contact-learning-angiogenesis-4'));
+    const migration=data.schemaVersion!==3||!!(data.modelRevision&&data.modelRevision!==(globalThis.CellLab?.MODEL_REVISION||'2026-11-spatial-evolution-5'));
     return {mode:'parameters',migration,warnings:[...(migration?['旧实验将按当前模型规则重新运行；种子与参数保留，演化轨迹会变化。']:[]),...(legacySlots?['旧四槽配方仅保留 P1 及其表达值，P2–P4 不再参与模拟；原文件不修改。']:[])],config:{initialCells:cleanCells,scene:data.scene,mazeSignalThroughWalls:!!data.maze?.signalThroughWalls,seed,boundary,worldWidth,worldHeight,refinement,settings,...(vessels?{vessels:vessels.map(v=>({x:v.x,y:v.y,radius:v.radius}))}:{}),...(sources?{sources:sources.map(s=>({type:s.type,x:s.x,y:s.y,radius:s.radius}))}:{}),warmup:data.warmup===undefined?(data.scene==='empty'?0:35):number(data.warmup,0,200,'warmup')},display,speed:data.speed===undefined?1:number(data.speed,.25,8,'speed'),sourceTime:Number.isFinite(data.time)?data.time:0,ignored};
   }
   globalThis.CellLabExperiment={parse,ranges,scenes,flags};
@@ -17044,7 +17077,22 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     }
     return out;
   }
+  function ecology(s){
+    const root=document.getElementById('tumor-ecology-content');if(!root||!root.parentElement.open)return;
+    const data=CellLabDisplay.tumorEcology(s),stamp=JSON.stringify([english(),data,s.scenario?.tumorDivisions]);if(root.dataset.stamp===stamp)return;root.dataset.stamp=stamp;root.replaceChildren();
+    root.append(node('p','immune-note',t('存活肿瘤 ','Living tumors ')+data.count+' · '+t('遗传克隆 ','Genetic clones ')+data.clones+' · '+t('本局肿瘤分裂 ','Tumor divisions ')+(s.scenario?.tumorDivisions||0)));
+    if(!data.count){root.append(node('p','immune-note',t('肿瘤出现后显示性状分布。','Trait distributions appear after tumors emerge.')));return;}
+    const table=node('table','ecology-table'),head=node('tr');
+    for(const label of [t('性状','Trait'),t('全体范围','Full range'),t('低压力组','Low stress'),t('高压力组','High stress')])head.append(node('th','',label));table.append(head);
+    for(const [key,zh,en]of [['tolerance','遗传耐受','Tolerance'],['proliferation','遗传增殖','Proliferation'],['invasion','遗传侵袭','Invasion'],['antigenLevel','当前呈递','Presented']]){
+      const row=node('tr'),a=data.all[key];row.append(node('th','',t(zh,en)),node('td','',a?a.min.toFixed(2)+'–'+a.max.toFixed(2):'—'));
+      for(const group of [data.low,data.high])row.append(node('td','',group?.[key]?.mean.toFixed(2)||'—'));table.append(row);
+    }root.append(table);
+    root.append(node('p','immune-note',data.groupSize?t('按每颗细胞实际氧糖／酸压力，取最低和最高各 25%（各 ','Actual local oxygen/glucose/acid stress: lowest and highest quarters (')+data.groupSize+t(' 颗），显示组均值；不是核心／边缘标签。',' cells each), showing group means; these are not core/rim labels.'):t('至少 8 颗且局部压力有差异时才比较环境分组。','Environment groups require at least 8 cells and a local stress difference.')));
+    root.append(node('p','immune-note',t('在显示 → 细胞配色切换胞体性状；外轮廓继续标记抗原。分布差异是观察值，不能单独证明选择因果。','Switch body traits under Display → Cell colors; outlines still mark antigens. Distribution differences alone do not establish selection causality.')));
+  }
   function stats(s){
+    ecology(s);
     const el=document.getElementById('genetics-summary'),canvas=document.getElementById('clone-history');if(!el||!s.immunity)return;
     const a=s.immunity,type=Number(document.getElementById('clone-history-type').value),living=s.cells.filter(c=>!c.dying&&c.kind===type),counts=new Map();for(const c of living)counts.set(c.geneClone,(counts.get(c.geneClone)||0)+1);
     const scores=new Map();for(const r of a.history)for(const [id,n]of Object.entries(r.counts))if(+id>0&&r.states[id]===type)scores.set(+id,Math.max(scores.get(+id)||0,n));
@@ -17223,7 +17271,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
   const controls=[
     ['angiogenesis','血管生成速度',0,3,.1,'持续超过诱导阈值后促进实际内皮分裂和出芽；需要已有内皮、营养与空间','×'],
     ['angiogenicSecretion','缺氧诱导因子分泌',0,3,.1,'正常与肿瘤来源分别扩散和衰减；死亡细胞与内皮不分泌','×'],
-    ['angiogenicThreshold','血管诱导阈值',.005,3,.005,'两种来源的局部浓度之和；超过阈值仍需持续刺激与真实分裂',''],
+    ['angiogenicThreshold','血管诱导阈值',.005,3,.001,'两种来源的局部浓度之和；超过阈值仍需持续刺激与真实分裂',''],
     ['angiogenicHalfLife','血管诱导因子半衰期',40,800,20,'仅作用于诱导因子，不改变免疫记忆',' MCS'],
     ['angiogenicHypoxia','诱导分泌的氧阈值',.2,.8,.05,'氧低于此值开始分泌；缺氧越重分泌越多',''],
     ['tumorVesselPenalty','肿瘤来源的血管功能折损',0,.95,.05,'按局部肿瘤来源占比降低氧糖交换与排酸；可调模型假设',''],
@@ -17274,7 +17322,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     ['temperature','膜形变波动',2,30,1,'CPM 温度，影响随机复制尝试的接受率',''],
     ['supply','氧糖补给与酸清除',0,3,.05,'培养液储库补给；调低后密集区域更容易恶化',''],
     ['normalSupport','正常细胞供给联动',0,100,1,'按本局健康正常细胞存活数的历史峰值计算保留比例；0% 无联动，100% 等比例影响全局氧糖补给和酸清除','%'],
-    ['metabolism','消耗与产酸强度',0,2,.05,'按实际细胞占据面积与邻域密度持续计算',''],
+    ['metabolism','消耗与产酸强度',0,2,.01,'按实际细胞占据面积与邻域密度持续计算',''],
     ['escape','恶劣环境逃逸',0,5,.1,'沿局部氧糖上升、酸负荷下降的方向重新极化',''],
     ['recruitment','识别后招募信号',0,3,.1,'实际接触识别癌前或肿瘤后分泌；仅被吸引者不自动接力',''],
     ['immuneGrowth','免疫扩增速度',0,1.5,.05,'抗原刺激记忆与 IL-2 共同支持；受营养、耗竭和实际空间限制',''],
@@ -17374,14 +17422,15 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     $('palette-status').textContent='当前：'+(CellLabDisplay.COLOR_PRESETS[preset]?.name||(preset==='original'?'原始配色':'自定义配色'));
     for(const button of $('color-presets').children){const active=button.dataset.palette===preset;button.classList.toggle('selected',active);button.setAttribute('aria-pressed',active);}
     for(const [key] of colorTypes)for(const part of ['body','nucleus'])$('color-'+key+'-'+part).value=cellColors[key][part];
-    $('proliferation-shading').checked=cellColors.proliferationShading;
+    $('proliferation-shading').checked=cellColors.proliferationShading;$('tumor-trait-view').value=cellColors.tumorTrait;
     for(const [key,css] of [['normal','normal'],['abnormal','abnormal'],['tumor','tumor'],['immune','immune'],['activated','immune-active'],['suppressive','immune-suppressive'],['endothelial','endothelial']]){for(const node of document.querySelectorAll('.legend .'+css))node.style.background=cellColors[key].body;document.querySelector('.population-'+key)?.style.setProperty('--population-color',cellColors[key].body);}
-    const ramp=document.querySelector('.proliferation-key'),low=CellLabDisplay.bodyColor({kind:2,genome:{proliferation:.25}},cellColors),high=cellColors.tumor.body;
+    const ramp=document.querySelector('.proliferation-key'),low=CellLabDisplay.bodyColor({kind:2,genome:{proliferation:.25,tolerance:.25,invasion:.25},antigenLevel:0},cellColors),high=cellColors.tumor.body;
     ramp.querySelector('i').style.background=`linear-gradient(90deg,rgb(${low.join(',')}),${high})`;
-    ramp.lastChild.textContent=cellColors.proliferationShading?'肿瘤：浅 → 深，增殖能力低 → 高':'肿瘤：统一胞体色';
+    ramp.lastChild.textContent=cellColors.proliferationShading?({proliferation:'肿瘤：浅 → 深，增殖能力低 → 高',tolerance:'肿瘤：浅 → 深，遗传耐受低 → 高',invasion:'肿瘤：浅 → 深，遗传侵袭低 → 高',antigenLevel:'肿瘤：浅 → 深，当前呈递低 → 高'}[cellColors.tumorTrait]):'肿瘤：统一胞体色';
   }
   function applyColors(value){cellColors=CellLabDisplay.normalizeColors(value);try{localStorage.setItem('cell-arena-colors-v1',JSON.stringify(cellColors));}catch{/* Private/storage-disabled contexts still support this session. */}syncColors();dirty=true;}
   $('reset-colors').addEventListener('click',()=>applyColors(null));
+  $('tumor-trait-view').addEventListener('change',e=>applyColors({...cellColors,tumorTrait:e.target.value,proliferationShading:true}));
   $('proliferation-shading').addEventListener('change',e=>applyColors({...cellColors,proliferationShading:e.target.checked}));syncColors();
   try{const saved=localStorage.getItem('cell-arena-edge-fade-v1');if(saved!==null&&Number.isFinite(Number(saved)))$('body-feather').value=Math.max(0,Math.min(100,Number(saved)));}catch{}
   function syncAppearance(){ $('body-feather-out').textContent=$('body-feather').value+'%';dirty=true;forceFrame=true; }
@@ -17707,12 +17756,12 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     const view=$('field-view').value,wrap=s.boundary==='wrap',seams=$('cell-seams').checked,showNuclei=$('nuclei').checked,showAntigen=$('antigen-marks').checked,showCycle=$('cycle-marks').checked;
     const protect=$('protect-bodies').checked,{field,info,signal,bodySignal}=displayCache.get(s,view,signalLayers,opacity,protect),environmentOpacity=opacity[view]??0,bodyEnvironmentOpacity=CellLabDisplay.bodyOpacity(environmentOpacity,protect);
     const actFlags=[0,...['normal-activity','tumor-activity','immune-activity'].map(id=>$('edge-activity').checked&&$(id).checked?1:0)];
-    const nextLegend=JSON.stringify([view,[...signalLayers],opacity,protect,actFlags,showAntigen,showCycle,!!s.maze,cellColors.proliferationShading]);
+    const nextLegend=JSON.stringify([view,[...signalLayers],opacity,protect,actFlags,showAntigen,showCycle,!!s.maze,cellColors.proliferationShading,cellColors.tumorTrait]);
     if(legendKey!==nextLegend){legendKey=nextLegend;
     const legend=[];if(info)legend.push(info.label+' · '+info.description);
     if(s.maze&&signalLayers.has('trail'))legend.push('迷宫招募场：0—30 固定色标，圆心持续供给，入口清除。');
     if(signal&&!s.maze)legend.push([...signalLayers].map(k=>CellLabDisplay.SIGNALS[k].label).join('、')+'：增强低浓度显示，非线性固定色标；重叠混色，原始浓度见悬停。');
-    if(!legend.length)legend.push(actFlags.some(Boolean)?'Act：红＝新生突起 → 黄 → 绿＝活性衰减；零活性恢复胞体色。':'胞体与胞核颜色可在「细胞配色」调整；免疫激活由真实接触识别触发。'+(cellColors.proliferationShading?'肿瘤增殖性状越高，胞体越接近所选深色（0.25–3 固定色标）。':''));
+    if(!legend.length)legend.push(actFlags.some(Boolean)?'Act：红＝新生突起 → 黄 → 绿＝活性衰减；零活性恢复胞体色。':'胞体与胞核颜色可在「细胞配色」调整；免疫激活由真实接触识别触发。'+(cellColors.proliferationShading?(cellColors.tumorTrait==='antigenLevel'?'胞体显示当前非自身抗原呈递（0–1 固定色标），可能随环境恢复。':'胞体显示所选遗传性状（0.25–3 固定色标），不是当前周期或移动速度。'):''));
     $('field-legend').textContent=legend.join(' ｜ ');$('heat-key').hidden=!info;
     if(info){$('heat-ramp').style.background='linear-gradient(90deg,'+[info.low,info.middle,info.high].filter(Boolean).map(c=>'rgb('+c.join(',')+')').join(',')+')';$('heat-scale').textContent=view==='adversity'?'友好 0 → 1 恶劣':'0 → 1';}
     updateOverlayButtons();syncOpacity();

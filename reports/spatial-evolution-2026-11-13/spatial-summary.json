@@ -1,0 +1,884 @@
+{
+  "neighborhoodRadius": 24,
+  "permutations": 99,
+  "interpretation": "Descriptive spatial autocorrelation, not causal selection evidence or clinical validation. Null shuffles retain the same positions and value distribution. Environmental quartiles are not geometric core/rim labels.",
+  "runs": [
+    {
+      "file": "baseline-onset.json",
+      "seed": 17,
+      "time": 24000,
+      "livingTumor": 0,
+      "malignantFounders": 12,
+      "tumorDivisions": 0,
+      "livingGeneticClones": 0,
+      "livingAntigenBranches": 0,
+      "kills": 1,
+      "maxGeneration": 0,
+      "livingWithTraitsAbsentFromAllFounders": 0,
+      "neighborhoodEdges": 0,
+      "quartileSize": 0,
+      "integrity": {
+        "disconnected": [
+          {
+            "id": 205,
+            "kind": 1,
+            "dying": true,
+            "cause": "lifespan"
+          }
+        ],
+        "connected": true,
+        "nuclei": true
+      },
+      "traits": {
+        "tolerance": {
+          "mean": null,
+          "minimum": null,
+          "maximum": null,
+          "lowPressureMean": null,
+          "highPressureMean": null,
+          "moranI": null,
+          "shuffledMean": null,
+          "shuffled95": null
+        },
+        "proliferation": {
+          "mean": null,
+          "minimum": null,
+          "maximum": null,
+          "lowPressureMean": null,
+          "highPressureMean": null,
+          "moranI": null,
+          "shuffledMean": null,
+          "shuffled95": null
+        },
+        "invasion": {
+          "mean": null,
+          "minimum": null,
+          "maximum": null,
+          "lowPressureMean": null,
+          "highPressureMean": null,
+          "moranI": null,
+          "shuffledMean": null,
+          "shuffled95": null
+        },
+        "antigenLevel": {
+          "mean": null,
+          "minimum": null,
+          "maximum": null,
+          "lowPressureMean": null,
+          "highPressureMean": null,
+          "moranI": null,
+          "shuffledMean": null,
+          "shuffled95": null
+        }
+      }
+    },
+    {
+      "file": "baseline-onset.json",
+      "seed": 31,
+      "time": 24000,
+      "livingTumor": 125,
+      "malignantFounders": 124,
+      "tumorDivisions": 126,
+      "livingGeneticClones": 103,
+      "livingAntigenBranches": 81,
+      "kills": 6,
+      "maxGeneration": 9,
+      "livingWithTraitsAbsentFromAllFounders": 20,
+      "neighborhoodEdges": 343,
+      "quartileSize": 31,
+      "integrity": {
+        "disconnected": [
+          {
+            "id": 423,
+            "kind": 2,
+            "dying": true,
+            "cause": "environment"
+          },
+          {
+            "id": 539,
+            "kind": 2,
+            "dying": true,
+            "cause": "environment"
+          },
+          {
+            "id": 603,
+            "kind": 2,
+            "dying": true,
+            "cause": "spontaneous"
+          }
+        ],
+        "connected": true,
+        "nuclei": true
+      },
+      "traits": {
+        "tolerance": {
+          "mean": 2.2806658158250763,
+          "minimum": 1.9643758305907246,
+          "maximum": 2.6386210848926566,
+          "lowPressureMean": 2.2801424386344196,
+          "highPressureMean": 2.3071093394394158,
+          "moranI": 0.1527957847275536,
+          "shuffledMean": -0.006807073621442436,
+          "shuffled95": 0.07688011460684967
+        },
+        "proliferation": {
+          "mean": 1.0234479629233064,
+          "minimum": 0.8623364586848765,
+          "maximum": 1.1952475762509462,
+          "lowPressureMean": 1.013471077613404,
+          "highPressureMean": 1.0481152670151606,
+          "moranI": 0.2795147299146321,
+          "shuffledMean": -0.010993015294745263,
+          "shuffled95": 0.07595195281009143
+        },
+        "invasion": {
+          "mean": 1.0520418045241862,
+          "minimum": 0.8528435598127544,
+          "maximum": 1.3351533541033493,
+          "lowPressureMean": 1.055884916826287,
+          "highPressureMean": 1.0268617277101215,
+          "moranI": 0.07718084117774925,
+          "shuffledMean": -0.003951620512228848,
+          "shuffled95": 0.08598216681679366
+        },
+        "antigenLevel": {
+          "mean": 0.3912926188013533,
+          "minimum": 0,
+          "maximum": 0.9999330038813005,
+          "lowPressureMean": 0.27726495104976934,
+          "highPressureMean": 0.5473195820325119,
+          "moranI": 0.1846458539719672,
+          "shuffledMean": 0.0009910078068777444,
+          "shuffled95": 0.11086256632122601
+        }
+      }
+    },
+    {
+      "file": "baseline-onset.json",
+      "seed": 77,
+      "time": 24000,
+      "livingTumor": 85,
+      "malignantFounders": 83,
+      "tumorDivisions": 99,
+      "livingGeneticClones": 60,
+      "livingAntigenBranches": 42,
+      "kills": 1,
+      "maxGeneration": 11,
+      "livingWithTraitsAbsentFromAllFounders": 20,
+      "neighborhoodEdges": 162,
+      "quartileSize": 21,
+      "integrity": {
+        "disconnected": [],
+        "connected": true,
+        "nuclei": true
+      },
+      "traits": {
+        "tolerance": {
+          "mean": 2.4624817194347246,
+          "minimum": 1.9663520880532448,
+          "maximum": 2.6577957107806305,
+          "lowPressureMean": 2.5003694668691248,
+          "highPressureMean": 2.389310867824955,
+          "moranI": 0.16199423327901596,
+          "shuffledMean": -0.0055263178634582305,
+          "shuffled95": 0.1051443913573665
+        },
+        "proliferation": {
+          "mean": 0.9489086831390117,
+          "minimum": 0.8637607030803337,
+          "maximum": 1.137620513443835,
+          "lowPressureMean": 0.9583458535643873,
+          "highPressureMean": 0.9394969148615188,
+          "moranI": 0.1618078088745269,
+          "shuffledMean": -0.0015330387148715632,
+          "shuffled95": 0.13729318904720286
+        },
+        "invasion": {
+          "mean": 1.0614704733367188,
+          "minimum": 0.8868985293665901,
+          "maximum": 1.1441128079080953,
+          "lowPressureMean": 1.069661691971123,
+          "highPressureMean": 1.0543038317081157,
+          "moranI": 0.32096901074263623,
+          "shuffledMean": -0.0019929655116703777,
+          "shuffled95": 0.09460288382115686
+        },
+        "antigenLevel": {
+          "mean": 0.3112612254704438,
+          "minimum": 0,
+          "maximum": 0.9999959477932087,
+          "lowPressureMean": 0.3557757335008212,
+          "highPressureMean": 0.39412831795503117,
+          "moranI": 0.2757290926481791,
+          "shuffledMean": -0.014116907872350776,
+          "shuffled95": 0.10626949171141993
+        }
+      }
+    },
+    {
+      "file": "control-no-kill.json",
+      "seed": 17,
+      "time": 24000,
+      "livingTumor": 84,
+      "malignantFounders": 70,
+      "tumorDivisions": 92,
+      "livingGeneticClones": 71,
+      "livingAntigenBranches": 54,
+      "kills": 0,
+      "maxGeneration": 15,
+      "livingWithTraitsAbsentFromAllFounders": 39,
+      "neighborhoodEdges": 201,
+      "quartileSize": 21,
+      "integrity": {
+        "disconnected": [],
+        "connected": true,
+        "nuclei": true
+      },
+      "traits": {
+        "tolerance": {
+          "mean": 2.1451552456200487,
+          "minimum": 1.3107423514127732,
+          "maximum": 2.691427804902196,
+          "lowPressureMean": 2.1193933459974463,
+          "highPressureMean": 2.1880319329954325,
+          "moranI": 0.1670023421711125,
+          "shuffledMean": -0.0017545431028791396,
+          "shuffled95": 0.1163517836252258
+        },
+        "proliferation": {
+          "mean": 1.086972682361906,
+          "minimum": 0.6683173079043626,
+          "maximum": 1.4845312348195163,
+          "lowPressureMean": 1.0382382254496425,
+          "highPressureMean": 1.1180047092901855,
+          "moranI": -0.019270574800612388,
+          "shuffledMean": -0.007713399522413431,
+          "shuffled95": 0.11118532162047637
+        },
+        "invasion": {
+          "mean": 0.988455068621405,
+          "minimum": 0.6066235836595296,
+          "maximum": 1.3301269233226778,
+          "lowPressureMean": 0.9892125693460307,
+          "highPressureMean": 0.948379198842367,
+          "moranI": 0.1197429442421733,
+          "shuffledMean": -0.006758251325171942,
+          "shuffled95": 0.1175266950480395
+        },
+        "antigenLevel": {
+          "mean": 0.24159846222829007,
+          "minimum": 0,
+          "maximum": 0.8808704786156386,
+          "lowPressureMean": 0.24018851836768165,
+          "highPressureMean": 0.18431636289667136,
+          "moranI": 0.36165218495599644,
+          "shuffledMean": -0.021310653805201186,
+          "shuffled95": 0.08211395723348652
+        }
+      }
+    },
+    {
+      "file": "control-no-mutation.json",
+      "seed": 17,
+      "time": 24000,
+      "livingTumor": 115,
+      "malignantFounders": 97,
+      "tumorDivisions": 112,
+      "livingGeneticClones": 47,
+      "livingAntigenBranches": 47,
+      "kills": 26,
+      "maxGeneration": 17,
+      "livingWithTraitsAbsentFromAllFounders": 0,
+      "neighborhoodEdges": 309,
+      "quartileSize": 28,
+      "integrity": {
+        "disconnected": [
+          {
+            "id": 91,
+            "kind": 2,
+            "dying": true,
+            "cause": "environment"
+          },
+          {
+            "id": 117,
+            "kind": 2,
+            "dying": true,
+            "cause": "spontaneous"
+          },
+          {
+            "id": 226,
+            "kind": 3,
+            "dying": true,
+            "cause": "environment"
+          }
+        ],
+        "connected": true,
+        "nuclei": true
+      },
+      "traits": {
+        "tolerance": {
+          "mean": 2.0346442160042755,
+          "minimum": 1.2197370193898678,
+          "maximum": 2.7577729005366565,
+          "lowPressureMean": 2.0432789255066632,
+          "highPressureMean": 2.0589638260725356,
+          "moranI": 0.04677067435084813,
+          "shuffledMean": -0.008711008400418496,
+          "shuffled95": 0.09280011831791464
+        },
+        "proliferation": {
+          "mean": 0.9227733792008268,
+          "minimum": 0.6135359697043895,
+          "maximum": 1.3964990749955177,
+          "lowPressureMean": 0.9016527455965323,
+          "highPressureMean": 0.9595511620132517,
+          "moranI": 0.11094956719193265,
+          "shuffledMean": -0.0009140472672403852,
+          "shuffled95": 0.09286963567396896
+        },
+        "invasion": {
+          "mean": 1.0447302633912658,
+          "minimum": 0.600209066644311,
+          "maximum": 1.3883917417377234,
+          "lowPressureMean": 1.0083346789104068,
+          "highPressureMean": 1.0851055764726232,
+          "moranI": 0.15776371148059062,
+          "shuffledMean": -0.002833656917830272,
+          "shuffled95": 0.08583124888500696
+        },
+        "antigenLevel": {
+          "mean": 0.5072757320116289,
+          "minimum": 0,
+          "maximum": 0.9842983514860867,
+          "lowPressureMean": 0.5262621397191596,
+          "highPressureMean": 0.39563007848351633,
+          "moranI": 0.015962779172028888,
+          "shuffledMean": -0.015091874869467488,
+          "shuffled95": 0.08178248865581032
+        }
+      }
+    },
+    {
+      "file": "final-onset.json",
+      "seed": 17,
+      "time": 24000,
+      "livingTumor": 135,
+      "malignantFounders": 128,
+      "tumorDivisions": 154,
+      "livingGeneticClones": 126,
+      "livingAntigenBranches": 91,
+      "kills": 3,
+      "maxGeneration": 14,
+      "livingWithTraitsAbsentFromAllFounders": 49,
+      "neighborhoodEdges": 405,
+      "quartileSize": 33,
+      "integrity": {
+        "disconnected": [],
+        "connected": true,
+        "nuclei": true
+      },
+      "traits": {
+        "tolerance": {
+          "mean": 2.194247373798863,
+          "minimum": 1.2762605030089615,
+          "maximum": 3,
+          "lowPressureMean": 2.1214309635715205,
+          "highPressureMean": 2.268767423013394,
+          "moranI": 0.024958558691213804,
+          "shuffledMean": -0.010095553889370605,
+          "shuffled95": 0.05915584663920692
+        },
+        "proliferation": {
+          "mean": 1.0946220337028798,
+          "minimum": 0.6011565303429961,
+          "maximum": 1.9130067364598178,
+          "lowPressureMean": 1.0851454250845254,
+          "highPressureMean": 1.0699395974469605,
+          "moranI": 0.08963673023536761,
+          "shuffledMean": -0.002629874059936938,
+          "shuffled95": 0.07076690209140683
+        },
+        "invasion": {
+          "mean": 1.0617957726664913,
+          "minimum": 0.5116582949613114,
+          "maximum": 1.8305845182964469,
+          "lowPressureMean": 1.0933009166437024,
+          "highPressureMean": 1.0840257114243956,
+          "moranI": 0.173641798600767,
+          "shuffledMean": -0.007168396187798313,
+          "shuffled95": 0.0835082225950339
+        },
+        "antigenLevel": {
+          "mean": 0.5358695538942096,
+          "minimum": 0,
+          "maximum": 0.9998613442841994,
+          "lowPressureMean": 0.4525526679914492,
+          "highPressureMean": 0.5118286825441035,
+          "moranI": -0.0007875259565301639,
+          "shuffledMean": -0.01733911920309989,
+          "shuffled95": 0.07630805682549961
+        }
+      }
+    },
+    {
+      "file": "final-onset.json",
+      "seed": 31,
+      "time": 24000,
+      "livingTumor": 106,
+      "malignantFounders": 97,
+      "tumorDivisions": 112,
+      "livingGeneticClones": 86,
+      "livingAntigenBranches": 74,
+      "kills": 2,
+      "maxGeneration": 11,
+      "livingWithTraitsAbsentFromAllFounders": 46,
+      "neighborhoodEdges": 265,
+      "quartileSize": 26,
+      "integrity": {
+        "disconnected": [
+          {
+            "id": 63,
+            "kind": 2,
+            "dying": true,
+            "cause": "environment"
+          }
+        ],
+        "connected": true,
+        "nuclei": true
+      },
+      "traits": {
+        "tolerance": {
+          "mean": 2.4714682077556485,
+          "minimum": 1.2321278508752584,
+          "maximum": 3,
+          "lowPressureMean": 2.5289762214212206,
+          "highPressureMean": 2.536648027813779,
+          "moranI": 0.00866051370408915,
+          "shuffledMean": -0.010743698171371814,
+          "shuffled95": 0.08568432456739682
+        },
+        "proliferation": {
+          "mean": 1.0892082138131463,
+          "minimum": 0.6164978753775358,
+          "maximum": 1.3756275655701757,
+          "lowPressureMean": 1.1044605230288593,
+          "highPressureMean": 1.0218646930331223,
+          "moranI": 0.3671671894257432,
+          "shuffledMean": -0.0068566869315019804,
+          "shuffled95": 0.08415444523269773
+        },
+        "invasion": {
+          "mean": 1.017653665842304,
+          "minimum": 0.5553492363129487,
+          "maximum": 1.4158956013043846,
+          "lowPressureMean": 0.9982583193005338,
+          "highPressureMean": 0.9862932357578896,
+          "moranI": 0.10019331886965728,
+          "shuffledMean": -0.013218599647400566,
+          "shuffled95": 0.07811079975648058
+        },
+        "antigenLevel": {
+          "mean": 0.5215566513597815,
+          "minimum": 0,
+          "maximum": 0.9994195111122574,
+          "lowPressureMean": 0.4346380139433336,
+          "highPressureMean": 0.6914664291897945,
+          "moranI": 0.13858785246051986,
+          "shuffledMean": -0.008573927171935178,
+          "shuffled95": 0.11147452811282893
+        }
+      }
+    },
+    {
+      "file": "final-onset.json",
+      "seed": 77,
+      "time": 24000,
+      "livingTumor": 104,
+      "malignantFounders": 110,
+      "tumorDivisions": 134,
+      "livingGeneticClones": 99,
+      "livingAntigenBranches": 76,
+      "kills": 11,
+      "maxGeneration": 13,
+      "livingWithTraitsAbsentFromAllFounders": 24,
+      "neighborhoodEdges": 235,
+      "quartileSize": 26,
+      "integrity": {
+        "disconnected": [
+          {
+            "id": 21,
+            "kind": 2,
+            "dying": true,
+            "cause": "environment"
+          },
+          {
+            "id": 146,
+            "kind": 2,
+            "dying": true,
+            "cause": "environment"
+          },
+          {
+            "id": 618,
+            "kind": 2,
+            "dying": true,
+            "cause": "environment"
+          }
+        ],
+        "connected": true,
+        "nuclei": true
+      },
+      "traits": {
+        "tolerance": {
+          "mean": 2.16031978400061,
+          "minimum": 1.3551925651729106,
+          "maximum": 2.766682884842157,
+          "lowPressureMean": 1.9262624386473919,
+          "highPressureMean": 2.2589852927474707,
+          "moranI": 0.05241568855425086,
+          "shuffledMean": -0.009269750243387165,
+          "shuffled95": 0.08751601306947017
+        },
+        "proliferation": {
+          "mean": 1.053960502635007,
+          "minimum": 0.6285873265936971,
+          "maximum": 1.3864407913759351,
+          "lowPressureMean": 0.9971336279734987,
+          "highPressureMean": 1.1141970842169422,
+          "moranI": 0.15402037806728144,
+          "shuffledMean": -0.00490000767972177,
+          "shuffled95": 0.129155817375324
+        },
+        "invasion": {
+          "mean": 1.0493998926497565,
+          "minimum": 0.6087455319240689,
+          "maximum": 1.7981937125385967,
+          "lowPressureMean": 1.090643155646937,
+          "highPressureMean": 1.0177482343574475,
+          "moranI": 0.0034658868474134923,
+          "shuffledMean": -0.012918620342144273,
+          "shuffled95": 0.10054508339183157
+        },
+        "antigenLevel": {
+          "mean": 0.3906998701206309,
+          "minimum": 0,
+          "maximum": 0.9972601024595338,
+          "lowPressureMean": 0.4482829823395514,
+          "highPressureMean": 0.3121081207362296,
+          "moranI": 0.15290629872231468,
+          "shuffledMean": -0.003702985934614154,
+          "shuffled95": 0.10991831521555932
+        }
+      }
+    },
+    {
+      "file": "final-random.json",
+      "seed": 17,
+      "time": 16000,
+      "livingTumor": 10,
+      "malignantFounders": 14,
+      "tumorDivisions": 10,
+      "livingGeneticClones": 5,
+      "livingAntigenBranches": 2,
+      "kills": 0,
+      "maxGeneration": 5,
+      "livingWithTraitsAbsentFromAllFounders": 4,
+      "neighborhoodEdges": 9,
+      "quartileSize": 2,
+      "integrity": {
+        "disconnected": [],
+        "connected": true,
+        "nuclei": true
+      },
+      "traits": {
+        "tolerance": {
+          "mean": 1.5733927553892137,
+          "minimum": 1.542942050844431,
+          "maximum": 1.5767761670053004,
+          "lowPressureMean": 1.5767761670053004,
+          "highPressureMean": 1.5767761670053004,
+          "moranI": -0.012345679012353462,
+          "shuffledMean": -0.11335578002244652,
+          "shuffled95": 0.11111111111109363
+        },
+        "proliferation": {
+          "mean": 0.8470864994637669,
+          "minimum": 0.751926863566041,
+          "maximum": 0.8576597923412919,
+          "lowPressureMean": 0.8576597923412919,
+          "highPressureMean": 0.8576597923412919,
+          "moranI": -0.012345679012346946,
+          "shuffledMean": -0.11335578002244666,
+          "shuffled95": 0.11111111111110823
+        },
+        "invasion": {
+          "mean": 1.007618647608906,
+          "minimum": 0.8135457612574101,
+          "maximum": 1.029182301647961,
+          "lowPressureMean": 1.029182301647961,
+          "highPressureMean": 1.029182301647961,
+          "moranI": -0.012345679012345533,
+          "shuffledMean": -0.11335578002244664,
+          "shuffled95": 0.1111111111111115
+        },
+        "antigenLevel": {
+          "mean": 0.06054524630893067,
+          "minimum": 0,
+          "maximum": 0.6054524630893067,
+          "lowPressureMean": 0.0,
+          "highPressureMean": 0.0,
+          "moranI": -0.012345679012345678,
+          "shuffledMean": -0.11335578002244666,
+          "shuffled95": 0.11111111111111119
+        }
+      }
+    },
+    {
+      "file": "final-random.json",
+      "seed": 31,
+      "time": 16000,
+      "livingTumor": 85,
+      "malignantFounders": 65,
+      "tumorDivisions": 66,
+      "livingGeneticClones": 73,
+      "livingAntigenBranches": 60,
+      "kills": 8,
+      "maxGeneration": 8,
+      "livingWithTraitsAbsentFromAllFounders": 19,
+      "neighborhoodEdges": 196,
+      "quartileSize": 21,
+      "integrity": {
+        "disconnected": [],
+        "connected": true,
+        "nuclei": true
+      },
+      "traits": {
+        "tolerance": {
+          "mean": 2.186398769456867,
+          "minimum": 1.301087610423565,
+          "maximum": 3,
+          "lowPressureMean": 2.1819445780582867,
+          "highPressureMean": 2.2631394560670564,
+          "moranI": 0.2817257276570325,
+          "shuffledMean": -0.025269109627727198,
+          "shuffled95": 0.08820352697619117
+        },
+        "proliferation": {
+          "mean": 1.0441642209564277,
+          "minimum": 0.6156890861690044,
+          "maximum": 1.3941340070217847,
+          "lowPressureMean": 1.1507307823277686,
+          "highPressureMean": 1.0156368748229962,
+          "moranI": 0.21448505427989484,
+          "shuffledMean": -0.016186943945322038,
+          "shuffled95": 0.11981692981210108
+        },
+        "invasion": {
+          "mean": 0.9861309220324754,
+          "minimum": 0.6257414715364575,
+          "maximum": 1.3653308629989624,
+          "lowPressureMean": 1.003614821118029,
+          "highPressureMean": 0.9721914545273791,
+          "moranI": 0.3374906368216421,
+          "shuffledMean": -0.017878872689588206,
+          "shuffled95": 0.10425725744961493
+        },
+        "antigenLevel": {
+          "mean": 0.39230958484146283,
+          "minimum": 0,
+          "maximum": 0.9889097185838069,
+          "lowPressureMean": 0.28571766986936126,
+          "highPressureMean": 0.4862431385336837,
+          "moranI": 0.032943998212316056,
+          "shuffledMean": -0.017512323054450198,
+          "shuffled95": 0.08518234516106715
+        }
+      }
+    },
+    {
+      "file": "final-random.json",
+      "seed": 77,
+      "time": 16000,
+      "livingTumor": 26,
+      "malignantFounders": 21,
+      "tumorDivisions": 25,
+      "livingGeneticClones": 10,
+      "livingAntigenBranches": 9,
+      "kills": 1,
+      "maxGeneration": 7,
+      "livingWithTraitsAbsentFromAllFounders": 0,
+      "neighborhoodEdges": 36,
+      "quartileSize": 6,
+      "integrity": {
+        "disconnected": [],
+        "connected": true,
+        "nuclei": true
+      },
+      "traits": {
+        "tolerance": {
+          "mean": 2.3494492726113925,
+          "minimum": 1.2022284995764494,
+          "maximum": 2.537040236964822,
+          "lowPressureMean": 2.432533306628466,
+          "highPressureMean": 2.0725024925544857,
+          "moranI": 0.29614527412311065,
+          "shuffledMean": -0.04086712670550774,
+          "shuffled95": 0.26036822269828136
+        },
+        "proliferation": {
+          "mean": 1.0221232438961478,
+          "minimum": 0.7528759138658643,
+          "maximum": 1.0535106010735036,
+          "lowPressureMean": 1.0535106010735034,
+          "highPressureMean": 0.917498719971627,
+          "moranI": 0.3499253841684088,
+          "shuffledMean": -0.025712950444887236,
+          "shuffled95": 0.24762289588275946
+        },
+        "invasion": {
+          "mean": 1.1480106607867542,
+          "minimum": 0.6506983701139688,
+          "maximum": 1.2342230107635261,
+          "lowPressureMean": 1.1958991024643184,
+          "highPressureMean": 0.9883825218615433,
+          "moranI": 0.1258325838174619,
+          "shuffledMean": -0.027251735074137307,
+          "shuffled95": 0.30099804860407725
+        },
+        "antigenLevel": {
+          "mean": 0.11154786109857937,
+          "minimum": 0,
+          "maximum": 0.7530940692456959,
+          "lowPressureMean": 0.0,
+          "highPressureMean": 0.22770722167209523,
+          "moranI": 0.2992807588778278,
+          "shuffledMean": -0.05237420347846461,
+          "shuffled95": 0.2754624469194264
+        }
+      }
+    },
+    {
+      "file": "holdout-onset.json",
+      "seed": 101,
+      "time": 24000,
+      "livingTumor": 1,
+      "malignantFounders": 18,
+      "tumorDivisions": 1,
+      "livingGeneticClones": 1,
+      "livingAntigenBranches": 1,
+      "kills": 3,
+      "maxGeneration": 1,
+      "livingWithTraitsAbsentFromAllFounders": 0,
+      "neighborhoodEdges": 0,
+      "quartileSize": 0,
+      "integrity": {
+        "disconnected": [],
+        "connected": true,
+        "nuclei": true
+      },
+      "traits": {
+        "tolerance": {
+          "mean": 2.5988523617386816,
+          "minimum": 2.5988523617386816,
+          "maximum": 2.5988523617386816,
+          "lowPressureMean": null,
+          "highPressureMean": null,
+          "moranI": null,
+          "shuffledMean": null,
+          "shuffled95": null
+        },
+        "proliferation": {
+          "mean": 1.2788701364770532,
+          "minimum": 1.2788701364770532,
+          "maximum": 1.2788701364770532,
+          "lowPressureMean": null,
+          "highPressureMean": null,
+          "moranI": null,
+          "shuffledMean": null,
+          "shuffled95": null
+        },
+        "invasion": {
+          "mean": 1.0125201389193534,
+          "minimum": 1.0125201389193534,
+          "maximum": 1.0125201389193534,
+          "lowPressureMean": null,
+          "highPressureMean": null,
+          "moranI": null,
+          "shuffledMean": null,
+          "shuffled95": null
+        },
+        "antigenLevel": {
+          "mean": 0.0,
+          "minimum": 0,
+          "maximum": 0,
+          "lowPressureMean": null,
+          "highPressureMean": null,
+          "moranI": null,
+          "shuffledMean": null,
+          "shuffled95": null
+        }
+      }
+    },
+    {
+      "file": "holdout-onset.json",
+      "seed": 211,
+      "time": 24000,
+      "livingTumor": 0,
+      "malignantFounders": 15,
+      "tumorDivisions": 0,
+      "livingGeneticClones": 0,
+      "livingAntigenBranches": 0,
+      "kills": 4,
+      "maxGeneration": 0,
+      "livingWithTraitsAbsentFromAllFounders": 0,
+      "neighborhoodEdges": 0,
+      "quartileSize": 0,
+      "integrity": {
+        "disconnected": [],
+        "connected": true,
+        "nuclei": true
+      },
+      "traits": {
+        "tolerance": {
+          "mean": null,
+          "minimum": null,
+          "maximum": null,
+          "lowPressureMean": null,
+          "highPressureMean": null,
+          "moranI": null,
+          "shuffledMean": null,
+          "shuffled95": null
+        },
+        "proliferation": {
+          "mean": null,
+          "minimum": null,
+          "maximum": null,
+          "lowPressureMean": null,
+          "highPressureMean": null,
+          "moranI": null,
+          "shuffledMean": null,
+          "shuffled95": null
+        },
+        "invasion": {
+          "mean": null,
+          "minimum": null,
+          "maximum": null,
+          "lowPressureMean": null,
+          "highPressureMean": null,
+          "moranI": null,
+          "shuffledMean": null,
+          "shuffled95": null
+        },
+        "antigenLevel": {
+          "mean": null,
+          "minimum": null,
+          "maximum": null,
+          "lowPressureMean": null,
+          "highPressureMean": null,
+          "moranI": null,
+          "shuffledMean": null,
+          "shuffled95": null
+        }
+      }
+    }
+  ]
+}
