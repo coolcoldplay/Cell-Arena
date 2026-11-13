@@ -573,7 +573,6 @@
     if(showAntigen&&!gpu)drawAntigenOutlines(s,scale,pixelRatio);
     drawVessels(s,scale,pixelRatio);
     if(showNuclei){ctx.save();ctx.scale(scale,scale);ctx.lineWidth=1.5*pixelRatio/scale;for(const batch of displayCache.nucleusBatches(s,cellColors)){ctx.fillStyle=batch.fill;ctx.strokeStyle=batch.stroke;ctx.fill(batch.path);ctx.stroke(batch.path);}ctx.restore();}
-    if(showNuclei&&showAntigen){ctx.save();ctx.scale(scale,scale);ctx.lineWidth=2*pixelRatio/scale;ctx.lineCap='butt';ctx.lineJoin='round';for(const batch of displayCache.nucleusArcBatches(s)){ctx.strokeStyle=batch.stroke;ctx.stroke(batch.path);}ctx.restore();}
     // Post-clearance membrane fragments are cosmetic, never extra cells.
     // Their age uses model time, so pausing also freezes the rupture effect.
     ctx.save();ctx.lineWidth=Math.max(1,pixelRatio);

@@ -741,8 +741,8 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
 抗原轮廓|Antigen outline
 抗原谱系轮廓|Antigen lineage outlines
 存活正常细胞的持续压力或损伤也可触发；不必先死亡。暴露越强、越久转蓝概率越高；0 关闭|Sustained stress or injury in living normal cells can also trigger this; prior death is not required. Stronger and longer exposure increases switching; 0 disables it.
-颜色表示遗传抗原谱；同色免疫核弧表示受体匹配潜力|Colors show inherited antigen profiles; matching nuclear arcs show receptor compatibility
-外轮廓／核弧：抗原谱系与匹配|Outlines / nuclear arcs: antigen profiles and matching
+颜色表示遗传抗原谱；同色免疫外轮廓表示受体匹配潜力|Colors show inherited antigen profiles; matching immune outlines show receptor compatibility
+外轮廓：肿瘤抗原／免疫匹配|Outlines: tumor antigens / immune matching
 追踪后：✓ 已识别 · ≈ 接触扫描 · × 不匹配 · ! 受限。|Track: ✓ recognized · ≈ scanning · × mismatch · ! limited.
 周期文字|Cycle labels
 红色轮廓：抗原可识别|Red outline: recognizable antigen

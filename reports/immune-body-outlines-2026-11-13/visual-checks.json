@@ -1,0 +1,527 @@
+{
+  "gpu": {
+    "renderer": {
+      "gpu": true,
+      "device": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "error": "",
+      "ms": 0.20000000298023224,
+      "fps": 0,
+      "renderMs": 0.4000000059604645,
+      "snapshotMs": 0.19999999552965164
+    },
+    "nuclei": true,
+    "antigens": true,
+    "rings": [
+      {
+        "id": 5,
+        "primed": false,
+        "matched": 8,
+        "colors": [
+          "#4e25bb",
+          "#a211b6",
+          "#ac2215",
+          "#1f25ad",
+          "#4713b4",
+          "#c8ac1e",
+          "#18d416",
+          "#a57e1d"
+        ],
+        "bodyPixels": [
+          155,
+          154,
+          168,
+          166,
+          165,
+          160,
+          128,
+          159
+        ],
+        "nuclearPixels": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "id": 6,
+        "primed": false,
+        "matched": 1,
+        "colors": [
+          "#1fb292"
+        ],
+        "bodyPixels": [
+          1249
+        ],
+        "nuclearPixels": [
+          0
+        ]
+      },
+      {
+        "id": 7,
+        "primed": false,
+        "matched": 0,
+        "colors": [
+          "#4e25bb",
+          "#a211b6",
+          "#ac2215",
+          "#1f25ad",
+          "#4713b4",
+          "#c8ac1e",
+          "#18d416",
+          "#a57e1d",
+          "#1fb292"
+        ],
+        "bodyPixels": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "nuclearPixels": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "gpuWithoutNuclei": {
+    "renderer": {
+      "gpu": true,
+      "device": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "error": "",
+      "ms": 0,
+      "fps": 0,
+      "renderMs": 0.10000000149011612,
+      "snapshotMs": 0.19999999552965164
+    },
+    "nuclei": false,
+    "antigens": true,
+    "rings": [
+      {
+        "id": 5,
+        "primed": false,
+        "matched": 8,
+        "colors": [
+          "#4e25bb",
+          "#a211b6",
+          "#ac2215",
+          "#1f25ad",
+          "#4713b4",
+          "#c8ac1e",
+          "#18d416",
+          "#a57e1d"
+        ],
+        "bodyPixels": [
+          155,
+          154,
+          168,
+          166,
+          165,
+          160,
+          128,
+          159
+        ],
+        "nuclearPixels": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "id": 6,
+        "primed": false,
+        "matched": 1,
+        "colors": [
+          "#1fb292"
+        ],
+        "bodyPixels": [
+          1249
+        ],
+        "nuclearPixels": [
+          0
+        ]
+      },
+      {
+        "id": 7,
+        "primed": false,
+        "matched": 0,
+        "colors": [
+          "#4e25bb",
+          "#a211b6",
+          "#ac2215",
+          "#1f25ad",
+          "#4713b4",
+          "#c8ac1e",
+          "#18d416",
+          "#a57e1d",
+          "#1fb292"
+        ],
+        "bodyPixels": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "nuclearPixels": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "withoutAntigens": {
+    "renderer": {
+      "gpu": true,
+      "device": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "error": "",
+      "ms": 0,
+      "fps": 0,
+      "renderMs": 0.10000000149011612,
+      "snapshotMs": 0.19999999552965164
+    },
+    "nuclei": false,
+    "antigens": false,
+    "rings": [
+      {
+        "id": 5,
+        "primed": false,
+        "matched": 8,
+        "colors": [
+          "#4e25bb",
+          "#a211b6",
+          "#ac2215",
+          "#1f25ad",
+          "#4713b4",
+          "#c8ac1e",
+          "#18d416",
+          "#a57e1d"
+        ],
+        "bodyPixels": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "nuclearPixels": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "id": 6,
+        "primed": false,
+        "matched": 1,
+        "colors": [
+          "#1fb292"
+        ],
+        "bodyPixels": [
+          0
+        ],
+        "nuclearPixels": [
+          0
+        ]
+      },
+      {
+        "id": 7,
+        "primed": false,
+        "matched": 0,
+        "colors": [
+          "#4e25bb",
+          "#a211b6",
+          "#ac2215",
+          "#1f25ad",
+          "#4713b4",
+          "#c8ac1e",
+          "#18d416",
+          "#a57e1d",
+          "#1fb292"
+        ],
+        "bodyPixels": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "nuclearPixels": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "cpu": {
+    "renderer": {
+      "gpu": false,
+      "device": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "error": "",
+      "ms": 0,
+      "fps": 0,
+      "renderMs": 3.600000001490116,
+      "snapshotMs": 0.19999999552965164
+    },
+    "nuclei": true,
+    "antigens": true,
+    "rings": [
+      {
+        "id": 5,
+        "primed": false,
+        "matched": 8,
+        "colors": [
+          "#4e25bb",
+          "#a211b6",
+          "#ac2215",
+          "#1f25ad",
+          "#4713b4",
+          "#c8ac1e",
+          "#18d416",
+          "#a57e1d"
+        ],
+        "bodyPixels": [
+          154,
+          155,
+          167,
+          160,
+          176,
+          180,
+          160,
+          168
+        ],
+        "nuclearPixels": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "id": 6,
+        "primed": false,
+        "matched": 1,
+        "colors": [
+          "#1fb292"
+        ],
+        "bodyPixels": [
+          1324
+        ],
+        "nuclearPixels": [
+          0
+        ]
+      },
+      {
+        "id": 7,
+        "primed": false,
+        "matched": 0,
+        "colors": [
+          "#4e25bb",
+          "#a211b6",
+          "#ac2215",
+          "#1f25ad",
+          "#4713b4",
+          "#c8ac1e",
+          "#18d416",
+          "#a57e1d",
+          "#1fb292"
+        ],
+        "bodyPixels": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "nuclearPixels": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "cpuWithoutNuclei": {
+    "renderer": {
+      "gpu": false,
+      "device": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "error": "",
+      "ms": 0,
+      "fps": 0,
+      "renderMs": 0.7999999970197678,
+      "snapshotMs": 0.19999999552965164
+    },
+    "nuclei": false,
+    "antigens": true,
+    "rings": [
+      {
+        "id": 5,
+        "primed": false,
+        "matched": 8,
+        "colors": [
+          "#4e25bb",
+          "#a211b6",
+          "#ac2215",
+          "#1f25ad",
+          "#4713b4",
+          "#c8ac1e",
+          "#18d416",
+          "#a57e1d"
+        ],
+        "bodyPixels": [
+          154,
+          155,
+          167,
+          160,
+          176,
+          180,
+          160,
+          168
+        ],
+        "nuclearPixels": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "id": 6,
+        "primed": false,
+        "matched": 1,
+        "colors": [
+          "#1fb292"
+        ],
+        "bodyPixels": [
+          1324
+        ],
+        "nuclearPixels": [
+          0
+        ]
+      },
+      {
+        "id": 7,
+        "primed": false,
+        "matched": 0,
+        "colors": [
+          "#4e25bb",
+          "#a211b6",
+          "#ac2215",
+          "#1f25ad",
+          "#4713b4",
+          "#c8ac1e",
+          "#18d416",
+          "#a57e1d",
+          "#1fb292"
+        ],
+        "bodyPixels": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "nuclearPixels": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "unchanged": true,
+  "zhLegend": "同一抗原序列与通道保持同色。肿瘤外轮廓表示携带的抗原；免疫外轮廓表示单一受体可交叉识别的抗原，不表示携带或呈递。仍需呈递、启动与接触才能激活。\n\nA-bb2c07c5 · 2\nA-b92c049f · 2\nA-b52bfe53 · 2\nA-c62c1916 · 2\nA-ef264973 · 1\nA-0730fc97 · 1\nA-d7600f3c · 1\nA-ba35d95b · 1\n\n另有 1 种抗原谱；追踪细胞查看对应颜色。",
+  "enLegend": "The same antigen sequence and channel keep one color. Tumor outlines show carried antigens; immune outlines show antigens a single receptor can cross-recognize, not antigens it carries or presents. Activation still requires presentation, priming and contact.\n\nA-bb2c07c5 · 2\nA-b92c049f · 2\nA-b52bfe53 · 2\nA-c62c1916 · 2\nA-ef264973 · 1\nA-0730fc97 · 1\nA-d7600f3c · 1\nA-ba35d95b · 1\n\n1 more profiles; select a cell to inspect its color.",
+  "inspector": {
+    "tumor": "抗原—免疫\nG2 · 独立起源\n\nimported founder · 0 MCS · 第 0 代\n\n每种遗传抗原对应一种颜色；表达变化只改变深浅，序列改变换色，遗传缺失移除该色段。\n\nA-bb2c07c5\nA-b92c049f\nA-b52bfe53\nA-c62c1916\n\n最多 4 个抗原槽位；一次序列突变替换一个槽位，其他槽位保留。自身或遗传缺失的抗原不着色。\n\nP1\nC1\nA\nA\nA\nA\nA\nA\n非自身特征\n表达\n100%\n呈递\n100%\nP2\nC1\nA\nA\nA\nA\nA\nC\n非自身特征\n表达\n100%\n呈递\n100%\nP3\nC1\nA\nA\nA\nA\nA\nG\n非自身特征\n表达\n100%\n呈递\n100%\nP4\nC1\nA\nA\nA\nA\nA\nT\n非自身特征\n表达\n100%\n呈递\n100%\nC1 通道能力\n100%\nC2 通道能力\n100%\n免疫刹车\n8%\n独立表面靶标 · 预留\n\n轮廓深浅表示当前非自身抗原呈递强度；浅色仍保留遗传身份，不保证足够刺激。\n\n实际接触中的识别\n\n当前没有免疫—肿瘤／癌前膜接触；免疫外轮廓仅表示受体潜力，尚无实际识别刺激。",
+    "immune": {
+      "text": "抗原—免疫\nG9 · 独立起源\n\nimported founder · 0 MCS · 第 0 代\n\n胞体外轮廓分段显示同一受体可匹配的当前抗原；不代表携带抗原或已经激活。\n\nA-bb2c07c5\nA-b92c049f\nA-b52bfe53\nA-c62c1916\nA-ef264973\nA-0730fc97\nA-d7600f3c\nA-ba35d95b\n稳定识别码\nA\nA\nA\nA\nA\nA\nC1\n\n等待抗原特异性启动\n\n启动进度\n0%\n刺激记忆\n0%\n耗竭\n0%\n实际接触中的识别\n\n当前没有免疫—肿瘤／癌前膜接触；免疫外轮廓仅表示受体潜力，尚无实际识别刺激。",
+      "chips": 8
+    }
+  }
+}

@@ -22,7 +22,7 @@
   function legend(s,visible=true){
     const root=document.getElementById('antigen-lineage-legend');if(!root)return;root.hidden=!visible;if(!visible)return;
     const profiles=s.immunity?.visuals?.profiles||[],stamp=JSON.stringify([english(),profiles.map(p=>[p.key,p.count])]);if(root.dataset.stamp===stamp)return;root.dataset.stamp=stamp;root.replaceChildren();
-    root.append(node('p','immune-note',t('同一抗原序列与通道保持同色；多抗原肿瘤的外轮廓分段。免疫核弧等分显示可匹配的抗原；仍需呈递、启动与接触才能激活。','The same antigen sequence and channel keep one color; tumors with several antigens have segmented outlines. Equal nuclear arcs show compatible antigens; activation still requires presentation, priming and contact.')));
+    root.append(node('p','immune-note',t('同一抗原序列与通道保持同色。肿瘤外轮廓表示携带的抗原；免疫外轮廓表示单一受体可交叉识别的抗原，不表示携带或呈递。仍需呈递、启动与接触才能激活。','The same antigen sequence and channel keep one color. Tumor outlines show carried antigens; immune outlines show antigens a single receptor can cross-recognize, not antigens it carries or presents. Activation still requires presentation, priming and contact.')));
     if(!profiles.length){root.append(node('p','immune-note',t('尚无非自身抗原谱。癌前或肿瘤产生抗原变异后显示谱系颜色。','No non-self antigen profile yet. Colors appear after antigen variation in precancer or tumor cells.')));return;}
     const row=node('div','antigen-profile-list');for(const p of [...profiles].sort((a,b)=>b.count-a.count||a.key.localeCompare(b.key)).slice(0,8))row.append(profileChip(p.key,p.count));root.append(row);
     if(profiles.length>8)root.append(node('p','immune-note',t('另有 '+(profiles.length-8)+' 种抗原谱；追踪细胞查看对应颜色。',(profiles.length-8)+' more profiles; select a cell to inspect its color.')));
@@ -42,13 +42,14 @@
     const clone=a.clones.find(c=>c.id===cell.geneClone),header=node('div','immune-genotype-head');
     header.append(node('b','',t('抗原—免疫','Antigen & immunity')),node('span','','G'+cell.geneClone+(clone?.parent?' ← G'+clone.parent:' · '+t('独立起源','Founder'))));root.append(header);
     if(clone)root.append(node('p','immune-note',eventLabel(clone.event)+' · '+clone.time+' MCS · '+t('第 ','Generation ')+clone.generation+(english()?'':' 代')));
-    if(profileKeys.length){const row=node('div','antigen-profile-list');for(const key of profileKeys)row.append(profileChip(key));root.append(node('p','immune-note',cell.kind===3?t('核轮廓等分显示可匹配的当前抗原；不代表已激活。','Equal nuclear arcs show compatible current antigens, not activation.'):t('每种遗传抗原对应一种颜色；表达变化只改变深浅，序列改变换色，遗传缺失移除该色段。','Each inherited antigen has one color. Expression changes intensity, sequence mutations change color, and genetic loss removes that segment.')),row);}
-    else if(cell.kind===3)root.append(node('p','immune-note',t('当前没有可匹配的非自身抗原谱，胞核保持状态配色。','No compatible current non-self profile; the nucleus keeps its state color.')));
+    if(profileKeys.length){const row=node('div','antigen-profile-list');for(const key of profileKeys)row.append(profileChip(key));root.append(node('p','immune-note',cell.kind===3?t('胞体外轮廓分段显示同一受体可匹配的当前抗原；不代表携带抗原或已经激活。','Segments of the cell body outline show current antigens compatible with one receptor, not carried antigens or activation.'):t('每种遗传抗原对应一种颜色；表达变化只改变深浅，序列改变换色，遗传缺失移除该色段。','Each inherited antigen has one color. Expression changes intensity, sequence mutations change color, and genetic loss removes that segment.')),row);}
+    else if(cell.kind===3)root.append(node('p','immune-note',t('当前没有可匹配的非自身抗原，不显示匹配色段。','No compatible current non-self antigen; no matching outline segments.')));
     if(cell.kind===3){
       const receptor=node('div','immune-receptor');receptor.append(node('span','',t('稳定识别码','Stable receptor')),sequence(g.receptor?.sequence),node('b','','C'+((g.receptor?.channel??0)+1)));root.append(receptor);
       root.append(node('p','immune-status',cell.primed?t('✓ 已具备响应资格；仍需匹配并实际接触','✓ Response competent; still requires a matching contact'):t('等待抗原特异性启动','Awaiting antigen-specific priming')));
       const meters=node('div','immune-meter-grid');meters.append(bar(t('启动进度','Priming'),cell.primed?1:cell.primingProgress),bar(t('刺激记忆','Memory'),cell.antigenMemory),bar(t('耗竭','Exhaustion'),cell.exhaustion,'brake'));root.append(meters);
     }else{
+      root.append(node('p','immune-note',t('最多 4 个抗原槽位；一次序列突变替换一个槽位，其他槽位保留。自身或遗传缺失的抗原不着色。','Up to 4 antigen slots. A sequence mutation replaces one slot and preserves the others. Self or genetically lost antigens have no color segment.')));
       const slots=node('div','immune-slots');
       g.peptides.forEach((p,i)=>{
         const self=a.self.includes(p.sequence),amount=cell.expression.peptides[i],shown=amount*cell.expression.presentation[p.channel],slot=node('div','immune-slot'+(!p.present?' lost':self?' self':''));
@@ -62,7 +63,7 @@
     }
     const heading=node('h3','',t('实际接触中的识别','Recognition at actual contacts'));root.append(heading);
     const contacts=a.selectedID===cell.id?a.contacts:[];
-    if(!contacts.length)root.append(node('p','immune-note',t('当前没有免疫—肿瘤／癌前膜接触；核弧仅表示受体潜力，尚无实际识别刺激。','No current immune–tumor/precancer contact; nuclear arcs indicate receptor potential, not actual stimulation.')));
+    if(!contacts.length)root.append(node('p','immune-note',t('当前没有免疫—肿瘤／癌前膜接触；免疫外轮廓仅表示受体潜力，尚无实际识别刺激。','No current immune–tumor/precancer contact; immune outlines indicate receptor potential, not actual stimulation.')));
     for(const r of contacts){
       const card=node('div','immune-contact'),status=assessment(r),head=node('div','immune-contact-head');head.style.color=status.color;
       head.append(node('b','',status.symbol+' '+status.label),node('span','','#'+r.immune+' → #'+r.target));card.append(head);
@@ -94,7 +95,7 @@
       g.peptides.forEach((p,i)=>out.push('P'+(i+1)+' '+p.sequence+' · '+t('通道','channel')+' '+(p.channel+1)+' · '+(!p.present?t('遗传缺失','Genetic loss'):t('表达 ','Expression ')+percent(cell.expression.peptides[i])+(cell.expression.peptides[i]<.08?t('（暂时低表达）',' (low expression)'):''))));
       out.push(t('呈递通道：','Presentation: ')+g.presentation.map((v,i)=>'C'+(i+1)+' '+(v===0?t('遗传缺失','Genetic loss'):percent(cell.expression.presentation[i]))).join(' / '),t('免疫刹车：','Checkpoint brake: ')+percent(cell.expression.checkpoint));
       out.push(t('独立表面靶标：','Independent surface targets: ')+g.surface.map((p,i)=>'S'+(i+1)+' '+p.sequence+' '+(p.present?percent(p.base):t('缺失','absent'))).join(' / '));
-      out.push(t('外轮廓颜色表示遗传抗原谱，深浅表示当前呈递；同色免疫核弧表示受体匹配潜力，不保证激活。','Outline color marks the inherited antigen profile and intensity marks presentation; matching nuclear arcs show receptor potential, not guaranteed activation.'));
+      out.push(t('外轮廓颜色表示遗传抗原谱，深浅表示当前呈递；同色免疫外轮廓表示受体匹配潜力，不保证激活。','Outline color marks the inherited antigen profile and intensity marks presentation; matching immune outlines show receptor potential, not guaranteed activation.'));
     }
     return out;
   }

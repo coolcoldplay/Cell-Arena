@@ -93,7 +93,7 @@
     return {key,label:'A-'+hash.toString(16).padStart(8,'0'),rgb,color:'#'+rgb.map(v=>v.toString(16).padStart(2,'0')).join('')};
   }
   function antigenVisuals(s){
-    const data=s.immunity?.visuals,profiles=new Map((data?.profiles||[]).map(p=>[p.key,{...p,...antigenProfileStyle(p.key)}])),outlines=new Map(),nuclei=new Map();
+    const data=s.immunity?.visuals,profiles=new Map((data?.profiles||[]).map(p=>[p.key,{...p,...antigenProfileStyle(p.key)}])),outlines=new Map();
     for(const m of s.cells){
       if(m.dying)continue;
       const entries=(data?.cloneProfiles[m.geneClone]||[]).map(key=>profiles.get(key)).filter(Boolean);
@@ -101,33 +101,30 @@
         const levels=s.immunity?.visuals?.presentation?.[m.id]||{};
         outlines.set(m.id,{x:m.x,y:m.y,segments:entries.map(p=>({...p,alpha:.35+.65*clamp(levels[p.key]??m.antigenLevel??0)}))});
       }else if(!data&&antigenMarked(m))outlines.set(m.id,{x:m.x,y:m.y,segments:[{key:'legacy',color:'#d12f39',rgb:[209,47,57],alpha:.25+.75*antigenStrength(m)}]});
-      if(m.kind===3){const matches=(data?.immuneMatches[m.geneClone]||[]).map(key=>profiles.get(key)).filter(Boolean);if(matches.length)nuclei.set(m.id,matches);}
+      if(m.kind===3){const matches=(data?.immuneMatches[m.geneClone]||[]).map(key=>profiles.get(key)).filter(Boolean);if(matches.length)outlines.set(m.id,{x:m.x,y:m.y,segments:matches.map(p=>({...p,alpha:1}))});}
     }
-    return {profiles,outlines,nuclei};
+    return {profiles,outlines};
   }
   function antigenSegment(style,x,y,s){
     if(style.segments.length===1)return style.segments[0];let dx=x-style.x,dy=y-style.y;
     if(s.boundary==='wrap'){dx-=Math.round(dx/s.width)*s.width;dy-=Math.round(dy/s.height)*s.height;}
     const angle=Math.atan2(dy,dx)+Math.PI,index=Math.min(style.segments.length-1,Math.floor(angle/(2*Math.PI)*style.segments.length));return style.segments[index];
   }
-  // Partition the actual (possibly deformed) closed nuclear contour by arc
-  // length, not angle; a multicolor ring therefore gives every match equal space.
-  function equalContourArcs(contour,count){
-    if(!count||contour.length<2)return [];
-    const lengths=contour.map((p,i)=>Math.hypot(contour[(i+1)%contour.length][0]-p[0],contour[(i+1)%contour.length][1]-p[1])),total=lengths.reduce((a,b)=>a+b,0);
-    if(!total)return [];
-    const arcs=Array.from({length:count},()=>[]);let at=0,part=0;
-    for(let i=0;i<contour.length;i++){
-      const a=contour[i],b=contour[(i+1)%contour.length],length=lengths[i];if(!length)continue;
-      let used=0;if(!arcs[part].length)arcs[part].push([...a]);
-      while(part<count-1&&(part+1)*total/count<at+length-1e-10){
-        const end=(part+1)*total/count,ratio=(end-at)/length,p=[a[0]+(b[0]-a[0])*ratio,a[1]+(b[1]-a[1])*ratio];
-        arcs[part].push(p);arcs[++part].push([...p]);used=end-at;
-      }
-      if(length>used)arcs[part].push([...b]);at+=length;
-      if(part<count-1&&Math.abs(at-(part+1)*total/count)<1e-10)arcs[++part].push([...b]);
+  // Variable-length color spans: one immune receptor may match more than the
+  // four peptide slots of a single tumor. Identical spans share atlas storage.
+  function antigenTextureData(outlines,buffers={},maxTextureSize=16384){
+    const width=Math.min(1024,maxTextureSize),limit=Math.min(width*maxTextureSize,2**24),spans=new Map(),bytes=[];
+    const centers=buffers.centers||new Float32Array(256*256*4);centers.fill(0);
+    for(const [id,style]of outlines){
+      if(!Number.isInteger(id)||id<1||id>=65536)throw Error('Antigen cell ID exceeds render texture');
+      const rgba=style.segments.flatMap(p=>[...p.rgb,Math.round(clamp(p.alpha)*255)]),key=rgba.join(',');
+      let offset=spans.get(key);
+      if(offset===undefined){offset=bytes.length/4;if(offset+style.segments.length>limit)throw Error('Antigen colors exceed render texture');for(const value of rgba)bytes.push(value);spans.set(key,offset);}
+      centers.set([style.x,style.y,style.segments.length,offset],id*4);
     }
-    return arcs;
+    const height=Math.max(1,Math.ceil(bytes.length/4/width)),size=width*height*4;
+    const colors=buffers.colors?.length>=size?buffers.colors:new Uint8Array(size);colors.fill(0,0,size);colors.set(bytes);
+    return {centers,colors,width,height};
   }
   // Smallest occupied interval on each periodic axis. A cell crossing a seam
   // gets a local box repeated at the edges, never a box spanning the dish.
@@ -188,16 +185,6 @@
   }
   class Cache {
     antigens(s){if(this.antigenSnapshot!==s){this.antigenSnapshot=s;this.antigenData=antigenVisuals(s);}return this.antigenData;}
-    nucleusArcBatches(s){
-      if(this.arcSnapshot===s)return this.arcPaths;
-      const groups=new Map(),batches=[],contours=this.nuclei(s),wrap=s.boundary==='wrap';
-      for(const m of s.cells){const matches=this.antigens(s).nuclei.get(m.id),contour=contours.get(m.id);if(!matches?.length||!contour)continue;
-        const arcs=equalContourArcs(contour,matches.length),cx=m.nucleusX+.5,cy=m.nucleusY+.5,r=Math.max(...contour.map(p=>Math.max(Math.abs(p[0]),Math.abs(p[1]))))+1,xs=[0],ys=[0];
-        if(wrap){if(cx-r<0)xs.push(s.width);if(cx+r>s.width)xs.push(-s.width);if(cy-r<0)ys.push(s.height);if(cy+r>s.height)ys.push(-s.height);}
-        arcs.forEach((arc,i)=>{const color=matches[i].color;for(const dx of xs)for(const dy of ys){let batch=groups.get(color);if(!batch||batch.count===32){batch={stroke:color,path:new Path2D(),count:0};groups.set(color,batch);batches.push(batch);}arc.forEach(([x,y],j)=>j?batch.path.lineTo(cx+dx+x,cy+dy+y):batch.path.moveTo(cx+dx+x,cy+dy+y));batch.count++;}});
-      }
-      this.arcSnapshot=s;return this.arcPaths=batches;
-    }
     nuclei(s){
       if(this.nuclearSnapshot!==s){this.nuclearSnapshot=s;this.nuclearContours=new Map();for(const m of s.cells)if(m.hasNucleus&&(!m.dying||m.deathIntact))this.nuclearContours.set(m.id,nucleusContour(m,s));}
       return this.nuclearContours;
@@ -239,5 +226,5 @@
     const wall=!!s.walls[q],blocked=wall||!!s.fieldMask?.[bin];
     return {x,y,bin,time:s.time,cell:s.cells.find(m=>m.id===s.grid[q])||null,wall,blocked,values:blocked?null:Object.fromEntries(['oxygen','glucose','acid',...Object.keys(SIGNALS)].map(key=>[key,s.fields[key]?.values[bin]??0]))};
   }
-  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,immuneSuppressive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,cycleColor,antigenMarked,antigenStrength,antigenProfileStyle,antigenVisuals,antigenSegment,equalContourArcs,selectionBounds,selectionBoxes,bodyOpacity,adversity,signals,sample,Cache};
+  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,immuneSuppressive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,cycleColor,antigenMarked,antigenStrength,antigenProfileStyle,antigenVisuals,antigenSegment,antigenTextureData,selectionBounds,selectionBoxes,bodyOpacity,adversity,signals,sample,Cache};
 })();

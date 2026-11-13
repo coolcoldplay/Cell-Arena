@@ -296,7 +296,7 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
         <label class="select-row">画面放大<select id="zoom"><option value="100">100%</option><option value="150">150%</option><option value="200">200%</option><option value="300">300%</option></select><button id="fullscreen" class="quiet">全屏 ↗</button></label>
       </div></details><details class="subsection" id="module-markings"><summary>细胞与热图 <span>Act · 标记 · 环境分量</span></summary><div class="section-body">
         <label class="select-row">环境热图<select id="field-view"><option value="none" selected>关闭</option><option value="adversity">综合恶劣度</option><option value="oxygen">氧可用量</option><option value="glucose">葡萄糖可用量</option><option value="acid">酸负荷</option><option value="density">局部细胞密度</option></select></label>
-        <div class="checks" role="group" aria-label="细胞标记"><label><input id="nuclei" type="checkbox" checked>显示细胞核</label><label title="颜色表示遗传抗原谱；同色免疫核弧表示受体匹配潜力"><input id="antigen-marks" type="checkbox" checked>抗原谱系轮廓</label><label><input title="红色周期文字表示肿瘤干性细胞" id="cycle-marks" type="checkbox">周期文字</label><label><input id="immune-links" type="checkbox" checked>选中细胞的识别关系</label></div><div id="antigen-lineage-legend" data-no-i18n></div><p class="hint immune-key">追踪后：✓ 已识别 · ≈ 接触扫描 · × 不匹配 · ! 受限。</p>
+        <div class="checks" role="group" aria-label="细胞标记"><label><input id="nuclei" type="checkbox" checked>显示细胞核</label><label title="颜色表示遗传抗原谱；同色免疫外轮廓表示受体匹配潜力"><input id="antigen-marks" type="checkbox" checked>抗原谱系轮廓</label><label><input title="红色周期文字表示肿瘤干性细胞" id="cycle-marks" type="checkbox">周期文字</label><label><input id="immune-links" type="checkbox" checked>选中细胞的识别关系</label></div><div id="antigen-lineage-legend" data-no-i18n></div><p class="hint immune-key">追踪后：✓ 已识别 · ≈ 接触扫描 · × 不匹配 · ! 受限。</p>
         <div class="checks"><label><input id="show-tracks" type="checkbox">显示运动轨迹</label></div><label class="slider"><span>轨迹保留时长<output id="track-duration-out">400 MCS</output></span><input id="track-duration" type="range" min="20" max="2000" value="400" step="20"></label><p class="hint">开启后记录；按模拟时间保留，暂停时不消退。</p><div class="checks"><label><input id="edge-activity" type="checkbox" checked>启用所选类型的 Act 显示</label><label><input id="normal-activity" type="checkbox">正常细胞 Act</label><label><input id="tumor-activity" type="checkbox">肿瘤细胞 Act</label><label><input id="immune-activity" type="checkbox">免疫细胞 Act</label><label><input id="cell-seams" type="checkbox" checked>细分界线</label><label><input id="arrows" type="checkbox">极性箭头</label></div>
         <p class="hint">默认配色：免疫未激活淡红，实际识别后激活深红；肿瘤遗传增殖性状越高越黑，范围 0.25–3。核区默认用深蓝、深红或浅金。可在「细胞配色」分别修改；各类 Act 独立开启，开启后覆盖局部胞体色。</p>
       </div></details><details class="subsection" id="module-colors"><summary>细胞配色 <span>预设 · 胞体 · 胞核</span></summary><div class="section-body">
@@ -345,7 +345,7 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
         <details class="stats-detail death-ledger" id="death-ledger"><summary>死亡明细</summary><div class="death-detail-rows"><p>免疫杀伤 <span id="kill-progress"></span></p><p>环境死亡 <span id="environment-death-progress"></span></p><p>自发凋亡 <span id="death-progress"></span></p><p>寿命凋亡 <span id="lifespan-death-progress"></span></p></div><p id="environment-count"></p><p>手动擦除 <b id="manual-removal-count">0</b></p><p class="hint">存活数不含死亡过程中的胞体；死亡清除在胞体消失时计数。寿命凋亡独立于肿瘤自发凋亡。</p><h3>最近从画面清除</h3><ol id="recent-clearances"></ol><details><summary>最近触发死亡</summary><ol id="recent-deaths"></ol></details></details>
         <details class="stats-detail" id="statistics-scenario"><summary>运行与开局</summary><div class="performance-line"><span>实际 MCS / 秒 <b id="rate">—</b></span><span id="performance"></span><span id="seed-label"></span><span id="grid-info"></span><span id="order"></span></div>
           <section id="scenario-guide" class="scenario-guide" aria-label="情境设定与实际进度"><div class="scenario-heading"><span id="scenario-configuration"></span><button id="restore-scenario" class="quiet" title="恢复情境参数、本次开局种子及默认显示，保留区域与精细度">恢复情境设定 ↺</button></div><p id="scenario-description"></p><div id="scenario-metrics"></div><small id="scenario-setup"></small></section>
-          <div class="legend stats-key"><span><i class="medium"></i>培养液</span><span class="proliferation-key"><i></i>肿瘤：灰 → 黑，增殖能力低 → 高</span><span class="edge-key"><i></i>Act：绿＝衰减中 → 红＝新生突起</span><span class="antigen-key"><i></i>外轮廓／核弧：抗原谱系与匹配</span><span class="cycle-key" hidden>G0 静息 · G1 生长 · S 复制 · G2 准备 · M 分裂</span></div>
+          <div class="legend stats-key"><span><i class="medium"></i>培养液</span><span class="proliferation-key"><i></i>肿瘤：灰 → 黑，增殖能力低 → 高</span><span class="edge-key"><i></i>Act：绿＝衰减中 → 红＝新生突起</span><span class="antigen-key"><i></i>外轮廓：肿瘤抗原／免疫匹配</span><span class="cycle-key" hidden>G0 静息 · G1 生长 · S 复制 · G2 准备 · M 分裂</span></div>
         </details>
       </details>
       <details id="mobile-tools" class="panel-details mobile-only"><summary>画布工具</summary><div id="mobile-tools-host"></div></details><details id="mobile-session" class="panel-details mobile-only"><summary>场景与开局</summary><div id="mobile-scenes-host"></div><div id="mobile-session-actions"></div></details>
@@ -387,7 +387,7 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
   </ol>
   <p>「统计」查看全程曲线和带序号、种子的历局结果，可按初始参数再次模拟（不重放手动操作）；顶部文件图标导出／导入参数、保存画面或导出历局 CSV，录制图标开始／停止视频。导入参数会重新开局，不恢复中途状态。</p>
   <p>「肿瘤细胞／免疫细胞 → 细胞周期」调整周期参数；「追踪」查看阶段及阻滞原因。双击「信号」可添加持续 IL-2 场源，并在「显示 → 观察图层」查看其分布。</p>
-  <p>「追踪 → 选中」查看抗原序列、当前表达／呈递与识别限制；「统计 → 抗原与克隆演化」查看主要克隆占比及实际接触覆盖。同一抗原序列与通道使用同色外轮廓；免疫核以等长色弧显示受体能匹配的抗原，仍需呈递、启动与实际接触才能激活。旧实验保留种子及兼容参数后迁移到新规则，演化轨迹会改变。</p>
+  <p>「追踪 → 选中」查看抗原序列、当前表达／呈递与识别限制；「统计 → 抗原与克隆演化」查看主要克隆占比及实际接触覆盖。同一抗原序列与通道使用同色外轮廓；免疫胞体外轮廓以分段颜色显示同一受体能匹配的抗原，仍需呈递、启动与实际接触才能激活。旧实验保留种子及兼容参数后迁移到新规则，演化轨迹会改变。</p>
   <p class="hint">这是未经实验标定的二维切面演示，MCS 为模拟步数，不等同于真实时间或完整三维肿瘤。<a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MODEL.md" target="_blank" rel="noreferrer">详细模型与机制参考</a> · <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MORPHOLOGY.md" target="_blank" rel="noreferrer">形态模型</a></p>
   </div><div data-language="en" hidden><h2>Model &amp; sources</h2>
 <p>Cell-Arena is built on <a href="https://doi.org/10.7554/eLife.61288" target="_blank" rel="noreferrer"><strong>Artistoo</strong> (Wortel &amp; Textor, eLife, 2021)</a>, an open-source JavaScript library for simulating cells and tissues in the browser. This page uses its Cellular Potts Model (CPM) for cell deformation and interactions, and its Act activity colors. The <a href="https://artistoo.net/examples/CancerInvasion.html" target="_blank" rel="noreferrer">Cancer Invasion example</a> informed the visualization. Artistoo uses the MIT license; code credits and full licenses are preserved below.</p>
@@ -412,7 +412,7 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
 </ol>
 <p>Statistics shows the full population history and numbered past-round results with saved seeds. Re-simulate their initial configurations; manual interventions are not replayed. The top file icon offers image, parameter and round-CSV export plus parameter import; the recording icon starts or stops video. Importing parameters starts a fresh run; it does not restore a checkpoint.</p>
 <p>Open Tumor or Immune → Cell cycle to adjust cycle parameters. Track a cell for its phase and arrest reason. Double-tapping Signal creates a persistent IL-2 source; Display → Observation layers shows its distribution.</p>
-<p>Track → Selected shows epitope sequences, expression, presentation and actual recognition limits. Statistics → Antigens and clonal evolution shows major clone fractions and actual encounter coverage. The same antigen sequence and channel share an outline color. Equal nuclear arcs show antigens a receptor can match; activation still requires presentation, priming and actual contact. Old experiments retain their seed and compatible settings under the new rules, with changed trajectories.</p>
+<p>Track → Selected shows epitope sequences, expression, presentation and actual recognition limits. Statistics → Antigens and clonal evolution shows major clone fractions and actual encounter coverage. The same antigen sequence and channel share an outline color. Segments of the immune cell body outline show antigens one receptor can cross-recognize; activation still requires presentation, priming and actual contact. Old experiments retain their seed and compatible settings under the new rules, with changed trajectories.</p>
 <p class="hint">This is an uncalibrated 2D section demo. MCS counts simulation steps, not real time or full 3D tumor dynamics. <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MODEL.md" target="_blank" rel="noreferrer">Detailed model and references</a> · <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/MORPHOLOGY.md" target="_blank" rel="noreferrer">Morphology model</a></p>
 </div>
   <details id="code-credits"><summary>代码来源、版本与许可</summary><p>Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定提交 e997d81213a5dcdfc40ad976a18958f412f00cc9 的官方文件原样内嵌。优化 JS 约束与 WebAssembly 内核包含对 Artistoo 顺序 CPM 与约束代码的专门化／移植，Act 配色沿用其 Canvas.drawActivityValues。</p><p>随 Artistoo 带入的 MT19937 随机数实现由 Makoto Matsumoto 与 Takuji Nishimura 编写，包内另保留 Sean McCullough 的 JavaScript 封装署名，采用 BSD 三条款许可；WASM 随机数部分移植同一实现。两个完整许可证均保留在本页面。</p><p>逐文件范围见 <a href="https://github.com/coolcoldplay/Cell-Arena/blob/main/THIRD_PARTY_NOTICES.md" target="_blank" rel="noreferrer">代码来源与第三方声明</a>。通讯、代谢、遗传、切面约束和交互为本网页的模型扩展；详细机制参考见模型文档。</p><details><summary>Artistoo · MIT 完整许可证</summary><pre id="license-artistoo">MIT License
@@ -15717,8 +15717,8 @@ Artistoo 作者为 Johannes Textor 与 Inge Wortel，使用 MIT 许可；固定�
 抗原轮廓|Antigen outline
 抗原谱系轮廓|Antigen lineage outlines
 存活正常细胞的持续压力或损伤也可触发；不必先死亡。暴露越强、越久转蓝概率越高；0 关闭|Sustained stress or injury in living normal cells can also trigger this; prior death is not required. Stronger and longer exposure increases switching; 0 disables it.
-颜色表示遗传抗原谱；同色免疫核弧表示受体匹配潜力|Colors show inherited antigen profiles; matching nuclear arcs show receptor compatibility
-外轮廓／核弧：抗原谱系与匹配|Outlines / nuclear arcs: antigen profiles and matching
+颜色表示遗传抗原谱；同色免疫外轮廓表示受体匹配潜力|Colors show inherited antigen profiles; matching immune outlines show receptor compatibility
+外轮廓：肿瘤抗原／免疫匹配|Outlines: tumor antigens / immune matching
 追踪后：✓ 已识别 · ≈ 接触扫描 · × 不匹配 · ! 受限。|Track: ✓ recognized · ≈ scanning · × mismatch · ! limited.
 周期文字|Cycle labels
 红色轮廓：抗原可识别|Red outline: recognizable antigen
@@ -16154,7 +16154,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     return {key,label:'A-'+hash.toString(16).padStart(8,'0'),rgb,color:'#'+rgb.map(v=>v.toString(16).padStart(2,'0')).join('')};
   }
   function antigenVisuals(s){
-    const data=s.immunity?.visuals,profiles=new Map((data?.profiles||[]).map(p=>[p.key,{...p,...antigenProfileStyle(p.key)}])),outlines=new Map(),nuclei=new Map();
+    const data=s.immunity?.visuals,profiles=new Map((data?.profiles||[]).map(p=>[p.key,{...p,...antigenProfileStyle(p.key)}])),outlines=new Map();
     for(const m of s.cells){
       if(m.dying)continue;
       const entries=(data?.cloneProfiles[m.geneClone]||[]).map(key=>profiles.get(key)).filter(Boolean);
@@ -16162,33 +16162,30 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
         const levels=s.immunity?.visuals?.presentation?.[m.id]||{};
         outlines.set(m.id,{x:m.x,y:m.y,segments:entries.map(p=>({...p,alpha:.35+.65*clamp(levels[p.key]??m.antigenLevel??0)}))});
       }else if(!data&&antigenMarked(m))outlines.set(m.id,{x:m.x,y:m.y,segments:[{key:'legacy',color:'#d12f39',rgb:[209,47,57],alpha:.25+.75*antigenStrength(m)}]});
-      if(m.kind===3){const matches=(data?.immuneMatches[m.geneClone]||[]).map(key=>profiles.get(key)).filter(Boolean);if(matches.length)nuclei.set(m.id,matches);}
+      if(m.kind===3){const matches=(data?.immuneMatches[m.geneClone]||[]).map(key=>profiles.get(key)).filter(Boolean);if(matches.length)outlines.set(m.id,{x:m.x,y:m.y,segments:matches.map(p=>({...p,alpha:1}))});}
     }
-    return {profiles,outlines,nuclei};
+    return {profiles,outlines};
   }
   function antigenSegment(style,x,y,s){
     if(style.segments.length===1)return style.segments[0];let dx=x-style.x,dy=y-style.y;
     if(s.boundary==='wrap'){dx-=Math.round(dx/s.width)*s.width;dy-=Math.round(dy/s.height)*s.height;}
     const angle=Math.atan2(dy,dx)+Math.PI,index=Math.min(style.segments.length-1,Math.floor(angle/(2*Math.PI)*style.segments.length));return style.segments[index];
   }
-  // Partition the actual (possibly deformed) closed nuclear contour by arc
-  // length, not angle; a multicolor ring therefore gives every match equal space.
-  function equalContourArcs(contour,count){
-    if(!count||contour.length<2)return [];
-    const lengths=contour.map((p,i)=>Math.hypot(contour[(i+1)%contour.length][0]-p[0],contour[(i+1)%contour.length][1]-p[1])),total=lengths.reduce((a,b)=>a+b,0);
-    if(!total)return [];
-    const arcs=Array.from({length:count},()=>[]);let at=0,part=0;
-    for(let i=0;i<contour.length;i++){
-      const a=contour[i],b=contour[(i+1)%contour.length],length=lengths[i];if(!length)continue;
-      let used=0;if(!arcs[part].length)arcs[part].push([...a]);
-      while(part<count-1&&(part+1)*total/count<at+length-1e-10){
-        const end=(part+1)*total/count,ratio=(end-at)/length,p=[a[0]+(b[0]-a[0])*ratio,a[1]+(b[1]-a[1])*ratio];
-        arcs[part].push(p);arcs[++part].push([...p]);used=end-at;
-      }
-      if(length>used)arcs[part].push([...b]);at+=length;
-      if(part<count-1&&Math.abs(at-(part+1)*total/count)<1e-10)arcs[++part].push([...b]);
+  // Variable-length color spans: one immune receptor may match more than the
+  // four peptide slots of a single tumor. Identical spans share atlas storage.
+  function antigenTextureData(outlines,buffers={},maxTextureSize=16384){
+    const width=Math.min(1024,maxTextureSize),limit=Math.min(width*maxTextureSize,2**24),spans=new Map(),bytes=[];
+    const centers=buffers.centers||new Float32Array(256*256*4);centers.fill(0);
+    for(const [id,style]of outlines){
+      if(!Number.isInteger(id)||id<1||id>=65536)throw Error('Antigen cell ID exceeds render texture');
+      const rgba=style.segments.flatMap(p=>[...p.rgb,Math.round(clamp(p.alpha)*255)]),key=rgba.join(',');
+      let offset=spans.get(key);
+      if(offset===undefined){offset=bytes.length/4;if(offset+style.segments.length>limit)throw Error('Antigen colors exceed render texture');for(const value of rgba)bytes.push(value);spans.set(key,offset);}
+      centers.set([style.x,style.y,style.segments.length,offset],id*4);
     }
-    return arcs;
+    const height=Math.max(1,Math.ceil(bytes.length/4/width)),size=width*height*4;
+    const colors=buffers.colors?.length>=size?buffers.colors:new Uint8Array(size);colors.fill(0,0,size);colors.set(bytes);
+    return {centers,colors,width,height};
   }
   // Smallest occupied interval on each periodic axis. A cell crossing a seam
   // gets a local box repeated at the edges, never a box spanning the dish.
@@ -16249,16 +16246,6 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
   }
   class Cache {
     antigens(s){if(this.antigenSnapshot!==s){this.antigenSnapshot=s;this.antigenData=antigenVisuals(s);}return this.antigenData;}
-    nucleusArcBatches(s){
-      if(this.arcSnapshot===s)return this.arcPaths;
-      const groups=new Map(),batches=[],contours=this.nuclei(s),wrap=s.boundary==='wrap';
-      for(const m of s.cells){const matches=this.antigens(s).nuclei.get(m.id),contour=contours.get(m.id);if(!matches?.length||!contour)continue;
-        const arcs=equalContourArcs(contour,matches.length),cx=m.nucleusX+.5,cy=m.nucleusY+.5,r=Math.max(...contour.map(p=>Math.max(Math.abs(p[0]),Math.abs(p[1]))))+1,xs=[0],ys=[0];
-        if(wrap){if(cx-r<0)xs.push(s.width);if(cx+r>s.width)xs.push(-s.width);if(cy-r<0)ys.push(s.height);if(cy+r>s.height)ys.push(-s.height);}
-        arcs.forEach((arc,i)=>{const color=matches[i].color;for(const dx of xs)for(const dy of ys){let batch=groups.get(color);if(!batch||batch.count===32){batch={stroke:color,path:new Path2D(),count:0};groups.set(color,batch);batches.push(batch);}arc.forEach(([x,y],j)=>j?batch.path.lineTo(cx+dx+x,cy+dy+y):batch.path.moveTo(cx+dx+x,cy+dy+y));batch.count++;}});
-      }
-      this.arcSnapshot=s;return this.arcPaths=batches;
-    }
     nuclei(s){
       if(this.nuclearSnapshot!==s){this.nuclearSnapshot=s;this.nuclearContours=new Map();for(const m of s.cells)if(m.hasNucleus&&(!m.dying||m.deathIntact))this.nuclearContours.set(m.id,nucleusContour(m,s));}
       return this.nuclearContours;
@@ -16300,7 +16287,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     const wall=!!s.walls[q],blocked=wall||!!s.fieldMask?.[bin];
     return {x,y,bin,time:s.time,cell:s.cells.find(m=>m.id===s.grid[q])||null,wall,blocked,values:blocked?null:Object.fromEntries(['oxygen','glucose','acid',...Object.keys(SIGNALS)].map(key=>[key,s.fields[key]?.values[bin]??0]))};
   }
-  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,immuneSuppressive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,cycleColor,antigenMarked,antigenStrength,antigenProfileStyle,antigenVisuals,antigenSegment,equalContourArcs,selectionBounds,selectionBoxes,bodyOpacity,adversity,signals,sample,Cache};
+  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,immuneSuppressive,displayKind,tumorShade,bodyColor,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,cycleColor,antigenMarked,antigenStrength,antigenProfileStyle,antigenVisuals,antigenSegment,antigenTextureData,selectionBounds,selectionBoxes,bodyOpacity,adversity,signals,sample,Cache};
 })();
 
 /* Display-only WebGL2 rasterizer. All cell copies and contacts stay in the
@@ -16325,7 +16312,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
       uniform ivec2 lattice;uniform vec2 viewport;uniform int fieldScale,fieldMode,seams,selected,wrap,smoothWall,antigen;
       uniform ivec4 actFlags;uniform float edgeFade;uniform int appearanceScale;out vec4 color;
       uint idAt(ivec2 p){if(wrap==1)p=(p+lattice)%lattice;else if(any(lessThan(p,ivec2(0)))||any(greaterThanEqual(p,lattice)))return 0u;return texelFetch(ids,p,0).r;}
-      vec4 antigenColor(uint id,vec2 xy){ivec2 at=ivec2(int(id)&255,int(id)>>8);vec3 c=texelFetch(antigenCenters,at,0).rgb;if(c.z<1.)return vec4(0);vec2 d=xy-c.xy;if(wrap==1)d=mod(d+vec2(lattice)*.5,vec2(lattice))-vec2(lattice)*.5;int slot=0;if(c.z>1.&&dot(d,d)>0.)slot=clamp(int(floor((atan(d.y,d.x)+3.14159265359)/6.28318530718*c.z)),0,int(c.z)-1);return texelFetch(antigenColors,ivec2(at.x*4+slot,at.y),0);}
+      vec4 antigenColor(uint id,vec2 xy){ivec2 at=ivec2(int(id)&255,int(id)>>8);vec4 c=texelFetch(antigenCenters,at,0);if(c.z<1.)return vec4(0);vec2 d=xy-c.xy;if(wrap==1)d=mod(d+vec2(lattice)*.5,vec2(lattice))-vec2(lattice)*.5;int slot=0;if(c.z>1.&&dot(d,d)>0.)slot=clamp(int(floor((atan(d.y,d.x)+3.14159265359)/6.28318530718*c.z)),0,int(c.z)-1);int index=int(c.w)+slot,width=textureSize(antigenColors,0).x;return texelFetch(antigenColors,ivec2(index%width,index/width),0);}
       void antigenEdge(inout vec4 edge,uint id,ivec2 p,vec2 xy,vec4 own,float coverage){uint other=idAt(p);if(other==id)return;vec4 ink=own.a>0.?own:antigenColor(other,xy);ink.a*=coverage;if(ink.a>edge.a)edge=ink;}
       vec3 body(int kind){return bodyColors[kind];}
       float insideAt(ivec2 p,uint id){if(idAt(p*appearanceScale+ivec2(appearanceScale/2))!=id)return 0.;ivec2 size=lattice/appearanceScale;if(wrap==1)p=(p+size)%size;return texelFetch(interior,p,0).r;}
@@ -16356,7 +16343,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
       gl.useProgram(program);gl.uniform3fv(gl.getUniformLocation(program,'bodyColors[0]'),Float32Array.from(CellLabDisplay.BODY_COLORS.flat(),v=>v/255));
       this.uniforms={};for(const key of ['lattice','viewport','fieldScale','fieldMode','seams','selected','wrap','smoothWall','antigen','actFlags','showSignals','environmentOpacity','bodyEnvironmentOpacity','pixelRatio','bodyColors[0]','proliferationShading','edgeFade','appearanceScale'])this.uniforms[key]=gl.getUniformLocation(program,key);
       this.textures=[];for(const [i,key] of ['ids','activity','walls','metadata','environment','palette','signalLayer','bodySignalLayer','interior','antigenColors','antigenCenters'].entries()){const t=gl.createTexture();this.textures.push(t);gl.activeTexture(gl.TEXTURE0+i);gl.bindTexture(gl.TEXTURE_2D,t);for(const p of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,p,gl.NEAREST);for(const p of [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T])gl.texParameteri(gl.TEXTURE_2D,p,gl.CLAMP_TO_EDGE);gl.uniform1i(gl.getUniformLocation(program,key),i);}
-      this.meta=new Uint8Array(256*256*4);this.antigenMeta=new Uint8Array(256*256*16);this.antigenCenters=new Float32Array(256*256*4);this.palettes=new WeakMap();this.textureSizes=[];
+      this.meta=new Uint8Array(256*256*4);this.antigenData={};this.maxTextureSize=gl.getParameter(gl.MAX_TEXTURE_SIZE);this.palettes=new WeakMap();this.textureSizes=[];
       const ext=gl.getExtension('WEBGL_debug_renderer_info');this.device=ext?gl.getParameter(ext.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER);
       this.hardware=ext?!/swiftshader|llvmpipe|software/i.test(this.device):null;
     }
@@ -16374,7 +16361,8 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
       g.uniform1i(u.proliferationShading,cellColors?.proliferationShading===false?0:1);
       if(this.snapshot!==s){this.upload(0,s.width,s.height,g.R16UI,g.RED_INTEGER,g.UNSIGNED_SHORT,s.grid);this.upload(1,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.activity);this.upload(2,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.walls);
         this.meta.fill(0);for(const m of s.cells){this.meta[m.id*4]=CellLabDisplay.displayKind(m);this.meta[m.id*4+1]=CellLabDisplay.deathCode(m)|(CellLabDisplay.antigenMarked(m)?8:0);this.meta[m.id*4+2]=m.kind===2?CellLabDisplay.tumorShade(m):0;this.meta[m.id*4+3]=Math.round((m.dying?Math.max(0,Math.min(1,m.deathProgress||0)):CellLabDisplay.antigenStrength(m))*255);}this.upload(3,256,256,g.RGBA8UI,g.RGBA_INTEGER,g.UNSIGNED_BYTE,this.meta);
-        this.antigenMeta.fill(0);this.antigenCenters.fill(0);for(const [id,style]of (antigenStyles||CellLabDisplay.antigenVisuals(s)).outlines){this.antigenCenters.set([style.x,style.y,style.segments.length,0],id*4);style.segments.forEach((segment,i)=>{const at=id*16+i*4;this.antigenMeta.set(segment.rgb,at);this.antigenMeta[at+3]=Math.round(segment.alpha*255);});}this.upload(9,1024,256,g.RGBA8,g.RGBA,g.UNSIGNED_BYTE,this.antigenMeta);this.upload(10,256,256,g.RGBA32F,g.RGBA,g.FLOAT,this.antigenCenters);this.snapshot=s;this.field=null;}
+        const a=this.antigenData=CellLabDisplay.antigenTextureData((antigenStyles||CellLabDisplay.antigenVisuals(s)).outlines,this.antigenData,this.maxTextureSize);
+        this.upload(9,a.width,a.height,g.RGBA8,g.RGBA,g.UNSIGNED_BYTE,a.colors);this.upload(10,256,256,g.RGBA32F,g.RGBA,g.FLOAT,a.centers);this.snapshot=s;this.field=null;}
       if(this.field!==field){if(field)this.upload(4,field.width,field.height,g.R32F,g.RED,g.FLOAT,field.values);else this.upload(4,1,1,g.R32F,g.RED,g.FLOAT,new Float32Array(1));this.field=field;}
       if(info!==this.info||!this.paletteReady){let p=this.palettes.get(info);if(!p&&info){p=Uint8Array.from(info.palette.flat(2));this.palettes.set(info,p);}this.upload(5,256,9,g.RGB8,g.RGB,g.UNSIGNED_BYTE,p||new Uint8Array(256*9*3));this.info=info;this.paletteReady=true;}
       if(this.signal!==signal||!this.signalReady){this.upload(6,signal?.width||1,signal?.height||1,g.RGBA8,g.RGBA,g.UNSIGNED_BYTE,signal?.rgba||new Uint8Array(4));this.signal=signal;this.signalReady=true;}
@@ -16819,7 +16807,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
   function legend(s,visible=true){
     const root=document.getElementById('antigen-lineage-legend');if(!root)return;root.hidden=!visible;if(!visible)return;
     const profiles=s.immunity?.visuals?.profiles||[],stamp=JSON.stringify([english(),profiles.map(p=>[p.key,p.count])]);if(root.dataset.stamp===stamp)return;root.dataset.stamp=stamp;root.replaceChildren();
-    root.append(node('p','immune-note',t('同一抗原序列与通道保持同色；多抗原肿瘤的外轮廓分段。免疫核弧等分显示可匹配的抗原；仍需呈递、启动与接触才能激活。','The same antigen sequence and channel keep one color; tumors with several antigens have segmented outlines. Equal nuclear arcs show compatible antigens; activation still requires presentation, priming and contact.')));
+    root.append(node('p','immune-note',t('同一抗原序列与通道保持同色。肿瘤外轮廓表示携带的抗原；免疫外轮廓表示单一受体可交叉识别的抗原，不表示携带或呈递。仍需呈递、启动与接触才能激活。','The same antigen sequence and channel keep one color. Tumor outlines show carried antigens; immune outlines show antigens a single receptor can cross-recognize, not antigens it carries or presents. Activation still requires presentation, priming and contact.')));
     if(!profiles.length){root.append(node('p','immune-note',t('尚无非自身抗原谱。癌前或肿瘤产生抗原变异后显示谱系颜色。','No non-self antigen profile yet. Colors appear after antigen variation in precancer or tumor cells.')));return;}
     const row=node('div','antigen-profile-list');for(const p of [...profiles].sort((a,b)=>b.count-a.count||a.key.localeCompare(b.key)).slice(0,8))row.append(profileChip(p.key,p.count));root.append(row);
     if(profiles.length>8)root.append(node('p','immune-note',t('另有 '+(profiles.length-8)+' 种抗原谱；追踪细胞查看对应颜色。',(profiles.length-8)+' more profiles; select a cell to inspect its color.')));
@@ -16839,13 +16827,14 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     const clone=a.clones.find(c=>c.id===cell.geneClone),header=node('div','immune-genotype-head');
     header.append(node('b','',t('抗原—免疫','Antigen & immunity')),node('span','','G'+cell.geneClone+(clone?.parent?' ← G'+clone.parent:' · '+t('独立起源','Founder'))));root.append(header);
     if(clone)root.append(node('p','immune-note',eventLabel(clone.event)+' · '+clone.time+' MCS · '+t('第 ','Generation ')+clone.generation+(english()?'':' 代')));
-    if(profileKeys.length){const row=node('div','antigen-profile-list');for(const key of profileKeys)row.append(profileChip(key));root.append(node('p','immune-note',cell.kind===3?t('核轮廓等分显示可匹配的当前抗原；不代表已激活。','Equal nuclear arcs show compatible current antigens, not activation.'):t('每种遗传抗原对应一种颜色；表达变化只改变深浅，序列改变换色，遗传缺失移除该色段。','Each inherited antigen has one color. Expression changes intensity, sequence mutations change color, and genetic loss removes that segment.')),row);}
-    else if(cell.kind===3)root.append(node('p','immune-note',t('当前没有可匹配的非自身抗原谱，胞核保持状态配色。','No compatible current non-self profile; the nucleus keeps its state color.')));
+    if(profileKeys.length){const row=node('div','antigen-profile-list');for(const key of profileKeys)row.append(profileChip(key));root.append(node('p','immune-note',cell.kind===3?t('胞体外轮廓分段显示同一受体可匹配的当前抗原；不代表携带抗原或已经激活。','Segments of the cell body outline show current antigens compatible with one receptor, not carried antigens or activation.'):t('每种遗传抗原对应一种颜色；表达变化只改变深浅，序列改变换色，遗传缺失移除该色段。','Each inherited antigen has one color. Expression changes intensity, sequence mutations change color, and genetic loss removes that segment.')),row);}
+    else if(cell.kind===3)root.append(node('p','immune-note',t('当前没有可匹配的非自身抗原，不显示匹配色段。','No compatible current non-self antigen; no matching outline segments.')));
     if(cell.kind===3){
       const receptor=node('div','immune-receptor');receptor.append(node('span','',t('稳定识别码','Stable receptor')),sequence(g.receptor?.sequence),node('b','','C'+((g.receptor?.channel??0)+1)));root.append(receptor);
       root.append(node('p','immune-status',cell.primed?t('✓ 已具备响应资格；仍需匹配并实际接触','✓ Response competent; still requires a matching contact'):t('等待抗原特异性启动','Awaiting antigen-specific priming')));
       const meters=node('div','immune-meter-grid');meters.append(bar(t('启动进度','Priming'),cell.primed?1:cell.primingProgress),bar(t('刺激记忆','Memory'),cell.antigenMemory),bar(t('耗竭','Exhaustion'),cell.exhaustion,'brake'));root.append(meters);
     }else{
+      root.append(node('p','immune-note',t('最多 4 个抗原槽位；一次序列突变替换一个槽位，其他槽位保留。自身或遗传缺失的抗原不着色。','Up to 4 antigen slots. A sequence mutation replaces one slot and preserves the others. Self or genetically lost antigens have no color segment.')));
       const slots=node('div','immune-slots');
       g.peptides.forEach((p,i)=>{
         const self=a.self.includes(p.sequence),amount=cell.expression.peptides[i],shown=amount*cell.expression.presentation[p.channel],slot=node('div','immune-slot'+(!p.present?' lost':self?' self':''));
@@ -16859,7 +16848,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     }
     const heading=node('h3','',t('实际接触中的识别','Recognition at actual contacts'));root.append(heading);
     const contacts=a.selectedID===cell.id?a.contacts:[];
-    if(!contacts.length)root.append(node('p','immune-note',t('当前没有免疫—肿瘤／癌前膜接触；核弧仅表示受体潜力，尚无实际识别刺激。','No current immune–tumor/precancer contact; nuclear arcs indicate receptor potential, not actual stimulation.')));
+    if(!contacts.length)root.append(node('p','immune-note',t('当前没有免疫—肿瘤／癌前膜接触；免疫外轮廓仅表示受体潜力，尚无实际识别刺激。','No current immune–tumor/precancer contact; immune outlines indicate receptor potential, not actual stimulation.')));
     for(const r of contacts){
       const card=node('div','immune-contact'),status=assessment(r),head=node('div','immune-contact-head');head.style.color=status.color;
       head.append(node('b','',status.symbol+' '+status.label),node('span','','#'+r.immune+' → #'+r.target));card.append(head);
@@ -16891,7 +16880,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
       g.peptides.forEach((p,i)=>out.push('P'+(i+1)+' '+p.sequence+' · '+t('通道','channel')+' '+(p.channel+1)+' · '+(!p.present?t('遗传缺失','Genetic loss'):t('表达 ','Expression ')+percent(cell.expression.peptides[i])+(cell.expression.peptides[i]<.08?t('（暂时低表达）',' (low expression)'):''))));
       out.push(t('呈递通道：','Presentation: ')+g.presentation.map((v,i)=>'C'+(i+1)+' '+(v===0?t('遗传缺失','Genetic loss'):percent(cell.expression.presentation[i]))).join(' / '),t('免疫刹车：','Checkpoint brake: ')+percent(cell.expression.checkpoint));
       out.push(t('独立表面靶标：','Independent surface targets: ')+g.surface.map((p,i)=>'S'+(i+1)+' '+p.sequence+' '+(p.present?percent(p.base):t('缺失','absent'))).join(' / '));
-      out.push(t('外轮廓颜色表示遗传抗原谱，深浅表示当前呈递；同色免疫核弧表示受体匹配潜力，不保证激活。','Outline color marks the inherited antigen profile and intensity marks presentation; matching nuclear arcs show receptor potential, not guaranteed activation.'));
+      out.push(t('外轮廓颜色表示遗传抗原谱，深浅表示当前呈递；同色免疫外轮廓表示受体匹配潜力，不保证激活。','Outline color marks the inherited antigen profile and intensity marks presentation; matching immune outlines show receptor potential, not guaranteed activation.'));
     }
     return out;
   }
@@ -17527,7 +17516,6 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     if(showAntigen&&!gpu)drawAntigenOutlines(s,scale,pixelRatio);
     drawVessels(s,scale,pixelRatio);
     if(showNuclei){ctx.save();ctx.scale(scale,scale);ctx.lineWidth=1.5*pixelRatio/scale;for(const batch of displayCache.nucleusBatches(s,cellColors)){ctx.fillStyle=batch.fill;ctx.strokeStyle=batch.stroke;ctx.fill(batch.path);ctx.stroke(batch.path);}ctx.restore();}
-    if(showNuclei&&showAntigen){ctx.save();ctx.scale(scale,scale);ctx.lineWidth=2*pixelRatio/scale;ctx.lineCap='butt';ctx.lineJoin='round';for(const batch of displayCache.nucleusArcBatches(s)){ctx.strokeStyle=batch.stroke;ctx.stroke(batch.path);}ctx.restore();}
     // Post-clearance membrane fragments are cosmetic, never extra cells.
     // Their age uses model time, so pausing also freezes the rupture effect.
     ctx.save();ctx.lineWidth=Math.max(1,pixelRatio);
