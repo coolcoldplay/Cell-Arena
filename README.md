@@ -1,5 +1,7 @@
 # Cell-Arena · 细胞生态竞技场
 
+2026-11-13：新增[缺氧区原位内皮团、随增殖扩张的管径、组织让位与功能绿色深浅](reports/local-vascular-growth-2026-11-13/README.md)。原位新团先是实心聚团，经真实分裂与成腔后才可能供血；默认强酸化情景中的新团仍可能停滞。深绿表示内皮交换功能好，浅绿表示较差，选中可查看来源比例与功能值。
+
 2026-11-13：已增加[发生发展的亚群空间演化校准与性状着色](reports/spatial-evolution-2026-11-13/README.md)。新增[接触学习、缺氧诱导血管与肿瘤入血快速离场](reports/contact-angiogenesis-2026-11-13/README.md)。已统一为[单抗原槽与谱系演化桑基图](reports/single-antigen-2026-11-13/README.md)，四槽运行模式已移除。此前新增[抗原谱系与免疫胞体匹配轮廓](reports/immune-body-outlines-2026-11-13/README.md)，并根据多种子对照收窄发生发展的损伤抑制范围。仍存在有限受体匹配与低氧区免疫低响应的模型限制。[性能路线讨论已归档并暂缓](reports/parallel-cpm/decisions-2026-11-13.md)。
 
 

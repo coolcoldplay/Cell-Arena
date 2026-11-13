@@ -45,7 +45,7 @@
       let segmentStart=0;for(const m of s.live()){
         const values=[1,m.kind,m.dying&&!m.deathIntact?1:0,C.getVolume(m.id)||0,p.cellperimeters[m.id]||0,m.planarTarget,m.lambdaV,m.perimeter,m.lambdaP,m.activity,m.drive,m.px,m.py,m.targetID,m.genome?.invasion||1,m.hasNucleus?1:0,m.nucleusX||0,m.nucleusY||0,m.nucleusRadius||0,m.maxReach,m.softReach,m.minVisibleArea];
         this.cells.set(values,m.id*stride);
-        this.cells.set(m.dying?[0,0,-1]:[m.vesselID||0,m.vascularID||0,m.vascularPhase||0],m.id*stride+29);
+        this.cells.set(m.dying?[0,0,-1]:[m.vesselID||0,m.lumenExitID||m.vascularID||0,m.lumenExitID?5:m.vascularPhase||0],m.id*stride+29);
         if(m.morphologyMode){const segments=m.shapeSegments;if(segmentStart+segments.length>this.segments.length)throw Error('Protrusion geometry exceeds WASM storage; continuing on JS');this.segments.set(segments,segmentStart);this.cells.set([m.morphologyMode,m.branchCore,m.branchPenalty,segmentStart,segments.length/6,m.protrusionForce,s.scale],m.id*stride+22);segmentStart+=segments.length;}
       }
       this.params.set(C.conf.MAX_ACT);this.params.set(C.conf.J.flat(),5);this.params[30]=C.conf.T;

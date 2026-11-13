@@ -46,7 +46,7 @@
   const labels=['培养液','正常细胞','肿瘤细胞','免疫细胞','实体障碍'];
   const titles={random:'随机生成',empty:'空白自建',ecosystem:'免疫共培养',collective:'群体迁移',invasion:'肿瘤扩张',maze:'免疫细胞迷宫',stress:'密度与逃逸',surveillance:'癌前监视',network:'胶质瘤样分枝成网'};
   const controls=[
-    ['angiogenesis','血管生成速度',0,3,.1,'持续超过诱导阈值后促进实际内皮分裂和出芽；需要已有内皮、营养与空间','×'],
+    ['angiogenesis','血管生成速度',0,3,.1,'持续缺氧且诱导因子超阈值时原位挤入内皮细胞团；增殖与成腔仍需营养和空间','×'],
     ['angiogenicSecretion','缺氧诱导因子分泌',0,3,.1,'正常与肿瘤来源分别扩散和衰减；死亡细胞与内皮不分泌','×'],
     ['angiogenicThreshold','血管诱导阈值',.005,3,.001,'两种来源的局部浓度之和；超过阈值仍需持续刺激与真实分裂',''],
     ['angiogenicHalfLife','血管诱导因子半衰期',40,800,20,'仅作用于诱导因子，不改变免疫记忆',' MCS'],
@@ -379,7 +379,7 @@
       CellLabImmuneUI.stats(s);lineageChart.update(s);
       const p=CellLabRounds.population(s);
       for(const kind of ['normal','abnormal','tumor','immune','endothelial'])$(kind+'-count').textContent=p[kind];
-      const vas=s.vascular; $('vascular-statistics').hidden=!vas?.vessels?.length; if(vas){$('vessel-functional').textContent=vas.functional+' / '+vas.vessels.length;$('vessel-perfusion').textContent=Math.round(vas.meanPerfusion*100)+'%';$('vessel-immune').textContent=(s.counters.extravasations||0)+' / '+(s.counters.vascularArrivals||0);$('vessel-export').textContent=s.counters.bloodstreamExports||0;$('vessel-growth').textContent='血管出芽 '+vas.sprouts+' · 成熟 '+vas.matured+' · 生长中 '+vas.nascent+' · 平均交换质量 '+Math.round(vas.meanQuality*100)+'%';$('vessel-repair').textContent='内皮分裂 '+(s.counters.endothelialDivisions||0)+' · 内皮死亡 '+(s.counters.endothelialDeaths||0)+' · 循环返回 '+(s.counters.circulationReturns||0);}
+      const vas=s.vascular; $('vascular-statistics').hidden=!vas?.vessels?.length; if(vas){$('vessel-functional').textContent=vas.functional+' / '+vas.vessels.length;$('vessel-perfusion').textContent=Math.round(vas.meanPerfusion*100)+'%';$('vessel-immune').textContent=(s.counters.extravasations||0)+' / '+(s.counters.vascularArrivals||0);$('vessel-export').textContent=s.counters.bloodstreamExports||0;$('vessel-growth').textContent='原位血管启动 '+vas.sprouts+' · 成熟 '+vas.matured+' · 生长中 '+vas.nascent+' · 平均交换质量 '+Math.round(vas.meanQuality*100)+'%';$('vessel-repair').textContent='内皮分裂 '+(s.counters.endothelialDivisions||0)+' · 内皮死亡 '+(s.counters.endothelialDeaths||0)+' · 循环返回 '+(s.counters.circulationReturns||0);}
       $('alive-count').textContent=p.total;$('resting-immune-count').textContent=p.immuneResting;$('activated-immune-count').textContent=p.immuneActive;$('suppressive-immune-count').textContent=p.immuneSuppressive;
       $('division-count').textContent=s.counters.divisions;$('malignant-count').textContent=s.counters.malignantTransitions;$('escape-count').textContent=s.immunity?.metrics.losses||0;
       $('immune-division-count').textContent='免疫分裂 '+s.counters.immuneDivisions;$('recognition-count').textContent=s.counters.recognitions;
@@ -429,7 +429,8 @@
         lines.push(`细胞周期 ${c.phase} · 阶段进度 ${Math.round(c.progress*100)}%`,c.phase==='G0'&&!c.arrest?'整合增殖信号':reasons[c.arrest]);
       }
       if(cell.resources)lines.push(`能量储备 ${Math.round(cell.resources.energy*100)}% · 合成储备 ${Math.round(cell.resources.precursor*100)}% · DNA 损伤 ${Math.round(cell.resources.dnaDamage*100)}%`);
-      if(cell.vesselID)lines.push('血管 #'+cell.vesselID+' · 内皮年龄 '+Math.round(cell.age)+' MCS','剩余修复分裂 '+cell.divisionsLeft+' 次 · 累积内皮损伤 '+Math.round((cell.endothelialInjury||0)*100)+'%');
+      if(cell.vesselID)lines.push('血管 #'+cell.vesselID+' · 内皮年龄 '+Math.round(cell.age)+' MCS','剩余修复分裂 '+cell.divisionsLeft+' 次 · 累积内皮损伤 '+Math.round((cell.endothelialInjury||0)*100)+'%','内皮交换功能 '+Math.round((cell.endothelialFunction??1)*100)+'% · 肿瘤来源诱导 '+Math.round((cell.endothelialTumorFraction||0)*100)+'%');
+      if(cell.lumenExitID)lines.push('血管扩张：正在向组织侧让位');
       if(cell.vascularID)lines.push('血管 #'+cell.vascularID+' · '+({1:'管腔内循环',2:'跨内皮进入组织',3:'肿瘤跨内皮入血',4:'已进入管腔，等待灌注带离'}[cell.vascularPhase]||''));
       if(cell.kind===1&&cell.state==='normal')lines.push(`剩余修复分裂 ${cell.divisionsLeft} 次 · 空隙接触 ${Math.round(cell.freeFraction*100)}%`);
       if(cell.kind===2)lines.push(cell.isStem?'肿瘤干性：自我更新／分化':'分化肿瘤 · 剩余分裂 '+(cell.tumorDivisionsLeft===null?'无限制':cell.tumorDivisionsLeft+' 次'),`干性生态位记忆 ${Math.round(cell.stemNiche*100)}% · 性状资源代价 ${cell.traitEconomy.demand.toFixed(2)}×`);

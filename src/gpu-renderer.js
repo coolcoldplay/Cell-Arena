@@ -29,7 +29,7 @@
       void main(){
         vec2 xy=vec2(gl_FragCoord.x,viewport.y-gl_FragCoord.y)*vec2(lattice)/viewport;
         ivec2 p=clamp(ivec2(xy),ivec2(0),lattice-1);uint id=idAt(p);
-        uvec4 m=texelFetch(metadata,ivec2(int(id)&255,int(id)>>8),0);int kind=int(m.r),physicalKind=(kind==5||kind==8)?1:(kind==6||kind==7)?3:kind;vec3 base=body(kind);if(kind==2&&proliferationShading==1)base=mix(base,vec3(1),float(m.b)/255.);vec3 rgb=base,under=body(0);
+        uvec4 m=texelFetch(metadata,ivec2(int(id)&255,int(id)>>8),0);int kind=int(m.r),physicalKind=(kind==5||kind==8)?1:(kind==6||kind==7)?3:kind;vec3 base=body(kind);if(kind==8||(kind==2&&proliferationShading==1))base=mix(base,vec3(1),float(m.b)/255.);vec3 rgb=base,under=body(0);
         if(fieldMode>0){float value=texelFetch(environment,p/fieldScale,0).r;int q=int(clamp(floor(value*255.+.5),0.,255.));vec3 heat=texelFetch(palette,ivec2(q,kind),0).rgb;rgb=mix(rgb,heat,kind>0?bodyEnvironmentOpacity:environmentOpacity);under=mix(under,heat,environmentOpacity);}
         if(showSignals==1){vec4 full=texelFetch(signalLayer,p/fieldScale,0),signal=kind>0?texelFetch(bodySignalLayer,p/fieldScale,0):full;rgb=mix(rgb,signal.rgb,signal.a);under=mix(under,full.rgb,full.a);}
         if(texelFetch(walls,p,0).r>0u&&id!=uint(smoothWall))rgb=(p.x+p.y)%7<2?vec3(66,83,87)/255.:body(4);
@@ -68,7 +68,7 @@
       if(this.cellColors!==cellColors){g.uniform3fv(u['bodyColors[0]'],Float32Array.from((cellColors?CellLabDisplay.paletteBodies(cellColors):CellLabDisplay.BODY_COLORS).flat(),v=>v/255));this.cellColors=cellColors;}
       g.uniform1i(u.proliferationShading,cellColors?.proliferationShading===false?0:1);
       if(this.snapshot!==s||this.tumorTrait!==cellColors?.tumorTrait){this.tumorTrait=cellColors?.tumorTrait;this.upload(0,s.width,s.height,g.R16UI,g.RED_INTEGER,g.UNSIGNED_SHORT,s.grid);this.upload(1,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.activity);this.upload(2,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.walls);
-        this.meta.fill(0);for(const m of s.cells){this.meta[m.id*4]=CellLabDisplay.displayKind(m);this.meta[m.id*4+1]=CellLabDisplay.deathCode(m)|(CellLabDisplay.antigenMarked(m)?8:0);this.meta[m.id*4+2]=m.kind===2?CellLabDisplay.tumorShade(m,cellColors?.tumorTrait):0;this.meta[m.id*4+3]=Math.round((m.dying?Math.max(0,Math.min(1,m.deathProgress||0)):CellLabDisplay.antigenStrength(m))*255);}this.upload(3,256,256,g.RGBA8UI,g.RGBA_INTEGER,g.UNSIGNED_BYTE,this.meta);
+        this.meta.fill(0);for(const m of s.cells){this.meta[m.id*4]=CellLabDisplay.displayKind(m);this.meta[m.id*4+1]=CellLabDisplay.deathCode(m)|(CellLabDisplay.antigenMarked(m)?8:0);this.meta[m.id*4+2]=m.state==='endothelial'?CellLabDisplay.endothelialShade(m):m.kind===2?CellLabDisplay.tumorShade(m,cellColors?.tumorTrait):0;this.meta[m.id*4+3]=Math.round((m.dying?Math.max(0,Math.min(1,m.deathProgress||0)):CellLabDisplay.antigenStrength(m))*255);}this.upload(3,256,256,g.RGBA8UI,g.RGBA_INTEGER,g.UNSIGNED_BYTE,this.meta);
         const a=this.antigenData=CellLabDisplay.antigenTextureData((antigenStyles||CellLabDisplay.antigenVisuals(s)).outlines,this.antigenData,this.maxTextureSize);
         this.upload(9,a.width,a.height,g.RGBA8,g.RGBA,g.UNSIGNED_BYTE,a.colors);this.upload(10,256,256,g.RGBA32F,g.RGBA,g.FLOAT,a.centers);this.snapshot=s;this.field=null;}
       if(this.field!==field){if(field)this.upload(4,field.width,field.height,g.R32F,g.RED,g.FLOAT,field.values);else this.upload(4,1,1,g.R32F,g.RED,g.FLOAT,new Float32Array(1));this.field=field;}

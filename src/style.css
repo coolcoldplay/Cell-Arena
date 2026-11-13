@@ -247,7 +247,7 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
 #round-delete-selected,#round-cleanup-confirm{color:#913d2f}#round-cleanup-dialog{max-width:420px}#round-cleanup-dialog h3{margin:0}#round-cleanup-error{color:#913d2f}#round-cleanup-error:empty{display:none}
 @media(max-width:850px){.auto-random-control{flex-wrap:wrap;white-space:normal}.auto-random-toggle{min-height:44px}.round-select{min-width:36px;min-height:44px}.round-cleanup-actions button,.round-selection-bar label{min-height:40px}}
 
-.population-cards{grid-template-columns:repeat(5,minmax(0,1fr))}.population-endothelial{--population-color:#61a39a}.vascular-stats{border-block:1px solid var(--line);padding:9px 0;margin:8px 0}.vascular-metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:7px 0}.vascular-metrics span{display:flex;justify-content:space-between;gap:6px}.vascular-stats small{color:var(--muted)}
+.population-cards{grid-template-columns:repeat(5,minmax(0,1fr))}.population-endothelial{--population-color:#228b4b}.vascular-stats{border-block:1px solid var(--line);padding:9px 0;margin:8px 0}.vascular-metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:7px 0}.vascular-metrics span{display:flex;justify-content:space-between;gap:6px}.vascular-stats small{display:block;line-height:1.6;margin-top:3px;color:var(--muted)}
 
 /* Clonal observer panel: independent of population count scale. */
 #clone-history{width:100%;height:auto;background:#f7f0e2}.clone-legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;margin:6px 0}#genetics-summary{white-space:pre-line;line-height:1.5}

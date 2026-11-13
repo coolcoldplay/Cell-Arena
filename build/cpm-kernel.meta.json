@@ -1,7 +1,7 @@
 {
-  "sourceSHA256": "2366e864674e30e64687ff5de574625e5e58c19314098098fe097bcd763905bc",
-  "wasmSHA256": "6647a5483533df72d9b9f9c12682596db56067dc7fbbb6a57e47ddcd043ed566",
-  "compiler": "WASI SDK 20 / Clang 16",
+  "sourceSHA256": "86ff2ba02a08682078c79be2e5239d8eebbf3d354040ec97afdef5fad9e963e3",
+  "wasmSHA256": "21e9c63c980b98714325f264a2452d4eb67ad21117d0ac81f82d8ebdc9fe3f85",
+  "compiler": "clang version 23.1.0-wasi-sdk (https://github.com/llvm/llvm-project 895aa2c896ada719451be2e3673c83da8ddf1141)",
   "flags": [
     "--target=wasm32",
     "-O3",

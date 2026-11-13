@@ -34,22 +34,18 @@ test('hypoxic normal and tumor cells secrete separate factors; oxygen recovery, 
  normal.oxygen=1;tumor.dying=true;s.updateSignals(4);assert.ok([...s.fields.angiogenicNormal.values].reduce((a,b)=>a+b)<n);assert.ok([...s.fields.angiogenicTumor.values].reduce((a,b)=>a+b)<t);
 });
 test('mixed provenance monotonically lowers oxygen/glucose supply and acid removal at equal total signal',()=>{
- const outcomes=[];for(const fraction of [0,.5,1]){const s=make({vessels:[{x:72,y:56,radius:11}],settings:{vesselDependence:100}}),v=s.vascular.vessels[0];s.fields.angiogenicNormal.values.fill(2*(1-fraction));s.fields.angiogenicTumor.values.fill(2*fraction);s.vascular.measure(1200);s.fields.oxygen.values.fill(.1);s.fields.glucose.values.fill(.1);s.fields.acid.values.fill(.8);s.updateEnvironment(4);const i=s.fieldIndex(72,56);outcomes.push({quality:v.quality,oxygen:s.fields.oxygen.values[i],glucose:s.fields.glucose.values[i],acid:s.fields.acid.values[i]});}
+ const outcomes=[];for(const fraction of [0,.5,1]){const s=make({vessels:[{x:72,y:56,radius:11}],settings:{vesselDependence:100}}),v=s.vascular.vessels[0];s.fields.angiogenicNormal.values.fill(2*(1-fraction));s.fields.angiogenicTumor.values.fill(2*fraction);for(const id of v.cells)s.vascular.biology(s.cells[id],80);s.vascular.measure(0);s.fields.oxygen.values.fill(.1);s.fields.glucose.values.fill(.1);s.fields.acid.values.fill(.8);s.updateEnvironment(4);const i=s.fieldIndex(72,56);outcomes.push({quality:v.quality,oxygen:s.fields.oxygen.values[i],glucose:s.fields.glucose.values[i],acid:s.fields.acid.values[i]});}
  for(let i=1;i<3;i++){assert.ok(outcomes[i].quality<outcomes[i-1].quality);assert.ok(outcomes[i].oxygen<outcomes[i-1].oxygen);assert.ok(outcomes[i].glucose<outcomes[i-1].glucose);assert.ok(outcomes[i].acid>outcomes[i-1].acid);}
-});
-test('a vascular sprout transfers existing endothelium, supplies nothing until mature and never overwrites tissue',()=>{
- const s=make({vessels:[{x:72,y:56,radius:11}],sectionModel:true}),v=s.vascular.vessels[0],m=s.cells[v.cells[0]];
- assert.equal(s.vascular.sprout(m,v),false,'no induction below threshold');s.fields.angiogenicNormal.values.fill(2);const pixels=s.C.grid._pixels.slice(),count=s.live().length;assert.ok(s.vascular.sprout(m,v));assert.deepEqual(s.C.grid._pixels,pixels);assert.equal(s.live().length,count);const bud=s.vascular.vessels.at(-1);assert.equal(bud.nascent,true);assert.equal(bud.perfusion,0);assert.equal(bud.parent,v.id);s.vascular.measure(4);assert.equal(bud.perfusion,0);assert.ok(s.section.fits(m,m.nucleusX,m.nucleusY));
 });
 test('only tumors confirmed inside the lumen leave within 40 MCS, even if perfusion collapses',()=>{
  const s=make({vessels:[{x:72,y:56,radius:11}]}),v=s.vascular.vessels[0],tumor=body(s,2,68,52),immune=body(s,3,71,42);Object.assign(tumor,{vascularID:v.id,vascularPhase:4,bloodstreamEnteredAt:0});Object.assign(immune,{vascularID:v.id,vascularPhase:1});v.perfusion=0;const deaths=s.deathHistory.length;
  s.C.time=39;s.vascular.tick(1);assert.ok(s.cells[tumor.id]);s.C.time=40;s.vascular.tick(1);assert.equal(s.cells[tumor.id],undefined);assert.ok(s.cells[immune.id]);assert.equal(s.counters.bloodstreamExports,1);assert.equal(s.deathHistory.length,deaths);assert.equal(s.counters.kills,0);
 });
-test('actual endothelial budding preserves JS/WASM trajectories and connected nuclei',async()=>{
+test('actual endothelial growth preserves JS/WASM trajectories and connected nuclei',async()=>{
  const config={width:160,height:128,scene:'empty',seed:31,warmup:0,vessels:[{x:80,y:64,radius:11}],settings:{metabolism:.25,supply:3,apoptosis:0,vesselLifespan:0,vesselImmuneRate:0,vesselDivisions:6,immuneLearning:0}},a=new CellLab.Simulation(config),b=new CellLab.Simulation(config);
  await CellLabWasm.install(b,await CellLabWasm.load(await readFile('build/cpm-kernel.wasm')));
  for(let t=0;t<1800;t+=100){for(const s of [a,b]){s.fields.angiogenicNormal.values.fill(2);s.advance(100);}assert.deepEqual(b.C.grid._pixels,a.C.grid._pixels);assert.deepEqual(b.counters,a.counters);assert.deepEqual(b.vascular.report(),a.vascular.report());}
- assert.ok(a.counters.vascularSprouts>0);assert.ok(a.vascular.vessels[0].radius>a.vascular.vessels[0].initialRadius);
+ assert.ok(a.counters.endothelialDivisions>0);assert.ok(a.vascular.vessels[0].radius>a.vascular.vessels[0].initialRadius);
  for(const m of a.live()){assert.equal(a.components(m.id).length,1);assert.ok(a.section.fits(m,m.nucleusX,m.nucleusY));assert.ok(m.divisionsLeft>=0);}
 });
 test('new controls serialize, validate limits, randomize within bounds and translate completely',async()=>{

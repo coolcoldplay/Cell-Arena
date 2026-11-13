@@ -14,13 +14,14 @@
     violet:{name:'雾紫 · 玫瑰',description:'灰紫组织，玫瑰免疫',colors:{normal:{body:'#c1bacf',nucleus:'#625574'},abnormal:{body:'#cbb18c',nucleus:'#725836'},tumor:{body:'#30253d',nucleus:'#e5d9f2'},immune:{body:'#efb6c4',nucleus:'#9b5067'},activated:{body:'#a03260',nucleus:'#ffe2eb'},proliferationShading:true}}
   };
   COLOR_DEFAULTS.suppressive={body:'#6398d2',nucleus:'#173d69'};
-  COLOR_DEFAULTS.endothelial={body:'#61a39a',nucleus:'#164e57'};
+  COLOR_DEFAULTS.endothelial={body:'#228b4b',nucleus:'#164e57'};
   for(const preset of Object.values(COLOR_PRESETS)){preset.colors.suppressive={...COLOR_DEFAULTS.suppressive};preset.colors.endothelial={...COLOR_DEFAULTS.endothelial};}
   const colorKey=m=>m?.state==='endothelial'?'endothelial':m?.state==='abnormal'?'abnormal':m?.kind===3?(immuneSuppressive(m)?'suppressive':immuneActive(m)?'activated':'immune'):m?.kind===2?'tumor':'normal';
   const hexRGB=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
   function normalizeColors(value){
     const result={proliferationShading:value?.proliferationShading!==false,tumorTrait:['proliferation','tolerance','invasion','antigenLevel'].includes(value?.tumorTrait)?value.tumorTrait:'proliferation'};
     for(const key of ['normal','abnormal','tumor','immune','activated','suppressive','endothelial']){result[key]={};for(const part of ['body','nucleus']){const c=value?.[key]?.[part];result[key][part]=typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c)?c.toLowerCase():COLOR_DEFAULTS[key][part];}}
+    if(result.endothelial.body==='#61a39a')result.endothelial.body=COLOR_DEFAULTS.endothelial.body;
     return result;
   }
   function colorPresetID(value){
@@ -33,10 +34,11 @@
   // not transient nutrient suppression or a population-relative ranking.
   const gray=Array.from({length:89},(_,v)=>[v,v,v]);
   const tumorShade=(m,trait='proliferation')=>Math.round((trait==='proliferation'?88:198)*(1-(trait==='antigenLevel'?clamp(m?.antigenLevel??0):clamp(((m?.genome?.[trait]??1)-.25)/2.75))));
+  const endothelialShade=m=>Math.round(198*(1-clamp(m?.endothelialFunction??1)));
   const bodyColor=(m,palette)=>{
-    if(!palette)return m?.kind===2?gray[tumorShade(m)]:BODY_COLORS[displayKind(m)];
+    if(!palette){if(m?.state==='endothelial')palette=COLOR_DEFAULTS;else return m?.kind===2?gray[tumorShade(m)]:BODY_COLORS[displayKind(m)];}
     if(!m||m.kind===0||m.kind===4)return BODY_COLORS[m?.kind||0];
-    const base=hexRGB(palette[colorKey(m)].body),t=m.kind===2&&palette.proliferationShading?tumorShade(m,palette.tumorTrait)/255:0;
+    const base=hexRGB(palette[colorKey(m)].body),t=m.state==='endothelial'?endothelialShade(m)/255:m.kind===2&&palette.proliferationShading?tumorShade(m,palette.tumorTrait)/255:0;
     return base.map(v=>Math.round(v+(255-v)*t));
   };
   // Descriptive environment groups, never spatial instructions to the model.
@@ -238,5 +240,5 @@
     const wall=!!s.walls[q],blocked=wall||!!s.fieldMask?.[bin];
     return {x,y,bin,time:s.time,cell:s.cells.find(m=>m.id===s.grid[q])||null,wall,blocked,values:blocked?null:Object.fromEntries(['oxygen','glucose','acid',...Object.keys(SIGNALS)].map(key=>[key,s.fields[key]?.values[bin]??0]))};
   }
-  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,immuneSuppressive,displayKind,tumorShade,bodyColor,tumorEcology,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,cycleColor,antigenMarked,antigenStrength,antigenProfileStyle,antigenVisuals,antigenSegment,antigenTextureData,selectionBounds,selectionBoxes,bodyOpacity,adversity,signals,sample,Cache};
+  globalThis.CellLabDisplay={BODY_COLORS,COLOR_DEFAULTS,COLOR_PRESETS,normalizeColors,colorPresetID,hexRGB,paletteBodies,SIGNALS,FIELD_INFO,immuneActive,immuneSuppressive,displayKind,tumorShade,endothelialShade,bodyColor,tumorEcology,cellName,deathCode,deathColor,deathPhaseLabel,nucleusStyle,nucleusContour,cycleText,cycleColor,antigenMarked,antigenStrength,antigenProfileStyle,antigenVisuals,antigenSegment,antigenTextureData,selectionBounds,selectionBoxes,bodyOpacity,adversity,signals,sample,Cache};
 })();

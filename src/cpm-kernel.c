@@ -57,14 +57,15 @@ static inline double vessel_distance(int i,double *v){double dx=(i>>ybits)-v[1],
 static inline double *vessel(int id){return id>0&&id<=64&&vessels[id*8]>0?vessels+id*8:0;}
 __attribute__((export_name("vascular_region"))) u32 region_pointer(){return(u32)vascular_region;}
 __attribute__((export_name("vascular_geometry"))) u32 vessel_pointer(){return(u32)vessels;}
-static inline int vascular_allowed(int tgt,int a){
+static inline int vascular_allowed(int src,int tgt,int a){
   double *m=cell(a);if(!params[33]||!m[PRESENT]||m[DYING]||m[TRANSIT]<0)return 1;double *v=vessel((int)m[VESSEL]);
-  if(v){double d=vessel_distance(tgt,v),lo=v[3]-v[5];if(lo<0)lo=0;return d>=lo&&d<=v[3]+v[4]+2*v[5];}
+  if(v){double d=vessel_distance(tgt,v),lo=v[3]-v[5],from=vessel_distance(src,v);if(lo<0)lo=0;if(from<lo)lo=from;return d>=lo&&d<=v[3]+v[4]+2*v[5];}
+  if(m[TRANSIT]==5){v=vessel((int)m[ACCESS]);if(v&&(!vascular_region[tgt]||vascular_region[tgt]==(int)m[ACCESS])){double d=vessel_distance(src,v),edge=v[3]+v[4];return vessel_distance(tgt,v)>=(d<edge?d:edge);}}
   if(m[TRANSIT]==1){v=vessel((int)m[ACCESS]);if(v)return vessel_distance(tgt,v)<v[3];}
   int id=vascular_region[tgt];v=vessel(id);if(!v)return 1;
   return vessel_distance(tgt,v)>=v[3]+(m[KIND]==2?v[4]-2*v[5]:0)||(m[ACCESS]==id&&m[TRANSIT]>=2);
 }
-static inline double vascular_energy(int tgt,double *m){if(!params[33]||m[DYING])return 0;double *v=vessel((int)m[VESSEL]);if(!v)return 0;double q=(vessel_distance(tgt,v)-v[3]-v[4]/2)/v[5];return .65*q*q;}
+static inline double vascular_energy(int tgt,double *m){if(!params[33]||m[DYING])return 0;double *v;if(m[TRANSIT]==5){v=vessel((int)m[ACCESS]);if(v){double q=(v[3]+v[4]-vessel_distance(tgt,v))/v[5];if(q<0)q=0;return 1.5*q*q;}}v=vessel((int)m[VESSEL]);if(!v)return 0;double q=(vessel_distance(tgt,v)-v[3]-v[4]/2)/v[5];return .65*q*q;}
 static inline double distance2(int i,double *m){double dx=(i>>ybits)-m[NX],dy=(i&((1<<ybits)-1))-m[NY];if(wrap){if(dx>width/2.)dx-=width;else if(dx< -width/2.)dx+=width;if(dy>height/2.)dy-=height;else if(dy< -height/2.)dy+=height;}return dx*dx+dy*dy;}
 static inline int own(int j,int id,int tgt,int a){return j>=0&&(j==tgt?a:grid[j])==id;}
 static inline int thick(int j,int id,int tgt,int a){return(own(ring_at(j,0),id,tgt,a)&&own(ring_at(j,1),id,tgt,a)&&own(ring_at(j,7),id,tgt,a))||(own(ring_at(j,2),id,tgt,a)&&own(ring_at(j,1),id,tgt,a)&&own(ring_at(j,3),id,tgt,a))||(own(ring_at(j,4),id,tgt,a)&&own(ring_at(j,3),id,tgt,a)&&own(ring_at(j,5),id,tgt,a))||(own(ring_at(j,6),id,tgt,a)&&own(ring_at(j,5),id,tgt,a)&&own(ring_at(j,7),id,tgt,a));}
@@ -142,7 +143,7 @@ static void setpixel(int i,int a,int b){
 __attribute__((export_name("run"))) int run(int length){
   count=length;logcount=0;for(int i=0;i<nraw;i++)where[i]=-1;for(int i=0;i<count;i++)where[pool[i]]=i;
   double t=0;while(t<1&&count){t+=1./count;int tgt=pool[(int)(random_value()*count)],src=neighbor_at(tgt,(int)(random_value()*nc[tgt])),a=grid[src],b=grid[tgt];
-    if(a==b||cell(a)[KIND]==4||cell(b)[KIND]==4)continue;if(section&&!section_allowed(tgt,a,b))continue;if(!topology(tgt,b))continue;if(!vascular_allowed(tgt,a))continue;
+    if(a==b||cell(a)[KIND]==4||cell(b)[KIND]==4)continue;if(section&&!section_allowed(tgt,a,b))continue;if(!topology(tgt,b))continue;if(!vascular_allowed(src,tgt,a))continue;
     double h=energy(src,tgt,a,b);if(h<0||random_value()<js_exp(-h/params[30]))setpixel(tgt,a,b);
   }return logcount;
 }

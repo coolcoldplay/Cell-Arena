@@ -5,6 +5,13 @@
   const dictionary=new Map(),missing=new Set(),cache=new Map();
   function add(rows){for(const line of rows.trim().split('\n')){const at=line.indexOf('|');if(at>0)dictionary.set(line.slice(0,at),line.slice(at+1));}}
   add(`
+持续缺氧且诱导因子超阈值时原位挤入内皮细胞团；增殖与成腔仍需营养和空间|Sustained hypoxia and above-threshold induction insert a local endothelial cluster; growth and lumen formation still require nutrients and space.
+内皮深绿表示交换功能较好，浅绿表示较差；肿瘤来源诱导和累积损伤降低功能，也实际降低供氧、供糖及排酸。选中内皮可查看数值。|Dark green endothelium has better exchange function; pale green has poorer function. Tumor-source induction and accumulated injury reduce actual oxygen/glucose delivery and acid removal. Select a cell for values.
+持续缺氧可在当地启动内皮细胞团，随后分裂、成腔并扩张；空间或营养不足会停滞。深绿内皮功能较好，浅绿较差。虚线标示管腔，中心百分比是灌注能力。|Sustained hypoxia can initiate a local endothelial cluster, followed by division, lumen formation and expansion. Limited space or nutrients can arrest growth. Dark green indicates better endothelial function; pale green indicates poorer function. Dashed lines mark lumens; percentages show perfusion.
+原位血管启动|Local vessel initiations
+内皮交换功能|Endothelial exchange function
+肿瘤来源诱导|Tumor-source induction
+血管扩张：正在向组织侧让位|Vessel expansion: moving outward into tissue
 Cell-Arena · 细胞生态竞技场|Cell-Arena · Cell ecology playground
 血管、灌注与浸润|Vessels, perfusion and trafficking
 初始血管数|Initial vessels
