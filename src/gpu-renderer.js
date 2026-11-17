@@ -67,11 +67,18 @@
       // Palette changes redraw even when model time and snapshot are unchanged.
       if(this.cellColors!==cellColors){g.uniform3fv(u['bodyColors[0]'],Float32Array.from((cellColors?CellLabDisplay.paletteBodies(cellColors):CellLabDisplay.BODY_COLORS).flat(),v=>v/255));this.cellColors=cellColors;}
       g.uniform1i(u.proliferationShading,cellColors?.proliferationShading===false?0:1);
-      if(this.snapshot!==s||this.tumorTrait!==cellColors?.tumorTrait){this.tumorTrait=cellColors?.tumorTrait;this.upload(0,s.width,s.height,g.R16UI,g.RED_INTEGER,g.UNSIGNED_SHORT,s.grid);this.upload(1,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.activity);this.upload(2,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.walls);
+      if(this.snapshot!==s){this.upload(0,s.width,s.height,g.R16UI,g.RED_INTEGER,g.UNSIGNED_SHORT,s.grid);this.upload(1,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.activity);}
+      if(this.walls!==s.walls){this.upload(2,s.width,s.height,g.R8UI,g.RED_INTEGER,g.UNSIGNED_BYTE,s.walls);this.walls=s.walls;}
+      if(this.snapshot!==s||this.tumorTrait!==cellColors?.tumorTrait){this.tumorTrait=cellColors?.tumorTrait;
         this.meta.fill(0);for(const m of s.cells){this.meta[m.id*4]=CellLabDisplay.displayKind(m);this.meta[m.id*4+1]=CellLabDisplay.deathCode(m)|(CellLabDisplay.antigenMarked(m)?8:0);this.meta[m.id*4+2]=m.state==='endothelial'?CellLabDisplay.endothelialShade(m):m.kind===2?CellLabDisplay.tumorShade(m,cellColors?.tumorTrait):0;this.meta[m.id*4+3]=Math.round((m.dying?Math.max(0,Math.min(1,m.deathProgress||0)):CellLabDisplay.antigenStrength(m))*255);}this.upload(3,256,256,g.RGBA8UI,g.RGBA_INTEGER,g.UNSIGNED_BYTE,this.meta);
+        this.snapshot=s;}
+      if(showAntigen&&this.antigenSnapshot!==s){
         const a=this.antigenData=CellLabDisplay.antigenTextureData((antigenStyles||CellLabDisplay.antigenVisuals(s)).outlines,this.antigenData,this.maxTextureSize);
-        this.upload(9,a.width,a.height,g.RGBA8,g.RGBA,g.UNSIGNED_BYTE,a.colors);this.upload(10,256,256,g.RGBA32F,g.RGBA,g.FLOAT,a.centers);this.snapshot=s;this.field=null;}
-      if(this.field!==field){if(field)this.upload(4,field.width,field.height,g.R32F,g.RED,g.FLOAT,field.values);else this.upload(4,1,1,g.R32F,g.RED,g.FLOAT,new Float32Array(1));this.field=field;}
+        this.upload(9,a.width,a.height,g.RGBA8,g.RGBA,g.UNSIGNED_BYTE,a.colors);this.upload(10,256,256,g.RGBA32F,g.RGBA,g.FLOAT,a.centers);this.antigenSnapshot=s;
+      }else if(!this.textureSizes[9]){
+        this.upload(9,1,1,g.RGBA8,g.RGBA,g.UNSIGNED_BYTE,new Uint8Array(4));this.upload(10,1,1,g.RGBA32F,g.RGBA,g.FLOAT,new Float32Array(4));
+      }
+      if(this.field!==field||!this.textureSizes[4]){if(field)this.upload(4,field.width,field.height,g.R32F,g.RED,g.FLOAT,field.values);else this.upload(4,1,1,g.R32F,g.RED,g.FLOAT,new Float32Array(1));this.field=field;}
       if(info!==this.info||!this.paletteReady){let p=this.palettes.get(info);if(!p&&info){p=Uint8Array.from(info.palette.flat(2));this.palettes.set(info,p);}this.upload(5,256,9,g.RGB8,g.RGB,g.UNSIGNED_BYTE,p||new Uint8Array(256*9*3));this.info=info;this.paletteReady=true;}
       if(this.signal!==signal||!this.signalReady){this.upload(6,signal?.width||1,signal?.height||1,g.RGBA8,g.RGBA,g.UNSIGNED_BYTE,signal?.rgba||new Uint8Array(4));this.signal=signal;this.signalReady=true;}
       if(this.bodySignal!==bodySignal||!this.bodySignalReady){this.upload(7,bodySignal?.width||1,bodySignal?.height||1,g.RGBA8,g.RGBA,g.UNSIGNED_BYTE,bodySignal?.rgba||new Uint8Array(4));this.bodySignal=bodySignal;this.bodySignalReady=true;}

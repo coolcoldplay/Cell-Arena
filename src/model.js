@@ -171,7 +171,7 @@
     constructor(sim){super({});this.sim=sim;this.stamp=0;this.visited=new Uint32Array(sim.C.grid._pixels.length);this.queue=new Uint32Array(this.visited.length);this.goals=new Uint32Array(this.visited.length);}
     fulfilled(src,tgt,source,target){
       const cell=this.sim.cells[target];if(!target||!cell||(cell.dying&&!cell.deathIntact))return true;
-      const neighbors=this.sim.rings[tgt],grid=this.C.grid._pixels;let mask=0;
+      const neighbors=this.sim.ringAt(tgt),grid=this.C.grid._pixels;let mask=0;
       for(let k=0;k<8;k++)if(neighbors[k]>=0&&grid[neighbors[k]]===target)mask|=1<<k;
       if((this.sim.section?connected4:connected)[mask])return true;
       if(!mask)return false;
@@ -183,7 +183,7 @@
       while(head<tail){const i=queue[head++];
         if(this.goals[i]===stamp)needed--;
         if(!needed)return true;
-        for(const n of (this.sim.section?this.sim.faces[i]:this.sim.neighbors[i]))if(n!==tgt&&grid[n]===target&&visited[n]!==stamp){visited[n]=stamp;queue[tail++]=n;}
+        for(const n of (this.sim.section?this.sim.facesAt(i):this.sim.neighborsAt(i)))if(n!==tgt&&grid[n]===target&&visited[n]!==stamp){visited[n]=stamp;queue[tail++]=n;}
       }
       return false;
     }
@@ -358,7 +358,7 @@
       const candidates=[],reach=v.radius-s.scale;
       for(let y=Math.ceil(v.y-reach);y<=Math.floor(v.y+reach);y++)for(let x=Math.ceil(v.x-reach);x<=Math.floor(v.x+reach);x++){
         const d=(x-v.x)**2+(y-v.y)**2;if(d>reach*reach)continue;const i=s.C.grid.p2i([x,y]),m=s.cells[s.C.pixti(i)];
-        if(m?.vesselID===v.id&&!m.dying&&(d<=s.scale*s.scale||s.faces[i].some(j=>!s.C.pixti(j))))candidates.push([i,d]);
+        if(m?.vesselID===v.id&&!m.dying&&(d<=s.scale*s.scale||s.facesAt(i).some(j=>!s.C.pixti(j))))candidates.push([i,d]);
       }
       candidates.sort((a,b)=>a[1]-b[1]||a[0]-b[0]);let left=Math.max(1,Math.ceil(s.scale*s.scale*dt/4));
       for(const [i]of candidates){const id=s.C.pixti(i);if(s.C.hard_constraints.every(c=>c.fulfilled(i,i,0,id))){s.C.setpixi(i,0);s.act.setActivity(i,0);s.C.stat_values={};if(--left===0)break;}}
@@ -519,7 +519,7 @@
     }
     report(){const s=this.s,active=this.vessels.filter(v=>v.active),health=1-s.settings.vesselImmuneHealth/100*(1-this.hostHealth);return {vessels:this.vessels.map(v=>({id:v.id,x:v.x,y:v.y,radius:v.radius,wall:v.wall,initialRadius:v.initialRadius,coverage:v.coverage,perfusion:v.perfusion,patency:v.patency,area:v.area,active:v.active,quality:v.quality,tumorFraction:v.tumorFraction,angiogenicSignal:v.angiogenicSignal,parent:v.parent,nascent:v.nascent,bornAt:v.bornAt,localOrigin:!!v.localOrigin,outerDiameter:2*(v.radius+v.wall)/s.scale,maxDiameter:s.settings.vesselMaxDiameter,growthStopped:!!v.growthStopped,stoppedAt:v.stoppedAt})),initial:this.initial.map(v=>({...v})),sprouts:s.counters.vascularSprouts,matured:s.counters.vascularMaturations,nascent:active.filter(v=>v.nascent).length,meanQuality:active.reduce((n,v)=>n+v.quality,0)/Math.max(1,active.length),endothelial:s.live().filter(m=>m.vesselID).length,functional:active.filter(v=>v.perfusion>.05).length,immuneAvailability:health,canRecruit:s.settings.vesselImmuneRate>0&&health>0&&active.some(v=>v.perfusion>.05&&v.radius>5*s.scale),area:active.reduce((n,v)=>n+v.area,0),meanPerfusion:active.reduce((n,v)=>n+v.perfusion,0)/Math.max(1,active.length)};}
   }
-  // Opt-in performance prototype. Membership updates are O(1); only an event's
+  // Membership updates are O(1); only an event's
   // target body is sorted, in the exact x-major order of Artistoo's pixels().
   // Keeping that order preserves centroid sums, relabelling and RNG trajectories.
   class CellPixelIndex {
@@ -535,8 +535,28 @@
     }
     indices(id){return (this.members[id]||[]).slice().sort((a,b)=>a-b);}
   }
+  const cellDetailKeys=[
+    'target','damage','phase','targetID','age','clone','generation','divisionsLeft','recruitment','oxygen','glucose',
+    'acid','stress','fitness','confinement','sectionFraction','sectionPressure','planarTarget','offPlaneTarget',
+    'origin','abnormalSince','abnormalAge','transformedAt','immuneCue','inflammatorySignal','inflammatoryExposure',
+    'morphologyMode','branchCount','deathStartedAt','vascularID','bloodstreamEnteredAt','endothelialInjury',
+    'endothelialTumorFraction','lumenExitID','lifespanScale','freeFraction','stemNiche','tumorDivisionsLeft',
+    'antigenMemory','il2','il2Response','il2Production','chronicStimulation','exhaustion','normalTolerance',
+    'mutationPressure','immuneEncounters','immuneContactMemory','recruitmentExposure','lastAntigenChange',
+    'normalDamageExposure','inhibition','immuneRefractory','tumorKills','primed','primingProgress'
+  ];
+  const largeLatticeSites=262144;
+  // Older model clients can still request the complete, padded neighbor tables.
+  function exposeNeighborTable(sim,name,read){
+    Object.defineProperty(sim,name,{enumerable:true,configurable:true,get(){
+      const rows=new Array(sim.C.grid._pixels.length);
+      for(const i of sim.positions)rows[i]=read(i);
+      Object.defineProperty(sim,name,{value:rows,enumerable:true,configurable:true,writable:true});
+      return rows;
+    }});
+  }
   class Simulation {
-    constructor({width,height,worldWidth=240,worldHeight=180,refinement,scene='ecosystem',seed=17,boundary='solid',settings={},sources,vessels,initialCells=[],mazeSignalThroughWalls=false,warmup=35,kernel='fast',sectionModel=true,pixelIndex=false}={}){
+    constructor({width,height,worldWidth=240,worldHeight=180,refinement,scene='ecosystem',seed=17,boundary='solid',settings={},sources,vessels,initialCells=[],mazeSignalThroughWalls=false,warmup=35,kernel='fast',sectionModel=true,pixelIndex}={}){
       this.scale=refinement??(width===undefined?1.5:1);
       if(!isRefinement(this.scale))throw Error('Unsupported lattice refinement');
       if(scene==='maze'&&this.scale<.5)throw Error('迷宫通道需要至少 0.5× 精细度');
@@ -544,7 +564,7 @@
       if(!Number.isInteger(width)||!Number.isInteger(height)||width<32||height<24||width>1024||height>768)throw Error('计算格点需在 32×24 至 1024×768 内，请降低区域或精细度');
       this.worldWidth=width/this.scale;this.worldHeight=height/this.scale;this.fieldScale=scene==='maze'?Math.max(1,Math.round(this.scale*1.25)):FIELD_SCALE*this.scale;
       this.width=width;this.height=height;this.scene=scene;this.seedValue=seed;this.wrap=boundary==='wrap';this.boundary=boundary;
-      this.initialWarmup=warmup;
+      this.initialWarmup=warmup;this.terrainRevision=0;this.fieldRevision=0;
       this.settings={...DEFAULTS,...(scene==='random'?randomSettings(seed):PRESETS[scene]?.settings||{}),...settings};
       // Legacy saved configurations may contain a population budget. It has
       // no biological meaning and must not influence this run or its report.
@@ -571,18 +591,28 @@
       const C=this.C,size=C.grid._pixels.length;
       // Observers only: neither coverage nor inspected identities enter steering.
       this.patrol={visited:new Uint8Array(size),checked:new Set(),contacts:new Map(),needsSeed:true};this.trackPatrol=false;
-      this.xs=new Int16Array(size);this.ys=new Int16Array(size);this.rings=new Array(size);this.neighbors=new Array(size);this.faces=new Array(size);this.connected4=connected4;
+      this.xs=new Int16Array(size);this.ys=new Int16Array(size);this.connected4=connected4;
       const neighbors=C.grid.neighi.bind(C.grid);
+      const stride=C.grid.X_STEP,mask=stride-1,edges=new Map();
+      const interior=i=>i>=stride&&i<(width-1)*stride&&(i&mask)>0&&(i&mask)<height-1;
+      this.neighborsAt=i=>interior(i)?[i-stride-1,i-stride,i-stride+1,i-1,i+1,i+stride-1,i+stride,i+stride+1]:edges.get(i)?.neighbors;
+      this.ringAt=i=>interior(i)?[i-stride-1,i-1,i+stride-1,i+stride,i+stride+1,i+1,i-stride+1,i-stride]:edges.get(i)?.ring;
+      this.facesAt=i=>interior(i)?[i-1,i+stride,i+1,i-stride]:edges.get(i)?.faces;
+      exposeNeighborTable(this,'neighbors',this.neighborsAt);
+      exposeNeighborTable(this,'rings',i=>Int32Array.from(this.ringAt(i)));
+      exposeNeighborTable(this,'faces',this.facesAt);
       this.positions=new Uint32Array(width*height);
       this.sinX=Float64Array.from({length:width},(_,x)=>Math.sin(x/width*2*Math.PI));this.cosX=Float64Array.from({length:width},(_,x)=>Math.cos(x/width*2*Math.PI));
       this.sinY=Float64Array.from({length:height},(_,y)=>Math.sin(y/height*2*Math.PI));this.cosY=Float64Array.from({length:height},(_,y)=>Math.cos(y/height*2*Math.PI));
       for(let x=0;x<width;x++)for(let y=0;y<height;y++){
-        const i=C.grid.p2i([x,y]);this.xs[i]=x;this.ys[i]=y;this.positions[y*width+x]=i;this.neighbors[i]=neighbors(i);
-        this.rings[i]=Int32Array.from(ringOffsets,([dx,dy])=>{let xx=x+dx,yy=y+dy;if(this.wrap){xx=(xx+width)%width;yy=(yy+height)%height;}return xx<0||yy<0||xx>=width||yy>=height?-1:C.grid.p2i([xx,yy]);});
-        this.faces[i]=[1,3,5,7].map(k=>this.rings[i][k]).filter(j=>j>=0);
+        const i=C.grid.p2i([x,y]);this.xs[i]=x;this.ys[i]=y;this.positions[y*width+x]=i;
+        if(interior(i))continue;
+        const ring=Int32Array.from(ringOffsets,([dx,dy])=>{let xx=x+dx,yy=y+dy;if(this.wrap){xx=(xx+width)%width;yy=(yy+height)%height;}return xx<0||yy<0||xx>=width||yy>=height?-1:C.grid.p2i([xx,yy]);});
+        const faces=[1,3,5,7].map(k=>ring[k]).filter(j=>j>=0),moore=neighbors(i);
+        edges.set(i,{ring,faces,neighbors:moore});
       }
       // All enabled Artistoo constraints read, never mutate, neighbour arrays.
-      C.grid.neighi=i=>this.neighbors[i];
+      C.grid.neighi=this.neighborsAt;
       this.section=sectionModel&&globalThis.CellLabSection?new globalThis.CellLabSection(this):null;
       if(this.section){const hard=new CPM.HardConstraint({});hard.fulfilled=(...args)=>this.section.allowed(...args);C.add(hard);const shape=new CPM.SoftConstraint({});shape.deltaH=(...args)=>this.section.energy(...args);C.add(shape);}
       this.topology=new LocalTopology(this);C.add(new CellVolume(this));C.add(this.topology);C.add(new LocalDirection(this));
@@ -595,7 +625,8 @@
       });
       // Register before fast/WASM capture the known listeners so bulk commit,
       // reference JS, user edits and trapped-WASM fallback all maintain it.
-      this.pixelIndex=pixelIndex?new CellPixelIndex(size):null;
+      this.pixelIndexPreference=pixelIndex;
+      this.pixelIndex=(pixelIndex??(width*height>=largeLatticeSites))?new CellPixelIndex(size):null;
       if(this.pixelIndex)C.post_setpix_listeners.push(this.pixelIndex.update.bind(this.pixelIndex));
       this.act=C.getConstraint('ActivityConstraint');
       this.act.cellParameter=(parameter,id)=>parameter==='LAMBDA_ACT'?(this.cells[id]?.activity||0):C.conf[parameter][C.cellKind(id)];
@@ -874,10 +905,10 @@
         // initialization only, grow neighbouring tissue into those corners so
         // every founder is connected; no fragment is left as a phantom cell.
         const pending=[];for(const site of sites){const remaining=new Set(site.points),parts=[];
-          while(remaining.size){const queue=[remaining.values().next().value],part=[];remaining.delete(queue[0]);while(queue.length){const i=queue.pop();part.push(i);for(const n of this.faces[i])if(remaining.delete(n))queue.push(n);}parts.push(part);}parts.sort((a,b)=>b.length-a.length);
+          while(remaining.size){const queue=[remaining.values().next().value],part=[];remaining.delete(queue[0]);while(queue.length){const i=queue.pop();part.push(i);for(const n of this.facesAt(i))if(remaining.delete(n))queue.push(n);}parts.push(part);}parts.sort((a,b)=>b.length-a.length);
           for(const part of parts.slice(1))for(const i of part){this.C.setpixi(i,0);pending.push(i);}
         }
-        for(let pass=0;pending.length&&pass<100;pass++)for(let j=pending.length-1;j>=0;j--){const i=pending[j],neighbor=this.faces[i].find(k=>{const m=this.cells[this.C.pixti(k)];return m?.kind===NORMAL||m?.kind===TUMOR;});if(neighbor!==undefined){this.C.setpixi(i,this.C.pixti(neighbor));pending.splice(j,1);}}
+        for(let pass=0;pending.length&&pass<100;pass++)for(let j=pending.length-1;j>=0;j--){const i=pending[j],neighbor=this.facesAt(i).find(k=>{const m=this.cells[this.C.pixti(k)];return m?.kind===NORMAL||m?.kind===TUMOR;});if(neighbor!==undefined){this.C.setpixi(i,this.C.pixti(neighbor));pending.splice(j,1);}}
         // Fully isolated subcellular pores remain extracellular space; no cell
         // identity is assigned without a connected neighbouring body.
         const map=new Map([...sites,...patrols].map(site=>{site.points=[];return [site.id,site];}));for(const i of this.positions){const site=map.get(this.C.pixti(i));if(site)site.points.push(i);}
@@ -938,7 +969,7 @@
         // A resting round cell is wider than the corridor. Seed a connected,
         // full-area body along the available passage, rather than a tiny dot.
         const queue=[start],seen=new Set([start]),points=[];
-        for(let h=0;h<queue.length&&points.length<Math.round(72*r*r);h++){const i=queue[h];if(this.C.pixti(i))continue;points.push(i);for(const n of this.faces[i])if(!seen.has(n)&&Math.hypot(this.xs[n]-x,this.ys[n]-y)<10*r){seen.add(n);queue.push(n);}}
+        for(let h=0;h<queue.length&&points.length<Math.round(72*r*r);h++){const i=queue[h];if(this.C.pixti(i))continue;points.push(i);for(const n of this.facesAt(i))if(!seen.has(n)&&Math.hypot(this.xs[n]-x,this.ys[n]-y)<10*r){seen.add(n);queue.push(n);}}
         if(points.length<40*r*r)throw Error('Maze entrance cannot fit an immune cell');
         const id=this.C.makeNewCellID(IMMUNE);for(const i of points)this.C.setpixi(i,id);this.refreshPositions();const m=this.cells[id];
         if(!this.section.initialize(m,points))throw Error('Maze entrance cannot fit an immune nucleus');
@@ -966,6 +997,7 @@
       return result;
     }
     applySources(channel=null){
+      this.fieldRevision++;
       for(const source of this.sources){if(channel&&source.type!==channel&&!(source.type==='normalDamage'&&channel==='danger'))continue;for(const i of this.sourceBins(source)){
         if(SIGNALS.includes(source.type))this.fields[source.type].values[i]=30;
         else if(source.type==='nutrient'){this.fields.oxygen.values[i]=1;this.fields.glucose.values[i]=1;}
@@ -1056,9 +1088,10 @@
         if(erase){if(old&&C.cellKind(old)===WALL){C.setpix([xx,yy],0);changed++;}}
         else if(!old){if(!this.wallID||!C.getVolume(this.wallID))this.wallID=C.makeNewCellID(WALL);C.setpix([xx,yy],this.wallID);changed++;}
       }
-      C.stat_values={};if(rebuild)this.rebuildMask();this.version++;return changed;
+      C.stat_values={};if(changed)this.terrainRevision++;if(rebuild)this.rebuildMask();this.version++;return changed;
     }
     rebuildMask(){
+      this.terrainRevision++;this.fieldRevision++;
       for(const f of Object.values(this.fields))f.blocked.fill(0);
       for(const [p,id] of this.C.pixels())if(this.C.cellKind(id)===WALL){const x=Math.floor(p[0]/this.fieldScale),y=Math.floor(p[1]/this.fieldScale);for(const f of Object.values(this.fields)){const i=y*f.width+x;f.blocked[i]=1;f.values[i]=0;}}
       if(this.maze?.signalThroughWalls)this.fields.trail.blocked.fill(0);
@@ -1070,8 +1103,8 @@
       const add=(a,b,dx,dy)=>{if(!this.cells[a])return;const map=contacts.get(a);let edge=map.get(b);if(!edge){edge={id:b,length:0,nx:0,ny:0};map.set(b,edge);}edge.length++;edge.nx+=dx;edge.ny+=dy;};
       const present=id=>!!this.cells[id]||this.C.cellKind(id)===WALL;
       for(const i of this.C.borderpixels.elements){
-        const a=grid[i];if(!present(a))continue;const ring=this.rings[i];
-        if(this.cells[a]?.kind===NORMAL)for(const j of this.faces[i])if(j>=0&&grid[j]===0)this.cells[a].freeMembrane++;
+        const a=grid[i];if(!present(a))continue;const ring=this.ringAt(i);
+        if(this.cells[a]?.kind===NORMAL)for(const j of this.facesAt(i))if(j>=0&&grid[j]===0)this.cells[a].freeMembrane++;
         const right=ring[3],b=right<0?0:grid[right];if(a!==b&&present(b)){add(a,b,1,0);add(b,a,-1,0);}
         const down=ring[5],c=down<0?0:grid[down];if(a!==c&&present(c)){add(a,c,0,1);add(c,a,0,-1);}
       }
@@ -1080,6 +1113,7 @@
     }
     fieldIndex(x,y){return Math.floor(y/this.fieldScale)*this.fields.oxygen.width+Math.floor(x/this.fieldScale);}
     prepareEnvironment(){
+      this.fieldRevision++;
       this.vascular.prepareExchange();
       this.updateNormalReference();
       const {oxygen,glucose,acid,density}=this.fields,blocked=oxygen.blocked,n=oxygen.values.length;
@@ -1109,6 +1143,7 @@
       }
     }
     integrateEnvironment(dt){
+      this.fieldRevision++;
       const {oxygen,glucose,acid}=this.fields,blocked=oxygen.blocked,n=oxygen.values.length;
       const effectiveSupply=this.normalSupportReport().effectiveSupply,background=this.vascular.vessels.length?1-this.settings.vesselDependence/100:1,exchange=this.vascular.exchange;
       const [loadOxygen,loadGlucose,loadAcid]=this.metabolicLoads;
@@ -1432,6 +1467,7 @@
       if(result.wallPixels){C.stat_values={};this.rebuildMask();}
       // Reset the touched extracellular field bins, not cell memories or history.
       // Remaining neighboring cells and sources can subsequently replenish them.
+      this.fieldRevision++;
       for(const [name,f]of Object.entries(this.fields))for(const i of bins)f.values[i]=f.blocked[i]?0:(name==='oxygen'||name==='glucose'?1:0);
       this.version++;return result;
     }
@@ -1673,7 +1709,7 @@
         points.sort((a,b)=>radius(b)-radius(a)||a-b);
         let budget=this.C.getVolume(id)-maximum,changed=true;
         while(budget>0&&changed){changed=false;for(const i of points){
-          if(!budget)break;if(grid[i]!==id||!this.faces[i].some(j=>grid[j]!==id)&&this.faces[i].length===4)continue;
+          if(!budget)break;if(grid[i]!==id||!this.facesAt(i).some(j=>grid[j]!==id)&&this.facesAt(i).length===4)continue;
           this.C.setpixi(i,0);budget--;changed=true;
         }}
         m.deathProgress=clamp(1-this.C.getVolume(id)/Math.max(1,m.deathArea));
@@ -1683,7 +1719,7 @@
     components(id){
       const remaining=new Set(this.pixelIndex?this.pixelIndex.indices(id):[]);
       if(!this.pixelIndex)for(const [p,cid] of this.C.pixels())if(cid===id)remaining.add(this.C.grid.p2i(p));
-      const parts=[];while(remaining.size){const seed=remaining.values().next().value,queue=[seed],part=[];remaining.delete(seed);while(queue.length){const i=queue.pop();part.push(i);for(const n of (this.section?this.faces[i]:this.neighbors[i]))if(remaining.delete(n))queue.push(n);}parts.push(part);}return parts;
+      const parts=[];while(remaining.size){const seed=remaining.values().next().value,queue=[seed],part=[];remaining.delete(seed);while(queue.length){const i=queue.pop();part.push(i);for(const n of (this.section?this.facesAt(i):this.neighborsAt(i)))if(remaining.delete(n))queue.push(n);}parts.push(part);}return parts;
     }
     divide(id){
       const m=this.cells[id];if(!m||m.dying||m.state==='abnormal'||(m.kind===TUMOR&&!m.isStem&&m.tumorDivisionsLeft===0)||this.C.getVolume(id)<80*this.scale*this.scale||(m.kind===NORMAL&&m.divisionsLeft<=0)||(m.kind===IMMUNE&&(m.divisionsLeft<=0||(this.settings.immuneKillLimit>0&&m.tumorKills>=this.settings.immuneKillLimit))))return 0;
@@ -1862,6 +1898,7 @@
     pulse(x,y,channel='danger',radius){
       if(![...SIGNALS,'oxygen','glucose','acid','nutrient','hostile'].includes(channel)||![x,y].every(Number.isFinite)||x<0||y<0||x>=this.width||y>=this.height)return;
       if(radius!==undefined&&(!Number.isFinite(radius)||radius<=0))return;
+      this.fieldRevision++;
       const bins=radius===undefined?[this.fieldIndex(x,y)]:this.sourceBins({x,y,radius:clamp(radius,2*this.scale,40*this.scale)});
       for(const i of bins){if(this.fields.oxygen.blocked[i])continue;
         if(SIGNALS.includes(channel)){this.fields[channel].values[i]=Math.min(30,this.fields[channel].values[i]+8);if(channel==='normalDamage')this.fields.danger.values[i]=Math.min(30,this.fields.danger.values[i]+8);}
@@ -1940,9 +1977,9 @@
       if(!sameHistoryRow(result.at(-1),current))result.push(current);
       return result;
     }
-    snapshotRaster(){
-      if(this.kernel==='wasm'){const raster=this.wasm.raster();if(raster)return raster;}
-      const grid=new Uint16Array(this.width*this.height),activity=new Uint8Array(grid.length),walls=new Uint8Array(grid.length);let orphans=0,visitedPixels=0,freePixels=0;
+    snapshotRaster(includeTerrain=true){
+      if(this.kernel==='wasm'){const raster=this.wasm.raster(includeTerrain);if(raster)return raster;}
+      const grid=new Uint16Array(this.width*this.height),activity=new Uint8Array(grid.length),walls=includeTerrain?new Uint8Array(grid.length):undefined;let orphans=0,visitedPixels=0,freePixels=0;
       // Artistoo stores columns; display textures store rows. Tiled transposition
       // keeps both working sets in cache instead of striding across the entire
       // high-resolution lattice. No cell or field sample is omitted.
@@ -1954,23 +1991,41 @@
         for(let x=bx;x<ex;x++){let i=(x<<bits)+by,q=by*w+x;for(let y=by;y<ey;y++,i++,q+=w){
           const id=pixels[i],kind=present[id];grid[q]=id;
           if(kind===1)activity[q]=Math.min(255,Math.round((act[i]||0)/maxAct[id]*255));
-          else if(kind===2)walls[q]=1;else if(id)orphans++;
+          else if(kind===2){if(walls)walls[q]=1;}else if(id)orphans++;
           if(kind!==2){freePixels++;visitedPixels+=visited[i];}
         }}
       }
       return {grid,activity,walls,orphans,visitedPixels,freePixels};
     }
-    snapshot(){
-      this.refreshPositions();const {grid,activity,walls,orphans,visitedPixels,freePixels}=this.snapshotRaster();
-      const cells=this.live().map(m=>({id:m.id,kind:m.kind,x:m.x,y:m.y,px:m.px,py:m.py,area:this.C.getVolume(m.id),target:m.target,antigen:m.antigen,antigenLevel:m.antigenLevel,damage:m.damage,dying:m.dying,deathCause:m.deathCause,phase:m.phase,targetID:m.targetID,age:m.age,genome:m.genome?{...m.genome}:null,clone:m.clone,generation:m.generation,divisionsLeft:m.divisionsLeft,activation:m.activation,recruitment:m.recruitment,oxygen:m.oxygen,glucose:m.glucose,acid:m.acid,stress:m.stress,fitness:m.fitness,confinement:m.confinement}));
-      for(const c of cells){const m=this.cells[c.id];for(const key of ['sectionFraction','sectionPressure','planarTarget','offPlaneTarget','hasNucleus','nucleusX','nucleusY','nucleusRadius','birth','nucleusStrainX','nucleusStrainY','state','origin','abnormalSince','abnormalAge','transformedAt','adversity','immuneCue','inflammatorySignal','inflammatoryExposure','morphologyMode','branchCount','networkDegree','deathStartedAt','deathPhase','deathProgress','deathIntact','vesselID','vascularID','vascularPhase','bloodstreamEnteredAt','endothelialInjury','endothelialTumorFraction','endothelialFunction','lumenExitID','lifespanScale'])c[key]=m[key];if(c.kind===IMMUNE){c.patrolChecked=m.patrolCheckedBirth===m.birth?m.patrolChecked||0:0;c.patrolScanning=!!m.patrolScanning;c.patrolTurning=!!m.patrolMotion?.turnTime;}}
-      for(const c of cells){const m=this.cells[c.id];c.cycle={...m.cycle};c.resources={...m.resources};c.traitEconomy=this.traitEconomy(m);c.freeFraction=m.freeFraction;for(const key of ['isStem','stemNiche','tumorDivisionsLeft','antigenMemory','il2','il2Response','il2Production','chronicStimulation','exhaustion','normalTolerance','mutationPressure','immuneEncounters','immuneContactMemory','recruitmentExposure','lastAntigenChange','immunePhenotype','normalDamageExposure','inhibition','immuneRefractory','tumorKills'])c[key]=m[key];}
-      for(const c of cells){const m=this.cells[c.id];Object.assign(c,{geneClone:m.geneClone,expression:structuredClone(m.expression),primed:m.primed,primingProgress:m.primingProgress,recognition:{...m.recognition},...(m.kind===IMMUNE?{learnedReceptors:structuredClone(m.learnedReceptors||[]),antigenCargo:structuredClone(m.antigenCargo||[])}:{})});}
-      const fields={};for(const [key,f] of Object.entries(this.fields))fields[key]={width:f.width,height:f.height,values:f.values.slice()};
+    snapshotCells(packDetails){
+      this.refreshPositions();const live=this.live(),cells=live.map(m=>{
+        const row={
+          id:m.id,birth:m.birth,kind:m.kind,state:m.state,x:m.x,y:m.y,px:m.px,py:m.py,area:this.C.getVolume(m.id),
+          hasNucleus:m.hasNucleus,nucleusX:m.nucleusX,nucleusY:m.nucleusY,nucleusRadius:m.nucleusRadius,nucleusStrainX:m.nucleusStrainX,nucleusStrainY:m.nucleusStrainY,
+          dying:m.dying,deathCause:m.deathCause,deathPhase:m.deathPhase,deathProgress:m.deathProgress,deathIntact:m.deathIntact,
+          antigen:m.antigen,antigenLevel:m.antigenLevel,activation:m.activation,immunePhenotype:m.immunePhenotype,geneClone:m.geneClone,isStem:m.isStem,
+          vesselID:m.vesselID,vascularPhase:m.vascularPhase,endothelialFunction:m.endothelialFunction,networkDegree:m.networkDegree,adversity:m.adversity,
+          genome:packDetails?m.genome:m.genome?{...m.genome}:null,cycle:packDetails?m.cycle:{...m.cycle},resources:packDetails?m.resources:{...m.resources},
+          traitEconomy:this.traitEconomy(m),expression:packDetails?m.expression:structuredClone(m.expression),recognition:packDetails?m.recognition:{...m.recognition}
+        };
+        if(m.kind===IMMUNE){
+          row.patrolChecked=m.patrolCheckedBirth===m.birth?m.patrolChecked||0:0;row.patrolScanning=!!m.patrolScanning;row.patrolTurning=!!m.patrolMotion?.turnTime;
+          row.learnedReceptors=packDetails?m.learnedReceptors||[]:structuredClone(m.learnedReceptors||[]);
+          row.antigenCargo=packDetails?m.antigenCargo||[]:structuredClone(m.antigenCargo||[]);
+        }
+        if(!packDetails)for(const key of cellDetailKeys)row[key]=m[key];
+        return row;
+      });
+      return packDetails?{cells,cellDetails:packDetails(live,cellDetailKeys)}:{cells};
+    }
+    snapshot({terrain=true,includeFields=true,packDetails}={}){
+      const {grid,activity,walls,orphans,visitedPixels,freePixels}=this.snapshotRaster(terrain);
+      const cellState=this.snapshotCells(packDetails);
+      let fields;if(includeFields){fields={};for(const [key,f] of Object.entries(this.fields))fields[key]={width:f.width,height:f.height,values:f.values.slice()};}
       const history=this.populationHistory(true),historySamples=this.history.length+(history.at(-1)===this.history.at(-1)?0:1);
       const maze=this.maze?{...this.maze,racers:this.maze.racers.map(r=>({...r,alive:this.cells[r.id]?.birth===r.birth&&!this.cells[r.id].dying})),arrivals:this.maze.arrivals.map(a=>({...a}))}:null;
       const observation=this.observationReport(),normalSupport=this.normalSupportReport();
-      return {initialRefinement:this.initialRefinement??this.scale,refinementTransitions:this.refinementTransitions||[],immunity:this.immunity.report(),initialCells:this.initialCells,modelRevision:MODEL_REVISION,warmup:this.initialWarmup,kernel:this.kernel,width:this.width,height:this.height,worldWidth:this.worldWidth,worldHeight:this.worldHeight,refinement:this.scale,fieldScale:this.fieldScale,fieldMask:this.fields.oxygen.blocked.slice(),scene:this.scene,scenario:this.scenarioReport(),vascular:this.vascular.report(),observation,normalSupport,cycles:this.cycleReport(),patrol:this.patrolReport({visitedPixels,freePixels}),maze,sources:this.sources.map(s=>({...s})),boundary:this.boundary,time:this.C.time,seed:this.seedValue,settings:{...this.settings},counters:{...this.counters},manualDeathRemovals:{...this.manualDeathRemovals},deaths:this.deathSummary(),recentDeaths:this.deathHistory.slice(-8).map(d=>({...d})),recentClearances:this.recentClearances.map(d=>({...d})),deathEffects:this.deathEffects.map(e=>({...e})),grid,activity,walls,orphans,cells,fields,history,historySamples,events:this.events.slice(-12)};
+      return {initialRefinement:this.initialRefinement??this.scale,refinementTransitions:this.refinementTransitions||[],immunity:this.immunity.report(),initialCells:this.initialCells,modelRevision:MODEL_REVISION,warmup:this.initialWarmup,kernel:this.kernel,width:this.width,height:this.height,worldWidth:this.worldWidth,worldHeight:this.worldHeight,refinement:this.scale,fieldScale:this.fieldScale,fieldMask:terrain?this.fields.oxygen.blocked.slice():undefined,scene:this.scene,scenario:this.scenarioReport(),vascular:this.vascular.report(),observation,normalSupport,cycles:this.cycleReport(),patrol:this.patrolReport({visitedPixels,freePixels}),maze,sources:this.sources.map(s=>({...s})),boundary:this.boundary,time:this.C.time,seed:this.seedValue,settings:{...this.settings},counters:{...this.counters},manualDeathRemovals:{...this.manualDeathRemovals},deaths:this.deathSummary(),recentDeaths:this.deathHistory.slice(-8).map(d=>({...d})),recentClearances:this.recentClearances.map(d=>({...d})),deathEffects:this.deathEffects.map(e=>({...e})),grid,activity,walls,orphans,...cellState,fields,history,historySamples,events:this.events.slice(-12)};
     }
   }
   globalThis.CellLab={MODEL_REVISION,isRefinement,Simulation,SignalField,StepClock,DEFAULTS,PRESETS,BODY_COLORS,TYPE_NAMES,NORMAL,TUMOR,IMMUNE,WALL,sampleHistory,randomSettings,RANDOM_RANGES,SCENE_RANDOM_RANGES};

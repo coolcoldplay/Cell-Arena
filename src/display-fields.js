@@ -227,7 +227,7 @@
       return this.selectionBox;
     }
     get(s,view,enabled,opacity={},protect=true){
-      if(this.snapshot!==s){this.snapshot=s;this.adverse=null;this.signalMask=null;this.signal=null;}
+      if(this.fields!==s.fields||this.maze!==!!s.maze){this.fields=s.fields;this.maze=!!s.maze;this.adverse=null;this.signalMask=null;this.signal=null;}
       if(view==='adversity'&&!this.adverse)this.adverse=adversity(s.fields);
       const mask=protect+':'+Object.keys(SIGNALS).map(k=>enabled.has(k)?'on:'+clamp(opacity[k]??1):'off').join(',');
       if(mask!==this.signalMask){this.signal=signals(s.fields,enabled,opacity,s.maze?{trail:30}:{});this.bodySignal=protect?signals(s.fields,enabled,Object.fromEntries(Object.keys(SIGNALS).map(k=>[k,bodyOpacity(opacity[k]??1,true)])),s.maze?{trail:30}:{}):this.signal;this.signalMask=mask;}

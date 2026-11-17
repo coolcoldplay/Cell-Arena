@@ -26,7 +26,7 @@
       if(e.vascular_region){this.vascularRegion=new Uint16Array(buffer,e.vascular_region(),n);this.vascularGeometry=new Float64Array(buffer,e.vascular_geometry(),65*8);this.vascularVersion=-1;}
       else if(s.vascular?.vessels.length)throw Error('Vascular constraints require the current WASM kernel');
       if(e.raster){const size=s.width*s.height;this.rasterKind=view(Uint8Array,17,65536);this.rasterVisited=view(Uint8Array,18,n);this.rasterGrid=view(Uint16Array,19,size);this.rasterActivity=view(Uint8Array,20,size);this.rasterWalls=view(Uint8Array,21,size);this.rasterCounts=view(Uint32Array,22,3);}
-      const boundary=i=>{this.nc[i]=s.neighbors[i].length;this.neighbors.set(s.neighbors[i],i*8);this.rings.set(s.rings[i],i*8);};
+      const boundary=i=>{const neighbors=s.C.grid.neighi(i),ring=s.ringAt?s.ringAt(i):s.rings[i];this.nc[i]=neighbors.length;this.neighbors.set(neighbors,i*8);this.rings.set(ring,i*8);};
       if(e.geometry_version?.()===1){
         // Interior neighbours are computed in the kernel. Only perimeter rows
         // need lookup tables; avoid copying/touching 64 MB of unused geometry.
@@ -110,12 +110,12 @@
       for(const m of live){let length=0;for(const e of s.contacts.get(m.id).values())length+=e.length;m.confinement=Math.max(0,Math.min(1,length/Math.max(1,4*Math.sqrt(C.getVolume(m.id)))));m.freeMembrane=this.freeMembrane[m.id];m.freeFraction=m.freeMembrane/Math.max(1,m.freeMembrane+length);}
       return s.contacts;
     }
-    raster(){
+    raster(includeTerrain=true){
       if(!this.e.raster)return null;const s=this.s,C=s.C;
       this.grid.set(C.grid._pixels.subarray(0,this.length));this.activity.set(s.act.cellpixelsact.subarray(0,this.length));this.rasterVisited.set(s.patrol.visited.subarray(0,this.length));this.rasterKind.fill(0);
       for(const m of s.live())this.rasterKind[m.id]=m.kind;for(const id of Object.keys(C.t2k))if(C.t2k[id]===4)this.rasterKind[id]=4;
       this.params.set(C.conf.MAX_ACT);this.e.raster();
-      return {grid:this.rasterGrid.slice(),activity:this.rasterActivity.slice(),walls:this.rasterWalls.slice(),orphans:this.rasterCounts[0],visitedPixels:this.rasterCounts[1],freePixels:this.rasterCounts[2]};
+      return {grid:this.rasterGrid.slice(),activity:this.rasterActivity.slice(),walls:includeTerrain?this.rasterWalls.slice():undefined,orphans:this.rasterCounts[0],visitedPixels:this.rasterCounts[1],freePixels:this.rasterCounts[2]};
     }
   }
   globalThis.CellLabWasm=WasmCPM;

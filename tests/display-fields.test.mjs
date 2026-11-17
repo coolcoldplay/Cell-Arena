@@ -22,6 +22,15 @@ test('opacity endpoints and independent channel weights are read-only and invali
   opacity.cohesion=0;const zero=cache.get(s,'none',enabled,opacity).signal;assert.equal(zero.rgba[3],0);assert.notEqual(zero,a);opacity.trail=1;assert.deepEqual([...cache.get(s,'none',enabled,opacity).signal.rgba.slice(0,3)],CellLabDisplay.SIGNALS.trail.color);
   opacity.trail=0;cache.get(s,'none',enabled,opacity);enabled.clear();assert.equal(cache.get(s,'none',enabled,opacity).signal,null);assert.equal(s.fields.trail.values[0],8);
 });
+test('successive cell frames reuse field textures until a field revision or display change',()=>{
+  const fields={oxygen:field([1,0]),glucose:field([1,.3]),acid:field([0,.6]),trail:field([1,3])};
+  const cache=new CellLabDisplay.Cache(),channels=new Set(['trail']);
+  const a=cache.get({fields,time:1},'adversity',channels),b=cache.get({fields,time:2},'adversity',channels);
+  assert.equal(b.field,a.field);assert.equal(b.signal,a.signal);assert.equal(b.bodySignal,a.bodySignal);
+  const maze=cache.get({fields,maze:{}},'adversity',channels);assert.notEqual(maze.signal,b.signal);
+  const next=structuredClone(fields);next.acid.values[0]=1;
+  const fresh=cache.get({fields:next},'adversity',channels);assert.notEqual(fresh.field,a.field);assert.ok(fresh.field.values[0]>a.field.values[0]);
+});
 test('hover samples the actual local field bin and masks wall-obstructed coarse bins instead of reporting zero resources',()=>{
   const s={width:4,height:2,fieldScale:2,time:12,grid:new Uint16Array(8),walls:new Uint8Array(8),fieldMask:new Uint8Array([0,1]),cells:[],fields:Object.fromEntries(['oxygen','glucose','acid','cohesion','danger','trail'].map(k=>[k,field([.123,0])]))};
   const p=CellLabDisplay.sample(s,1,1);assert.equal(p.bin,0);assert.ok(Math.abs(p.values.oxygen-.123)<1e-6);assert.equal(p.time,12);assert.equal(CellLabDisplay.sample(s,3,1).values,null);assert.equal(CellLabDisplay.sample(s,-1,0),null);

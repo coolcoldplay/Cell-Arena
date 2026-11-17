@@ -29,7 +29,7 @@ for(const spec of cases){
     for(const i of s.positions){
       if(s.C.pixti(i)!==0||seen[i])continue;
       components++;seen[i]=1;const queue=[i];
-      for(let n=0;n<queue.length;n++)for(const j of s.faces[queue[n]])if(s.C.pixti(j)===0&&!seen[j]){seen[j]=1;queue.push(j);}
+      for(let n=0;n<queue.length;n++)for(const j of s.facesAt(queue[n]))if(s.C.pixti(j)===0&&!seen[j]){seen[j]=1;queue.push(j);}
       empty+=queue.length;largest=Math.max(largest,queue.length);
     }
     const live=s.live().filter(m=>!m.dying);

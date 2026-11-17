@@ -46,7 +46,7 @@ export async function validateFrozen(config={},count=4096,{tile=4,batch=4,schedu
   const pairs=[],expected=[];let x=39193;const rand=()=>{x^=x<<13;x^=x>>>17;x^=x<<5;return x>>>0;};
   const border=s.C.borderpixels.elements;
   for(let q=0;q<count;q++){
-    const tgt=border[rand()%border.length],neighbors=s.neighbors[tgt],src=neighbors[rand()%neighbors.length],a=s.C.pixti(src),b=s.C.pixti(tgt),ps=s.C.grid.i2p(src),pt=s.C.grid.i2p(tgt);
+    const tgt=border[rand()%border.length],neighbors=s.C.grid.neighi(tgt),src=neighbors[rand()%neighbors.length],a=s.C.pixti(src),b=s.C.pixti(tgt),ps=s.C.grid.i2p(src),pt=s.C.grid.i2p(tgt);
     pairs.push(ps[1]*s.width+ps[0],pt[1]*s.width+pt[0]);
     expected.push([s.wasm.e.energy(src,tgt,a,b),s.section.allowed(src,tgt,a,b)?1:0,s.topology.fulfilled(src,tgt,a,b)?1:0,s.vascular.allowed(src,tgt,a,b)?1:0]);
   }

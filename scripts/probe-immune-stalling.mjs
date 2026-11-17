@@ -24,7 +24,7 @@ await writeFile(`${out}/${args.tag||'baseline'}-${seed}-${refinement}.json`,JSON
 const diagnostics=[];
 for(const m of s.live().filter(m=>m.kind===3&&!m.dying)){
   const d={...row(m),attempts:0,nucleus:0,minArea:0,reach:0,shape:0,topology:0,allowed:0,sumAcceptance:0};
-  for(const tgt of s.C.borderpixels.elements)for(const src of s.neighbors[tgt]){
+  for(const tgt of s.C.borderpixels.elements)for(const src of s.C.grid.neighi(tgt)){
     const a=s.C.pixti(src),b=s.C.pixti(tgt);if(a===b||(a!==m.id&&b!==m.id))continue;const source=s.cells[a],target=s.cells[b];if(s.C.cellKind(a)===4||s.C.cellKind(b)===4)continue;d.attempts++;
     if(target&&!target.dying&&s.C.getVolume(b)<=target.minVisibleArea){d.minArea++;continue;}
     if(target&&!target.dying&&target.hasNucleus&&s.section.distance2(s.xs[tgt],s.ys[tgt],target)<=target.nucleusRadius**2){d.nucleus++;continue;}

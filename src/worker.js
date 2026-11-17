@@ -4,6 +4,7 @@ let sim=null,playing=true,visible=true,speed=1,clock=new CellLab.StepClock(30),p
 let previous=performance.now(),lastSnapshot=0,lastMeasure=previous,measuredSteps=0,rate=0,limited=false,revision=0;
 let dragSession=null;
 let frameSerial=0,presentedFrame=0,lastPublishedTime=-1;
+let lastFieldRevision=-1,lastTerrainRevision=-1;
 let presentation={fps:60,workMs:8,idleMs:0},stepMs=0;
 let backend=new CellLabGPU.ComputeBackend();const commands=[];let busy=false,wasmModule=null,kernelNote='';
 const turnQueue=new MessageChannel();turnQueue.port1.onmessage=()=>tick();
@@ -14,12 +15,14 @@ function sendSnapshot(interactive=false){
   // make the simulation serialize a queue of obsolete full-resolution images.
   if(!interactive&&(frameSerial-presentedFrame>=2||sim.C.time===lastPublishedTime))return;
   const begin=performance.now();
-  const data=sim.snapshot();data.playing=playing;data.speed=speed;data.rate=rate;data.targetRate=30*speed;data.limited=limited;data.revision=revision;
+  const baseFrame=interactive?0:frameSerial;
+  const data=sim.snapshot({terrain:!baseFrame||sim.terrainRevision!==lastTerrainRevision,includeFields:!baseFrame||sim.fieldRevision!==lastFieldRevision,packDetails:baseFrame?CellLabPresentation.packDetails:null});
+  data.playing=playing;data.speed=speed;data.rate=rate;data.targetRate=30*speed;data.limited=limited;data.revision=revision;
   data.compute=backend.info();data.kernelNote=sim.kernelNote||kernelNote;
   data.snapshotMs=performance.now()-begin;
   data.stepMs=stepMs;data.presentation={...presentation};
-  const transfers=[data.grid.buffer,data.activity.buffer,data.walls.buffer,data.fieldMask.buffer,...Object.values(data.fields).map(f=>f.values.buffer)];
-  postMessage({type:'snapshot',frame:++frameSerial,interactive,data},transfers);
+  postMessage({type:'snapshot',frame:frameSerial+1,baseFrame,interactive,data},CellLabPresentation.transfers(data));
+  frameSerial++;lastFieldRevision=sim.fieldRevision;lastTerrainRevision=sim.terrainRevision;
   // Keep an absolute publication cadence. Resetting the clock after packing
   // turned a 25 ms MCS into one image every two steps at a 30 FPS limit.
   // Missed deadlines are discarded, never queued; physics still advances whole MCS.
@@ -89,7 +92,7 @@ async function handle(event){
     else if(command==='mazeSignal'){value=sim.setMazeSignalMode(payload.throughWalls);resetClock();}
     else if(command==='divide'){
       const target=payload.id||sim.live().filter(c=>!c.dying).sort((a,b)=>sim.C.getVolume(b.id)-sim.C.getVolume(a.id))[0]?.id;value=sim.divide(target);
-    }else if(command==='export')value={initialRefinement:sim.initialRefinement??sim.scale,refinementTransitions:sim.refinementTransitions||[],format:'cell-arena-experiment',schemaVersion:3,initialCells:sim.initialCells,immunity:sim.immunity.report(true),version:'4.0.0',modelRevision:CellLab.MODEL_REVISION,warmup:sim.initialWarmup,speed,kernel:sim.kernel,compute:backend.info(),scene:sim.scene,scenario:sim.scenarioReport(),vessels:sim.vascular.initial.map(v=>({...v})),vascular:sim.vascular.report(),normalSupport:sim.normalSupportReport(),cycles:sim.cycleReport(),patrol:{...sim.patrolReport(),checkedBirths:[...sim.patrol.checked]},maze:sim.maze?structuredClone(sim.maze):null,sources:sim.sources.map(s=>({type:s.type,x:s.x/sim.scale,y:s.y/sim.scale,radius:s.radius/sim.scale})),supplyMap:Array.from(sim.supplyMap),boundary:sim.boundary,seed:sim.seedValue,worldWidth:sim.worldWidth,worldHeight:sim.worldHeight,refinement:sim.scale,settings:sim.settings,time:sim.C.time,history:sim.populationHistory(),events:sim.events,counters:sim.counters,manualDeathRemovals:sim.manualDeathRemovals,deaths:sim.deathSummary(),deathHistory:sim.deathHistory,lineage:sim.lineage,cells:sim.snapshot().cells};
+    }else if(command==='export')value={initialRefinement:sim.initialRefinement??sim.scale,refinementTransitions:sim.refinementTransitions||[],format:'cell-arena-experiment',schemaVersion:3,initialCells:sim.initialCells,immunity:sim.immunity.report(true),version:'4.0.0',modelRevision:CellLab.MODEL_REVISION,warmup:sim.initialWarmup,speed,kernel:sim.kernel,compute:backend.info(),scene:sim.scene,scenario:sim.scenarioReport(),vessels:sim.vascular.initial.map(v=>({...v})),vascular:sim.vascular.report(),normalSupport:sim.normalSupportReport(),cycles:sim.cycleReport(),patrol:{...sim.patrolReport(),checkedBirths:[...sim.patrol.checked]},maze:sim.maze?structuredClone(sim.maze):null,sources:sim.sources.map(s=>({type:s.type,x:s.x/sim.scale,y:s.y/sim.scale,radius:s.radius/sim.scale})),supplyMap:Array.from(sim.supplyMap),boundary:sim.boundary,seed:sim.seedValue,worldWidth:sim.worldWidth,worldHeight:sim.worldHeight,refinement:sim.scale,settings:sim.settings,time:sim.C.time,history:sim.populationHistory(),events:sim.events,counters:sim.counters,manualDeathRemovals:sim.manualDeathRemovals,deaths:sim.deathSummary(),deathHistory:sim.deathHistory,lineage:sim.lineage,cells:sim.snapshotCells().cells};
     else if(command==='snapshot')value={time:sim.C.time,cells:sim.live().length};
     else throw Error('Unknown command: '+command);
     if(['seed','sprinkle','divide'].includes(command))sim.record();

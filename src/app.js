@@ -183,6 +183,7 @@
   const blob=new Blob([$('worker-source').textContent],{type:'text/javascript'}),workerURL=URL.createObjectURL(blob),worker=new Worker(workerURL);
   let sequence=0,snapshot=null,selected=0,observedBirth=0,tool='move',image=null,dirty=false,toastTimer,lastRevision=-1;
   let pendingFrame=0,lastUISync=0,uiPending=false,lastHistoryDraw=0;
+  let receivedFrame=0,recoveringFrame=false;
   let settingsKey='',legendKey='';
   const frameStats={fps:0,renderMs:0,snapshotMs:0,count:0,since:performance.now(),time:null,revision:null};
   const colorTypes=[['normal','正常细胞'],['abnormal','癌前细胞'],['tumor','肿瘤细胞'],['immune','未激活免疫'],['activated','已激活免疫'],['suppressive','免疫抑制样'],['endothelial','血管内皮']];
@@ -319,11 +320,17 @@
   worker.onmessage=event=>{
     const m=event.data;
     if(m.type==='snapshot'){
+      const data=CellLabPresentation.receive(m,snapshot,receivedFrame);
+      if(!data){
+        if(!recoveringFrame){recoveringFrame=true;rpc('snapshot').catch(e=>{recoveringFrame=false;fail(e);});}
+        return;
+      }
+      receivedFrame=m.frame;if(!m.baseFrame)recoveringFrame=false;
       const previous=snapshot?.cells.find(c=>c.id===selected),next=m.data.cells.find(c=>c.id===selected);
       const family=m.data.observation?.rootBirth===observedBirth?m.data.observation:null;
       if(family){if(!family.cells.some(c=>c.id===selected))selected=family.cells[0]?.id||0;}
       else if(previous&&next&&previous.birth!==next.birth)selected=0;
-      snapshot=m.data;if(snapshot.revision!==lastRevision){lastRevision=snapshot.revision;selected=0;observedBirth=0;adaptive.reset(performance.now());}
+      snapshot=data;if(snapshot.revision!==lastRevision){lastRevision=snapshot.revision;selected=0;observedBirth=0;adaptive.reset(performance.now());}
       autoRandom.observe(snapshot,performance.now());
       if(!setupBusy){if(journal.active&&journal.epoch!==snapshot.revision+':'+snapshot.seed)archiveRound('external-reset');if(!journal.active)journal.begin(snapshot,performance.now(),undefined,parameterLocks.toJSON(),displaySettings());journal.observe(snapshot,performance.now(),!document.hidden&&!stroke);}
       performanceContext();
@@ -418,7 +425,7 @@
     $('compute-note').textContent=(s.compute?.reason||'初始化计算后端…')+(s.kernelNote?' '+s.kernelNote:'');
     performanceReadout();
     if(!force&&!panelVisible('cell-inspector'))return;
-    const cell=s.cells.find(c=>c.id===selected),phases={search:cell?.kind===3?(cell.patrolTurning?'巡逻转向':cell.immuneCue>.05?'局部趋化':cell.patrolScanning?'巡逻接触扫描':'持续巡逻'):'探索',scan:'接触扫描',kill:'识别后递送损伤',dying:CellLabDisplay.deathPhaseLabel(cell)};
+    const cell=CellLabPresentation.cellAt(s,s.cells.findIndex(c=>c.id===selected)),phases={search:cell?.kind===3?(cell.patrolTurning?'巡逻转向':cell.immuneCue>.05?'局部趋化':cell.patrolScanning?'巡逻接触扫描':'持续巡逻'):'探索',scan:'接触扫描',kill:'识别后递送损伤',dying:CellLabDisplay.deathPhaseLabel(cell)};
     $('selection-label').textContent=cell?'#'+cell.id+' '+CellLabDisplay.cellName(cell):'未选中';
     const selectedVessel=cell?.vesselID?s.vascular?.vessels.find(v=>v.id===cell.vesselID):null;
     $('divide').disabled=!cell||cell.dying||cell.state==='abnormal'||!!selectedVessel?.growthStopped;
@@ -534,7 +541,7 @@
   function render(){
     if(!snapshot||!image)return;const renderStart=performance.now(),s=snapshot,w=s.width,h=s.height,grid=s.grid,data=image.data,meta=[];
     lastRender=renderStart;forceFrame=false;
-    const pixelRatio=resizeDisplay(),bodies=[];for(const c of s.cells){meta[c.id]=c;bodies[c.id]=CellLabDisplay.bodyColor(c,cellColors);}
+    const pixelRatio=resizeDisplay();for(const c of s.cells)meta[c.id]=c;
     const view=$('field-view').value,wrap=s.boundary==='wrap',seams=$('cell-seams').checked,showNuclei=$('nuclei').checked,showAntigen=$('antigen-marks').checked,showCycle=$('cycle-marks').checked;
     const protect=$('protect-bodies').checked,{field,info,signal,bodySignal}=displayCache.get(s,view,signalLayers,opacity,protect),environmentOpacity=opacity[view]??0,bodyEnvironmentOpacity=CellLabDisplay.bodyOpacity(environmentOpacity,protect);
     const actFlags=[0,...['normal-activity','tumor-activity','immune-activity'].map(id=>$('edge-activity').checked&&$(id).checked?1:0)];
@@ -553,8 +560,9 @@
     }
     const edgeFade=Number($('body-feather').value)/100,surface=edgeFade>0?surfaceCache.get(s):null;
     CellLabImmuneUI.legend(s,showAntigen);
-    let gpu=false;if(gpuRenderer)try{gpu=gpuRenderer.draw(ctx,s,{actFlags,seams,selected,showAntigen,antigenStyles:displayCache.antigens(s),field,info,signal,bodySignal,environmentOpacity,bodyEnvironmentOpacity,pixelRatio,cellColors,surface,edgeFade});}catch(e){rendererFailure=String(e);gpuRenderer.lost=true;}
+    let gpu=false;if(gpuRenderer)try{gpu=gpuRenderer.draw(ctx,s,{actFlags,seams,selected,showAntigen,antigenStyles:showAntigen?displayCache.antigens(s):null,field,info,signal,bodySignal,environmentOpacity,bodyEnvironmentOpacity,pixelRatio,cellColors,surface,edgeFade});}catch(e){rendererFailure=String(e);gpuRenderer.lost=true;}
     if(!gpu){
+    const bodies=[];for(const c of s.cells)bodies[c.id]=CellLabDisplay.bodyColor(c,cellColors);
     const bodySurface=surface?.scale>1?surfaceCache.full(s):surface;
     for(let q=0;q<grid.length;q++){
       const x=q%w,y=(q/w)|0,id=grid[q],m=meta[id];let rgb;
@@ -901,7 +909,7 @@
     if(hover&&performance.now()-hoverMovedAt>=10000&&!$('field-probe').hidden)probeDirty=true;
     if(probeDirty)updateProbe();requestAnimationFrame(frame);
   }requestAnimationFrame(frame);applyPerformance();
-  window.artistooLab={rpc,ready,get snapshot(){return snapshot;},get roundHistory(){return {completed:CellLabRounds.numbered(completedRounds).map(r=>structuredClone(r)),current:journal.current()};},get parameterLocks(){return parameterLocks.toJSON();},get autoRandom(){return {...autoRandom.status(),busy:autoRandomBusy};},get performance(){return {...adaptive.status(),visiblePanels:[...visiblePanels]};},get errors(){return errors;},get selected(){return selected;},get recording(){return video.status;},get colors(){return CellLabDisplay.normalizeColors(cellColors);},get renderer(){return {gpu:!!gpuRenderer&&!gpuRenderer.lost,device:gpuRenderer?.device,error:rendererFailure,ms:gpuRenderer?.lastMs,fps:snapshot?.playing?frameStats.fps:0,renderMs:frameStats.renderMs,snapshotMs:frameStats.snapshotMs};},setTool,render,exportData,importData,replayRound};
+  window.artistooLab={rpc,ready,get snapshot(){return CellLabPresentation.complete(snapshot);},get roundHistory(){return {completed:CellLabRounds.numbered(completedRounds).map(r=>structuredClone(r)),current:journal.current()};},get parameterLocks(){return parameterLocks.toJSON();},get autoRandom(){return {...autoRandom.status(),busy:autoRandomBusy};},get performance(){return {...adaptive.status(),visiblePanels:[...visiblePanels]};},get errors(){return errors;},get selected(){return selected;},get recording(){return video.status;},get colors(){return CellLabDisplay.normalizeColors(cellColors);},get renderer(){return {gpu:!!gpuRenderer&&!gpuRenderer.lost,device:gpuRenderer?.device,error:rendererFailure,ms:gpuRenderer?.lastMs,fps:snapshot?.playing?frameStats.fps:0,renderMs:frameStats.renderMs,snapshotMs:frameStats.snapshotMs};},setTool,render,exportData,importData,replayRound};
   const language=CellLabI18n.mount($('language'));
   for(const event of ['click','change'])$('language').addEventListener(event,()=>{if(snapshot)sync(true);dirty=true;});
   window.addEventListener('pagehide',()=>{if(snapshot)journal.observe(snapshot,performance.now(),false);checkpointRound(performance.now(),true);});

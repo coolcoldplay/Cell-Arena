@@ -1,0 +1,776 @@
+{
+  "date": "2026-11-18",
+  "baseline": "14b818034c94746b1a1db5a878ec620c2649b0d2",
+  "buildSHA256": "757eb961a390de09bf042306b30ffc5a8a406c66242dfba15fd90d017d5622bc",
+  "hardware": {
+    "cpu": "Apple M5",
+    "memoryGiB": 32,
+    "platform": "macOS arm64",
+    "node": "v24.22.1"
+  },
+  "snapshots": [
+    {
+      "baseline": "14b818034c94746b1a1db5a878ec620c2649b0d2",
+      "cpu": "Apple M5",
+      "node": "v24.22.1",
+      "name": "default",
+      "seed": 17,
+      "count": 96,
+      "lattice": [
+        360,
+        270
+      ],
+      "cells": 204,
+      "verified": 14,
+      "before": {
+        "packMs": {
+          "mean": 1.1590795104166673,
+          "p50": 1.0964999999999918,
+          "p95": 1.5767079999999396
+        },
+        "deliveryMs": {
+          "mean": 2.645290343750002,
+          "p50": 2.565541000000053,
+          "p95": 3.082708000000025
+        },
+        "transferBytes": {
+          "mean": 521100,
+          "p50": 521100,
+          "p95": 521100
+        }
+      },
+      "after": {
+        "packMs": {
+          "mean": 0.6717108645833351,
+          "p50": 0.6527079999999614,
+          "p95": 0.8288750000000391
+        },
+        "deliveryMs": {
+          "mean": 1.4937959791666646,
+          "p50": 1.4616659999999229,
+          "p95": 1.7390000000000327
+        },
+        "transferBytes": {
+          "mean": 376377,
+          "p50": 345456,
+          "p95": 475056
+        }
+      }
+    },
+    {
+      "baseline": "14b818034c94746b1a1db5a878ec620c2649b0d2",
+      "cpu": "Apple M5",
+      "node": "v24.22.1",
+      "name": "maximum",
+      "seed": 17,
+      "count": 96,
+      "lattice": [
+        1024,
+        768
+      ],
+      "cells": 859,
+      "verified": 14,
+      "before": {
+        "packMs": {
+          "mean": 5.355362385416645,
+          "p50": 5.083916000000045,
+          "p95": 6.730167000000165
+        },
+        "deliveryMs": {
+          "mean": 11.136857218749986,
+          "p50": 10.849416999999903,
+          "p95": 12.489708999999948
+        },
+        "transferBytes": {
+          "mean": 3747840,
+          "p50": 3747840,
+          "p95": 3747840
+        }
+      },
+      "after": {
+        "packMs": {
+          "mean": 3.0979032500000394,
+          "p50": 3.0338339999998425,
+          "p95": 3.4842080000000806
+        },
+        "deliveryMs": {
+          "mean": 5.988828572916671,
+          "p50": 5.9181250000001455,
+          "p95": 6.4193750000004
+        },
+        "transferBytes": {
+          "mean": 2722146.25,
+          "p50": 2579200,
+          "p95": 3175896
+        }
+      }
+    },
+    {
+      "baseline": "14b818034c94746b1a1db5a878ec620c2649b0d2",
+      "cpu": "Apple M5",
+      "node": "v24.22.1",
+      "name": "maximum",
+      "seed": 29,
+      "count": 96,
+      "lattice": [
+        1024,
+        768
+      ],
+      "cells": 859,
+      "verified": 14,
+      "before": {
+        "packMs": {
+          "mean": 5.186108937500005,
+          "p50": 4.966499999999542,
+          "p95": 6.543040999999903
+        },
+        "deliveryMs": {
+          "mean": 11.07762065624999,
+          "p50": 10.784625000000233,
+          "p95": 12.497583000000304
+        },
+        "transferBytes": {
+          "mean": 3747840,
+          "p50": 3747840,
+          "p95": 3747840
+        }
+      },
+      "after": {
+        "packMs": {
+          "mean": 3.0481627291666817,
+          "p50": 2.9881249999998545,
+          "p95": 3.421166999999514
+        },
+        "deliveryMs": {
+          "mean": 5.870947479166664,
+          "p50": 5.820458000000144,
+          "p95": 6.2902500000000146
+        },
+        "transferBytes": {
+          "mean": 2673398,
+          "p50": 2572328,
+          "p95": 3169024
+        }
+      }
+    },
+    {
+      "baseline": "14b818034c94746b1a1db5a878ec620c2649b0d2",
+      "cpu": "Apple M5",
+      "node": "v24.22.1",
+      "name": "small",
+      "seed": 17,
+      "count": 64,
+      "lattice": [
+        96,
+        72
+      ],
+      "cells": 30,
+      "verified": 10,
+      "before": {
+        "packMs": {
+          "mean": 0.20988990624999793,
+          "p50": 0.18891700000000355,
+          "p95": 0.32995800000000486
+        },
+        "deliveryMs": {
+          "mean": 0.5085904374999997,
+          "p50": 0.4796670000000063,
+          "p95": 0.65300000000002
+        },
+        "transferBytes": {
+          "mean": 48816,
+          "p50": 48816,
+          "p95": 48816
+        }
+      },
+      "after": {
+        "packMs": {
+          "mean": 0.1186530312500007,
+          "p50": 0.11099999999999,
+          "p95": 0.19120800000000315
+        },
+        "deliveryMs": {
+          "mean": 0.31125329687500214,
+          "p50": 0.29750000000001364,
+          "p95": 0.46229200000000503
+        },
+        "transferBytes": {
+          "mean": 29178.75,
+          "p50": 24096,
+          "p95": 44832
+        }
+      }
+    }
+  ],
+  "processes": {
+    "maximum-17": {
+      "before": {
+        "baseline": "14b818034c94746b1a1db5a878ec620c2649b0d2",
+        "cpu": "Apple M5",
+        "node": "v24.22.1",
+        "name": "maximum",
+        "seed": 17,
+        "kernel": "wasm",
+        "startup": "before",
+        "count": 240,
+        "startupMs": 4673.1298750000005,
+        "rss": 871563264,
+        "heapUsed": 468812440,
+        "arrayBuffers": 43650835,
+        "cells": 856,
+        "time": 307,
+        "stateSHA256": "e4e365565e019a227e9b33b0e9db6c0d1cd6860182eb877698248049b9d85656",
+        "mcsPerSecond": 69.07882986624027,
+        "p95": 21.712875000000167,
+        "p99": 36.972999999999956
+      },
+      "after": {
+        "baseline": "14b818034c94746b1a1db5a878ec620c2649b0d2",
+        "cpu": "Apple M5",
+        "node": "v24.22.1",
+        "name": "maximum",
+        "seed": 17,
+        "kernel": "wasm",
+        "startup": "after",
+        "count": 240,
+        "startupMs": 2078.987709,
+        "rss": 413925376,
+        "heapUsed": 26599656,
+        "arrayBuffers": 47848211,
+        "cells": 856,
+        "time": 307,
+        "stateSHA256": "e4e365565e019a227e9b33b0e9db6c0d1cd6860182eb877698248049b9d85656",
+        "mcsPerSecond": 68.50476022809447,
+        "p95": 21.87408400000004,
+        "p99": 25.7517499999999
+      }
+    },
+    "maximum-29": {
+      "before": {
+        "baseline": "14b818034c94746b1a1db5a878ec620c2649b0d2",
+        "cpu": "Apple M5",
+        "node": "v24.22.1",
+        "name": "maximum",
+        "seed": 29,
+        "kernel": "wasm",
+        "startup": "before",
+        "count": 240,
+        "startupMs": 4743.974208,
+        "rss": 869629952,
+        "heapUsed": 468834696,
+        "arrayBuffers": 43650835,
+        "cells": 858,
+        "time": 307,
+        "stateSHA256": "c4d5c5630e1734367e0e8bb790269b113ecacc80ec3c5566455c8c7ced55b07f",
+        "mcsPerSecond": 69.69886223228805,
+        "p95": 21.311999999999898,
+        "p99": 30.206749999999374
+      },
+      "after": {
+        "baseline": "14b818034c94746b1a1db5a878ec620c2649b0d2",
+        "cpu": "Apple M5",
+        "node": "v24.22.1",
+        "name": "maximum",
+        "seed": 29,
+        "kernel": "wasm",
+        "startup": "after",
+        "count": 240,
+        "startupMs": 2089.941792,
+        "rss": 411828224,
+        "heapUsed": 26643680,
+        "arrayBuffers": 47848211,
+        "cells": 858,
+        "time": 307,
+        "stateSHA256": "c4d5c5630e1734367e0e8bb790269b113ecacc80ec3c5566455c8c7ced55b07f",
+        "mcsPerSecond": 64.46344844512657,
+        "p95": 23.71941700000025,
+        "p99": 32.45024999999987
+      }
+    },
+    "default-17": {
+      "before": {
+        "baseline": "14b818034c94746b1a1db5a878ec620c2649b0d2",
+        "cpu": "Apple M5",
+        "node": "v24.22.1",
+        "name": "default",
+        "seed": 17,
+        "kernel": "wasm",
+        "startup": "before",
+        "count": 240,
+        "startupMs": 515.3702910000001,
+        "rss": 311001088,
+        "heapUsed": 67840000,
+        "arrayBuffers": 7749867,
+        "cells": 201,
+        "time": 307,
+        "stateSHA256": "e0e19dbe61038b7649e129cba9a2aa5a50eb41f0cd89ecf1bc706f995d01c609",
+        "mcsPerSecond": 353.1715617064277,
+        "p95": 4.773750000000064,
+        "p99": 7.928207999999813
+      },
+      "after": {
+        "baseline": "14b818034c94746b1a1db5a878ec620c2649b0d2",
+        "cpu": "Apple M5",
+        "node": "v24.22.1",
+        "name": "default",
+        "seed": 17,
+        "kernel": "wasm",
+        "startup": "after",
+        "count": 240,
+        "startupMs": 374.01675,
+        "rss": 146374656,
+        "heapUsed": 11325808,
+        "arrayBuffers": 7749867,
+        "cells": 201,
+        "time": 307,
+        "stateSHA256": "e0e19dbe61038b7649e129cba9a2aa5a50eb41f0cd89ecf1bc706f995d01c609",
+        "mcsPerSecond": 347.59230090874274,
+        "p95": 5.084249999999884,
+        "p99": 8.282083000000057
+      }
+    },
+    "js-17": {
+      "before": {
+        "baseline": "14b818034c94746b1a1db5a878ec620c2649b0d2",
+        "cpu": "Apple M5",
+        "node": "v24.22.1",
+        "name": "maximum",
+        "seed": 17,
+        "kernel": "fast",
+        "startup": "before",
+        "count": 48,
+        "startupMs": 4689.680334,
+        "rss": 806354944,
+        "heapUsed": 477213984,
+        "arrayBuffers": 39453459,
+        "cells": 859,
+        "time": 115,
+        "stateSHA256": "14c0b7ba3bd0ea9f49eae385df3d08ada2c8722a8a9c4858177deb7db78e6e39",
+        "mcsPerSecond": 9.687986868329386,
+        "p95": 115.31137499999932,
+        "p99": 122.71674999999959
+      },
+      "after": {
+        "baseline": "14b818034c94746b1a1db5a878ec620c2649b0d2",
+        "cpu": "Apple M5",
+        "node": "v24.22.1",
+        "name": "maximum",
+        "seed": 17,
+        "kernel": "fast",
+        "startup": "after",
+        "count": 48,
+        "startupMs": 2099.6999170000004,
+        "rss": 333266944,
+        "heapUsed": 34911536,
+        "arrayBuffers": 43650835,
+        "cells": 859,
+        "time": 115,
+        "stateSHA256": "14c0b7ba3bd0ea9f49eae385df3d08ada2c8722a8a9c4858177deb7db78e6e39",
+        "mcsPerSecond": 22.57312723284381,
+        "p95": 52.136625000000095,
+        "p99": 62.920250000000124
+      }
+    }
+  },
+  "pairedMCS": [
+    {
+      "case": "fine",
+      "seed": 17,
+      "config": {
+        "worldWidth": 240,
+        "worldHeight": 180,
+        "refinement": 4,
+        "scene": "hot",
+        "seed": 17,
+        "boundary": "wrap",
+        "warmup": 0
+      },
+      "lattice": [
+        960,
+        720
+      ],
+      "cells": [
+        198,
+        198
+      ],
+      "summary": {
+        "baseline": {
+          "mcsPerSecond": 138.93832399685067,
+          "steps": {
+            "count": 480,
+            "meanMs": 7.197045035416648,
+            "p50Ms": 5.9854999999997744,
+            "p95Ms": 9.618875000000116,
+            "p99Ms": 31.643249999999625,
+            "maxMs": 82.83958299999995,
+            "over33ms": 3,
+            "over50ms": 3,
+            "over100ms": 0
+          },
+          "events": {
+            "divide": {
+              "count": 1,
+              "meanMs": 76.6392079999996,
+              "p50Ms": 76.6392079999996,
+              "p95Ms": 76.6392079999996,
+              "p99Ms": 76.6392079999996,
+              "maxMs": 76.6392079999996,
+              "over33ms": 1,
+              "over50ms": 1,
+              "over100ms": 0
+            },
+            "eraseCell": {
+              "count": 7,
+              "meanMs": 28.78611299999992,
+              "p50Ms": 23.791583000000173,
+              "p95Ms": 45.82600000000002,
+              "p99Ms": 45.82600000000002,
+              "maxMs": 45.82600000000002,
+              "over33ms": 2,
+              "over50ms": 0,
+              "over100ms": 0
+            }
+          },
+          "windowRates": [
+            142.76790768851234,
+            144.66764107676877,
+            130.28393374544413
+          ]
+        },
+        "prototype": {
+          "mcsPerSecond": 140.569202990445,
+          "steps": {
+            "count": 480,
+            "meanMs": 7.113401914583361,
+            "p50Ms": 6.194791999998415,
+            "p95Ms": 10.683415999999852,
+            "p99Ms": 15.785334000000148,
+            "maxMs": 19.717250000001513,
+            "over33ms": 0,
+            "over50ms": 0,
+            "over100ms": 0
+          },
+          "events": {
+            "divide": {
+              "count": 1,
+              "meanMs": 4.35912499999904,
+              "p50Ms": 4.35912499999904,
+              "p95Ms": 4.35912499999904,
+              "p99Ms": 4.35912499999904,
+              "maxMs": 4.35912499999904,
+              "over33ms": 0,
+              "over50ms": 0,
+              "over100ms": 0
+            },
+            "eraseCell": {
+              "count": 7,
+              "meanMs": 1.4208572857140618,
+              "p50Ms": 1.3594169999996666,
+              "p95Ms": 1.8898339999996097,
+              "p99Ms": 1.8898339999996097,
+              "maxMs": 1.8898339999996097,
+              "over33ms": 0,
+              "over50ms": 0,
+              "over100ms": 0
+            }
+          },
+          "windowRates": [
+            145.41094411514433,
+            152.3000581325514,
+            126.60224367487223
+          ]
+        }
+      },
+      "stateIdentical": true,
+      "indexStorage": {
+        "slotBytes": 3935040,
+        "memberCount": 670683,
+        "cellLists": 198,
+        "note": "Member arrays and JS metadata are additional to slotBytes."
+      },
+      "windowStateHashes": [
+        "0d58c8612330ce0adea8daa42463fd225d05c2781c71ccb2d35a15b9a3d9f696",
+        "1331737aebc0fe4dcaf0659d2474207492901743a1d259daff6ccaa8b71eff88",
+        "619b2963e0b59c8d5d25307e36656592726fcf9233da072ee6b4fac827ddcbdb"
+      ]
+    },
+    {
+      "case": "maximum",
+      "seed": 29,
+      "config": {
+        "worldWidth": 512,
+        "worldHeight": 384,
+        "refinement": 2,
+        "scene": "hot",
+        "seed": 29,
+        "boundary": "wrap",
+        "warmup": 0
+      },
+      "lattice": [
+        1024,
+        768
+      ],
+      "cells": [
+        855,
+        855
+      ],
+      "summary": {
+        "baseline": {
+          "mcsPerSecond": 67.24850792103356,
+          "steps": {
+            "count": 480,
+            "meanMs": 14.869580427083308,
+            "p50Ms": 12.53125,
+            "p95Ms": 21.638542000000598,
+            "p99Ms": 31.645332999999937,
+            "maxMs": 74.14495799999895,
+            "over33ms": 4,
+            "over50ms": 2,
+            "over100ms": 0
+          },
+          "events": {
+            "divide": {
+              "count": 0,
+              "meanMs": null,
+              "p50Ms": null,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": null,
+              "over33ms": 0,
+              "over50ms": 0,
+              "over100ms": 0
+            },
+            "eraseCell": {
+              "count": 4,
+              "meanMs": 34.89044825000019,
+              "p50Ms": 26.83558400000038,
+              "p95Ms": 62.54866700000093,
+              "p99Ms": 62.54866700000093,
+              "maxMs": 62.54866700000093,
+              "over33ms": 1,
+              "over50ms": 1,
+              "over100ms": 0
+            }
+          },
+          "windowRates": [
+            68.18898577407283,
+            66.71644917451025,
+            66.85956581867644
+          ]
+        },
+        "prototype": {
+          "mcsPerSecond": 67.77112060867769,
+          "steps": {
+            "count": 480,
+            "meanMs": 14.754955383333346,
+            "p50Ms": 12.730084000000716,
+            "p95Ms": 21.608917000001384,
+            "p99Ms": 25.050874999998996,
+            "maxMs": 33.22595799999999,
+            "over33ms": 0,
+            "over50ms": 0,
+            "over100ms": 0
+          },
+          "events": {
+            "divide": {
+              "count": 0,
+              "meanMs": null,
+              "p50Ms": null,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": null,
+              "over33ms": 0,
+              "over50ms": 0,
+              "over100ms": 0
+            },
+            "eraseCell": {
+              "count": 4,
+              "meanMs": 0.6082190000001901,
+              "p50Ms": 0.47524999999950523,
+              "p95Ms": 0.9980000000014115,
+              "p99Ms": 0.9980000000014115,
+              "maxMs": 0.9980000000014115,
+              "over33ms": 0,
+              "over50ms": 0,
+              "over100ms": 0
+            }
+          },
+          "windowRates": [
+            67.95094302902687,
+            66.2400405371826,
+            69.18722825110744
+          ]
+        }
+      },
+      "stateIdentical": true,
+      "indexStorage": {
+        "slotBytes": 4197376,
+        "memberCount": 782559,
+        "cellLists": 855,
+        "note": "Member arrays and JS metadata are additional to slotBytes."
+      },
+      "windowStateHashes": [
+        "7cf3652a4b1bd41e4ad33c5e4d3832612112c4cfdc5e496613b376674f902b8b",
+        "59611e199ac1d25622ac18809714596f744deacca4eec1ee4da8a0279a87264c",
+        "d8bd03e206b46570c8088d95e964a668d8f8c60075f9ccd5970ee2d084c4e968"
+      ]
+    },
+    {
+      "case": "maximum",
+      "seed": 17,
+      "config": {
+        "worldWidth": 512,
+        "worldHeight": 384,
+        "refinement": 2,
+        "scene": "hot",
+        "seed": 17,
+        "boundary": "wrap",
+        "warmup": 0
+      },
+      "lattice": [
+        1024,
+        768
+      ],
+      "cells": [
+        849,
+        849
+      ],
+      "summary": {
+        "baseline": {
+          "mcsPerSecond": 66.65302671722034,
+          "steps": {
+            "count": 480,
+            "meanMs": 15.002528993749987,
+            "p50Ms": 12.359290999999757,
+            "p95Ms": 22.144000000000233,
+            "p99Ms": 48.753082999999606,
+            "maxMs": 65.6522500000001,
+            "over33ms": 9,
+            "over50ms": 3,
+            "over100ms": 0
+          },
+          "events": {
+            "divide": {
+              "count": 0,
+              "meanMs": null,
+              "p50Ms": null,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": null,
+              "over33ms": 0,
+              "over50ms": 0,
+              "over100ms": 0
+            },
+            "eraseCell": {
+              "count": 10,
+              "meanMs": 32.1265830999997,
+              "p50Ms": 26.43579099999988,
+              "p95Ms": 53.71991600000001,
+              "p99Ms": 53.71991600000001,
+              "maxMs": 53.71991600000001,
+              "over33ms": 3,
+              "over50ms": 2,
+              "over100ms": 0
+            }
+          },
+          "windowRates": [
+            66.1809536179059,
+            67.7192447774091,
+            66.0839371322855
+          ]
+        },
+        "prototype": {
+          "mcsPerSecond": 68.00851922091032,
+          "steps": {
+            "count": 480,
+            "meanMs": 14.703432133333353,
+            "p50Ms": 12.753333000000566,
+            "p95Ms": 21.31145800000013,
+            "p99Ms": 23.233957999999802,
+            "maxMs": 33.822415999999976,
+            "over33ms": 1,
+            "over50ms": 0,
+            "over100ms": 0
+          },
+          "events": {
+            "divide": {
+              "count": 0,
+              "meanMs": null,
+              "p50Ms": null,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": null,
+              "over33ms": 0,
+              "over50ms": 0,
+              "over100ms": 0
+            },
+            "eraseCell": {
+              "count": 10,
+              "meanMs": 0.42254160000011326,
+              "p50Ms": 0.4016670000000886,
+              "p95Ms": 0.7214999999996508,
+              "p99Ms": 0.7214999999996508,
+              "maxMs": 0.7214999999996508,
+              "over33ms": 0,
+              "over50ms": 0,
+              "over100ms": 0
+            }
+          },
+          "windowRates": [
+            67.15552390385132,
+            68.62305639265858,
+            68.26427346322878
+          ]
+        }
+      },
+      "stateIdentical": true,
+      "indexStorage": {
+        "slotBytes": 4197376,
+        "memberCount": 777034,
+        "cellLists": 849,
+        "note": "Member arrays and JS metadata are additional to slotBytes."
+      },
+      "windowStateHashes": [
+        "00a36fa70a0fe81426ae11824aa4b6a725059d663ceb718f0bb0944302078a21",
+        "6ac646e5f52ca9f6fbbf548a94752c0c9f25859f4915335829df616c514b9417",
+        "0c786904d7bd328aa1893e6ad719ce2642427f88425440d0ea7b370809e266b4"
+      ]
+    }
+  ],
+  "browser": {
+    "gpu": "Apple M5 via ANGLE Metal WebGL2",
+    "emulatedViewportCSS": [
+      390,
+      844
+    ],
+    "physicalMobileDevice": false,
+    "largestLattice": [
+      1024,
+      768
+    ],
+    "exportedCells": 859,
+    "canvas2DFallback": {
+      "canvasPixels": [
+        680,
+        510
+      ],
+      "distinctLayerImages": 3,
+      "observedDescendants": 2,
+      "exportedCells": 3
+    },
+    "animationIntervalsMs": [
+      1017,
+      1000,
+      1017,
+      1000,
+      1017,
+      1017
+    ],
+    "applicationErrorsDuringVerifiedScenarios": 0
+  },
+  "automatedTests": {
+    "passed": 455,
+    "failed": 0,
+    "skipped": 0
+  }
+}

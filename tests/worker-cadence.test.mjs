@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
-const source=await readFile('src/worker.js','utf8');
+const source=(await readFile('src/presentation-frames.js','utf8'))+'\n'+(await readFile('src/worker.js','utf8'));
 function worker(){
   const context=vm.createContext({now:0,performance:{now:()=>context.now},setTimeout(){},MessageChannel:class{port1={};port2={postMessage(){}}},CellLab:{StepClock:class{}},CellLabGPU:{ComputeBackend:class{info(){return {};}}},frames:[],postMessage:m=>context.frames.push(context.now)});
   vm.runInContext(source,context);

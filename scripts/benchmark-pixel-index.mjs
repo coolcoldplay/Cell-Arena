@@ -31,7 +31,7 @@ if(!child){
   vm.runInThisContext(execFileSync('git',['show',revision+':src/model.js'],{encoding:'utf8',maxBuffer:4*1024*1024}),{filename:'baseline/model.js'});const Baseline=CellLab.Simulation;
   vm.runInThisContext(await readFile('src/model.js','utf8'),{filename:'prototype/model.js'});const Prototype=CellLab.Simulation;
   const module=await CellLabWasm.load(await readFile('build/cpm-kernel.wasm'));
-  const config={...cases[name],scene:'hot',seed,boundary:'wrap',warmup:0},models=[new Baseline(config),new Prototype({...config,pixelIndex:true})];
+  const config={...cases[name],scene:'hot',seed,boundary:'wrap',warmup:0},models=[new Baseline({...config,pixelIndex:false}),new Prototype({...config,pixelIndex:true})];
   for(const s of models){await CellLabWasm.install(s,module);s.advance(warmup);}
   const state=s=>({time:s.C.time,grid:s.C.grid._pixels,mt:s.C.mt.mt,mti:s.C.mt.mti,lastID:s.C.last_cell_id,cellKinds:s.C.t2k,volumes:s.C.cellvolume,degree:s.C._neighbours,borders:s.C.borderpixels.elements,perimeters:s.C.getConstraint('PerimeterConstraint').cellperimeters,act:s.act.cellpixelsact,cells:s.cells,contacts:s.contacts,occupancy:s.occupancy,fields:s.fields,counters:s.counters,events:s.events,history:s.history,histories:s.histories,lineage:s.lineage,deaths:s.deathHistory,patrol:s.patrol,immunity:Object.fromEntries(Object.entries(s.immunity).filter(([key])=>key!=='s'))});
   // V8 serialization is not canonical: equal arrays may have different internal

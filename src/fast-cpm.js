@@ -6,12 +6,12 @@
 (() => {
   'use strict';
   function install(sim){
-    const C=sim.C,grid=C.grid._pixels,neighbors=sim.neighbors,cells=sim.cells;
-    C.neighi=i=>neighbors[i]; // GridBasedModel bound the original method at construction.
+    const C=sim.C,grid=C.grid._pixels,neighborsAt=C.grid.neighi,cells=sim.cells;
+    C.neighi=i=>neighborsAt(i); // GridBasedModel bound the original method at construction.
     const perimeter=C.getConstraint('PerimeterConstraint'),adhesion=C.getConstraint('Adhesion'),act=sim.act;
     perimeter.deltaH=(src,tgt,a,b)=>{
       if(a===b)return 0;const ca=cells[a],cb=cells[b],la=ca?.lambdaP||0,lb=cb?.lambdaP||0;if(!la&&!lb)return 0;
-      let da=0,db=0;const ns=neighbors[tgt];
+      let da=0,db=0;const ns=neighborsAt(tgt);
       for(let k=0;k<ns.length;k++){const n=grid[ns[k]];da+=n===a?-1:1;db+=n===b?1:-1;}
       let energy=0;
       if(la){const p=perimeter.cellperimeters[a],hnew=(p+da)-ca.perimeter,hold=p-ca.perimeter;energy+=la*(hnew*hnew-hold*hold);}
@@ -19,7 +19,7 @@
       return energy;
     };
     adhesion.deltaH=(src,tgt,a,b)=>{
-      let hs=0,ht=0;const ns=neighbors[tgt];for(let k=0;k<ns.length;k++){const n=grid[ns[k]];if(n!==a)hs+=adhesion.J(n,a);if(n!==b)ht+=adhesion.J(n,b);}return hs-ht;
+      let hs=0,ht=0;const ns=neighborsAt(tgt);for(let k=0;k<ns.length;k++){const n=grid[ns[k]];if(n!==a)hs+=adhesion.J(n,a);if(n!==b)ht+=adhesion.J(n,b);}return hs-ht;
     };
     const values=new Uint8Array(grid.length),active=new Uint32Array(grid.length),where=new Int32Array(grid.length);where.fill(-1);let count=0;
     for(const key in act.cellpixelsact){const i=Number(key),a=act.cellpixelsact[i];if(a){values[i]=a;where[i]=count;active[count++]=i;}}
@@ -36,7 +36,7 @@
       let n=0;while(n<count){const i=active[n];if(values[i]>1){values[i]--;n++;}else{values[i]=0;const last=active[--count];active[n]=last;where[last]=n;where[i]=-1;}}
     };
     act.activityAt=i=>{
-      const id=grid[i];let product=values[i];if(!id||!product)return 0;let n=1;const ns=neighbors[i];
+      const id=grid[i];let product=values[i];if(!id||!product)return 0;let n=1;const ns=neighborsAt(i);
       for(let k=0;k<ns.length;k++){const j=ns[k];if(grid[j]===id){const a=values[j];if(!a)return 0;product*=a;n++;}}
       return Math.pow(product,1/n);
     };
@@ -48,7 +48,7 @@
     C.post_setpix_listeners.splice(perimeterListener,1);
     C.updateborderneari=(i,old,id)=>{
       if(old===id)return;
-      const ns=neighbors[i],was=degree[i]>0;let next=0,previous=0;
+      const ns=neighborsAt(i),was=degree[i]>0;let next=0,previous=0;
       for(let k=0;k<ns.length;k++){
         const j=ns[k],nt=grid[j];
         if(nt!==id)next++;if(nt!==old)previous++;

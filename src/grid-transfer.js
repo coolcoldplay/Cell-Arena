@@ -33,7 +33,7 @@
     const width=Math.round(source.worldWidth*refinement),height=Math.round(source.worldHeight*refinement);
     if(width<32||height<24||Math.abs(width/refinement-source.worldWidth)>1e-8||Math.abs(height/refinement-source.worldHeight)>1e-8)throw Error('当前区域不能无损保持尺寸，请选择其他精细度');
     const q=refinement/source.scale,qq=q*q;
-    const next=new CellLab.Simulation({scene:'empty',seed:source.seedValue,worldWidth:source.worldWidth,worldHeight:source.worldHeight,refinement,boundary:source.boundary,settings:source.settings,vessels:[],warmup:0,kernel:'reference',sectionModel:!!source.section,pixelIndex:!!source.pixelIndex});
+    const next=new CellLab.Simulation({scene:'empty',seed:source.seedValue,worldWidth:source.worldWidth,worldHeight:source.worldHeight,refinement,boundary:source.boundary,settings:source.settings,vessels:[],warmup:0,kernel:'reference',sectionModel:!!source.section,pixelIndex:source.pixelIndexPreference});
     // Keep the exact culture identity across fractional slider steps; e.g.
     // 92 / (23/60) is 239.99999999999997 in floating-point arithmetic.
     next.worldWidth=source.worldWidth;next.worldHeight=source.worldHeight;

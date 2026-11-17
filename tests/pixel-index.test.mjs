@@ -26,7 +26,7 @@ function identical(a,b){
 }
 async function pair(extra={},kernel='wasm'){
   const options={width:96,height:72,scene:'empty',warmup:0,seed:29,settings:quiet,kernel:kernel==='wasm'?'fast':kernel,...extra};
-  const sims=[new CellLab.Simulation(options),new CellLab.Simulation({...options,pixelIndex:true})];
+  const sims=[new CellLab.Simulation({...options,pixelIndex:false}),new CellLab.Simulation({...options,pixelIndex:true})];
   if(kernel==='wasm')for(const s of sims)await CellLabWasm.install(s,module);
   return sims;
 }

@@ -7,7 +7,7 @@
   const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
   const nucleusSpokes=Array.from({length:12},(_,i)=>{const a=i*Math.PI/6;return [Math.cos(a),Math.sin(a),Math.cos(2*a),Math.sin(2*a)];});
   class SectionMechanics {
-    constructor(sim){this.s=sim;this.disks=new Map();this.junctions=new Map();}
+    constructor(sim){this.s=sim;this.facesAt=sim.facesAt??(i=>sim.faces[i]);this.ringAt=sim.ringAt??(i=>sim.rings[i]);this.disks=new Map();this.junctions=new Map();}
     delta(x,length){if(this.s.wrap){if(x>length/2)x-=length;else if(x< -length/2)x+=length;}return x;}
     distance2(x,y,m){const dx=this.delta(x-m.nucleusX,this.s.width),dy=this.delta(y-m.nucleusY,this.s.height);return dx*dx+dy*dy;}
     disk(radius){const key=radius.toFixed(3);if(this.disks.has(key))return this.disks.get(key);const d=[];for(let x=-Math.ceil(radius);x<=radius;x++)for(let y=-Math.ceil(radius);y<=radius;y++)if(x*x+y*y<=radius*radius)d.push([x,y]);this.disks.set(key,d);return d;}
@@ -141,7 +141,7 @@
     processDistance(p){let length=0;for(let i=1;i<p.points.length;i++)length+=Math.hypot(p.points[i][0]-p.points[i-1][0],p.points[i][1]-p.points[i-1][1]);return length;}
     tipNeighbourhood(m,point){
       const s=this.s,x=Math.round(m.nucleusX+point[0]),y=Math.round(m.nucleusY+point[1]);let support=false,bonded=false;
-      for(const [dx,dy] of this.disk(1.8*s.scale)){const i=this.at(x+dx,y+dy);if(i<0||s.C.pixti(i)!==m.id)continue;support=true;for(const j of s.faces[i])if(this.bond(m.id,s.C.pixti(j))>0)bonded=true;}
+      for(const [dx,dy] of this.disk(1.8*s.scale)){const i=this.at(x+dx,y+dy);if(i<0||s.C.pixti(i)!==m.id)continue;support=true;for(const j of this.facesAt(i))if(this.bond(m.id,s.C.pixti(j))>0)bonded=true;}
       return {support,bonded};
     }
     tipScore(m,tip,angle,step){
@@ -233,32 +233,33 @@
         if(s.C.getVolume(b)<=target.minVisibleArea)return false;
         if(target.hasNucleus&&this.distance2(s.xs[tgt],s.ys[tgt],target)<=target.nucleusRadius**2)return false;
       }
+      const faces=this.facesAt(tgt);
       if(source&&(!source.dying||source.deathIntact)){
         if(source.hasNucleus&&this.distance2(s.xs[tgt],s.ys[tgt],source)>source.maxReach**2)return false;
-        let attached=false;for(const j of s.faces[tgt])if(grid[j]===a){attached=true;break;}if(!attached)return false;
+        let attached=false;for(const j of faces)if(grid[j]===a){attached=true;break;}if(!attached)return false;
       }
       // One-pixel tips may nucleate, but must widen before they elongate.
       // A flat front must be able to add its first pixel; prohibiting every
       // local articulation would freeze every rectangular cell.
       const own=(j,id)=>j>=0&&(j===tgt?a:grid[j])===id;
-      const thick=(j,id)=>{const r=s.rings[j];for(const [p,q,k] of [[0,1,7],[2,1,3],[4,3,5],[6,5,7]])if(own(r[p],id)&&own(r[q],id)&&own(r[k],id))return true;return false;};
-      if(source&&(!source.dying||source.deathIntact)){let anchored=false;for(const j of s.faces[tgt])if(grid[j]===a&&thick(j,a)){anchored=true;break;}if(!anchored)return false;}
+      const thick=(j,id)=>{const r=this.ringAt(j);for(const [p,q,k] of [[0,1,7],[2,1,3],[4,3,5],[6,5,7]])if(own(r[p],id)&&own(r[q],id)&&own(r[k],id))return true;return false;};
+      if(source&&(!source.dying||source.deathIntact)){let anchored=false;for(const j of faces)if(grid[j]===a&&thick(j,a)){anchored=true;break;}if(!anchored)return false;}
       // Filling a one-site extracellular pore surrounded on all four faces by
       // this cell cannot thin a neck, sever cytoplasm or displace another cell.
       // Staggered diagonal pores otherwise fail the 3x3 thickness test forever:
       // the upper/lower cortex is connected outside that local stencil.
       // Keep ordinary CPM energy/volume acceptance, reach and nuclear rules.
-      if(source&&!b&&s.faces[tgt].length===4&&s.faces[tgt].every(j=>grid[j]===a))return true;
+      if(source&&!b&&faces.length===4&&faces.every(j=>grid[j]===a))return true;
       const check=j=>{const id=j===tgt?a:grid[j],m=s.cells[id];if(!m||(m.dying&&!m.deathIntact)||(id!==a&&id!==b))return true;
-        let mask=0,faces=0;const ring=s.rings[j];for(let k=0;k<8;k++){const n=ring[k];if(n>=0&&(n===tgt?a:grid[n])===id){mask|=1<<k;if(k&1)faces++;}}
+        let mask=0,faces=0;const ring=this.ringAt(j);for(let k=0;k<8;k++){const n=ring[k];if(n>=0&&(n===tgt?a:grid[n])===id){mask|=1<<k;if(k&1)faces++;}}
         if(faces<2||s.connected4[mask]===1)return true;
         // Ignore a single leaf tip. The remaining body must still connect
         // around this site; a bridge between two substantial lobes is illegal.
-        for(const k of [1,3,5,7])if(mask&(1<<k)){const n=ring[k];let degree=0;for(const f of s.faces[n])if(own(f,id))degree++;if(degree===1)mask&=~(1<<k);}
+        for(const k of [1,3,5,7])if(mask&(1<<k)){const n=ring[k];let degree=0;for(const f of this.facesAt(n))if(own(f,id))degree++;if(degree===1)mask&=~(1<<k);}
         return !mask||s.connected4[mask]===1;
       };
       if(source&&(!source.dying||source.deathIntact)&&!check(tgt))return false;
-      for(const j of s.faces[tgt])if(!check(j))return false;
+      for(const j of faces)if(!check(j))return false;
       return true;
     }
     energy(src,tgt,a,b){
@@ -267,6 +268,7 @@
     }
   }
   function makeSpace(s,reserved,x,y,radius,movingID=0,oldPoints=[],reference=new Map()){
+    const {facesAt,ringAt}=s.section;
     const reject=reason=>({ok:false,reason});
     const at=(x,y)=>s.section.at(x,y),delta=(v,n)=>s.section.delta(v,n),grid=s.C.grid._pixels.slice(),affected=new Set();
     // The vacated trailing edge is available for elastic neighbour motion.
@@ -292,15 +294,15 @@
     const assign=(i,id)=>{const old=grid[i];if(old===id)return;cells.get(old)?.points.delete(i);cells.get(id)?.points.add(i);if(old)changed.add(old);if(id)changed.add(id);grid[i]=id;changes.set(i,id);};
     function connected(points){
       const first=points.values().next().value;if(first===undefined)return false;
-      const seen=new Set([first]),queue=[first];for(let n=0;n<queue.length;n++)for(const j of s.faces[queue[n]])if(points.has(j)&&!seen.has(j)){seen.add(j);queue.push(j);}
+      const seen=new Set([first]),queue=[first];for(let n=0;n<queue.length;n++)for(const j of facesAt(queue[n]))if(points.has(j)&&!seen.has(j)){seen.add(j);queue.push(j);}
       return seen.size===points.size;
     }
     // Same local thin-neck rule as the runtime section constraint, on draft pixels.
     function neckSafe(i){
       const id=grid[i];if(!cells.has(id))return true;let mask=0,degree=0;
-      for(let k=0;k<8;k++){const j=s.rings[i][k];if(j>=0&&grid[j]===id){mask|=1<<k;if(k&1)degree++;}}
+      const ring=ringAt(i);for(let k=0;k<8;k++){const j=ring[k];if(j>=0&&grid[j]===id){mask|=1<<k;if(k&1)degree++;}}
       if(degree<2||s.connected4[mask]===1)return true;
-      for(const k of [1,3,5,7])if(mask&(1<<k)){const j=s.rings[i][k];if(s.faces[j].filter(q=>grid[q]===id).length===1)mask&=~(1<<k);}
+      for(const k of [1,3,5,7])if(mask&(1<<k)){const j=ring[k];if(facesAt(j).filter(q=>grid[q]===id).length===1)mask&=~(1<<k);}
       return !mask||s.connected4[mask]===1;
     }
     function nucleusOutside(c){
@@ -311,7 +313,7 @@
       const queue=[first],seen=new Set(queue);
       for(let n=0;n<queue.length;n++){
         const i=queue[n];if(fits(c,s.xs[i],s.ys[i],true))return [s.xs[i],s.ys[i]];
-        for(const j of s.faces[i])if(!seen.has(j)){seen.add(j);if(grid[j]===c.m.id&&fits(c,s.xs[j],s.ys[j]))queue.push(j);}
+        for(const j of facesAt(i))if(!seen.has(j)){seen.add(j);if(grid[j]===c.m.id&&fits(c,s.xs[j],s.ys[j]))queue.push(j);}
       }
       return null;
     }
@@ -333,7 +335,7 @@
         if(!removed)break;
       }
       const joined=connected(remaining),narrow=[...remaining].filter(i=>!neckSafe(i)),valid=remaining.size>=c.minimum&&(!movingID||remaining.size<=c.maximum+4*s.scale*s.scale)&&joined&&!narrow.length;
-      if(movingID)c.repair=narrow.length?narrow:!joined?[...remaining].filter(i=>s.faces[i].some(j=>reserved.has(j))):[];
+      if(movingID)c.repair=narrow.length?narrow:!joined?[...remaining].filter(i=>facesAt(i).some(j=>reserved.has(j))):[];
       for(const i of [...cut,...trim])grid[i]=c.m.id;
       if(!valid)return false;
       c.nx=nucleus[0];c.ny=nucleus[1];for(const i of [...cut,...trim])assign(i,0);return true;
@@ -345,7 +347,7 @@
       // escape route, rather than inflating a distant lobe indefinitely.
       const id=c.m.id,dirX=delta((movingID?c.nx:c.m.x)-x,s.width),dirY=delta((movingID?c.ny:c.m.y)-y,s.height),norm=Math.hypot(dirX,dirY),ux=norm>.1?dirX/norm:1,uy=norm>.1?dirY/norm:0;
       const distance=radius+c.m.nucleusRadius+s.scale,aimX=x+ux*distance,aimY=y+uy*distance,candidates=new Set();
-      for(const i of c.points)for(const j of s.faces[i])if(grid[j]!==id&&!reserved.has(j))candidates.add(j);
+      for(const i of c.points)for(const j of facesAt(i))if(grid[j]!==id&&!reserved.has(j))candidates.add(j);
       const score=i=>{
         const aim=delta(s.xs[i]-aimX,s.width)**2+delta(s.ys[i]-aimY,s.height)**2;
         return c.repair?.length?100*Math.min(...c.repair.map(j=>delta(s.xs[i]-s.xs[j],s.width)**2+delta(s.ys[i]-s.ys[j],s.height)**2))+.01*aim:aim;
@@ -356,10 +358,10 @@
         if(delta(s.xs[i]-x,s.width)**2+delta(s.ys[i]-y,s.height)**2>(radius+18*s.scale)**2)continue;
         if(delta(s.xs[i]-c.nx,s.width)**2+delta(s.ys[i]-c.ny,s.height)**2>c.m.maxReach**2)continue;
         if(donor&&(donor.points.size<=donor.minimum||delta(s.xs[i]-donor.nx,s.width)**2+delta(s.ys[i]-donor.ny,s.height)**2<=donor.m.nucleusRadius**2))continue;
-        if(donor){let mask=0;for(let k=0;k<8;k++){const j=s.rings[i][k];if(j>=0&&grid[j]===other)mask|=1<<k;}if(s.connected4[mask]!==1)continue;}
-        const thick=j=>{const ring=s.rings[j];return [[0,1,7],[2,1,3],[4,3,5],[6,5,7]].some(indices=>indices.every(k=>ring[k]>=0&&grid[ring[k]]===id));};
-        if(!s.faces[i].some(j=>grid[j]===id&&thick(j)))continue;
-        grid[i]=id;const valid=neckSafe(i)&&s.faces[i].every(neckSafe);grid[i]=other;
+        if(donor){const ring=ringAt(i);let mask=0;for(let k=0;k<8;k++){const j=ring[k];if(j>=0&&grid[j]===other)mask|=1<<k;}if(s.connected4[mask]!==1)continue;}
+        const thick=j=>{const ring=ringAt(j);return [[0,1,7],[2,1,3],[4,3,5],[6,5,7]].some(indices=>indices.every(k=>ring[k]>=0&&grid[ring[k]]===id));};
+        if(!facesAt(i).some(j=>grid[j]===id&&thick(j)))continue;
+        grid[i]=id;const valid=neckSafe(i)&&facesAt(i).every(neckSafe);grid[i]=other;
         if(!valid)continue;assign(i,id);return true;
       }
       return false;
