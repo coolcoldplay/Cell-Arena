@@ -224,16 +224,14 @@ body.arena-fullscreen .mobile-tools,body.arena-fullscreen #mobile-dock{display:n
 .immune-receptor{display:flex;gap:8px;align-items:center;justify-content:space-between}.immune-receptor code{flex:1;max-width:155px}.immune-status,.immune-note{font-size:10px!important;color:var(--muted);line-height:1.5!important;margin:6px 0!important}.immune-surface{border-top:1px solid var(--line);padding-top:6px}.immune-surface summary{font-size:11px;cursor:pointer}
 #immune-system-inspector h3{font-size:11px;margin:10px 0 5px}.immune-contact{padding:7px;margin:5px 0;border:1px solid var(--line);background:#ede5d6}.immune-contact-head>span{font:11px Consolas,monospace}.immune-pipeline{display:flex;gap:3px;flex-wrap:wrap;margin:6px 0}.immune-pipeline span{font-size:9px;padding:2px 3px;background:#e0e8d8;border:1px solid #99a68d;color:#4d674c}.immune-pipeline .limited{background:#f4e0c3;color:#895620!important;border-color:#c69c65}.immune-pipeline .pending{background:#e5e3dd;color:#766953;border-color:#b6ad9c}.immune-contact-detail{font-size:10px!important;line-height:1.5!important}
 .immune-affinities{display:flex;flex-wrap:wrap;gap:4px;font:10px Consolas,monospace}.immune-affinities span{padding:2px 4px;border:1px solid #bdb09b}.immune-affinities .match{background:#dae7d7;border-color:#829779}.immune-affinities .irrelevant{opacity:.5;text-decoration:line-through}
-.fullscreen-rail{position:absolute;top:0;bottom:0;width:var(--rail-space);padding:12px 8px;display:flex;flex-direction:column;justify-content:center;gap:9px;overflow:hidden;pointer-events:none;background:#eee4d2e8;color:var(--ink);font-size:11px}
-.fullscreen-rail[data-fullscreen-rail=left]{left:0;border-right:1px solid var(--line);padding-left:max(8px,env(safe-area-inset-left))}
-.fullscreen-rail[data-fullscreen-rail=right]{right:0;border-left:1px solid var(--line);padding-right:max(8px,env(safe-area-inset-right))}
-#arena-stage[data-rotated=true] .fullscreen-rail[data-fullscreen-rail=left]{padding-left:max(8px,env(safe-area-inset-top))}
-#arena-stage[data-rotated=true] .fullscreen-rail[data-fullscreen-rail=right]{padding-right:max(8px,env(safe-area-inset-bottom))}
-.fullscreen-rail h2{font-size:11px;line-height:1.3;margin:0 0 2px;color:var(--muted);font-weight:500}
-.fullscreen-stat{display:flex;flex-direction:column;gap:2px;border-top:1px solid #c2ae8f55;padding-top:5px;min-width:0}
-.fullscreen-stat span{font-size:10px;line-height:1.3;overflow-wrap:anywhere;color:var(--muted)}
-.fullscreen-stat b{font:600 clamp(12px,2.2vmin,18px)/1.3 Consolas,monospace;overflow-wrap:anywhere}
-body.mobile-arena-fullscreen .viewport{touch-action:none}
+body.mobile-arena-fullscreen .viewport{display:grid;grid-template-columns:minmax(0,1fr) clamp(92px,22%,180px);touch-action:none}
+body.mobile-arena-fullscreen #arena-stage{position:relative;min-width:0;margin-left:env(safe-area-inset-left)}
+.fullscreen-rail{display:flex;flex-direction:column;justify-content:safe center;overflow:auto;min-width:0;border-left:1px solid var(--line);background:var(--paper);padding:max(12px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) 10px}
+.fullscreen-rail h2{font-size:12px;color:var(--muted);margin:0 0 8px}
+.fullscreen-rail dl{margin:0}
+.fullscreen-rail dl>div{border-top:1px solid var(--line);padding:6px 0}
+.fullscreen-rail dt{font-size:12px;color:var(--muted)}
+.fullscreen-rail dd{margin:1px 0 0;font:600 clamp(16px,3vmin,20px)/1.2 Consolas,monospace;overflow-wrap:anywhere}
 body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px}
 .replay-round{margin:5px 0;font-size:12px;min-height:32px}
 
@@ -266,7 +264,17 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
 <body>
 <main class="workspace">
   <section class="simulation" aria-label="Arena 培养皿">
-    <div class="viewport"><div id="arena-stage"><canvas id="world" tabindex="-1" width="960" height="720" aria-label="可拖动细胞、点击播种、添加信号或绘制障碍的交互培养皿"></canvas><button id="maze-diffusion" class="maze-diffusion" hidden aria-pressed="false" title="仅切换招募因子扩散；细胞仍不能穿墙">招募扩散：沿通道</button><div id="brush-preview" hidden aria-hidden="true"></div><section id="auto-round-notice" class="auto-round-notice" hidden aria-labelledby="auto-round-title"><div><b id="auto-round-title">即将随机换局</b><span><strong id="auto-round-seconds">10</strong> s</span></div><p id="auto-round-reason" role="status" aria-live="polite"></p><small id="auto-round-paused" hidden>已暂停倒计时</small><button id="auto-round-cancel">继续本局 · 关闭自动换局</button></section><div id="toast" role="status" aria-live="polite"></div><section class="fullscreen-rail" data-fullscreen-rail="left" data-no-i18n hidden aria-label="Population"></section><section class="fullscreen-rail" data-fullscreen-rail="right" data-no-i18n hidden aria-label="Simulation statistics"></section></div></div>
+    <div class="viewport"><div id="arena-stage"><canvas id="world" tabindex="-1" width="960" height="720" aria-label="可拖动细胞、点击播种、添加信号或绘制障碍的交互培养皿"></canvas><button id="maze-diffusion" class="maze-diffusion" hidden aria-pressed="false" title="仅切换招募因子扩散；细胞仍不能穿墙">招募扩散：沿通道</button><div id="brush-preview" hidden aria-hidden="true"></div><section id="auto-round-notice" class="auto-round-notice" hidden aria-labelledby="auto-round-title"><div><b id="auto-round-title">即将随机换局</b><span><strong id="auto-round-seconds">10</strong> s</span></div><p id="auto-round-reason" role="status" aria-live="polite"></p><small id="auto-round-paused" hidden>已暂停倒计时</small><button id="auto-round-cancel">继续本局 · 关闭自动换局</button></section><div id="toast" role="status" aria-live="polite"></div></div>
+      <section id="fullscreen-stats" class="fullscreen-rail" hidden aria-labelledby="fullscreen-state">
+        <h2 id="fullscreen-state">已暂停</h2>
+        <dl>
+          <div><dt>MCS</dt><dd data-stat="time">0</dd></div>
+          <div><dt>存活</dt><dd data-stat="total">0</dd></div>
+          <div><dt>肿瘤细胞</dt><dd data-stat="tumor">0</dd></div>
+          <div><dt>免疫细胞</dt><dd data-stat="immune">0</dd></div>
+        </dl>
+      </section>
+    </div>
   </section>
   <aside aria-label="模拟控制面板">
     <div class="panel-head"><a class="brand" href="https://github.com/coolcoldplay/Cell-Arena" target="_blank" rel="noreferrer"><span class="mark" aria-hidden="true">C</span><b>Cell-Arena</b></a><button id="language" type="button" value="zh" aria-label="Switch to English" title="Switch to English" data-no-i18n>Eng</button><button id="mobile-expand" class="mobile-only" aria-expanded="false" aria-controls="sidebar-scroll" aria-label="展开面板" title="展开面板">↑</button><button id="file-actions" class="header-icon" aria-label="导入与导出" title="导入与导出" aria-expanded="false" aria-controls="file-menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h9l5 5v13H5Z"/><path d="M14 3v6h5M8 13h8M8 17h6"/></svg></button><button id="record-video" class="header-icon" aria-label="录制视频" title="录制视频" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle class="record-dot" cx="12" cy="12" r="4"/></svg></button><button id="arena-fullscreen" class="header-icon" aria-label="全屏 Arena" title="全屏 Arena" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9V3h6M15 3h6v6M21 15v6h-6M9 21H3v-6"/></svg></button><button id="about" class="header-icon" aria-label="模型与来源" title="模型与来源"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 1 1 5 2c-1 1-2 1-2 3M12 17v1"/></svg></button><div id="file-menu" class="file-menu" role="group" aria-label="导入与导出" hidden><button id="snapshot">保存画面 ↓</button><button id="export-data">导出实验数据 ↓</button><button id="import-data">导入实验参数 ↑</button><button id="file-export-rounds">导出历局 CSV</button></div></div>
@@ -17621,43 +17629,41 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
   globalThis.CellLabLineage={layout,columns,Chart};
 })();
 
-/* Display-only mobile framing. Rotation never changes the lattice or model. */
+/* The stage occupies the arena column in mobile fullscreen. */
 (() => {
   function layout(width,height,ratio){
-    const rotated=height>width,w=rotated?height:width,h=rotated?width:height;
-    const boardWidth=Math.min(w,h*ratio),boardHeight=boardWidth/ratio;
-    return {rotated,width:w,height:h,boardWidth,boardHeight,rail:Math.max(0,(w-boardWidth)/2)};
+    const boardWidth=Math.min(width,height*ratio);
+    return {boardWidth,boardHeight:boardWidth/ratio};
   }
-  function coordinates(rect,x,y,rotated){
-    return rotated?[(y-rect.top)/rect.height,1-(x-rect.left)/rect.width]:[(x-rect.left)/rect.width,(y-rect.top)/rect.height];
+  function coordinates(rect,x,y){
+    return [(x-rect.left)/rect.width,(y-rect.top)/rect.height];
   }
   class View {
-    constructor(viewport,stage){this.viewport=viewport;this.stage=stage;this.active=false;this.mobile=false;this.rotated=false;this.lastSnapshot=null;}
+    constructor(stage,panel){
+      this.stage=stage;
+      this.panel=panel;
+      this.mobile=false;
+      this.heading=panel.querySelector('h2');
+      this.fields=panel.querySelectorAll('[data-stat]');
+    }
     enable(active,mobile=false){
-      this.active=active;this.mobile=active&&mobile;this.rotated=false;
+      this.mobile=active&&mobile;
       document.body.classList.toggle('mobile-arena-fullscreen',this.mobile);
-      if(!this.mobile){this.stage.style.cssText='';delete this.stage.dataset.rotated;}
-      for(const el of this.stage.querySelectorAll('.fullscreen-rail'))el.hidden=!this.mobile;
+      this.panel.hidden=!this.mobile;
     }
     frame(ratio){
-      if(!this.mobile)return null;
-      const f=layout(this.viewport.clientWidth,this.viewport.clientHeight,ratio);this.rotated=f.rotated;
-      Object.assign(this.stage.style,{width:f.width+'px',height:f.height+'px',left:'50%',top:'50%',transform:'translate(-50%,-50%)'+(f.rotated?' rotate(90deg)':'')});
-      this.stage.dataset.rotated=String(f.rotated);this.stage.style.setProperty('--rail-space',f.rail+'px');
-      for(const el of this.stage.querySelectorAll('.fullscreen-rail'))el.hidden=f.rail<82;
-      return f;
+      return this.mobile?layout(this.stage.clientWidth,this.stage.clientHeight,ratio):null;
     }
     update(s){
-      if(!this.mobile||!s)return;this.lastSnapshot=s;
-      const en=document.documentElement.lang.startsWith('en'),t=(a,b)=>en?b:a,p=CellLabRounds.population(s);
-      const fill=(side,title,rows)=>{
-        const root=this.stage.querySelector('[data-fullscreen-rail="'+side+'"]');
-        const values=JSON.stringify([title,rows]);if(root.dataset.values===values)return;root.dataset.values=values;root.replaceChildren();
-        const head=document.createElement('h2');head.textContent=title;root.append(head);
-        for(const [label,value,kind]of rows){const item=document.createElement('div'),name=document.createElement('span'),n=document.createElement('b');item.className='fullscreen-stat '+(kind||'');name.textContent=label;n.textContent=typeof value==='number'?value.toLocaleString():value;item.append(name,n);root.append(item);}
-      };
-      fill('left',t('当前细胞','Population'),[[t('正常','Normal'),p.normal],[t('癌前','Precancer'),p.abnormal],[t('肿瘤','Tumor'),p.tumor,'tumor-text'],[t('免疫','Immune'),p.immune],[t('内皮','Endothelium'),p.endothelial]]);
-      fill('right',s.playing?t('模拟中','Running'):t('已暂停','Paused'),[['MCS',s.time],[t('静息 / 激活 / 抑制','Rest / Active / Supp.'),p.immuneResting+' / '+p.immuneActive+' / '+p.immuneSuppressive],[t('免疫清除','Immune kills'),s.deaths?.kill?.cleared||0],[t('累计分裂','Divisions'),s.counters.divisions],[t('巡逻覆盖','Coverage'),Math.round(s.patrol.coverage*100)+'%']]);
+      if(!this.mobile||!s)return;
+      const state=CellLabI18n.translate(s.playing?'运行中':'已暂停',document.documentElement.lang.startsWith('en')?'en':'zh');
+      if(this.heading.textContent!==state)this.heading.textContent=state;
+      const population=CellLabRounds.population(s);
+      for(const field of this.fields){
+        const key=field.dataset.stat;
+        const value=(key==='time'?s.time:population[key]).toLocaleString();
+        if(field.textContent!==value)field.textContent=value;
+      }
     }
   }
   globalThis.CellLabFullscreen={layout,coordinates,View};
@@ -17747,7 +17753,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
   let hover=null,hoverMovedAt=0,probeDirty=false,panGesture=null,recordingScale=0,eraseSource=false;
   const trajectories=new CellLabTrajectories();
   const historyChart=CellLabHistory.mount();
-  const stage=$('arena-stage'),viewport=stage.parentElement,view={x:0,y:0},fullscreenView=new CellLabFullscreen.View(viewport,stage);
+  const stage=$('arena-stage'),viewport=stage.parentElement,view={x:0,y:0},fullscreenView=new CellLabFullscreen.View(stage,$('fullscreen-stats'));
   let performancePreferences;try{performancePreferences=JSON.parse(localStorage.getItem('cell-arena-performance-v1'));}catch{}
   const adaptive=new CellLabPerformance.Controller({preferences:performancePreferences,now:performance.now()});
   const mobileQuery=matchMedia('(max-width:850px)');
@@ -18370,7 +18376,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     $('seed-options').hidden=tool!=='seed';$('signal-options').hidden=tool!=='signal';$('wall-options').hidden=tool!=='wall';$('eraser-options').hidden=tool!=='remove';probeDirty=true;
     canvas.style.cursor=tool==='move'?'grab':tool==='inspect'?'pointer':'crosshair';
   }
-  function point(e){const r=canvas.getBoundingClientRect(),[x,y]=CellLabFullscreen.coordinates(r,e.clientX,e.clientY,fullscreenView.rotated);return [Math.max(0,Math.min(snapshot.width-1,Math.floor(x*snapshot.width))),Math.max(0,Math.min(snapshot.height-1,Math.floor(y*snapshot.height)))];}
+  function point(e){const r=canvas.getBoundingClientRect(),[x,y]=CellLabFullscreen.coordinates(r,e.clientX,e.clientY);return [Math.max(0,Math.min(snapshot.width-1,Math.floor(x*snapshot.width))),Math.max(0,Math.min(snapshot.height-1,Math.floor(y*snapshot.height)))];}
   function drawVessels(s,scale,pixelRatio){
     if(!s.vascular?.vessels.length)return;
     ctx.save();ctx.lineWidth=1.2*pixelRatio;ctx.font=`${Math.max(9,10*pixelRatio)}px monospace`;ctx.textAlign='center';ctx.textBaseline='middle';
@@ -18382,7 +18388,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     probeDirty=false;const box=$('field-probe'),brush=$('brush-preview');brush.hidden=true;if(!hover||!snapshot||panGesture){box.hidden=true;return;}
     const r=canvas.getBoundingClientRect(),v=document.querySelector('.viewport').getBoundingClientRect(),{clientX,clientY}=hover;
     if(clientX<Math.max(r.left,v.left)||clientX>=Math.min(r.right,v.right)||clientY<Math.max(r.top,v.top)||clientY>=Math.min(r.bottom,v.bottom)){box.hidden=true;return;}
-    if(tool==='remove'){const diameter=2*Number($('eraser-radius').value)*snapshot.refinement*parseFloat(canvas.style.width)/snapshot.width,[x,y]=CellLabFullscreen.coordinates(stage.getBoundingClientRect(),clientX,clientY,fullscreenView.rotated);brush.style.width=diameter+'px';brush.style.height=diameter+'px';brush.style.left=x*stage.clientWidth+'px';brush.style.top=y*stage.clientHeight+'px';brush.hidden=false;box.hidden=true;return;}
+    if(tool==='remove'){const diameter=2*Number($('eraser-radius').value)*snapshot.refinement*parseFloat(canvas.style.width)/snapshot.width,[x,y]=CellLabFullscreen.coordinates(stage.getBoundingClientRect(),clientX,clientY);brush.style.width=diameter+'px';brush.style.height=diameter+'px';brush.style.left=x*stage.clientWidth+'px';brush.style.top=y*stage.clientHeight+'px';brush.hidden=false;box.hidden=true;return;}
     if(stroke||tool!=='inspect'||performance.now()-hoverMovedAt>=10000){box.hidden=true;return;}
     const [x,y]=point(hover),sample=CellLabDisplay.sample(snapshot,x,y);if(!sample){box.hidden=true;return;}
     $('probe-position').textContent=`位置 ${x}, ${y} · ${sample.time} MCS`;
@@ -18484,7 +18490,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     if(((preset||shuffle)&&snapshot)||scene==='empty')await rpc('playing',{value:false});
     await rpc('start',{scene,seed,worldWidth,worldHeight,refinement,boundary,randomize:shuffle,settings:shuffle?lockedSettings:preserve?snapshot?.settings||{}:{},...(scene==='empty'?{warmup:0}:{})});
     archiveRound(reason||(shuffle?'manual-random':priorScene!==scene?'scene-change':preset?'preset-reset':'manual-restart'));
-    if(resetDisplay){$('antigen-marks').checked=true;$('edge-activity').checked=!tumorPreset;$('normal-activity').checked=false;$('tumor-activity').checked=false;$('immune-activity').checked=scene==='maze';if(tumorPreset){$('nuclei').checked=true;$('cycle-marks').checked=true;$('show-tracks').checked=false;syncTracks();}dirty=true;}
+    if(resetDisplay){$('cycle-marks').checked=false;$('antigen-marks').checked=true;$('edge-activity').checked=!tumorPreset;$('normal-activity').checked=false;$('tumor-activity').checked=false;$('immune-activity').checked=scene==='maze';if(tumorPreset){$('nuclei').checked=true;$('show-tracks').checked=false;syncTracks();}dirty=true;}
     if(preset||shuffle||scene==='empty'){signalLayers.clear();$('field-view').value=tumorPreset?'adversity':'none';if(tumorPreset||scene==='maze')signalLayers.add('trail');if(scene==='maze'){$('edge-activity').checked=true;$('immune-activity').checked=true;$('show-tracks').checked=true;$('track-duration').value='1200';syncTracks();view.x=0;view.y=0;$('zoom').value='100';$('view-fit').value='contain';}updateOverlayButtons();dirty=true;await rpc('speed',{value:tumorPreset||scene==='network'?3:1});await rpc('playing',{value:scene!=='empty'});}
     else if(scene==='stress'||scene==='surveillance'){$('field-view').value='adversity';dirty=true;}
     if(scene==='empty'){view.x=0;view.y=0;$('zoom').value='100';$('seed-kind').value='1';setTool('seed');if(mobileUI.isMobile)mobileUI.focus('mobile-tools');dirty=true;}
@@ -18514,7 +18520,6 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
   function fullscreenLayout(value){
     arenaFullscreen=value;document.body.classList.toggle('arena-fullscreen',value);$('arena-fullscreen').setAttribute('aria-pressed',String(value));
     fullscreenView.enable(value,mobileQuery.matches||(matchMedia('(pointer:coarse)').matches&&Math.min(innerWidth,innerHeight)<850));fullscreenView.update(snapshot);fitCanvas();dirty=true;
-    if(!value)try{screen.orientation?.unlock?.();}catch{}
   }
   async function exitArenaFullscreen(){
     fullscreenLayout(false);if(document.fullscreenElement)try{await document.exitFullscreen();}catch{}fullscreenHadNative=false;fullscreenFocus?.focus({preventScroll:true});
@@ -18523,7 +18528,6 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     if(arenaFullscreen||document.fullscreenElement)return exitArenaFullscreen();
     fullscreenFocus=document.activeElement;
     try{const request=viewport.requestFullscreen?.();fullscreenLayout(true);if(request)await request;fullscreenHadNative=!!document.fullscreenElement;}catch(error){viewport.dataset.fullscreenFallback=error.name+": "+error.message;fullscreenLayout(true);}
-    if(fullscreenView.mobile&&document.fullscreenElement)try{await screen.orientation?.lock?.('landscape');}catch{/* iOS / unsupported: the stage rotates instead. */}
     if(!arenaFullscreen)return;fitCanvas();canvas.focus({preventScroll:true});toast('Esc 或双指轻触退出全屏');
   }
   for(const id of ['arena-fullscreen','fullscreen'])$(id).addEventListener('click',toggleArenaFullscreen);

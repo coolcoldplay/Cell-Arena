@@ -16,10 +16,10 @@ try{
  await wait('!!window.artistooLab?.snapshot');await b.evaluate('artistooLab.ready');await set('language','zh');await b.evaluate('artistooLab.rpc("playing",{value:false})');
  for(const scene of ['oncogenesis','cold','hot','random']){
   // Dirty prior display preferences must not leak into a fresh preset.
-  await b.evaluate(`for(const id of ['nuclei','antigen-marks','cycle-marks'])document.getElementById(id).checked=false;for(const id of ['edge-activity','normal-activity','tumor-activity','immune-activity','show-tracks'])document.getElementById(id).checked=true`);
+  await b.evaluate(`for(const id of ['nuclei','antigen-marks'])document.getElementById(id).checked=false;for(const id of ['cycle-marks','edge-activity','normal-activity','tumor-activity','immune-activity','show-tracks'])document.getElementById(id).checked=true`);
   await click(scene==='random'?'#shuffle':`[data-scene=${scene}]`);await wait(`artistooLab.snapshot.scene==='${scene==='random'?'hot':scene}'&&artistooLab.snapshot.speed===3&&artistooLab.snapshot.playing`);await b.evaluate('artistooLab.rpc("playing",{value:false})');
   const data=await b.evaluate('artistooLab.exportData()');
-  check(scene+' uses wrap, 3×, nuclei/antigen/cycle, recruitment/adversity, and no Act/tracks',data.boundary==='wrap'&&data.speed===3&&['nuclei','antigen-marks','cycle-marks'].every(k=>data.display.flags[k])&&['edge-activity','normal-activity','tumor-activity','immune-activity','show-tracks'].every(k=>!data.display.flags[k])&&data.display.fieldView==='adversity'&&data.display.signalLayers.length===1&&data.display.signalLayers[0]==='trail');
+  check(scene+' uses wrap, 3×, nuclei/antigen, recruitment/adversity, and no cycle labels/Act/tracks',data.boundary==='wrap'&&data.speed===3&&['nuclei','antigen-marks'].every(k=>data.display.flags[k])&&['cycle-marks','edge-activity','normal-activity','tumor-activity','immune-activity','show-tracks'].every(k=>!data.display.flags[k])&&data.display.fieldView==='adversity'&&data.display.signalLayers.length===1&&data.display.signalLayers[0]==='trail');
  }
  check('Complementary tools share columns, with one signal tool and no pan button',await paired());await shot('desktop-defaults');
  await set('boundary','solid');await wait('artistooLab.snapshot.boundary==="solid"');await b.evaluate('artistooLab.rpc("playing",{value:false})');

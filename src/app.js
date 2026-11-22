@@ -17,7 +17,7 @@
   let hover=null,hoverMovedAt=0,probeDirty=false,panGesture=null,recordingScale=0,eraseSource=false;
   const trajectories=new CellLabTrajectories();
   const historyChart=CellLabHistory.mount();
-  const stage=$('arena-stage'),viewport=stage.parentElement,view={x:0,y:0},fullscreenView=new CellLabFullscreen.View(viewport,stage);
+  const stage=$('arena-stage'),viewport=stage.parentElement,view={x:0,y:0},fullscreenView=new CellLabFullscreen.View(stage,$('fullscreen-stats'));
   let performancePreferences;try{performancePreferences=JSON.parse(localStorage.getItem('cell-arena-performance-v1'));}catch{}
   const adaptive=new CellLabPerformance.Controller({preferences:performancePreferences,now:performance.now()});
   const mobileQuery=matchMedia('(max-width:850px)');
@@ -640,7 +640,7 @@
     $('seed-options').hidden=tool!=='seed';$('signal-options').hidden=tool!=='signal';$('wall-options').hidden=tool!=='wall';$('eraser-options').hidden=tool!=='remove';probeDirty=true;
     canvas.style.cursor=tool==='move'?'grab':tool==='inspect'?'pointer':'crosshair';
   }
-  function point(e){const r=canvas.getBoundingClientRect(),[x,y]=CellLabFullscreen.coordinates(r,e.clientX,e.clientY,fullscreenView.rotated);return [Math.max(0,Math.min(snapshot.width-1,Math.floor(x*snapshot.width))),Math.max(0,Math.min(snapshot.height-1,Math.floor(y*snapshot.height)))];}
+  function point(e){const r=canvas.getBoundingClientRect(),[x,y]=CellLabFullscreen.coordinates(r,e.clientX,e.clientY);return [Math.max(0,Math.min(snapshot.width-1,Math.floor(x*snapshot.width))),Math.max(0,Math.min(snapshot.height-1,Math.floor(y*snapshot.height)))];}
   function drawVessels(s,scale,pixelRatio){
     if(!s.vascular?.vessels.length)return;
     ctx.save();ctx.lineWidth=1.2*pixelRatio;ctx.font=`${Math.max(9,10*pixelRatio)}px monospace`;ctx.textAlign='center';ctx.textBaseline='middle';
@@ -652,7 +652,7 @@
     probeDirty=false;const box=$('field-probe'),brush=$('brush-preview');brush.hidden=true;if(!hover||!snapshot||panGesture){box.hidden=true;return;}
     const r=canvas.getBoundingClientRect(),v=document.querySelector('.viewport').getBoundingClientRect(),{clientX,clientY}=hover;
     if(clientX<Math.max(r.left,v.left)||clientX>=Math.min(r.right,v.right)||clientY<Math.max(r.top,v.top)||clientY>=Math.min(r.bottom,v.bottom)){box.hidden=true;return;}
-    if(tool==='remove'){const diameter=2*Number($('eraser-radius').value)*snapshot.refinement*parseFloat(canvas.style.width)/snapshot.width,[x,y]=CellLabFullscreen.coordinates(stage.getBoundingClientRect(),clientX,clientY,fullscreenView.rotated);brush.style.width=diameter+'px';brush.style.height=diameter+'px';brush.style.left=x*stage.clientWidth+'px';brush.style.top=y*stage.clientHeight+'px';brush.hidden=false;box.hidden=true;return;}
+    if(tool==='remove'){const diameter=2*Number($('eraser-radius').value)*snapshot.refinement*parseFloat(canvas.style.width)/snapshot.width,[x,y]=CellLabFullscreen.coordinates(stage.getBoundingClientRect(),clientX,clientY);brush.style.width=diameter+'px';brush.style.height=diameter+'px';brush.style.left=x*stage.clientWidth+'px';brush.style.top=y*stage.clientHeight+'px';brush.hidden=false;box.hidden=true;return;}
     if(stroke||tool!=='inspect'||performance.now()-hoverMovedAt>=10000){box.hidden=true;return;}
     const [x,y]=point(hover),sample=CellLabDisplay.sample(snapshot,x,y);if(!sample){box.hidden=true;return;}
     $('probe-position').textContent=`位置 ${x}, ${y} · ${sample.time} MCS`;
@@ -754,7 +754,7 @@
     if(((preset||shuffle)&&snapshot)||scene==='empty')await rpc('playing',{value:false});
     await rpc('start',{scene,seed,worldWidth,worldHeight,refinement,boundary,randomize:shuffle,settings:shuffle?lockedSettings:preserve?snapshot?.settings||{}:{},...(scene==='empty'?{warmup:0}:{})});
     archiveRound(reason||(shuffle?'manual-random':priorScene!==scene?'scene-change':preset?'preset-reset':'manual-restart'));
-    if(resetDisplay){$('antigen-marks').checked=true;$('edge-activity').checked=!tumorPreset;$('normal-activity').checked=false;$('tumor-activity').checked=false;$('immune-activity').checked=scene==='maze';if(tumorPreset){$('nuclei').checked=true;$('cycle-marks').checked=true;$('show-tracks').checked=false;syncTracks();}dirty=true;}
+    if(resetDisplay){$('cycle-marks').checked=false;$('antigen-marks').checked=true;$('edge-activity').checked=!tumorPreset;$('normal-activity').checked=false;$('tumor-activity').checked=false;$('immune-activity').checked=scene==='maze';if(tumorPreset){$('nuclei').checked=true;$('show-tracks').checked=false;syncTracks();}dirty=true;}
     if(preset||shuffle||scene==='empty'){signalLayers.clear();$('field-view').value=tumorPreset?'adversity':'none';if(tumorPreset||scene==='maze')signalLayers.add('trail');if(scene==='maze'){$('edge-activity').checked=true;$('immune-activity').checked=true;$('show-tracks').checked=true;$('track-duration').value='1200';syncTracks();view.x=0;view.y=0;$('zoom').value='100';$('view-fit').value='contain';}updateOverlayButtons();dirty=true;await rpc('speed',{value:tumorPreset||scene==='network'?3:1});await rpc('playing',{value:scene!=='empty'});}
     else if(scene==='stress'||scene==='surveillance'){$('field-view').value='adversity';dirty=true;}
     if(scene==='empty'){view.x=0;view.y=0;$('zoom').value='100';$('seed-kind').value='1';setTool('seed');if(mobileUI.isMobile)mobileUI.focus('mobile-tools');dirty=true;}
@@ -784,7 +784,6 @@
   function fullscreenLayout(value){
     arenaFullscreen=value;document.body.classList.toggle('arena-fullscreen',value);$('arena-fullscreen').setAttribute('aria-pressed',String(value));
     fullscreenView.enable(value,mobileQuery.matches||(matchMedia('(pointer:coarse)').matches&&Math.min(innerWidth,innerHeight)<850));fullscreenView.update(snapshot);fitCanvas();dirty=true;
-    if(!value)try{screen.orientation?.unlock?.();}catch{}
   }
   async function exitArenaFullscreen(){
     fullscreenLayout(false);if(document.fullscreenElement)try{await document.exitFullscreen();}catch{}fullscreenHadNative=false;fullscreenFocus?.focus({preventScroll:true});
@@ -793,7 +792,6 @@
     if(arenaFullscreen||document.fullscreenElement)return exitArenaFullscreen();
     fullscreenFocus=document.activeElement;
     try{const request=viewport.requestFullscreen?.();fullscreenLayout(true);if(request)await request;fullscreenHadNative=!!document.fullscreenElement;}catch(error){viewport.dataset.fullscreenFallback=error.name+": "+error.message;fullscreenLayout(true);}
-    if(fullscreenView.mobile&&document.fullscreenElement)try{await screen.orientation?.lock?.('landscape');}catch{/* iOS / unsupported: the stage rotates instead. */}
     if(!arenaFullscreen)return;fitCanvas();canvas.focus({preventScroll:true});toast('Esc 或双指轻触退出全屏');
   }
   for(const id of ['arena-fullscreen','fullscreen'])$(id).addEventListener('click',toggleArenaFullscreen);
