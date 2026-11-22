@@ -1958,12 +1958,12 @@
       const preset=PRESETS[this.scene],baseline={...DEFAULTS,...(this.scene==='random'?randomSettings(this.seedValue):preset.settings)};
       return {label:preset.label,description:preset.description,profile:{environment:preset.environmentProfile||'uniform',founderTolerance:preset.founderTolerance||1,founderTraitSpread:preset.founderTraitSpread??.15,...(this.ecology?{niches:this.ecology.niches.map(n=>({...n}))}:{})},phase,achieved,initial:{...state.initial,clones:[...state.initial.clones]},tumor:active.length,tumorBodies:tumors.length,abnormal,farTumor:far,distalRadius:55,tumorDivisions:state.tumorDivisions,distalDivisions:state.distalDivisions,peakTumor:state.peakTumor,clearanceAt:state.clearanceAt,clearanceElapsed:elapsed,maxAdversity,customized:Object.keys(DEFAULTS).some(k=>this.settings[k]!==baseline[k])};
     }
-    populationRow(){const counts=[0,0,0,0],states=Object.fromEntries(POPULATION_STATES.map(k=>[k,0]));let px=0,py=0,n=0,abnormal=0,endothelial=0;
-      for(const m of this.live()){counts[m.kind]++;if(m.vesselID)endothelial++;if(m.state==='abnormal')abnormal++;if(!m.dying){px+=m.px;py+=m.py;n++;}
+    populationRow(){let tumorG0=0,immuneExhausted=0;const counts=[0,0,0,0],states=Object.fromEntries(POPULATION_STATES.map(k=>[k,0]));let px=0,py=0,n=0,abnormal=0,endothelial=0;
+      for(const m of this.live()){counts[m.kind]++;if(m.vesselID)endothelial++;if(m.state==='abnormal')abnormal++;if(!m.dying){px+=m.px;py+=m.py;n++;if(m.kind===TUMOR&&m.cycle.phase==='G0')tumorG0++;if(m.kind===IMMUNE&&m.exhaustion>.5)immuneExhausted++;}
         const type=m.vesselID?'endothelial':m.kind===IMMUNE?'immune':m.kind===TUMOR?'tumor':m.state==='abnormal'?'abnormal':'normal';
         const state=m.dying?'Dying':type==='immune'?(m.immunePhenotype==='suppressive'?'Suppressive':m.activation>0?'Active':'Resting'):type==='normal'||type==='endothelial'?'Living':m.antigen?'Positive':'Negative';states[type+state]++;
       }
-      return {time:this.C.time,normal:counts[1]-abnormal-endothelial,abnormal,tumor:counts[2],immune:counts[3],endothelial,...states,order:n?Math.hypot(px,py)/n:0,...this.counters};
+      return {time:this.C.time,normal:counts[1]-abnormal-endothelial,abnormal,tumor:counts[2],immune:counts[3],endothelial,tumorG0,immuneExhausted,distalTumorDivisions:this.scenarioState?.distalDivisions??0,...states,order:n?Math.hypot(px,py)/n:0,...this.counters};
     }
     record(){const row=this.populationRow();if(!sameHistoryRow(this.history.at(-1),row))this.history.push(row);this.immunity.record();}
     populationHistory(reduced=false){

@@ -6,12 +6,24 @@
   <section class="simulation" aria-label="Arena 培养皿">
     <div class="viewport"><div id="arena-stage"><canvas id="world" tabindex="-1" width="960" height="720" aria-label="可拖动细胞、点击播种、添加信号或绘制障碍的交互培养皿"></canvas><button id="maze-diffusion" class="maze-diffusion" hidden aria-pressed="false" title="仅切换招募因子扩散；细胞仍不能穿墙">招募扩散：沿通道</button><div id="brush-preview" hidden aria-hidden="true"></div><section id="auto-round-notice" class="auto-round-notice" hidden aria-labelledby="auto-round-title"><div><b id="auto-round-title">即将随机换局</b><span><strong id="auto-round-seconds">10</strong> s</span></div><p id="auto-round-reason" role="status" aria-live="polite"></p><small id="auto-round-paused" hidden>已暂停倒计时</small><button id="auto-round-cancel">继续本局 · 关闭自动换局</button></section><div id="toast" role="status" aria-live="polite"></div></div>
       <section id="fullscreen-stats" class="fullscreen-rail" hidden aria-labelledby="fullscreen-state">
-        <h2 id="fullscreen-state">已暂停</h2>
-        <dl>
-          <div><dt>MCS</dt><dd data-stat="time">0</dd></div>
-          <div><dt>存活</dt><dd data-stat="total">0</dd></div>
-          <div><dt>肿瘤细胞</dt><dd data-stat="tumor">0</dd></div>
-          <div><dt>免疫细胞</dt><dd data-stat="immune">0</dd></div>
+        <header class="fullscreen-head"><h2 id="fullscreen-state">已暂停</h2><span><b data-stat="time">0</b> MCS</span></header>
+        <div class="fullscreen-total"><span>存活细胞</span><strong data-stat="total">0</strong></div>
+        <dl class="fullscreen-population">
+          <div><dt>正常</dt><dd data-stat="normal">0</dd></div>
+          <div><dt>癌前</dt><dd data-stat="abnormal">0</dd></div>
+          <div><dt>肿瘤</dt><dd data-stat="tumor">0</dd></div>
+          <div><dt>免疫</dt><dd data-stat="immune">0</dd></div>
+          <div><dt>内皮</dt><dd data-stat="endothelial">0</dd></div>
+        </dl>
+        <figure class="fullscreen-trend">
+          <figcaption><span>肿瘤趋势</span><b data-trend="delta"></b></figcaption>
+          <svg viewBox="0 0 120 30" preserveAspectRatio="none" aria-hidden="true"><polyline fill="none" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke"/><circle r="2" fill="currentColor"/></svg>
+          <small data-trend="range"></small>
+        </figure>
+        <details class="tumor-assessment"><summary><span>微环境研判</span><strong data-state-phase data-no-i18n></strong><span class="state-signals" data-state-signals data-no-i18n></span></summary><div data-state-evidence data-no-i18n></div></details>
+        <dl class="fullscreen-events">
+          <div><dt>累计分裂</dt><dd data-stat="divisions">0</dd></div>
+          <div><dt>免疫清除</dt><dd data-stat="clearances">0</dd></div>
         </dl>
       </section>
     </div>
@@ -67,6 +79,7 @@
       <details id="statistics-panel" class="panel-details" hidden><summary>数量与事件统计</summary>
         <div class="statistics-actions"><button id="statistics-expand" aria-pressed="false">占满侧栏</button><button id="statistics-play">Ⅱ 暂停</button><button id="statistics-record">● 录制 MP4</button></div><div id="statistics-record-settings"></div>
         <div class="stats-heading"><span>当前存活</span><b id="alive-count">0</b><span id="scenario-phase">正在准备情境</span></div>
+        <details class="tumor-assessment"><summary><span>微环境研判</span><strong data-state-phase data-no-i18n></strong><span class="state-signals" data-state-signals data-no-i18n></span></summary><div data-state-evidence data-no-i18n></div></details>
         <div class="population-cards">
           <div class="population-normal"><span>正常</span><b id="normal-count">0</b></div><div class="population-abnormal"><span>癌前</span><b id="abnormal-count">0</b></div>
           <div class="population-tumor"><span>肿瘤</span><b id="tumor-count">0</b></div><div class="population-immune"><span>免疫</span><b id="immune-count">0</b></div><div class="population-endothelial"><span>内皮</span><b id="endothelial-count">0</b></div>

@@ -619,6 +619,10 @@ Act：红＝新生突起 → 黄 → 绿＝活性衰减；零活性恢复胞体�
 远端分裂|Distal divisions
 残留肿瘤胞体|Remaining tumor bodies
 癌前免疫清除|Precancerous cells killed
+微环境研判|Microenvironment
+存活细胞|Live cells
+肿瘤趋势|Tumor trend
+累计分裂|Divisions
 免疫清除|Immune clearances
 清除后观察|Observation after clearance
 免疫分裂|Immune divisions

@@ -21,7 +21,19 @@ try{
    const stats=panel.getBoundingClientRect();
    return panel.checkVisibility()&&stats.width>0&&canvas.width>0&&canvas.left>=-.1&&canvas.right<=stats.left+.5&&stats.right<=innerWidth+.5&&canvas.top>=-.5&&canvas.bottom<=innerHeight+.5&&Math.abs(canvas.width/canvas.height-4/3)<.001;
  })()`);
- check('portrait shows the complete arena left of the four key statistics',await fitsLeft()&&await b.evaluate('!document.querySelector("aside").checkVisibility()&&document.querySelectorAll("#fullscreen-stats dd").length===4'));
+ check('portrait shows the complete arena left of the population, trend and event statistics',await fitsLeft()&&await b.evaluate('!document.querySelector("aside").checkVisibility()&&document.querySelectorAll("#fullscreen-stats [data-stat]").length===9&&document.querySelector("#fullscreen-stats polyline").hasAttribute("points")'));
+ const combined=await b.evaluate(`(()=>{
+   const snap=artistooLab.snapshot,panel=document.getElementById('fullscreen-stats');
+   const view=new CellLabFullscreen.View(document.getElementById('arena-stage'),panel);
+   const base=snap.history.at(-1);
+   const history=[0,30,60,90].map((time,i)=>({...base,time,tumor:10+2*i,tumorDying:0,tumorNegative:2*i,immune:6,immuneDying:0,immuneExhausted:4,recognitions:2*i,distalTumorDivisions:i}));
+   view.enable(true,true);view.update({...snap,history});
+   const names=CellLabTumorState.names,lang=Number(document.documentElement.lang.startsWith('en'));
+   const chips=[...panel.querySelectorAll('[data-state-signals] span')].filter(el=>el.checkVisibility()).map(el=>el.textContent);
+   view.update(snap);
+   return ['exhausted','escapeHint','distal'].every(id=>chips.includes(names[id][lang]));
+ })()`);
+ check('a controlled history renders exhaustion, escape clues and distal growth together',combined);
  check('entering fullscreen does not change time, cells or biological parameters',before===await b.evaluate('JSON.stringify([artistooLab.snapshot.time,Array.from(artistooLab.snapshot.grid),artistooLab.snapshot.settings])'));
  await tap(await cellPoint(2));await wait('artistooLab.selected===2');check('portrait touch selects the actual cell beneath the finger',await b.evaluate('artistooLab.selected===2'));await shot('portrait-fallback');
  await b.evaluate('artistooLab.setTool("move")');const p=await cellPoint(4),old=await b.evaluate('(()=>{const c=artistooLab.snapshot.cells.find(c=>c.id===4);return {x:c.x,y:c.y}})()');

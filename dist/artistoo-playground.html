@@ -224,14 +224,31 @@ body.arena-fullscreen .mobile-tools,body.arena-fullscreen #mobile-dock{display:n
 .immune-receptor{display:flex;gap:8px;align-items:center;justify-content:space-between}.immune-receptor code{flex:1;max-width:155px}.immune-status,.immune-note{font-size:10px!important;color:var(--muted);line-height:1.5!important;margin:6px 0!important}.immune-surface{border-top:1px solid var(--line);padding-top:6px}.immune-surface summary{font-size:11px;cursor:pointer}
 #immune-system-inspector h3{font-size:11px;margin:10px 0 5px}.immune-contact{padding:7px;margin:5px 0;border:1px solid var(--line);background:#ede5d6}.immune-contact-head>span{font:11px Consolas,monospace}.immune-pipeline{display:flex;gap:3px;flex-wrap:wrap;margin:6px 0}.immune-pipeline span{font-size:9px;padding:2px 3px;background:#e0e8d8;border:1px solid #99a68d;color:#4d674c}.immune-pipeline .limited{background:#f4e0c3;color:#895620!important;border-color:#c69c65}.immune-pipeline .pending{background:#e5e3dd;color:#766953;border-color:#b6ad9c}.immune-contact-detail{font-size:10px!important;line-height:1.5!important}
 .immune-affinities{display:flex;flex-wrap:wrap;gap:4px;font:10px Consolas,monospace}.immune-affinities span{padding:2px 4px;border:1px solid #bdb09b}.immune-affinities .match{background:#dae7d7;border-color:#829779}.immune-affinities .irrelevant{opacity:.5;text-decoration:line-through}
-body.mobile-arena-fullscreen .viewport{display:grid;grid-template-columns:minmax(0,1fr) clamp(92px,22%,180px);touch-action:none}
+body.mobile-arena-fullscreen .viewport{display:grid;grid-template-columns:minmax(0,1fr) clamp(108px,24%,192px)}
 body.mobile-arena-fullscreen #arena-stage{position:relative;min-width:0;margin-left:env(safe-area-inset-left)}
-.fullscreen-rail{display:flex;flex-direction:column;justify-content:safe center;overflow:auto;min-width:0;border-left:1px solid var(--line);background:var(--paper);padding:max(12px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) 10px}
-.fullscreen-rail h2{font-size:12px;color:var(--muted);margin:0 0 8px}
+.fullscreen-rail{display:flex;flex-direction:column;justify-content:safe center;overflow:auto;overscroll-behavior:contain;touch-action:pan-y;min-width:0;border-left:1px solid var(--line);background:var(--paper);padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) 10px;font-size:12px}
+.fullscreen-rail>*{flex:none}
+.fullscreen-head,.fullscreen-trend figcaption,.fullscreen-rail dl>div{display:flex;align-items:baseline;justify-content:space-between;gap:5px}
+.fullscreen-head{flex-wrap:wrap;color:var(--muted);line-height:1.3}
+.fullscreen-head h2{font-size:12px;margin:0}
+.fullscreen-head span,.fullscreen-rail dd,.fullscreen-total strong,.fullscreen-trend b{font-variant-numeric:tabular-nums}
+.fullscreen-head span{font-size:10px}
+.fullscreen-total{display:flex;align-items:baseline;justify-content:space-between;gap:4px;padding:6px 0 4px}
+.fullscreen-total strong{font-size:22px;line-height:1.3}
 .fullscreen-rail dl{margin:0}
-.fullscreen-rail dl>div{border-top:1px solid var(--line);padding:6px 0}
-.fullscreen-rail dt{font-size:12px;color:var(--muted)}
-.fullscreen-rail dd{margin:1px 0 0;font:600 clamp(16px,3vmin,20px)/1.2 Consolas,monospace;overflow-wrap:anywhere}
+.fullscreen-rail dl>div{padding:2px 0;line-height:1.3}
+.fullscreen-rail dd{margin:0;font-weight:600}
+.fullscreen-population{border-top:1px solid var(--line);padding-top:5px}
+.fullscreen-trend{margin:7px 0;padding:6px 0;border-block:1px solid var(--line)}
+.fullscreen-trend svg{display:block;width:100%;height:30px;color:#87483d;background:repeating-linear-gradient(to top,#c2ae8f55 0 1px,transparent 1px 14px)}
+.fullscreen-trend figcaption{margin-bottom:3px}
+.fullscreen-trend small{font-size:10px;color:var(--muted)}
+.tumor-assessment{margin:5px 0;padding:4px 0;border-block:1px solid var(--line)}
+.tumor-assessment summary{cursor:pointer;font-size:11px;color:var(--muted)}
+.tumor-assessment strong{display:block;margin:2px 0;font-size:13px;color:var(--ink)}
+.tumor-assessment [data-state-evidence]{white-space:pre-line;font-size:11px;line-height:1.45;color:var(--ink)}
+.state-signals{display:flex;flex-wrap:wrap;gap:3px}.state-signals>span{background:#e8dfcb;color:#644936;padding:2px 4px;line-height:1.3}
+.fullscreen-rail .tumor-assessment{margin:0 0 4px;border-top:0}
 body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px}
 .replay-round{margin:5px 0;font-size:12px;min-height:32px}
 
@@ -266,12 +283,24 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
   <section class="simulation" aria-label="Arena 培养皿">
     <div class="viewport"><div id="arena-stage"><canvas id="world" tabindex="-1" width="960" height="720" aria-label="可拖动细胞、点击播种、添加信号或绘制障碍的交互培养皿"></canvas><button id="maze-diffusion" class="maze-diffusion" hidden aria-pressed="false" title="仅切换招募因子扩散；细胞仍不能穿墙">招募扩散：沿通道</button><div id="brush-preview" hidden aria-hidden="true"></div><section id="auto-round-notice" class="auto-round-notice" hidden aria-labelledby="auto-round-title"><div><b id="auto-round-title">即将随机换局</b><span><strong id="auto-round-seconds">10</strong> s</span></div><p id="auto-round-reason" role="status" aria-live="polite"></p><small id="auto-round-paused" hidden>已暂停倒计时</small><button id="auto-round-cancel">继续本局 · 关闭自动换局</button></section><div id="toast" role="status" aria-live="polite"></div></div>
       <section id="fullscreen-stats" class="fullscreen-rail" hidden aria-labelledby="fullscreen-state">
-        <h2 id="fullscreen-state">已暂停</h2>
-        <dl>
-          <div><dt>MCS</dt><dd data-stat="time">0</dd></div>
-          <div><dt>存活</dt><dd data-stat="total">0</dd></div>
-          <div><dt>肿瘤细胞</dt><dd data-stat="tumor">0</dd></div>
-          <div><dt>免疫细胞</dt><dd data-stat="immune">0</dd></div>
+        <header class="fullscreen-head"><h2 id="fullscreen-state">已暂停</h2><span><b data-stat="time">0</b> MCS</span></header>
+        <div class="fullscreen-total"><span>存活细胞</span><strong data-stat="total">0</strong></div>
+        <dl class="fullscreen-population">
+          <div><dt>正常</dt><dd data-stat="normal">0</dd></div>
+          <div><dt>癌前</dt><dd data-stat="abnormal">0</dd></div>
+          <div><dt>肿瘤</dt><dd data-stat="tumor">0</dd></div>
+          <div><dt>免疫</dt><dd data-stat="immune">0</dd></div>
+          <div><dt>内皮</dt><dd data-stat="endothelial">0</dd></div>
+        </dl>
+        <figure class="fullscreen-trend">
+          <figcaption><span>肿瘤趋势</span><b data-trend="delta"></b></figcaption>
+          <svg viewBox="0 0 120 30" preserveAspectRatio="none" aria-hidden="true"><polyline fill="none" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke"/><circle r="2" fill="currentColor"/></svg>
+          <small data-trend="range"></small>
+        </figure>
+        <details class="tumor-assessment"><summary><span>微环境研判</span><strong data-state-phase data-no-i18n></strong><span class="state-signals" data-state-signals data-no-i18n></span></summary><div data-state-evidence data-no-i18n></div></details>
+        <dl class="fullscreen-events">
+          <div><dt>累计分裂</dt><dd data-stat="divisions">0</dd></div>
+          <div><dt>免疫清除</dt><dd data-stat="clearances">0</dd></div>
         </dl>
       </section>
     </div>
@@ -327,6 +356,7 @@ body.mobile-arena-fullscreen #toast{max-width:55%;font-size:12px;padding:5px 8px
       <details id="statistics-panel" class="panel-details" hidden><summary>数量与事件统计</summary>
         <div class="statistics-actions"><button id="statistics-expand" aria-pressed="false">占满侧栏</button><button id="statistics-play">Ⅱ 暂停</button><button id="statistics-record">● 录制 MP4</button></div><div id="statistics-record-settings"></div>
         <div class="stats-heading"><span>当前存活</span><b id="alive-count">0</b><span id="scenario-phase">正在准备情境</span></div>
+        <details class="tumor-assessment"><summary><span>微环境研判</span><strong data-state-phase data-no-i18n></strong><span class="state-signals" data-state-signals data-no-i18n></span></summary><div data-state-evidence data-no-i18n></div></details>
         <div class="population-cards">
           <div class="population-normal"><span>正常</span><b id="normal-count">0</b></div><div class="population-abnormal"><span>癌前</span><b id="abnormal-count">0</b></div>
           <div class="population-tumor"><span>肿瘤</span><b id="tumor-count">0</b></div><div class="population-immune"><span>免疫</span><b id="immune-count">0</b></div><div class="population-endothelial"><span>内皮</span><b id="endothelial-count">0</b></div>
@@ -14499,12 +14529,12 @@ var CPM = (function (exports, module$1) {
       const preset=PRESETS[this.scene],baseline={...DEFAULTS,...(this.scene==='random'?randomSettings(this.seedValue):preset.settings)};
       return {label:preset.label,description:preset.description,profile:{environment:preset.environmentProfile||'uniform',founderTolerance:preset.founderTolerance||1,founderTraitSpread:preset.founderTraitSpread??.15,...(this.ecology?{niches:this.ecology.niches.map(n=>({...n}))}:{})},phase,achieved,initial:{...state.initial,clones:[...state.initial.clones]},tumor:active.length,tumorBodies:tumors.length,abnormal,farTumor:far,distalRadius:55,tumorDivisions:state.tumorDivisions,distalDivisions:state.distalDivisions,peakTumor:state.peakTumor,clearanceAt:state.clearanceAt,clearanceElapsed:elapsed,maxAdversity,customized:Object.keys(DEFAULTS).some(k=>this.settings[k]!==baseline[k])};
     }
-    populationRow(){const counts=[0,0,0,0],states=Object.fromEntries(POPULATION_STATES.map(k=>[k,0]));let px=0,py=0,n=0,abnormal=0,endothelial=0;
-      for(const m of this.live()){counts[m.kind]++;if(m.vesselID)endothelial++;if(m.state==='abnormal')abnormal++;if(!m.dying){px+=m.px;py+=m.py;n++;}
+    populationRow(){let tumorG0=0,immuneExhausted=0;const counts=[0,0,0,0],states=Object.fromEntries(POPULATION_STATES.map(k=>[k,0]));let px=0,py=0,n=0,abnormal=0,endothelial=0;
+      for(const m of this.live()){counts[m.kind]++;if(m.vesselID)endothelial++;if(m.state==='abnormal')abnormal++;if(!m.dying){px+=m.px;py+=m.py;n++;if(m.kind===TUMOR&&m.cycle.phase==='G0')tumorG0++;if(m.kind===IMMUNE&&m.exhaustion>.5)immuneExhausted++;}
         const type=m.vesselID?'endothelial':m.kind===IMMUNE?'immune':m.kind===TUMOR?'tumor':m.state==='abnormal'?'abnormal':'normal';
         const state=m.dying?'Dying':type==='immune'?(m.immunePhenotype==='suppressive'?'Suppressive':m.activation>0?'Active':'Resting'):type==='normal'||type==='endothelial'?'Living':m.antigen?'Positive':'Negative';states[type+state]++;
       }
-      return {time:this.C.time,normal:counts[1]-abnormal-endothelial,abnormal,tumor:counts[2],immune:counts[3],endothelial,...states,order:n?Math.hypot(px,py)/n:0,...this.counters};
+      return {time:this.C.time,normal:counts[1]-abnormal-endothelial,abnormal,tumor:counts[2],immune:counts[3],endothelial,tumorG0,immuneExhausted,distalTumorDivisions:this.scenarioState?.distalDivisions??0,...states,order:n?Math.hypot(px,py)/n:0,...this.counters};
     }
     record(){const row=this.populationRow();if(!sameHistoryRow(this.history.at(-1),row))this.history.push(row);this.immunity.record();}
     populationHistory(reduced=false){
@@ -16127,6 +16157,10 @@ Act：红＝新生突起 → 黄 → 绿＝活性衰减；零活性恢复胞体�
 远端分裂|Distal divisions
 残留肿瘤胞体|Remaining tumor bodies
 癌前免疫清除|Precancerous cells killed
+微环境研判|Microenvironment
+存活细胞|Live cells
+肿瘤趋势|Tumor trend
+累计分裂|Divisions
 免疫清除|Immune clearances
 清除后观察|Observation after clearance
 免疫分裂|Immune divisions
@@ -17629,6 +17663,76 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
   globalThis.CellLabLineage={layout,columns,Chart};
 })();
 
+// Descriptive states for sampled simulation history. No model parameters or RNG are touched.
+(() => {
+  const names={
+    absent:['未见存活肿瘤','No live tumor'],precancer:['癌前阶段','Precancerous population'],
+    clearing:['肿瘤清除中','Tumor clearance underway'],undetected:['消退后未检出','Undetected after decline'],
+    onset:['新近发生癌变','Recent malignant transition'],detected:['首次检出肿瘤','Tumor first detected'],
+    redetected:['肿瘤再次检出','Tumor redetected'],rebound:['消退后再增长','Regrowth after decline'],
+    growing:['肿瘤扩增','Tumor expanding'],declining:['肿瘤消退','Tumor declining'],
+    fluctuating:['肿瘤数量波动','Tumor fluctuating'],stable:['肿瘤数量平稳','Stable tumor burden'],
+    dormant:['休眠样状态','Dormancy-like state'],turnover:['动态平衡样','Turnover with stable burden'],
+    observing:['积累观察中','Gathering observations'],scant:['近期采样不足','Sparse recent history'],
+    immuneAbsent:['局部未见免疫细胞','No local immune cells'],immuneActive:['有免疫清除事件','Immune clearances recorded'],
+    exhausted:['持续免疫耗竭信号','Persistent exhaustion signal'],suppressed:['抑制样免疫群体','Suppressive immune population'],
+    escapeHint:['逃逸线索：低呈递群扩张','Escape clue: low-presentation cells expanding'],
+    distal:['原灶外扩增','Distal growth in this field'],focalExhaustion:['部分免疫细胞持续耗竭','Persistent exhaustion in a subset'],
+    export:['出现肿瘤入血','Tumor bloodstream entry'],manual:['近期有手动移除','Recent manual removal']
+  };
+  const live=r=>Math.max(0,r.tumor-(r.tumorDying||0));
+  const immunity=r=>Math.max(0,r.immune-(r.immuneDying||0));
+  const divisions=r=>r.divisions-r.normalDivisions-r.endothelialDivisions-r.immuneDivisions;
+  function assess(rows){
+    const last=rows.at(-1);
+    if(!last)return {phase:'observing',signals:[],recent:[],delta:0};
+    // Same-tick edits describe one instant. Use its final observation.
+    const recent=[];
+    for(let i=rows.length-1;i>=0&&rows[i].time>=last.time-180;i--){
+      if(rows[i].time!==recent.at(-1)?.time)recent.push(rows[i]);
+    }
+    recent.reverse();
+    const first=recent[0],n=live(last),counts=recent.map(live),delta=n-counts[0];
+    const span=last.time-first.time,limit=Math.max(2,Math.ceil(.15*counts[0]));
+    const dense=recent.length>=4&&span>=90&&recent.every((r,i)=>!i||r.time-recent[i-1].time<=60);
+    let priorPeak=0,episodePeak=0,zeroAfterTumor=false,firstPositive=null,priorZero=null,redetected=false;
+    for(let i=0;i<rows.length;i++){
+      const r=rows[i];if(rows[i+1]?.time===r.time)continue;
+      const v=live(r);
+      if(!v){if(priorPeak)zeroAfterTumor=true;episodePeak=0;firstPositive=null;priorZero=r;}
+      else{if(!firstPositive){firstPositive=r;redetected=zeroAfterTumor;}if(r.time<=first.time)episodePeak=Math.max(episodePeak,v);}
+      priorPeak=Math.max(priorPeak,v);
+    }
+    const signals=[];
+    if(n&&!immunity(last))signals.push('immuneAbsent');
+    if(last.kills>first.kills)signals.push('immuneActive');
+    if(last.distalTumorDivisions>first.distalTumorDivisions)signals.push('distal');
+    if(last.intravasations>first.intravasations)signals.push('export');
+    if(last.manualRemoved>first.manualRemoved)signals.push('manual');
+    if(dense){
+      if(recent.every(r=>r.immuneExhausted>=2&&r.immuneExhausted>=immunity(r)/2))signals.push('exhausted');
+      else if(recent.every(r=>r.immuneExhausted>=1))signals.push('focalExhaustion');
+      if(recent.every(r=>r.immuneSuppressive>=2&&r.immuneSuppressive>=immunity(r)/2))signals.push('suppressed');
+      if(n>0&&counts[0]>0&&recent.every(r=>immunity(r)>0)&&last.recognitions>first.recognitions&&
+        last.tumorNegative>=first.tumorNegative+2&&last.tumorNegative/n>=first.tumorNegative/counts[0]+.15)signals.push('escapeHint');
+    }
+    const range=Math.max(...counts)-Math.min(...counts);
+    let phase;
+    if(!n)phase=last.tumorDying?'clearing':priorPeak?'undetected':last.abnormal>(last.abnormalDying||0)?'precancer':'absent';
+    else if(priorZero&&firstPositive&&last.time-firstPositive.time<=90&&firstPositive.time-priorZero.time<=60){
+      phase=redetected?'redetected':firstPositive.malignantTransitions>priorZero.malignantTransitions?'onset':'detected';
+    }else if(!dense)phase=last.time-rows[0].time<90?'observing':'scant';
+    else if(delta>=limit)phase=episodePeak>=counts[0]*2&&counts[0]>0?'rebound':'growing';
+    else if(delta<=-limit)phase='declining';
+    else if(range>=limit)phase='fluctuating';
+    else if(divisions(last)-divisions(first)>Math.max(0,delta))phase='turnover';
+    else if(recent.every(r=>live(r)>0&&r.tumorG0>=.8*live(r))&&divisions(last)===divisions(first))phase='dormant';
+    else phase='stable';
+    return {phase,signals,recent,delta};
+  }
+  globalThis.CellLabTumorState={assess,names,live};
+})();
+
 /* The stage occupies the arena column in mobile fullscreen. */
 (() => {
   function layout(width,height,ratio){
@@ -17645,6 +17749,12 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
       this.mobile=false;
       this.heading=panel.querySelector('h2');
       this.fields=panel.querySelectorAll('[data-stat]');
+      this.desktop=document.querySelector('#statistics-panel .tumor-assessment');
+      this.mobileAssessment=panel.querySelector('.tumor-assessment');
+      this.line=panel.querySelector('polyline');
+      this.dot=panel.querySelector('circle');
+      this.delta=panel.querySelector('[data-trend=delta]');
+      this.range=panel.querySelector('[data-trend=range]');
     }
     enable(active,mobile=false){
       this.mobile=active&&mobile;
@@ -17654,16 +17764,50 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
     frame(ratio){
       return this.mobile?layout(this.stage.clientWidth,this.stage.clientHeight,ratio):null;
     }
-    update(s){
-      if(!this.mobile||!s)return;
-      const state=CellLabI18n.translate(s.playing?'运行中':'已暂停',document.documentElement.lang.startsWith('en')?'en':'zh');
-      if(this.heading.textContent!==state)this.heading.textContent=state;
-      const population=CellLabRounds.population(s);
-      for(const field of this.fields){
-        const key=field.dataset.stat;
-        const value=(key==='time'?s.time:population[key]).toLocaleString();
-        if(field.textContent!==value)field.textContent=value;
+    update(s,desktopVisible=false){
+      if(!s||(!this.mobile&&!desktopVisible))return;
+      const en=document.documentElement.lang.startsWith('en');
+      const {assess,names,live}=CellLabTumorState;
+      const {phase,signals,recent,delta}=assess(s.history);
+      const first=recent[0],last=recent.at(-1);
+      if(!last)return;
+      const label=id=>names[id][en?1:0];
+      const times=first.time+'–'+last.time+' MCS';
+      const evidence=[times+' · '+(en?'Live tumor':'存活肿瘤')+' '+live(first)+' → '+live(last)];
+      if(live(last))evidence.push('G0 '+last.tumorG0+'/'+live(last)+' · '+(en?'Low presentation':'低呈递')+' '+last.tumorNegative+'/'+live(last));
+      const immune=last.immune-last.immuneDying;
+      if(immune)evidence.push((en?'Exhaustion > 0.5':'耗竭值 > 0.5')+' · '+last.immuneExhausted+'/'+immune);
+      if(phase==='onset'||phase==='redetected')evidence.push((en?'Malignant transitions in window':'窗口内癌变')+' +'+(last.malignantTransitions-first.malignantTransitions));
+      if(signals.includes('distal'))evidence.push((en?'Distal divisions':'原灶外分裂')+' +'+(last.distalTumorDivisions-first.distalTumorDivisions));
+      if(signals.includes('export'))evidence.push((en?'Bloodstream entries':'入血事件')+' +'+(last.intravasations-first.intravasations));
+      if(signals.includes('escapeHint'))evidence.push((en?'Low-presentation cells':'低呈递细胞')+' '+first.tumorNegative+' → '+last.tumorNegative+' · '+(en?'recognitions':'识别事件')+' +'+(last.recognitions-first.recognitions));
+      if(signals.includes('immuneActive'))evidence.push((en?'Immune clearances':'免疫清除')+' +'+(last.kills-first.kills));
+      const updateText=(node,value)=>{if(node.textContent!==value)node.textContent=value;};
+      for(const view of [this.mobile&&this.mobileAssessment,desktopVisible&&this.desktop]){
+        if(!view)continue;
+        updateText(view.querySelector('[data-state-phase]'),label(phase));
+        const badges=view.querySelector('[data-state-signals]'),stamp=signals.map(label).join('|');
+        if(badges.dataset.stamp!==stamp){
+          badges.dataset.stamp=stamp;
+          badges.replaceChildren(...signals.map(id=>{const badge=document.createElement('span');badge.textContent=label(id);return badge;}));
+        }
+        updateText(view.querySelector('[data-state-evidence]'),evidence.join('\n'));
       }
+      if(!this.mobile)return;
+      updateText(this.heading,CellLabI18n.translate(s.playing?'运行中':'已暂停',en?'en':'zh'));
+      const values=CellLabRounds.population(s);
+      Object.assign(values,{time:s.time,divisions:s.counters.divisions,clearances:s.deaths.kill.cleared});
+      for(const field of this.fields)updateText(field,values[field.dataset.stat].toLocaleString());
+      const counts=recent.map(live),low=Math.min(...counts),high=Math.max(...counts);
+      const points=recent.map((r,i)=>{
+        const x=first.time===last.time?118:2+116*(r.time-first.time)/(last.time-first.time);
+        const y=high===low?15:27-24*(counts[i]-low)/(high-low);
+        return [x.toFixed(1),y.toFixed(1)];
+      });
+      this.line.setAttribute('points',points.map(point=>point.join(',')).join(' '));
+      this.dot.setAttribute('cx',points.at(-1)[0]);this.dot.setAttribute('cy',points.at(-1)[1]);
+      updateText(this.delta,recent.length>1?(delta>0?'+':'')+delta:'—');
+      updateText(this.range,times);
     }
   }
   globalThis.CellLabFullscreen={layout,coordinates,View};
@@ -18151,7 +18295,7 @@ S 期缺氧、储备不足或高酸增加 DNA 损伤。依据：Foskolou 2017；
       $('grid-info').textContent=s.width+' × '+s.height+' 格点 · '+s.refinement+'× 精细度';
       for(const [key,label]of [['normal','正常'],['tumor','肿瘤'],['immune','免疫']]){const c=s.cycles?.[key];$('cycle-'+key).textContent=c?label+' · G0 '+c.G0+' · G1 '+c.G1+' · S '+c.S+' · G2 '+c.G2+' · M '+c.M+' · 周期阻滞 '+c.arrested:'';}
     }
-    fullscreenView.update(s);
+    fullscreenView.update(s,!$('statistics-panel').hidden&&(force||panelVisible('statistics-panel')));
     $('rate').textContent=s.playing?(Math.round(s.rate)||'—'):'0';
     $('performance').textContent=`目标 ${s.targetRate} MCS / 秒 · ${s.limited?'算力不足，实际推进较慢；生长与分裂继续计算':'固定模型步长'}`;
     $('performance').classList.toggle('limited',s.limited);

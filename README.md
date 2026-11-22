@@ -11,6 +11,8 @@
 
 本轮更新：**特异抗原、独立呈递、有限免疫启动、遗传克隆演化**，以及手机全屏的左侧画布与右侧关键统计。见 [机制、参数迁移、实测与文献](IMMUNE-GENETICS.md) 和 [可导入机制演示](experiments/immune-genetics/README.md)。
 
+手机全屏和桌面统计页可查看微环境研判，展开标签可查看时间窗、细胞数和事件依据。各状态在多种子测试中的误报、漏报及未覆盖情况见[研判验证报告](reports/state-validation-2026-11-23/README.md)。
+
 [在线体验](https://coolcoldplay.github.io/Cell-Arena/) · [GitHub 源码](https://github.com/coolcoldplay/Cell-Arena)
 
 在浏览器里探索细胞形变、肿瘤进化、免疫接触杀伤与微环境。
